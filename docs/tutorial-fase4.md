@@ -27,7 +27,7 @@ export ACDT_HIFI_BIN=/caminho/para/env/bin
 export ACDT_VSP_PYTHON=/caminho/para/python-com-openvsp
 ```
 
-Neste PC, a 18 nov 2026, o Windows continua sem OpenVSP: não há executável e `ACDT_VSP_PYTHON` está vazio. A exportação usou o OpenVSP 3.48.2 que já está no contentor MDO Lab. O visor do VSPAERO não vem nessa imagem. Esse contentor não substitui um instalador no Windows, e não vê o disco do Windows montado: o caso entra por cópia para a pasta partilhada e as saídas voltam à mesma cópia. O processo acdt não importa `openvsp`. O gestor de análises escreve o caso e pára; o binário do solver corre noutro processo, porque o lançamento pelo gestor não regressa.
+Neste PC, a 18 nov 2026, o OpenVSP 3.56.0 está instalado num venv de Python 3.13 e `ACDT_VSP_PYTHON` aponta para esse `python.exe` (`docs/DEV-SETUP-WINDOWS.md` §3–4). O contentor MDO Lab continua com o 3.48.2; essa imagem não vê o disco do Windows montado e não substitui o instalador. O processo acdt não importa `openvsp`. O gestor de análises escreve o caso com `StopBeforeRun` e o `vspaero.exe` corre noutro processo. O painel grosso da asa voadora, com a esteira no default lido de volta, está em `examples/output/uav150_flying_wing_tailless_hifi_win/h7_vspaero_painel.json`. Decisão `nao_aplicar`.
 
 ## 1. Correr
 
