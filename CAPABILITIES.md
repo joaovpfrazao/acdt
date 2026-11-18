@@ -1769,7 +1769,7 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * **Validado**: `tests/test_thermal.py`.
 * **Limites**: rede de dois nós por compartimento; sem permutadores líquidos, refrigeração, efeito Meredith ou
   arrasto externo da entrada (só declarado); sol ao nível do mar a qualquer altitude; adaptadores VTOL/jato nativos
-  em falta. Pormenor em [docs/TERMICA.md](docs/TERMICA.md).
+  em falta. Pormenor em [docs/TERMICA.md](docs/TERMICA.md). A proposta de alta fidelidade (18 nov 2026, ramo `termico-gelo-proposta`) não correu: não há sólido da baía, o `MARKER_HEATFLUX = 0` não é o balanço do compartimento, e o custo fica `nao_avaliado`. O L0/L1 não fica validado. Ver [docs/proposta-termica-gelo.md](docs/proposta-termica-gelo.md).
 
 ## 32t. Gelo — L0/L1 (18 nov 2026)
 
@@ -1797,7 +1797,7 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * **Validado**: `tests/test_icing.py`.
 * **Limites**: só a linha de estagnação com geometria limpa; sem gelo de retorno nem intercíclico; sem SLD
   (Ap. O); ar sangrado e botas sem potência; encontros mistos não combinados; adaptadores VTOL/jato nativos em
-  falta. Pormenor em [docs/GELO.md](docs/GELO.md).
+  falta. Pormenor em [docs/GELO.md](docs/GELO.md). A proposta de alta fidelidade não escreveu malha de acreção nem correu o LEWICE. O Apêndice O e as formas da NASA IRT continuam ausentes. O L0/L1 não fica validado. Ver [docs/proposta-termica-gelo.md](docs/proposta-termica-gelo.md).
 
 ## 32u. Fiabilidade e manutenção de frota — L0 (18 nov 2026)
 

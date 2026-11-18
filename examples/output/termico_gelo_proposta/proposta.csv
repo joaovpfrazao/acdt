@@ -1,0 +1,6 @@
+quantity,hifi,lower_level,ratio,decision,status
+thermal_bay_temperature,,"compartimento do exemplo, cruzeiro 50–52 °C; subida e solo 64–70 °C",,nao_aplicar,nao_avaliado
+thermal_wall_heat_flux,,MARKER_HEATFLUX = 0 nos .cfg de RANS já escritos,,nao_aplicar,nao_avaliado
+ice_thickness_stagnation,,"exemplo: estabilizador 14,1–57,2 mm; asa 11,3–45,4 mm",,nao_aplicar,nao_avaliado
+ice_beta0,,"β₀ de Langmuir e Blodgett, Eq. (3.13) de Anderson",,nao_aplicar,nao_avaliado
+ice_appendix_O,,,,nao_aplicar,nao_avaliado
