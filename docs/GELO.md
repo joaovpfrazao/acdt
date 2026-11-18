@@ -140,11 +140,13 @@ e ficam em `not_coupled`. Compõe-se com o acoplamento térmico (o ciclo do gelo
 
 ## 6. V&V (`acdt vv --discipline gelo`)
 
+Nos casos de Anderson usa-se d = 0,0316 c (o valor do próprio exemplo) e as entradas exatas em unidades inglesas.
+
 | Caso | Referência | Calculado | Tolerância |
 |---|---|---|---|
-| ICING-AND-B1 | Anderson Ap. B.1: K 12,56, K₀ 3,350, β₀ 0,789, A_c 2,293, h_c 2,690×10⁵ cal/(h·m²·K), b 0,7134, φ 14,02 K, θ 19,23 K, n₀ 0,518, p_st 9,700×10⁴ Pa | 12,555; 3,351; 0,789; 2,293; 2,689×10⁵; 0,7137; 14,02; 19,25; 0,518; 97 004 | 0,1 % (θ 0,2 %; β₀, n₀ ±0,0005/0,001) |
+| ICING-AND-B1 | Anderson Ap. B.1: K 12,56, K₀ 3,350, β₀ 0,789, A_c 2,293, h_c 2,690×10⁵ cal/(h·m²·K), b 0,7134, φ 14,02 K, θ 19,23 K, n₀ 0,518, p_st 9,700×10⁴ Pa | 12,555; 3,351; 0,789; 2,293; 2,689×10⁵; 0,7137; 14,02; 19,25; 0,518; 97 003 | 0,1 % (K, K₀, A_c, h_c, b); θ 0,2 %; p_st 0,05 %; β₀ ±0,0005; n₀ ±0,001; φ ±0,01 K |
 | ICING-AND-B2 | Ap. B.2: K 4,09, K₀ 1,381, β₀ 0,629, A_c 1,265, h_c 3,068×10⁵, b 0,1662, φ 5,94 K, θ 6,88 K, n₀ 0,598, p_st 9,492×10⁴ Pa | 4,090; 1,381; 0,629; 1,265; 3,068×10⁵; 0,1662; 5,94; 6,88; 0,598; 94 916 | idem |
-| ICING-APPC-JECK | Jeck Tabelas 1–2 (seis nós) e Ap. C Parte I(c) | exatos | 0,0005 g/m³ |
+| ICING-APPC-JECK | Jeck Tabelas 1–2 (cinco nós: 0,800; 0,191; 0,009; 3,915; 1,041 g/m³) e Ap. C Parte I(c) (0,35 g/m³) | iguais à 3.ª casa | 0,0005 g/m³; descolagem exata |
 | ICING-NACA0012-RLE | r_le = 1,58 % c (Anderson/Abbott & von Doenhoff) | 1,587 % | 10⁻⁴ (ver nota) |
 
 Nota: o caso do raio do bordo de ataque falhou na primeira corrida com a meia unidade (5×10⁻⁵): a fórmula dá 1,587 %

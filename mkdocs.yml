@@ -97,6 +97,7 @@ nav:
     - "Relatórios automáticos de revisão de projeto (`acdt report`)": RELATORIOS.md
     - "Ruído acústico (disciplina ruido, L0)": RUIDO.md
     - "Gestão térmica (disciplina termica, L0/L1)": TERMICA.md
+    - "Gelo (disciplina gelo, L0/L1)": GELO.md
     - "Qualidade de software — CI, tipos, cobertura e tolerâncias numéricas": QUALIDADE.md
   - Referência:
     - API Python (acdt.api): referencia/api.md

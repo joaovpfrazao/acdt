@@ -1759,6 +1759,34 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   arrasto externo da entrada (só declarado); sol ao nível do mar a qualquer altitude; adaptadores VTOL/jato nativos
   em falta. Pormenor em [docs/TERMICA.md](docs/TERMICA.md).
 
+## 32t. Gelo — L0/L1 (18 nov 2026)
+
+* **O que faz**: etapa `icing` do pipeline (depois da térmica) para qualquer aeronave do adaptador `aircraft`
+  (condições a partir dos segmentos da missão); `acdt.api.icing` aceita uma especificação genérica (VTOL, jatos,
+  sondas, cilindros). Envelopes do 14 CFR 25 Apêndice C (contínuo, intermitente, descolagem) com fator de extensão
+  horizontal e envelope altitude–temperatura; na linha de estagnação de cada superfície: temperatura total,
+  captação β₀, fração de congelação e tipo de gelo (rime/glaze), espessura acumulada na missão; potência de
+  anti-gelo térmico e de degelo eletrotérmico; penalização aerodinâmica só como intervalo publicado.
+* **Métodos**: 14 CFR 25 Ap. C transcrito de Jeck, DOT/FAA/AR-00/30 (2002), Tabelas 1–2 (Figs. 2 e 5 lidas da
+  grelha, banda ±500 ft/±2 °F); Langmuir & Blodgett (1946), Messinger (1953), propriedades e balanço via Anderson,
+  NASA/CR-2004-212875 (2004), Eq. (3.5)–(3.59) e Ap. A; r_le de Abbott & von Doenhoff; penalização de Broeren et al.,
+  NASA/TP-2011-216929 (2011). Sem LEWICE (nem outro código GPL) em processo. Apêndice O não implementado.
+* **Completude**: espessura, captação, potência e penalização em intervalo (β₀ com o desvio publicado vs LEWICE,
+  ρ_i ±10 %, exposição padrão vs condição inteira); fora das tabelas → desconhecido; botas e gelo residual →
+  desconhecido; ΔC_D0 desconhecido; FIKI nunca passa por análise (só falha ou desconhecido).
+* **Acoplamento**: potência elétrica de proteção (majorante) no balanço elétrico (`systems_power_W` + carga do power
+  budget, elétricos) e massa declarada nos pesos; `coupling: relatorio` (omissão) só relata, `coupling: iterar` faz
+  ponto fixo com o dimensionamento (envolve o ciclo térmico).
+* **Integração**: secção `icing` no `result.json`; disciplina `gelo`/L0 no `design.json`; requisitos
+  `ice_protection_power`, `max_ice_thickness`, `flight_into_known_icing` e avaliador `gelo:<caminho>`; métricas de
+  UQ e MDO pelos caminhos `icing.*`; API 1.4.0 (`icing`, `icing_envelope`).
+* **V&V**: `ICING-AND-B1`, `ICING-AND-B2` (exemplos de Anderson Ap. B), `ICING-APPC-JECK`, `ICING-NACA0012-RLE` —
+  todos passam. Sem validação contra formas de gelo medidas.
+* **Validado**: `tests/test_icing.py`.
+* **Limites**: só a linha de estagnação com geometria limpa; sem gelo de retorno nem intercíclico; sem SLD
+  (Ap. O); ar sangrado e botas sem potência; encontros mistos não combinados; adaptadores VTOL/jato nativos em
+  falta. Pormenor em [docs/GELO.md](docs/GELO.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.
@@ -1863,7 +1891,7 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 10 | BAIXA | **Modelos substitutos / ML** para MDO rápido | MDO com L1/L3 a custo L0; exploração de espaço de projeto | krigagem (SMT, BSD); redes neuronais; multifidelidade (co-krigagem) |
 | 11 | BAIXA | **Ingestão de dados de ensaio em voo** | calibrar polares, desempenho e estabilidade com dados reais (como a Fase 4 faz com CFD) | identificação de sistemas (output-error, Klein & Morelli); logs PX4/ArduPilot |
 | 12 | BAIXA (L0 feito 18 nov 2026, §32r) | **Ruído** | ruído de hélice para certificação e aceitação (UAV urbano) | feito: Gutin, Schlegel-King-Mull, ISO 9613-1, IEC 61672-1, ISO 226, Parte 36 Ap. G; falta Hanson, espessura, motor, ICAO Anexo 16 |
-| 13 | BAIXA | **Gelo** | penalização aerodinâmica e necessidade de proteção | NASA LEWICE (referência); CS-25 Anexo C (envelopes) |
+| 13 | BAIXA (L0/L1 feito 18 nov 2026, §32t) | **Gelo** | penalização aerodinâmica e necessidade de proteção | feito: 14 CFR 25 Ap. C (Jeck), Langmuir & Blodgett, Messinger (Anderson), potência de proteção, penalização em intervalo (Broeren); falta Ap. O (SLD), gelo de retorno, formas de gelo (LEWICE só como referência externa) |
 | 14 | BAIXA (L0/L1 feito 18 nov 2026, §32s) | **Gestão térmica** de aviónica e baterias | temperatura de células e eletrónica; dimensionamento de arrefecimento | feito: parâmetros concentrados (Incropera), MIL-HDBK-310, entradas NACA; falta modelo térmico de Bernardi (baterias), permutadores líquidos |
 | 15 | BAIXA | **Custo do ciclo de vida, carbono e LCA** | custo total de posse e pegada (fabrico, operação, fim de vida) | LCC (Roskam VIII, a verificar); ISO 14040/44; fatores de emissão de bases públicas |
 | 16 | BAIXA | **Cadeia de abastecimento / BOM com preços em direto** | L2 do custo alimentado por preços atuais de distribuidores | pesquisa da IA com proveniência (já é a regra) + cache datada de cotações |
