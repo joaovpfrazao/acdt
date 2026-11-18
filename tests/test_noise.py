@@ -168,3 +168,17 @@ def test_noise_not_evaluated_for_jet_and_without_propeller_map():
     from acdt.domains.aircraft.noise import analyse_noise
     r = analyse_noise(SimpleNamespace(spec=SimpleNamespace(propulsion_kind="jet", assumptions={})))
     assert r["evaluated"] is False and r["overhead_LAmax_dBA"] is None
+
+
+def test_api_rotor_noise_hover_and_flyover():
+    from acdt import api
+
+    h = api.rotor_noise(blades=2, diameter_m=0.6, rpm=6000, thrust_N=60, power_W=3000, n_rotors=4, altitude_m=100,
+                        blade_area_m2=0.02, projected_thickness_m=0.004)
+    f = api.rotor_noise(blades=2, diameter_m=0.6, rpm=6000, thrust_N=60, power_W=3000, n_rotors=4, altitude_m=100,
+                        speed_m_s=20, blade_area_m2=0.02, projected_thickness_m=0.004)
+    one = api.rotor_noise(blades=2, diameter_m=0.6, rpm=6000, thrust_N=60, power_W=3000, n_rotors=1, altitude_m=100,
+                          blade_area_m2=0.02, projected_thickness_m=0.004)
+    assert h["overhead_LA_dBA"] - one["overhead_LA_dBA"] == pytest.approx(10 * math.log10(4), abs=1e-6)
+    assert f["flyover"]["LAmax_dBA"] >= f["overhead_LA_dBA"] - 1e-9 and f["flyover"]["SEL_dBA"] is not None
+    assert h["detection_ground_range_quiet_m"] > 100.0

@@ -25,7 +25,7 @@ from acdt import __version__
 from ._deprecation import DEPRECATED, ACDTDeprecationWarning, deprecated
 
 #: Versão semântica da API pública (independente da versão do pacote, :data:`acdt.__version__`).
-API_VERSION = "1.1.0"
+API_VERSION = "1.2.0"
 
 #: Níveis de fidelidade aceites por :func:`size`/:func:`analyse` (``None`` = o que a missão declara).
 LEVELS: dict[str, str] = {"L0": "handbook", "L1": "lowfi"}
@@ -42,6 +42,8 @@ __all__ = [
     "db_load", "db_save", "db_get", "db_diff", "db_validate",
     # relatórios de revisão (SRR/PDR/CDR)
     "report",
+    # ruído de rotores/hélices (L0)
+    "rotor_noise",
     # erros
     "errors",
 ]
@@ -517,3 +519,23 @@ def report(design: PathLike, level: str, output: PathLike | None = None, *, uq: 
 
     return R.report(design, level, output, uq=uq, mdo=mdo, vv=vv, calib=calib, criteria=criteria,
                     discover=discover, pdf=pdf)
+
+
+def rotor_noise(*, blades: int, diameter_m: float, rpm: float, thrust_N: float, power_W: float, n_rotors: int = 1,
+                altitude_m: float = 100.0, speed_m_s: float = 0.0, rho: float = 1.225, c_m_s: float = 340.294,
+                blade_area_m2: float | None = None, projected_thickness_m: float | None = None,
+                harmonics: int = 10, T_C: float = 15.0, rh_pct: float = 70.0, p_kpa: float = 101.325,
+                ground_dB: float = 0.0, ambient_third_octave_dB: Mapping[float, float] | None = None,
+                detection_margin_dB: float = 0.0) -> dict[str, Any]:
+    """Ruído L0 de rotores/hélices dados explicitamente (desde 1.2.0; docs/RUIDO.md).
+
+    Gutin (tons de carga) + Schlegel-King-Mull (banda larga), absorção ISO 9613-1, ponderação A IEC 61672-1, limiar
+    ISO 226. Devolve L_A na vertical, sobrevoo (L_A,max, L_AE), espectro e alcances de deteção auditiva.
+    ``thrust_N`` e ``power_W`` são de um rotor; ``speed_m_s`` = 0 é pairar."""
+    from acdt.core.acoustics.study import rotor_noise as _rn
+
+    return _rn(blades=blades, diameter_m=diameter_m, rpm=rpm, thrust_N=thrust_N, power_W=power_W, n_rotors=n_rotors,
+               altitude_m=altitude_m, speed_m_s=speed_m_s, rho=rho, c_m_s=c_m_s, blade_area_m2=blade_area_m2,
+               projected_thickness_m=projected_thickness_m, harmonics=harmonics, T_C=T_C, rh_pct=rh_pct, p_kpa=p_kpa,
+               ground_dB=ground_dB, ambient_third_octave_dB=ambient_third_octave_dB,
+               detection_margin_dB=detection_margin_dB)

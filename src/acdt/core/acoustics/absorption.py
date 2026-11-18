@@ -30,7 +30,7 @@ P_R = 101.325  # kPa
 def molar_h2o(T_K: float, rh_pct: float, p_kpa: float = P_R) -> float:
     """h [%] — ISO 9613-1 Anexo B."""
     C = -6.8346 * (T01 / T_K) ** 1.261 + 4.6151
-    return rh_pct * (10.0 ** C) / (p_kpa / P_R)
+    return float(rh_pct * (10.0 ** C) / (p_kpa / P_R))
 
 
 def alpha_iso9613(f: float, T_C: float = 20.0, rh_pct: float = 70.0, p_kpa: float = P_R) -> float:
@@ -44,9 +44,9 @@ def alpha_iso9613(f: float, T_C: float = 20.0, rh_pct: float = 70.0, p_kpa: floa
     frO = pr * (24.0 + 4.04e4 * h * (0.02 + h) / (0.391 + h))
     frN = pr * tr ** -0.5 * (9.0 + 280.0 * h * math.exp(-4.170 * (tr ** (-1.0 / 3.0) - 1.0)))
     f2 = f * f
-    return 8.686 * f2 * (1.84e-11 / pr * tr ** 0.5
+    return float(8.686 * f2 * (1.84e-11 / pr * tr ** 0.5
                          + tr ** -2.5 * (0.01275 * math.exp(-2239.1 / T) / (frO + f2 / frO)
-                                         + 0.1068 * math.exp(-3352.0 / T) / (frN + f2 / frN)))
+                                         + 0.1068 * math.exp(-3352.0 / T) / (frN + f2 / frN))))
 
 
 def in_validity(f: float, T_C: float, rh_pct: float, p_kpa: float = P_R) -> bool:

@@ -154,7 +154,7 @@ def _eval_noise(req: TracedRequirement, ctx: VerificationContext, key: str) -> E
         return Evidence(None, message=f"noise.{key} sem valor", pointer=f"noise.{key}")
     x = float(v)
     if not nz.get("sources_complete") and req.comparison == "max" and req.threshold is not None \
-            and x <= float(req.threshold):  # type: ignore[arg-type]
+            and x <= float(req.threshold):
         return Evidence(None, message=f"noise.{key} = {x:.4g} é limite inferior (fontes incompletas: "
                         f"{nz.get('sources_note', '')}); não pode passar", pointer=f"noise.{key}", fidelity="N0")
     return Evidence(x, req.unit, pointer=f"noise.{key}", fidelity="N0",

@@ -21,7 +21,7 @@ def lp_from_prms(p_rms: float) -> float:
 
 
 def prms_from_lp(lp: float) -> float:
-    return P_REF * 10.0 ** (lp / 20.0)
+    return float(P_REF * 10.0 ** (lp / 20.0))
 
 
 def level_sum(levels: Iterable[float]) -> float:

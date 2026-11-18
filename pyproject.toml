@@ -129,6 +129,7 @@ files = [
   "src/acdt/core/acoustics/rotor.py",
   "src/acdt/core/acoustics/propagation.py",
   "src/acdt/core/acoustics/certification.py",
+  "src/acdt/core/acoustics/study.py",
 ]
 strict = true
 follow_imports = "silent"
