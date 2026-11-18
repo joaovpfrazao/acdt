@@ -771,7 +771,8 @@ def h1_factor_decision(hifi, lowfi, *, same_quantity: bool, oscillatory: bool = 
         out["reason"] = f"razão {ratio:.4g} fora de [{lo:g}, {hi:g}]; rever o modelo antes de aplicar"
         return out
     if oscillatory or not iterative_ok or not gci_defined:
-        out["reason"] = "GCI oscilatório ou erro iterativo não pequeno face à diferença fino–médio"
+        out["reason"] = why or (
+            "GCI oscilatório ou erro iterativo não pequeno face à diferença fino–médio")
         return out
     out["eligible"] = True
     out["reason"] = ("razão dentro da banda e GCI aceitável num só α; a polar não foi avaliada, "
@@ -1459,6 +1460,14 @@ def measure_wing_sections(patches: dict, sections: list[dict]) -> dict:
         else:
             le, te, dist = edge_b, edge_a, db
         stations.append({"j": j, "le": le, "te": te, "le_distance_m": dist})
+    faired = patches.get("faired_te")
+    if faired is not None:
+        faired = np.asarray(faired, float)
+        if faired.shape != (n_j, 3):
+            raise ValueError("faired_te tem de ser (n_span, 3); uma corda em falta não se substitui")
+        for s in stations:
+            s["te_surface"] = s["te"]
+            s["te"] = faired[s["j"]]
     les = np.vstack([s["le"] for s in stations])
     tes = np.vstack([s["te"] for s in stations])
     out = []
@@ -1599,6 +1608,9 @@ def verify_wing_rans_geometry(patches: dict, avl_text: str, cfg_text: str, *,
             "incidencia", "passa",
             f"raiz, secções intermédias e ponta dentro de {INCIDENCE_TOL_DEG:g}° do Ainc",
             erro_max_deg=worst, le_distance_max_m=le_worst))
+
+    from .control_surface import deflection_checks
+    checks.extend(deflection_checks(patches))
 
     # --- axes ---
     root, tip = stations[0], stations[-1]
@@ -1811,7 +1823,9 @@ def verify_wing_rans_geometry(patches: dict, avl_text: str, cfg_text: str, *,
             "PRESSUPOSTO: a área é a de planta de Surface.planform_area (corda do bordo interior de cada painel). A tampa em semicírculo não entra na área nem na envergadura.",
             "PRESSUPOSTO: com YDUPLICATE a malha é a meia asa de estibordo e Sref/Bref são os da asa completa; REF_AREA do SU2 é Sref/2. Sem YDUPLICATE compara-se a malha directamente com Sref e Bref.",
             "PRESSUPOSTO: o CMy do SU2, com x para trás, z para cima e y para estibordo, compara-se em sinal com o Cmtot do AVL. Sem os dois números o sinal fica nao_avaliado.",
-        ],
+        ] + ([
+            "PRESSUPOSTO: com um flap selado, a incidência e a área usam o bordo de fuga alinhado, guardado antes da rotação. O ângulo do flap é a rotação em torno do ponto da linha de corda na coluna da charneira e não entra no Ainc.",
+        ] if patches.get("controls") else []),
         "sections": [{k: v for k, v in s.items()} for s in stations],
         "checks": checks,
         "pode_correr": not any(c["bloqueia"] for c in checks),

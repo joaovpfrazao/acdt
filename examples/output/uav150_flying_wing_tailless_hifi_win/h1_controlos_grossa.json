@@ -1,0 +1,1013 @@
+{
+ "case": "uav150_flying_wing_tailless",
+ "date": "2026-11-17",
+ "branch": "h1-controlos",
+ "solver": "SU2 8.5.0 Harrier, RANS, Spalart-Allmaras, OpenMP, 6 threads",
+ "mesh": "wing.su2",
+ "scope": "Meia asa de estibordo, sem corpo, trem ou hélice. Espessura naca_yt 0,15/0,12, cartões 0015/0012, linha média por construir. Elevon selada, opt-in, η 0,20–0,45, charneira a 0,75c. A split não deforma o loft.",
+ "alpha_deg": 9.52057,
+ "decision": "nao_aplicar",
+ "applied_to_l1_l2": false,
+ "valid": false,
+ "eligible": false,
+ "band": [
+  0.7,
+  1.5
+ ],
+ "decision_reason": "Uma malha grossa e um α, sem GCI. A split não foi avaliada: a fenda não cabe na extrusão de uma superfície fechada, e a abertura assimétrica não cabe numa meia asa com MARKER_SYM. O C_hf da TN 690 é H/(q cf Sf) e não é o Ch da elevon. Na elevon, o Ch a -10° tem o sinal oposto ao HM do AVL por lado (razão -0,797). A -25° a razão do Ch é 0,191, fora de [0,7, 1,5]. A +10° a razão é 1,09, dentro da banda, e mesmo assim não se aplica. O incremento de CL fica em 0,74 nos três δ, dentro da banda, e não se aplica. O incremento de CMy fica em 0,68–0,69, abaixo de 0,7. O CL absoluto a -25° dá razão 1,99, fora da banda. O CD do RANS não é o CDtot invíscido. Os atuadores e o yaml não mudam.",
+ "example_yaml_changed": false,
+ "actuators_changed": false,
+ "actuators_note": "O yaml mantém 8x Volz DA 30 (5,04 kg) nas folhas da split e 2x Volz DA 30 (1,26 kg) nas elevons. Não há C_h medido da split, e o Ch da elevon não passa o filtro.",
+ "reference": {
+  "Sref_m2": 3.186,
+  "Bref_m": 4.381874564811488,
+  "Cref_m": 0.7270860799131671,
+  "x_ref_m": 0.9801559793360929,
+  "REF_AREA_m2": 1.593,
+  "Mach": 0.1369538125677505,
+  "Ch_definition": "Ch = H / (q Sref Cref), Sref da asa completa, H só do lado de estibordo."
+ },
+ "baseline_rans_delta0": {
+  "source": "h1_polar_grossa.json, α 9,52057°, grossa simétrica. Não foi re-corrida.",
+  "alpha_deg": 9.52057,
+  "CL": 0.4170208795,
+  "CD": 0.03110908415,
+  "CMy": 0.03191435401,
+  "rms_rho": -7.229655971,
+  "wall_s": 4128.152554273605,
+  "surface_csv": "ausente",
+  "Ch_ref": null,
+  "Ch_note": "A polar não gravou a pressão de superfície da charneira. Não há ΔCh do RANS. Não se voltou a correr o δ = 0 por esse ponto: a decisão já é nao_aplicar."
+ },
+ "avl_delta0_four_section": {
+  "CL": 0.41633,
+  "Cmtot": 0.03319,
+  "CDtot": 0.01188,
+  "CDff": 0.0105492,
+  "hm_raw": -0.0008119,
+  "hm_per_side": -0.00040595,
+  "elevon_deg": 0.0,
+  "note": "O mesmo ficheiro, sem deflexão. Um cartão com as mesmas quatro secções e sem o cartão CONTROL dá o mesmo CL 0,41633. Não é o cartão de duas secções."
+ },
+ "avl_washout": {
+  "two_section": {
+   "CL": 0.50293,
+   "Cmtot": 0.02886,
+   "CDff": 0.0145358,
+   "note": "Cartão da polar e do GCI v2: raiz e ponta, Ainc 0° e -10°. Reconfirmado neste α e neste Mach."
+  },
+  "degree_linear_cuts": {
+   "Ainc_deg": {
+    "eta_0.20": -2.0,
+    "eta_0.45": -4.5
+   },
+   "CL": 0.41633,
+   "Cmtot": 0.03319,
+   "CDff": 0.0105492,
+   "note": "Estações em η 0,20 e 0,45 com a torção do loft, linear em graus, sem cartão CONTROL. Trocar 0014 por 0015, ou pôr 0012 em todas as secções, deixa o CL em 0,41633. A espessura NACA não explica o salto."
+  },
+  "ruled_trailing_edge": {
+   "Ainc_deg": {
+    "eta_0.20": -0.905,
+    "eta_0.45": -2.454
+   },
+   "CL": 0.50308,
+   "Cmtot": 0.02881,
+   "construction": "Ainc = arcsin(η * c_ponta * sin(-10°) / c(η)). O bordo de fuga fica na recta entre a corda da raiz e a da ponta.",
+   "note": "Este Ainc recupera o CL e o Cm do cartão de duas secções. O resultado numérico é: o cartão de duas secções comporta-se como um bordo de fuga recto entre a corda da raiz e a da ponta. O loft roda a corda pelo ângulo, linear em graus. O RANS δ = 0 (CL 0,41702, CMy 0,03191) fica ao lado do AVL de quatro secções, não do 0,50293. A razão histórica 0,826 comparava o loft com o cartão de duas secções. O GCI v2 não foi reaberto."
+  }
+ },
+ "elevon": [
+  {
+   "tag": "dm10",
+   "delta_deg": -10.0,
+   "kind": "plain",
+   "eta": [
+    0.2,
+    0.45
+   ],
+   "x_hinge": 0.75,
+   "x_hinge_mesh": 0.7499999999999999,
+   "edge_scale": 0.5,
+   "sealed": true,
+   "pyhyp_wall_s": 14,
+   "mesh": {
+    "name": "wing.su2",
+    "cells": 190464,
+    "n_hex": 190464,
+    "min_volume_m3": 1.7109153847282405e-11,
+    "watertight": true,
+    "reject_below_m3": -1e-12,
+    "mean_march_m": 59.054108608487674,
+    "geometry_pode_correr": true
+   },
+   "published": {
+    "which": "history_8000",
+    "rule": "O ponto publicado é o final das 8000 iterações. O menor rms interior fica ao lado e não o substitui. Nenhum caso chegou a rms[Rho] = -8. Não houve continuação com CFL 100.",
+    "iters": 7999.0,
+    "n_rows": 8000,
+    "rms_rho": -7.105480923,
+    "residual_met": false,
+    "CL": 0.318909838,
+    "CD": 0.02867816195,
+    "CMy": 0.04914381391,
+    "CL_drift": 0.00029945579791105874,
+    "CD_drift": 0.001816670471797851,
+    "CMy_drift": 0.00023875721207738867,
+    "wall_s": 4148.410717964172,
+    "RefForce_N": 1466.281591,
+    "best_rms": {
+     "iters": 6487.0,
+     "rms_rho": -7.232215831,
+     "CL": 0.319133406,
+     "CD": 0.02879181116,
+     "CMy": 0.04915809835
+    }
+   },
+   "avl_four_section": {
+    "CL": 0.28528,
+    "Cmtot": 0.05807,
+    "CDtot": 0.0079,
+    "CDff": 0.0068601,
+    "hm_raw": 0.001344,
+    "hm_per_side": 0.000672,
+    "hm_note": "hm_raw é o coeficiente do cartão simétrico (SgnDup +1) no ficheiro HM. hm_per_side divide por 2, como tailless_followup faz ao HM simétrico para um lado. O RANS integra só a meia asa de estibordo, com Ch = H / (q Sref Cref) e Sref da asa completa.",
+    "card": "Quatro secções: raiz, η 0,20, η 0,45 e ponta. Ainc linear em graus. Cartão elevon com SgnDup +1. O α e o Mach são os do cruzeiro."
+   },
+   "deltas_vs_delta0": {
+    "rans": {
+     "dCL": -0.0981110415,
+     "dCD": -0.0024309222000000012,
+     "dCMy": 0.0172294599
+    },
+    "avl_four_section": {
+     "dCL": -0.13105,
+     "dCmtot": 0.02488,
+     "dCDtot": -0.003979999999999999
+    },
+    "note": "O zero do RANS é a grossa simétrica da polar, não re-corrida. O zero do AVL é o mesmo cartão de quatro secções a δ = 0, não o cartão de duas secções da polar."
+   },
+   "hinge": {
+    "H_Nm": -1.141603271460074,
+    "Ch_ref": -0.0005353853337141878,
+    "Ch_ref_note": "H / (q Sref Cref), a mesma definição do HM do AVL",
+    "flap_area_m2": 0.16887240809777146,
+    "completo": true,
+    "n_expected": 128,
+    "n_matched": 128,
+    "match_tol_m": 0.0001,
+    "pressao_da_face": "média dos nós",
+    "pressure_source": "conservative",
+    "gamma": 1.4,
+    "gamma_note": "γ = 1,4, omissão do SU2; a cfg não define GAMMA_VALUE",
+    "sign": "positivo baixa o bordo de fuga (rotação direita em torno da envergadura para fora)",
+    "forca": "p vezes a área do marcador wing. write_su2_volume escreve a parede como a face −k, oposta à normal exterior da pele."
+   },
+   "comparisons": {
+    "CL_dm10": {
+     "quantity": "CL_dm10",
+     "hifi": 0.318909838,
+     "lowfi": 0.28528,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 1.1178836160964667,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "CMy_dm10": {
+     "quantity": "CMy_dm10",
+     "hifi": 0.04914381391,
+     "lowfi": 0.05807,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.8462857570173928,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "dCL_dm10": {
+     "quantity": "dCL_dm10",
+     "hifi": -0.0981110415,
+     "lowfi": -0.13105,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.7486535024799694,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "dCMy_dm10": {
+     "quantity": "dCMy_dm10",
+     "hifi": 0.0172294599,
+     "lowfi": 0.02488,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.6925024075562701,
+     "reason": "razão 0.6925 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+     "valid": false
+    },
+    "Ch_dm10": {
+     "quantity": "Ch_dm10",
+     "hifi": -0.0005353853337141878,
+     "lowfi": 0.000672,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": -0.7967043656461128,
+     "reason": "razão -0.7967 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+     "valid": false
+    },
+    "CD_dm10": {
+     "quantity": "CD_dm10",
+     "hifi": 0.02867816195,
+     "lowfi": 0.0079,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": null,
+     "reason": "O CD do RANS-SA não é o CDtot invíscido do AVL. Não é a mesma grandeza e a razão não se forma.",
+     "valid": false
+    }
+   }
+  },
+  {
+   "tag": "dp10",
+   "delta_deg": 10.0,
+   "kind": "plain",
+   "eta": [
+    0.2,
+    0.45
+   ],
+   "x_hinge": 0.75,
+   "x_hinge_mesh": 0.7499999999999999,
+   "edge_scale": 0.5,
+   "sealed": true,
+   "pyhyp_wall_s": 8,
+   "mesh": {
+    "name": "wing.su2",
+    "cells": 190464,
+    "n_hex": 190464,
+    "min_volume_m3": 1.7109115207333418e-11,
+    "watertight": true,
+    "reject_below_m3": -1e-12,
+    "mean_march_m": 59.05580520720256,
+    "geometry_pode_correr": true
+   },
+   "published": {
+    "which": "history_8000",
+    "rule": "O ponto publicado é o final das 8000 iterações. O menor rms interior fica ao lado e não o substitui. Nenhum caso chegou a rms[Rho] = -8. Não houve continuação com CFL 100.",
+    "iters": 7999.0,
+    "n_rows": 8000,
+    "rms_rho": -7.160255625,
+    "residual_met": false,
+    "CL": 0.5132916766,
+    "CD": 0.03960933882,
+    "CMy": 0.01510592524,
+    "CL_drift": 0.001206430433670543,
+    "CD_drift": 0.0022815175080470648,
+    "CMy_drift": 0.007252119169100242,
+    "wall_s": 4349.099756240845,
+    "RefForce_N": 1466.281591,
+    "best_rms": {
+     "iters": 7970.0,
+     "rms_rho": -7.261783087,
+     "CL": 0.5133018876,
+     "CD": 0.0396107825,
+     "CMy": 0.01510777496
+    }
+   },
+   "avl_four_section": {
+    "CL": 0.54643,
+    "Cmtot": 0.00852,
+    "CDtot": 0.02152,
+    "CDff": 0.0199263,
+    "hm_raw": -0.002962,
+    "hm_per_side": -0.001481,
+    "hm_note": "hm_raw é o coeficiente do cartão simétrico (SgnDup +1) no ficheiro HM. hm_per_side divide por 2, como tailless_followup faz ao HM simétrico para um lado. O RANS integra só a meia asa de estibordo, com Ch = H / (q Sref Cref) e Sref da asa completa.",
+    "card": "Quatro secções: raiz, η 0,20, η 0,45 e ponta. Ainc linear em graus. Cartão elevon com SgnDup +1. O α e o Mach são os do cruzeiro."
+   },
+   "deltas_vs_delta0": {
+    "rans": {
+     "dCL": 0.09627079709999997,
+     "dCD": 0.008500254669999999,
+     "dCMy": -0.01680842877
+    },
+    "avl_four_section": {
+     "dCL": 0.1301,
+     "dCmtot": -0.024669999999999997,
+     "dCDtot": 0.009640000000000001
+    },
+    "note": "O zero do RANS é a grossa simétrica da polar, não re-corrida. O zero do AVL é o mesmo cartão de quatro secções a δ = 0, não o cartão de duas secções da polar."
+   },
+   "hinge": {
+    "H_Nm": -3.442267345711718,
+    "Ch_ref": -0.0016143431765575263,
+    "Ch_ref_note": "H / (q Sref Cref), a mesma definição do HM do AVL",
+    "flap_area_m2": 0.1691458347218966,
+    "completo": true,
+    "n_expected": 128,
+    "n_matched": 128,
+    "match_tol_m": 0.0001,
+    "pressao_da_face": "média dos nós",
+    "pressure_source": "conservative",
+    "gamma": 1.4,
+    "gamma_note": "γ = 1,4, omissão do SU2; a cfg não define GAMMA_VALUE",
+    "sign": "positivo baixa o bordo de fuga (rotação direita em torno da envergadura para fora)",
+    "forca": "p vezes a área do marcador wing. write_su2_volume escreve a parede como a face −k, oposta à normal exterior da pele."
+   },
+   "comparisons": {
+    "CL_dp10": {
+     "quantity": "CL_dp10",
+     "hifi": 0.5132916766,
+     "lowfi": 0.54643,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.9393548608238933,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "CMy_dp10": {
+     "quantity": "CMy_dp10",
+     "hifi": 0.01510592524,
+     "lowfi": 0.00852,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 1.7729959201877934,
+     "reason": "razão 1.773 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+     "valid": false
+    },
+    "dCL_dp10": {
+     "quantity": "dCL_dp10",
+     "hifi": 0.09627079709999997,
+     "lowfi": 0.1301,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.7399753812451958,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "dCMy_dp10": {
+     "quantity": "dCMy_dp10",
+     "hifi": -0.01680842877,
+     "lowfi": -0.024669999999999997,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.6813307162545603,
+     "reason": "razão 0.6813 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+     "valid": false
+    },
+    "Ch_dp10": {
+     "quantity": "Ch_dp10",
+     "hifi": -0.0016143431765575263,
+     "lowfi": -0.001481,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 1.09003590584573,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "CD_dp10": {
+     "quantity": "CD_dp10",
+     "hifi": 0.03960933882,
+     "lowfi": 0.02152,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": null,
+     "reason": "O CD do RANS-SA não é o CDtot invíscido do AVL. Não é a mesma grandeza e a razão não se forma.",
+     "valid": false
+    }
+   }
+  },
+  {
+   "tag": "dm25",
+   "delta_deg": -25.0,
+   "kind": "plain",
+   "eta": [
+    0.2,
+    0.45
+   ],
+   "x_hinge": 0.75,
+   "x_hinge_mesh": 0.7499999999999999,
+   "edge_scale": 0.5,
+   "sealed": true,
+   "pyhyp_wall_s": 8,
+   "mesh": {
+    "name": "wing.su2",
+    "cells": 190464,
+    "n_hex": 190464,
+    "min_volume_m3": 1.7107898201194473e-11,
+    "watertight": true,
+    "reject_below_m3": -1e-12,
+    "mean_march_m": 59.05493795486417,
+    "geometry_pode_correr": true
+   },
+   "published": {
+    "which": "history_8000",
+    "rule": "O ponto publicado é o final das 8000 iterações. O menor rms interior fica ao lado e não o substitui. Nenhum caso chegou a rms[Rho] = -8. Não houve continuação com CFL 100.",
+    "iters": 7999.0,
+    "n_rows": 8000,
+    "rms_rho": -7.100617463,
+    "residual_met": false,
+    "CL": 0.1727297255,
+    "CD": 0.03320921216,
+    "CMy": 0.07508778818,
+    "CL_drift": 0.0016748477956678885,
+    "CD_drift": 0.0018088074390501204,
+    "CMy_drift": 0.0018757758540225158,
+    "wall_s": 4270.604289531708,
+    "RefForce_N": 1466.281591,
+    "best_rms": {
+     "iters": 7577.0,
+     "rms_rho": -7.145842903,
+     "CL": 0.1725454573,
+     "CD": 0.03323436604,
+     "CMy": 0.07516203149
+    }
+   },
+   "avl_four_section": {
+    "CL": 0.08695,
+    "Cmtot": 0.09577,
+    "CDtot": 0.01259,
+    "CDff": 0.0119917,
+    "hm_raw": 0.004587,
+    "hm_per_side": 0.0022935,
+    "hm_note": "hm_raw é o coeficiente do cartão simétrico (SgnDup +1) no ficheiro HM. hm_per_side divide por 2, como tailless_followup faz ao HM simétrico para um lado. O RANS integra só a meia asa de estibordo, com Ch = H / (q Sref Cref) e Sref da asa completa.",
+    "card": "Quatro secções: raiz, η 0,20, η 0,45 e ponta. Ainc linear em graus. Cartão elevon com SgnDup +1. O α e o Mach são os do cruzeiro."
+   },
+   "deltas_vs_delta0": {
+    "rans": {
+     "dCL": -0.244291154,
+     "dCD": 0.0021001280100000005,
+     "dCMy": 0.043173434170000004
+    },
+    "avl_four_section": {
+     "dCL": -0.32938,
+     "dCmtot": 0.06258,
+     "dCDtot": 0.0007100000000000006
+    },
+    "note": "O zero do RANS é a grossa simétrica da polar, não re-corrida. O zero do AVL é o mesmo cartão de quatro secções a δ = 0, não o cartão de duas secções da polar."
+   },
+   "hinge": {
+    "H_Nm": 0.9344386526088577,
+    "Ch_ref": 0.0004382299546343987,
+    "Ch_ref_note": "H / (q Sref Cref), a mesma definição do HM do AVL",
+    "flap_area_m2": 0.1713547349721514,
+    "completo": true,
+    "n_expected": 128,
+    "n_matched": 128,
+    "match_tol_m": 0.0001,
+    "pressao_da_face": "média dos nós",
+    "pressure_source": "conservative",
+    "gamma": 1.4,
+    "gamma_note": "γ = 1,4, omissão do SU2; a cfg não define GAMMA_VALUE",
+    "sign": "positivo baixa o bordo de fuga (rotação direita em torno da envergadura para fora)",
+    "forca": "p vezes a área do marcador wing. write_su2_volume escreve a parede como a face −k, oposta à normal exterior da pele."
+   },
+   "comparisons": {
+    "CL_dm25": {
+     "quantity": "CL_dm25",
+     "hifi": 0.1727297255,
+     "lowfi": 0.08695,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 1.9865408338125359,
+     "reason": "razão 1.987 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+     "valid": false
+    },
+    "CMy_dm25": {
+     "quantity": "CMy_dm25",
+     "hifi": 0.07508778818,
+     "lowfi": 0.09577,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.784042896314086,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "dCL_dm25": {
+     "quantity": "dCL_dm25",
+     "hifi": -0.244291154,
+     "lowfi": -0.32938,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.741669664217621,
+     "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+     "valid": false
+    },
+    "dCMy_dm25": {
+     "quantity": "dCMy_dm25",
+     "hifi": 0.043173434170000004,
+     "lowfi": 0.06258,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.689891885107063,
+     "reason": "razão 0.6899 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+     "valid": false
+    },
+    "Ch_dm25": {
+     "quantity": "Ch_dm25",
+     "hifi": 0.0004382299546343987,
+     "lowfi": 0.0022935,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": 0.19107475676232777,
+     "reason": "razão 0.1911 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+     "valid": false
+    },
+    "CD_dm25": {
+     "quantity": "CD_dm25",
+     "hifi": 0.03320921216,
+     "lowfi": 0.01259,
+     "band": [
+      0.7,
+      1.5
+     ],
+     "decision": "nao_aplicar",
+     "eligible": false,
+     "ratio": null,
+     "reason": "O CD do RANS-SA não é o CDtot invíscido do AVL. Não é a mesma grandeza e a razão não se forma.",
+     "valid": false
+    }
+   }
+  }
+ ],
+ "comparisons_delta0": {
+  "CL_delta0_four_section": {
+   "quantity": "CL_delta0_four_section",
+   "hifi": 0.4170208795,
+   "lowfi": 0.41633,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": 1.0016594516369226,
+   "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "valid": false
+  },
+  "CMy_delta0_four_section": {
+   "quantity": "CMy_delta0_four_section",
+   "hifi": 0.03191435401,
+   "lowfi": 0.03319,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": 0.9615653513106358,
+   "reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "valid": false
+  }
+ },
+ "factors": [
+  {
+   "name": "CL_delta0_four_section",
+   "value": 1.0016594516369226,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "CMy_delta0_four_section",
+   "value": 0.9615653513106358,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "CL_dm10",
+   "value": 1.1178836160964667,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "CMy_dm10",
+   "value": 0.8462857570173928,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "dCL_dm10",
+   "value": 0.7486535024799694,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "dCMy_dm10",
+   "value": 0.6925024075562701,
+   "valid": false,
+   "invalid_reason": "razão 0.6925 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "Ch_dm10",
+   "value": -0.7967043656461128,
+   "valid": false,
+   "invalid_reason": "razão -0.7967 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": false
+  },
+  {
+   "name": "CD_dm10",
+   "value": null,
+   "valid": false,
+   "invalid_reason": "O CD do RANS-SA não é o CDtot invíscido do AVL. Não é a mesma grandeza e a razão não se forma.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": null
+  },
+  {
+   "name": "CL_dp10",
+   "value": 0.9393548608238933,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "CMy_dp10",
+   "value": 1.7729959201877934,
+   "valid": false,
+   "invalid_reason": "razão 1.773 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "dCL_dp10",
+   "value": 0.7399753812451958,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "dCMy_dp10",
+   "value": 0.6813307162545603,
+   "valid": false,
+   "invalid_reason": "razão 0.6813 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "Ch_dp10",
+   "value": 1.09003590584573,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "CD_dp10",
+   "value": null,
+   "valid": false,
+   "invalid_reason": "O CD do RANS-SA não é o CDtot invíscido do AVL. Não é a mesma grandeza e a razão não se forma.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": null
+  },
+  {
+   "name": "CL_dm25",
+   "value": 1.9865408338125359,
+   "valid": false,
+   "invalid_reason": "razão 1.987 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "CMy_dm25",
+   "value": 0.784042896314086,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "dCL_dm25",
+   "value": 0.741669664217621,
+   "valid": false,
+   "invalid_reason": "Uma malha grossa e um α, sem GCI. A razão não entra no L1/L2.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "dCMy_dm25",
+   "value": 0.689891885107063,
+   "valid": false,
+   "invalid_reason": "razão 0.6899 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "Ch_dm25",
+   "value": 0.19107475676232777,
+   "valid": false,
+   "invalid_reason": "razão 0.1911 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": true
+  },
+  {
+   "name": "CD_dm25",
+   "value": null,
+   "valid": false,
+   "invalid_reason": "O CD do RANS-SA não é o CDtot invíscido do AVL. Não é a mesma grandeza e a razão não se forma.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+   "sinais_iguais": null
+  }
+ ],
+ "split": {
+  "status": "nao_avaliado",
+  "rans": "bloqueado",
+  "symmetric_rans": "bloqueado",
+  "asymmetric_rans": "bloqueado",
+  "motivo": "A folha superior da split abre uma fenda. A extrusão pyHyp desta asa é uma superfície fechada. Rodar só essa pele deixa de ser estanque, e um sólido sem fenda é outro dispositivo: o ΔCD não é o da split. A abertura assimétrica também não cabe numa meia asa com MARKER_SYM. ΔCD, Cn e C_h ficam nao_avaliado. Não avaliado não é aprovação.",
+  "cf_c": 0.4,
+  "eta": [
+   0.45,
+   0.98
+  ],
+  "Sf_over_S": 0.08641304170879684,
+  "y_bar_over_b": 0.34499049912894886,
+  "C1": 0.014311268731375199,
+  "rows": [
+   {
+    "kind": "simetrica_bias",
+    "delta_u_deg": 2.0,
+    "delta_l_deg": 2.0,
+    "dCD_L1": 0.00010105069976071548,
+    "dCn_L1": 3.486153134777878e-05,
+    "dCl_L1": 0.0,
+    "dCm_L1_at_equal_leaves": -6.919361946292349e-06,
+    "Chf_abs_TN690": 0.157,
+    "hifi": "nao_avaliado"
+   },
+   {
+    "kind": "simetrica",
+    "delta_u_deg": 15.0,
+    "delta_l_deg": 15.0,
+    "dCD_L1": 0.005557678992492268,
+    "dCn_L1": 0.001917346449618381,
+    "dCl_L1": 0.0,
+    "dCm_L1_at_equal_leaves": -0.00038055740951246155,
+    "Chf_abs_TN690": 0.3,
+    "hifi": "nao_avaliado"
+   },
+   {
+    "kind": "simetrica",
+    "delta_u_deg": 30.0,
+    "delta_l_deg": 30.0,
+    "dCD_L1": 0.020741540372139353,
+    "dCn_L1": 0.007155634365687598,
+    "dCl_L1": 0.0,
+    "dCm_L1_at_equal_leaves": -0.001420259587497302,
+    "Chf_abs_TN690": 0.43,
+    "hifi": "nao_avaliado"
+   },
+   {
+    "kind": "simetrica",
+    "delta_u_deg": 45.0,
+    "delta_l_deg": 45.0,
+    "dCD_L1": 0.04148308074427872,
+    "dCn_L1": 0.014311268731375202,
+    "dCl_L1": 0.0,
+    "dCm_L1_at_equal_leaves": -0.0028405191749946053,
+    "Chf_abs_TN690": 0.555,
+    "hifi": "nao_avaliado"
+   },
+   {
+    "kind": "simetrica",
+    "delta_u_deg": 60.0,
+    "delta_l_deg": 60.0,
+    "dCD_L1": 0.062224621116418063,
+    "dCn_L1": 0.021466903097062798,
+    "dCl_L1": 0.0,
+    "dCm_L1_at_equal_leaves": -0.004260778762491906,
+    "Chf_abs_TN690": 0.64,
+    "hifi": "nao_avaliado"
+   },
+   {
+    "kind": "assimetrica_so_superior",
+    "delta_u_deg": 60.0,
+    "delta_l_deg": 0.0,
+    "dCD_L1": 0.031112310558209032,
+    "dCn_L1": 0.010733451548531399,
+    "dCl_L1": 0.0,
+    "dCm_L1_at_equal_leaves": null,
+    "Chf_abs_TN690": 0.64,
+    "hifi": "nao_avaliado"
+   }
+  ],
+  "Chf_definition": "NACA TN 690 (Wenzinger & Rogallo 1939) Figs. 17–18, dados de NACA TN 498: C_hf = H/(q c_f S_f) de split flaps 0,15c e 0,25c (Clark Y), envolvente |C_hf| em α −10…20° lida dos gráficos (±0,01)",
+  "Chf_pressuposto": "PRESSUPOSTO já no L1: o cf/c 0,40 está fora dos 0,15–0,25 ensaiados na TN 690. C_hf = H/(q cf Sf) não é o Ch = H/(q Sref Cref) da elevon. Não há RANS da fenda, portanto não há razão e não se calibra.",
+  "decision": "nao_aplicar"
+ },
+ "recursos": {
+  "ram_est_GB": 1.14,
+  "guard": "70 % da RAM livre no arranque de cada caso",
+  "fits": true,
+  "disk_floor_GB": 50,
+  "tempo_est_h": 1.23,
+  "base": "grossa simétrica, 4434 s, 190464 hex",
+  "note": "As três extrusões e os três SU2 couberam na guarda. O disco livre ficou acima de 208 GB. Não se reduziu a malha nem o |δ|."
+ },
+ "pressupostos": [
+  "PRESSUPOSTO: com três ou mais estações da elevon, as dos extremos levam metade do ângulo (edge_scale 0,5). A estação do meio fica no ângulo pedido. O cartão AVL aplica o ângulo pedido em todo o flap. Não é a mesma geometria de bordo.",
+  "PRESSUPOSTO: a pressão da face do marcador é a média dos nós. γ = 1,4, omissão do SU2; a cfg não define GAMMA_VALUE.",
+  "PRESSUPOSTO já no L1: o cf/c 0,40 da split está fora dos 0,15–0,25 ensaiados na NACA TN 690. O C_hf dessa nota não calibra o Ch da elevon.",
+  "A split aberta não foi extrudida. ΔCD, Cn e C_h da folha superior ficam nao_avaliado. Não avaliado não é aprovação.",
+  "Nenhum RANS chegou a rms -8. O valor publicado é o final das 8000 iterações.",
+  "O sinal do integrador da charneira não foi invertido quando discordou do HM do AVL."
+ ]
+}
