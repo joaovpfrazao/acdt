@@ -49,7 +49,22 @@ acdt simulate examples/simulation/n0_patrol.yaml --fidelity pointmass   # P3, ma
 acdt flap-options examples/uav_loiter_dash_camber.yaml          # Fase 9, flaps de camber como opção
 acdt certify examples/cessna172_check.yaml -o out/c172          # Fase 10, base, matriz de conformidade, FHA/FTA/FMEA, SORA
 acdt safety uas --scheme stanag4671 --mtow 153 --trade          # Fase 10, avaliação rápida sem dimensionamento
+acdt --version                                                  # acdt 0.2.0 (API 1.0.0)
+acdt size examples/uav_gasoline_150kg.yaml -o out/uav --json    # resumo JSON em stdout (envelope acdt.cli/1)
 ```
+
+A partir de Python, pela API pública versionada (política em [docs/API.md](docs/API.md)):
+
+```python
+from acdt import api
+
+r = api.size("examples/uav_gasoline_150kg.yaml", "out/uav", level="L0", no_systems=True)
+print(r["feasible"], r["W0_kg"], r["verification"]["por_estado"])
+m = api.verify("examples/uav_gasoline_150kg.yaml", "out/uav")   # matriz de verificação
+```
+
+Notebooks em `examples/notebooks/` (dimensionamento rápido, incerteza + verificação, MDO com frente de Pareto).
+Documentação gerada: `pip install -e ".[docs]"` e `mkdocs serve` (referência da API e da CLI em `docs/referencia/`).
 
 Exemplos em `examples/`:
 

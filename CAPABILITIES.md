@@ -1632,6 +1632,36 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   alinhamento de tópicos ULog e segmentos estabilizados; dados de ensaio reais. Pormenor em
   [docs/CALIBRACAO.md](docs/CALIBRACAO.md).
 
+## 32p. API pública versionada, documentação gerada, CLI coerente e notebooks (18 nov 2026)
+
+* **O que faz**: dá ao acdt uma porta de entrada estável para scripts, notebooks e outras ferramentas, com
+  versionamento semântico verificado por teste, documentação gerada do código e uma CLI com convenções comuns.
+* **API Python `acdt.api`** (API 1.0.0; pacote 0.2.0):
+  * `load_mission`, `size`, `analyse`, `verify`, `uq`, `uq_study`, `mdo`, `mdo_study`, `function_model`,
+    `vv_cases`, `vv`, `calibrate`, `load_test_data`, `db_load`/`db_save`/`db_get`/`db_diff`/`db_validate`,
+    `version_info`, `errors`;
+  * resultados em `dict`/`list` serializáveis; desconhecido = `None`; `level` L0/L1/`None` igual a `acdt size`;
+  * `function_model` torna qualquer função Python num modelo de sistema com requisitos rastreáveis, para UQ e MDO
+    genéricos.
+* **Versões e descontinuação**: `api_surface.json` fixa as assinaturas; o teste falha se uma assinatura mudar ou
+  um nome sair sem subir a MAIOR, ou se um nome entrar sem subir a MENOR. `deprecated(since, removed_in=,
+  alternative=)` emite `ACDTDeprecationWarning` e só deixa remover numa MAIOR.
+* **CLI**: `acdt --version`; `--help`, `--json` (envelope `acdt.cli/1` em stdout, texto humano em stderr) e
+  `--debug` em todos os comandos; códigos de saída documentados (0 sucesso, 1 falha avaliada, 2 entrada,
+  3 indeterminado, 4 erro interno, 130 interrompido).
+* **Documentação**: MkDocs + mkdocs-material + mkdocstrings (BSD-2/MIT/ISC); referência da API a partir das
+  docstrings e da CLI a partir do próprio parser; guia do utilizador com as páginas pt-PT; job `docs` no CI
+  (`mkdocs build --strict`) e workflow do GitHub Pages pronto mas inativo até ativar o Pages.
+* **Notebooks** (`examples/notebooks/`): dimensionamento rápido L0, incerteza + verificação (Ishigami, Sobol'
+  contra o analítico), MDO NSGA-II na ZDT1 com a frente verdadeira; guardados sem saídas e executados no CI
+  (nbmake).
+* **Fidelidade**: não muda nenhum resultado de engenharia; é uma camada sobre as funções existentes.
+* **Validado**: `tests/test_api.py` (estabilidade, regras de versão, descontinuação, contratos de `size`/
+  `verify`/`db`/UQ/MDO), `tests/test_cli_contract.py` (todos os comandos com `--help`, `--json`, códigos de
+  saída) e `tests/test_notebooks.py`; os três notebooks correm em ~20 s.
+* **Por fazer**: alargar a API a sistemas, fabrico/custo, certificação e simulação; `result` estruturado no
+  `--json` dos restantes comandos; documentação por versão da API. Pormenor em [docs/API.md](docs/API.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.
