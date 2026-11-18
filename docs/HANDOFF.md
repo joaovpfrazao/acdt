@@ -262,15 +262,16 @@ Meia asa do exemplo `uav150_flying_wing_tailless`, controlos alinhados, um α de
 
 ### Cadeia por fechar (18 nov 2026)
 
-Nada disto entra em `main` por esta sessão. O #68 já está merged em `main`. O #77 já está merged na base `h1-curvatura`. O #69 está fechado e não foi merged. A fila que continua aberta, cada um na base da etapa anterior:
+Nada disto entra em `main` por esta sessão. O histórico público começa em `dcca304`. Nesse commit já estão o GCI v2 (CL fino/AVL 0,833), a linha média (CL 0,73034 contra AVL 0,81407) e a polar (CLmax 1,059, CD0 viscoso 0,0198, razão 2,17). As três decisões são `nao_aplicar`. `uav_gasoline` e `uav_small_electric` são aliases de Raymer Tab. 3.1 (`uav_tactical_recce_ucav` e `uav_small`). A fila aberta neste repositório, por ordem de merge, cada PR na base da etapa anterior:
 
-1. #81 `h1-controlos` sobre `h1-polar`. Elevon na grossa. CL 0,31891 / 0,51329 / 0,17273 em δ −10° / +10° / −25°. `nao_aplicar`.
-2. #82 `h2-calculix` sobre `h1-controlos`. k_EI 0,571, válido e por aplicar. k_GJ −0,891. NLGEOM com código 201. `nao_aplicar`.
-3. #83 `h3-mphys` sobre `h2-calculix`. FFD com desvio 9,8×10⁻¹³ m. Cruzeiro ADflow+TACS por avaliar. `nao_aplicar`.
-4. #84 `h5-c172-gci` sobre `h3-mphys`. CL 0,47990, CD 0,010421, GCI fino de CD 3,0 % com erro iterativo. RANS de asa e fuselagem não coube (21,7 GB). `nao_aplicar`.
-5. #85 `h6-rcs-bounces2` sobre `h5-c172-gci`. Duas reflexões, VV −7,49 dBsm. Onda completa por correr. `nao_aplicar`.
-6. #86 `h7-openvsp` sobre `h6-rcs-bounces2`. VSPAERO fino, CL 0,49394 contra AVL 0,50293. `nao_aplicar`.
-7. #87 `h8-pycycle` sobre `h7-openvsp`. TSFC 0,79852 contra 0,400 da correlação L0. `nao_aplicar`.
+1. #1 `h1-controlos` sobre `main`. Elevon na grossa. CL 0,31891 / 0,51329 / 0,17273 em δ −10° / +10° / −25°. `nao_aplicar`.
+2. #2 `h2-calculix` sobre `h1-controlos`. k_EI 0,571, válido e por aplicar. k_GJ −0,891. NLGEOM com código 201. `nao_aplicar`.
+3. #3 `h3-mphys` sobre `h2-calculix`. FFD com desvio 9,8×10⁻¹³ m. Cruzeiro ADflow+TACS por avaliar. `nao_aplicar`.
+4. #4 `h5-c172-gci` sobre `h3-mphys`. CL 0,47990, CD 0,010421, GCI fino de CD 3,0 % com erro iterativo. RANS de asa e fuselagem não coube (21,7 GB). `nao_aplicar`.
+5. #5 `h6-rcs-bounces2` sobre `h5-c172-gci`. Duas reflexões, VV −7,49 dBsm. Onda completa por correr. `nao_aplicar`.
+6. #6 `h7-openvsp` sobre `h6-rcs-bounces2`. VSPAERO fino, CL 0,49394 contra AVL 0,50293. `nao_aplicar`.
+7. #7 `h8-pycycle` sobre `h7-openvsp`. TSFC 0,79852 contra 0,400 da correlação L0. `nao_aplicar`.
+8. `h8-cadeia-publica` sobre `h8-pycycle`. Actualiza esta lista para os PRs públicos. Não muda números nem decisões.
 
 O que fica para o João: o instalador OpenVSP no Windows; o visor do VSPAERO no contentor; uma instalação de pyCycle que resolva o turbojato sem o ajuste local de `ThermoAdd`; a onda completa do RCS, só como proposta; o RANS de asa e fuselagem do C172, que não coube; o painel grosso do VSPAERO, que morre na esteira; um deck L1 de motor, que não existe. Nenhum factor foi aplicado e o yaml dos exemplos não mudou. Os ficheiros pesados que já estavam fora do git continuam fora.
 
