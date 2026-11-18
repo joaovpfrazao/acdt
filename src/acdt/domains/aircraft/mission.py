@@ -124,6 +124,20 @@ DEFAULT_ASSUMPTIONS: dict = {
               "flyover_altitude_m": None, "flyover_speed_m_s": None, "sideline_m": 0.0, "ground_dB": 0.0,
               "ambient_third_octave_dB": None, "detection_margin_dB": 0.0, "other_sources": None,
               "engine_noise": None, "certification": None},
+    # Disciplina térmica L0/L1 (thermal.py; docs/TERMICA.md). bays: compartimentos [{id, skin_area_m2, flow_length_m,
+    # height_m, eps_ext, alpha_solar, eps_int, sources, components: [{id, source|heat_W, conductance_W_K|case_area_m2,
+    # T_max_C, T_min_C, limit_source}], ram_air, fan, capacity_J_K}]; sem bays → fuselagem π·D·L. coupling:
+    # relatorio (uma passagem, efeito relatado) | iterar (ponto fixo com o dimensionamento).
+    "thermal": {"enabled": True, "coupling": "relatorio", "max_iter": 6, "tol": 0.01,
+                "hot_atmosphere": "mil310_hot_1pct", "cold_atmosphere": "mil310_cold_1pct", "solar_W_m2": None,
+                "ground": True, "ground_time_s": None, "conditions": None, "bays": None, "sources": {},
+                "radiated_fraction": 0.0,
+                "electric": {"eta_esc": None, "eta_motor": None, "eta_battery": None, "cell_R_internal_ohm": None,
+                             "source": None},
+                "engine": {"fuel": None, "lhv_MJ_kg": None, "cooling_fraction": None, "heat_rejection_W": None,
+                           "air_temperature_rise_K": None, "ram_recovery": None, "duct_loss_q": None,
+                           "mass_flow_ratio": None, "source": None},
+                "components": [], "transient": None},
 }
 
 

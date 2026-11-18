@@ -16,12 +16,26 @@ from .mission import MissionSpec
 
 def _size(st: DesignState):
     spec = st["spec"]
-    if spec.systems and not st["options"].get("no_systems"):
-        from .systems_integration import run_with_systems
-        st["result"], st["systems"] = run_with_systems(spec)
-    else:
+    use_sys = bool(spec.systems and not st["options"].get("no_systems"))
+
+    def run_fn(sp):  # noqa: ANN001, ANN202
+        if use_sys:
+            from .systems_integration import run_with_systems
+            return run_with_systems(sp)
         from .sizing import run
-        st["result"] = run(spec)
+        return run(sp), None
+
+    th = (spec.assumptions.get("thermal") or {}) if isinstance(spec.assumptions, dict) else {}
+    if th.get("coupling") == "iterar" and th.get("enabled", True):
+        # acoplamento térmico (thermal.py; docs/TERMICA.md): ponto fixo dimensionamento ↔ arrefecimento
+        from .thermal import size_with_thermal
+        res, sysr, loop = size_with_thermal(spec, run_fn)
+        res.thermal_coupling = loop
+    else:
+        res, sysr = run_fn(spec)
+    st["result"] = res
+    if use_sys:
+        st["systems"] = sysr
     st.issues += st["result"].issues
 
 
@@ -45,6 +59,13 @@ def _noise(st: DesignState):
     sobrevoo, deteção auditiva (ISO 226) e, opcional, 14 CFR 36 Ap. G."""
     from .noise import noise_stage
     noise_stage(st["result"])
+
+
+def _thermal(st: DesignState):
+    """Disciplina térmica L0/L1 (thermal.py; docs/TERMICA.md): fontes de calor dos modelos existentes, compartimentos
+    em regime permanente e transitório (Incropera), dia quente/frio MIL-HDBK-310, ar dinâmico e acoplamento."""
+    from .thermal import thermal_stage
+    thermal_stage(st["result"])
 
 
 def _report(st: DesignState):
@@ -89,6 +110,8 @@ DOMAIN = register_domain(Domain(
                   "ceilings (Raymer Ch. 17, Anderson)"),
             Stage("noise", _noise, description="ruído de hélice L0 (Gutin, Schlegel-King-Mull), ISO 9613-1, "
                   "ponderação A IEC 61672-1, deteção auditiva ISO 226, 14 CFR 36 Ap. G opcional"),
+            Stage("thermal", _thermal, description="gestão térmica L0/L1: compartimentos (Incropera), dia quente/"
+                  "frio MIL-HDBK-310, ar dinâmico NACA, arrasto/massa/potência de arrefecimento"),
             Stage("report", _report, description="markdown + plots + JSON"),
             Stage("verification", _verification, description="matriz de verificação dos requisitos rastreáveis "
                   "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)"),

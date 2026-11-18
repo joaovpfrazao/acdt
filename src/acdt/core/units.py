@@ -25,6 +25,8 @@ _UNITS: dict[str, dict[str, float]] = {
     "dimensionless": {"-": 1.0, "": 1.0, "g": 1.0, "%": 0.01},
     "currency": {"USD": 1.0, "kUSD": 1e3, "MUSD": 1e6},  # cost model output is USD; no FX conversion
     "sound": {"dB": 1.0, "dBA": 1.0},
+    # diferença de temperatura (margens): 1 K = 1 °C; 1 °F de diferença = 5/9 K (NIST SP 811 B.8)
+    "temperature_difference": {"K": 1.0, "°C": 1.0, "degC": 1.0, "C": 1.0, "°F": 5.0 / 9.0, "degF": 5.0 / 9.0},
     "voltage": {"V": 1.0},
     "current": {"A": 1.0},
     "specific_energy": {"J/kg": 1.0, "Wh/kg": 3600.0},

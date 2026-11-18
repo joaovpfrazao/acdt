@@ -61,6 +61,12 @@ Corrida de 17 nov 2026 no box Linux (`acdt vv --cost medio`): **22 passa, 0 falh
 | NOISE-AWEIGHT | ruido | verificação | barato | IEC 61672-1:2013 Tabela 3 (ponderação A, 31,5 Hz – 16 kHz) | 0,05 dB |
 | NOISE-ISO9613-ALPHA | ruido | verificação | barato | α da ISO 9613-1 (4 atmosferas × 7 oitavas), tabela reproduzida pela ETH Zürich | meia unidade do último algarismo + 0,01 dB/km |
 | NOISE-P36G-LIMITS | ruido | verificação | barato | 14 CFR 36 Ap. G, G36.301(b)/(c) | exato |
+| THERMAL-INC-EX5.1 | termica | verificação | barato | Incropera 6.ª ed. Ex. 5.1 (termopar, capacidade concentrada): D = 0,706 mm, t = 5,2 s | 0,0005 mm; 0,05 s |
+| THERMAL-INC-EX7.1 | termica | verificação | barato | Incropera Ex. 7.1 (placa plana laminar, Eq. 7.30): q′ = 570 W/m | 0,5 % |
+| THERMAL-INC-EX9.2 | termica | verificação | barato | Incropera Ex. 9.2 (Churchill & Chu, Eq. 9.26): q = 1060 W | 0,5 % |
+| THERMAL-INC-EX8.6 | termica | verificação | barato | Incropera Ex. 8.6 (conduto, Dittus–Boelter): q″ = 304 W/m², T_s,L = 50,7 °C | 0,5 %; 0,15 °C |
+| THERMAL-MIL310 | termica | verificação | barato | MIL-HDBK-310 (1997) §5.3.1.1.2, §5.3.1.2.2, Tabela I | exato |
+| THERMAL-AIR-PROPS | termica | verificação | barato | Incropera Tabela A.4 (ar a 300 K): μ, k, Pr | 0,5 %; 1 %; 1 % |
 | SIZ-C172S | dimensionamento | **validação** | médio | Cessna 172S Information Manual (1998): MTOW 1157 kg, vazio 754 kg, 134 kW, 16,2 m², 71,4 kg/m² | ±15 % massas, ±25 % resto (método conceptual) |
 
 Achado ao montar a biblioteca: o primeiro valor de referência escrito para o SP-8007 (0,5806) estava errado; a

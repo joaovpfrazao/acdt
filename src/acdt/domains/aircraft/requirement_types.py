@@ -51,6 +51,14 @@ _BUILTIN = [
     RequirementType("aural_detection_range", "length", "Ground distance within which the aircraft is audible "
                     "(ISO 226 threshold; ambient noise optional)", ("check",), ("max",),
                     reference="ISO 226:2003 T_f + noise.py propagation (docs/RUIDO.md)"),
+    RequirementType("thermal_margin", "temperature_difference", "Minimum hot-side component temperature margin "
+                    "(T_max − T) over the thermal conditions (hot day MIL-HDBK-310)", ("check",), ("min",),
+                    reference="thermal.py: Incropera et al. 6th ed. correlations, MIL-HDBK-310 (docs/TERMICA.md)"),
+    RequirementType("cold_thermal_margin", "temperature_difference", "Minimum cold-side component temperature margin "
+                    "(T − T_min) over the thermal conditions (cold day MIL-HDBK-310)", ("check",), ("min",),
+                    reference="thermal.py: Incropera et al. 6th ed. correlations, MIL-HDBK-310 (docs/TERMICA.md)"),
+    RequirementType("cooling_drag_area", "area", "Cooling drag area D/q at hot-day cruise (ram air + engine cooling)",
+                    ("check",), ("max",), reference="thermal.py: momentum + Bernoulli, NACA RM A8I29 (docs/TERMICA.md)"),
     RequirementType("regulatory_category", "category", "Regulatory / certification basis", ("check", "systems"),
                     ("target",), choices=("easa_open", "easa_specific", "easa_certified", "stanag_4703",
                                           "stanag_4671", "cs_23", "cs_vla", "cs_lsa", "far_23")),
