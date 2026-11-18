@@ -314,6 +314,8 @@ def flatten(db: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
             for n, q in (blk.get("quantities") or {}).items():
                 e = {"discipline": d, "level": lvl, "provenance_fingerprint": fp}
                 e.update({k: blk.get(k) for k in _INHERIT})
+                if blk.get("fidelity"):
+                    e["fidelity"] = blk["fidelity"]
                 sec = (blk.get("sections") or {}).get(n.split(".", 1)[0])
                 if sec:
                     e["method"] = sec

@@ -1,0 +1,10 @@
+# Metadados do conjunto de dados (acdt.testdata/1). DADOS SINTÉTICOS: teste da framework, não é um ensaio real.
+synthetic: true
+source: "gerar_sintetico.py: CD0 = 0,0250, e = 0,78, AR = 8, ruído normal σ_CD = 0,0004 e σ_CL = 0,005, semente 20261118"
+kind: tunel
+date: null
+instrument: "balança de 6 componentes (fictícia)"
+conditions: {Re: 3.0e5, V_m_s: "25 m/s"}
+channels:
+  CD: {uncertainty: {sd: 0.0004, source: "σ do ruído sintético"}}
+  CL: {uncertainty: {sd: 0.005, source: "σ do ruído sintético"}}

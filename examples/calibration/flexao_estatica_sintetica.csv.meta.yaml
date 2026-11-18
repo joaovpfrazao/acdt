@@ -1,0 +1,8 @@
+# DADOS SINTÉTICOS: teste da framework, não é um ensaio real.
+synthetic: true
+source: "gerar_sintetico.py: k_EI = 0,92, flecha da viga 1e-5 m/N, ruído normal σ = 0,5 mm, semente 20261119"
+kind: estatico
+conditions: {}
+channels:
+  w: {uncertainty: {sd: 0.5, source: "σ do ruído sintético (mm)"}}
+  w_beam: {}

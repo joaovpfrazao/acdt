@@ -207,6 +207,7 @@ class FitResult:
     identifiable: bool
     notes: list[str] = field(default_factory=list)
     discrepancy: dict[str, Any] | None = None
+    mask: Array | None = None  # linhas do conjunto usadas no ajuste
 
     def sd(self) -> Array | None:
         if self.cov is None:
@@ -229,7 +230,7 @@ class FitResult:
         return np.asarray(self.cov / np.outer(s, s), dtype=float)
 
 
-def _data(spec: ModelSpec, ds: Dataset) -> tuple[dict[str, Array], Array, Array | None, dict[str, Array | None], int]:
+def _data(spec: ModelSpec, ds: Dataset) -> tuple[dict[str, Array], Array, Array | None, dict[str, Array | None], Array]:
     ins = spec.inputs()
     out = ds.channel(spec.output)
 
@@ -251,9 +252,8 @@ def _data(spec: ModelSpec, ds: Dataset) -> tuple[dict[str, Array], Array, Array 
     ok = np.isfinite(y)
     for v in x.values():
         ok &= np.isfinite(v)
-    nd = int(ok.size - ok.sum())
     return ({k: v[ok] for k, v in x.items()}, y[ok], None if sy is None else sy[ok],
-            {k: (None if v is None else v[ok]) for k, v in sx.items()}, nd)
+            {k: (None if v is None else v[ok]) for k, v in sx.items()}, ok)
 
 
 def _jac(f: Callable[[Array], Array], th: Array, lo: Array, hi: Array) -> Array:
@@ -269,7 +269,8 @@ def _jac(f: Callable[[Array], Array], th: Array, lo: Array, hi: Array) -> Array:
 
 
 def fit(spec: ModelSpec, ds: Dataset) -> FitResult:
-    x, y, sy, sx, nd = _data(spec, ds)
+    x, y, sy, sx, mask = _data(spec, ds)
+    nd = int(mask.size - mask.sum())
     n, p = y.size, len(spec.parameters)
     if n == 0:
         raise CalibrationError("sem pontos válidos (todos em falta)")
@@ -286,8 +287,11 @@ def fit(spec: ModelSpec, ds: Dataset) -> FitResult:
         return np.broadcast_to(e, y.shape).astype(float)
 
     if spec.method == "koh":
-        return _fit_koh(spec, x, y, sy, sx, nd, eta, th0, lo, hi)
-    return _fit_wls(spec, x, y, sy, sx, nd, eta, th0, lo, hi)
+        r = _fit_koh(spec, x, y, sy, sx, nd, eta, th0, lo, hi)
+    else:
+        r = _fit_wls(spec, x, y, sy, sx, nd, eta, th0, lo, hi)
+    r.mask = mask
+    return r
 
 
 def _sigma_eff(eta: Callable[..., Array], th: Array, x: Mapping[str, Array], sy: Array | None,

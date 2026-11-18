@@ -155,6 +155,19 @@ def build_record(study: Mapping[str, Any], spec: F.ModelSpec, ds: Dataset, res: 
             "decision": dec[q.name], "reasons": why[q.name]}
     validity = {k: [float(np.min(v)), float(np.max(v))] for k, v in res.x.items()}
     vunits = {k: spec.units.get(k) or ds.channel(k).unit for k in res.x}
+    for k in [str(c) for c in (study.get("validity") or {}).get("channels") or []]:
+        ch = ds.channel(k)
+        u = spec.units.get(k) or ch.unit
+        vals = ch.values if u is None else ch.to(u)
+        vals = vals[res.mask] if res.mask is not None else vals
+        vals = vals[np.isfinite(vals)]
+        if vals.size:
+            validity[k] = [float(vals.min()), float(vals.max())]
+            vunits[k] = u
+    if (study.get("validity") or {}).get("only_channels"):
+        keep = set(str(c) for c in study["validity"]["channels"])
+        validity = {k: v for k, v in validity.items() if k in keep}
+        vunits = {k: v for k, v in vunits.items() if k in keep}
     rows = []
     for j in range(res.n):
         r: dict[str, Any] = {k: float(v[j]) for k, v in res.x.items()}
@@ -270,16 +283,20 @@ def spearman_from_pearson(rho: float) -> float:
 
 def uq_inputs(rec: Mapping[str, Any], source_path: str | None = None, only_applied: bool = True
               ) -> dict[str, Any]:
-    """Fragmento ``uncertainty`` para ``acdt uq``: N(valor, sd) por parâmetro com ``target`` ou ``factor``
-    (caminho ``assumptions.calibration.factors.<fator>``) e correlações de postos pela covariância."""
+    """Fragmento ``uncertainty`` para ``acdt uq``: N(valor, sd) por parâmetro com ``target`` e correlações de
+    postos pela covariância. Os ``factor`` entram pelo ficheiro de fatores (``uncertainty.calibration.file``),
+    que o domínio lê com as mesmas regras da corrida determinística."""
     names = list(rec["parameters"])
     inputs, idx = [], []
     src = f"acdt.calib/1 {source_path or rec['name']} ({rec['method']['name']}, n = {rec['fit']['n']})"
     excluded = []
     for i, n in enumerate(names):
         p = rec["parameters"][n]
-        path = p.get("target") or (f"assumptions.calibration.factors.{p['factor']}" if p.get("factor") else None)
+        path = p.get("target")
         if not path:
+            if p.get("factor"):
+                excluded.append({"parameter": n, "reason": f"fator {p['factor']}: entra por uncertainty.calibration."
+                                                           f"file (calibration_factors.json), N(valor, σ)"})
             continue
         if p["sd"] is None:
             excluded.append({"parameter": n, "reason": "incerteza desconhecida: não propagada"})
