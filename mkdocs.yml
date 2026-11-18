@@ -1,0 +1,106 @@
+# Documentação do acdt (MkDocs + mkdocstrings: BSD-2/ISC/MIT). Construir: `mkdocs build --strict` (docs/API.md §5).
+site_name: acdt — documentação
+site_description: Framework de projeto de engenharia (aeronave primeiro), métodos clássicos citados
+site_url: https://joaovpfrazao.github.io/acdt/
+repo_url: https://github.com/joaovpfrazao/acdt
+repo_name: joaovpfrazao/acdt
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: site
+copyright: Copyright (c) 2026 João Frazão — Apache-2.0
+theme:
+  name: material
+  language: pt
+  features: [navigation.sections, navigation.top, search.highlight, content.code.copy]
+hooks:
+  - docs/hooks/cli_ref.py
+exclude_docs: |
+  hooks/
+validation:
+  # As páginas pt-PT existentes ligam a ficheiros do repositório fora de docs/ (código, exemplos, CAPABILITIES):
+  # no site ficam como ligações para o GitHub; não são erro. Âncoras e ligações internas em falta continuam aviso.
+  links:
+    not_found: info
+    absolute_links: info
+    unrecognized_links: info
+    anchors: info
+  omitted_files: info
+  nav:
+    omitted_files: info
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+plugins:
+  - search:
+      lang: pt
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_heading: true
+            show_signature_annotations: true
+            separate_signature: true
+            members_order: source
+            filters: ["!^_"]
+nav:
+  - Início: index.md
+  - Guia do utilizador:
+    - "API pública, versões e CLI": API.md
+    - "acdt — Arquitetura": ARCHITECTURE.md
+    - "Workflow de design por níveis de fidelidade crescente": DESIGN_WORKFLOW.md
+    - "Workflow de design — do problema ao design final validado": workflow-design.md
+    - "Estruturas L1 — viga da aeronave e torção no ciclo de `size`": structures-l1.md
+    - "CAD paramétrico da estrutura": cad-parametrico.md
+    - "Guia para agentes de IA — acdt": ai-agent-guide.md
+    - "Estudo conceptual conduzido pela IA (concept trade)": ai-concept-trade.md
+    - Tutoriais:
+      - "Tutorial — asa voadora sem superfícies verticais (split ailerons + SAS)": tutorial-asa-voadora-sem-deriva.md
+      - "Tutorial — estudo conceptual a partir de um problema (pesca ilegal)": tutorial-concept-trade.md
+      - "Armazenamento de energia comum L0 — 7 nov 2026": tutorial-energy-storage.md
+      - "Tutorial — Fase 1: do requisito ao design point": tutorial-fase1.md
+      - "Tutorial — Fase 10: base de certificação, matriz de conformidade e segurança (ARP4761)": tutorial-fase10-certificacao-seguranca.md
+      - "Tutorial — Fase 2: baixa fidelidade (AVL, XFOIL, V-n, caixão, estabilidade, desempenho)": tutorial-fase2.md
+      - "Tutorial — Fase 3: MDA/MDO (OpenMDAO), aeroestrutura, aeroelasticidade, encurvadura, qualidades de voo": tutorial-fase3.md
+      - "Tutorial — Fase 4: alta fidelidade (L3), calibração, dimensionamento detalhado": tutorial-fase4.md
+      - "Tutorial — Fase 5: estrutura interna da asa, FEM de cascas e otimização perfil ↔ longarinas ↔ desempenho": tutorial-fase5.md
+      - "Tutorial — Fase 6: RCS, materiais, secções, encurvadura no ciclo e calibração viga ↔ cascas": tutorial-fase6.md
+      - "Tutorial — Fase 7: fabrico e custo": tutorial-fase7-fabrico-custo.md
+      - "Tutorial — Fase 8: superfícies de comando e simulador de missão 6-DOF": tutorial-fase8-simulador.md
+      - "Tutorial — Fase 9: hélice de passo fixo, inércias Roskam e camber flaps como opção de projeto": tutorial-fase9-camber-flaps.md
+      - "Jatos L0 — descolagem, subida e OEI (7 nov 2026)": tutorial-jet-performance.md
+      - "Jatos de transporte subsónicos — primeira fatia L0": tutorial-jet.md
+      - "Missão–propulsão–frota: primeiro feedback N0→N1 (L0)": tutorial-mission-fleet.md
+      - "Carga útil e elétrica transversais — L0 opt-in": tutorial-onboard.md
+      - "Tutorial P2 — matriz morfológica N1 e poda por conjuntos": tutorial-p2-morfologico.md
+      - "Tutorial — P3: simulador de missão em massa pontual (N0/N1)": tutorial-p3-massa-pontual.md
+      - "Tutorial P4 — Arquitetura elétrica e trade de carga útil": tutorial-p4-sistemas.md
+      - "Tutorial P5 — Registo de decisões": tutorial-p5-decisoes.md
+      - "Tutorial P6 (leve) — Forma OML N2 com aero/RCS/packaging": tutorial-p6-forma-n2.md
+      - "Tutorial P7 — Sensibilidade e fidelidade por necessidade": tutorial-p7-sensibilidade.md
+      - "Tutorial VTOL / eVTOL — L0 (pairar, transição, arquiteturas)": tutorial-vtol.md
+      - "Tutorial — peso e centragem operacional e trem de aterragem": tutorial-wb-trem.md
+  - Engenharia do framework:
+    - "Estado de projeto único com unidades (`acdt.design/1`)": DADOS.md
+    - "Requisitos rastreáveis e matriz de verificação": REQUISITOS.md
+    - "Incerteza e sensibilidade (`acdt uq`)": INCERTEZA.md
+    - "MDO global de sistema (`acdt mdo`)": MDO.md
+    - "Verificação e validação como produto (`acdt vv`)": VV.md
+    - "Dados de ensaio e calibração de modelos (`acdt calib`)": CALIBRACAO.md
+    - "Qualidade de software — CI, tipos, cobertura e tolerâncias numéricas": QUALIDADE.md
+  - Referência:
+    - API Python (acdt.api): referencia/api.md
+    - CLI (acdt): referencia/cli.md
+  - Projeto:
+    - "Passagem de testemunho — estado do acdt (5 nov 2026)": HANDOFF.md
+    - "Melhorias futuras (registadas, ainda não aprovadas)": FUTURE_IMPROVEMENTS.md
+    - "TODO — Modelo estrutural L1 com deformação → aero no ciclo de `size`": TODO-structures-l1.md
+    - "Ambiente de desenvolvimento no Windows (Cursor / Grok Build)": DEV-SETUP-WINDOWS.md
+
