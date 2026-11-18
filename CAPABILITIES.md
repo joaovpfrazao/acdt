@@ -1817,6 +1817,30 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   fria/quente, fases, Weibull, causa comum nem METRIC; não altera o W0. Pormenor em
   [docs/FIABILIDADE.md](docs/FIABILIDADE.md).
 
+## 32v. Custo de produção em série — L0 (18 nov 2026)
+
+* **O que faz**: etapa `series_cost` do pipeline (depois da fiabilidade; só corre se pedida) e
+  `acdt.api.series_cost` / `learning_curve`. Varre as CER existentes (Eastlake modificado, DAPCA IV) em quantidade.
+  Para cada N separa RDT&E / ferramentas / recorrente e dá o custo unitário de saída de fábrica, o custo médio, as
+  amortizações de RDT&E e de ferramentas e o custo recorrente por lote. Tem também uma rota de baixo para cima (T1 +
+  curva de aprendizagem Crawford/Wright, lotes, NRE) e o ponto de equilíbrio contra o preço (nominal e tabela).
+* **Métodos**: Gudmundsson (2014) Cap. 2 (Eastlake, já em `cost.py`); Raymer (2018) Cap. 18 (DAPCA IV, já em
+  `costing.dapca4`); Wright (1936), Crawford (1944), FAA Pricing Handbook (1998) Cap. 18 Eq. 18-4/18-7/18-9/18-10
+  (lotes, aproximação contínua); ponto médio do lote por definição.
+* **PRESSUPOSTOS**: a decomposição RDT&E/ferramentas/recorrente (classificação fixo/variável de Gudmundsson, com as
+  ferramentas na produção); o declive sem fonte declarada. Não há curva por cima da CER (a aprendizagem já está
+  nos expoentes de N) nem modelo de cadência além do Q_m do Eastlake.
+* **Completude**: sem preço → equilíbrio desconhecido; equilíbrio não atingido → `None` («não atingido até n_max»);
+  NRE não declarado na rota de aprendizagem → limites inferiores. Os requisitos desconhecidos nunca passam.
+* **Integração**: secção `series_cost` (chaves `*_USD`); disciplina `custo_serie`/L0 no `design.json`; requisitos
+  `unit_cost_at_quantity` e `flyaway_cost` (qualificador `quantity`) e `break_even_quantity`; avaliador
+  `custo_serie:`; métricas UQ/MDO pelos caminhos `series_cost.*`; API 1.6.0.
+* **V&V**: `CS-FAA18-SLOPE`, `CS-FAA18-CUMAV-LOT`, `CS-FAA18-UNIT-APPROX` — todos passam.
+* **Validado**: `tests/test_series_cost.py`.
+* **Limites**: a validade do Eastlake é a aviação geral (num UAS é extrapolação, com nota). T1 ainda não vem
+  automaticamente do plano de fabrico e não há curvas com degraus. Pormenor em
+  [docs/CUSTO_SERIE.md](docs/CUSTO_SERIE.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.

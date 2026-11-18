@@ -1772,6 +1772,19 @@ disciplina `gelo` no `design.json`, requisitos `ice_protection_power`, `max_ice_
   O resultado do exemplo de teste do PR #17 (W0 25,20 → 34,31 kg com ciclo 1) passa a ser mais baixo com a
   omissão; `power_schedule: missao` reproduz o majorante.
 
+### Custo de produção em série L0 (18 nov 2026, ramo `disc-custo-serie`, PR #20)
+
+Estudo `manufacturing/series.py` e etapa `series_cost` (`domains/aircraft/series_cost.py`, depois da fiabilidade, só
+se pedida). Reutiliza `cost.py` (Eastlake), `costing.dapca4` e as curvas de `costing`, acrescentando
+`learning_lot`, `wright_unit`, `lot_midpoint` e `learning_b`. `sizing.eastlake_inputs` foi extraído de
+`unit_cost_estimate` sem mudar o resultado. Ficam também a disciplina `custo_serie` no `design.json` e os requisitos
+`unit_cost_at_quantity`/`flyaway_cost` (qualificador novo `quantity` em `core/requirements.py`) e
+`break_even_quantity`. A API sobe a 1.6.0 (`series_cost`, `learning_curve`) e há três casos V&V do FAA Pricing
+Handbook Cap. 18, todos a passar. O avaliador genérico `eval_section_interval` serve as próximas disciplinas. Doc:
+[CUSTO_SERIE.md](CUSTO_SERIE.md); CAPABILITIES §32v.
+
+* **Falta**: T1 automático a partir do plano de fabrico, curvas com degraus, modelo de cadência com fonte.
+
 ### Fiabilidade e manutenção de frota L0 (18 nov 2026, ramo `disc-fiabilidade`, PR #19)
 
 Núcleo `acdt/core/reliability/` (taxas com proveniência, RBD série/paralelo/k-de-n/caminhos, manutibilidade e
