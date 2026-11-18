@@ -1775,6 +1775,41 @@ def _cmd_vv(a) -> int:
     return 0
 
 
+def _cmd_report(a) -> int:
+    """Relatório de revisão de projeto SRR/PDR/CDR (docs/RELATORIOS.md): critérios NPR 7123.1D Ap. G avaliados sobre
+    o estado de projeto e os registos (verificação, proveniência, UQ, MDO, V&V, calibração) → JSON + MD + HTML."""
+    from acdt.core import review as R
+
+    dp = Path(a.design)
+    base = dp if dp.is_dir() else dp.parent
+    out = Path(a.output) if a.output else base / f"revisao_{a.level.lower()}"
+    if out.resolve() == base.resolve():
+        print("[acdt] a pasta de saída não pode ser a do design.json (o relatório tem proveniência própria e "
+              "sobreporia a da corrida); use -o outra/pasta", file=sys.stderr)
+        return 2
+    try:
+        r = R.report(a.design, a.level, out, uq=a.uq or (), mdo=a.mdo or (), vv=a.vv or (), calib=a.calib or (),
+                     criteria=a.criteria, discover=not a.no_discover, pdf=a.pdf)
+    except (R.ReviewInputError, ValueError) as e:
+        print(f"[acdt] {e}", file=sys.stderr)
+        return 2
+    except RuntimeError as e:  # PDF pedido sem WeasyPrint
+        print(f"[acdt] {e}", file=sys.stderr)
+        return 2
+    v = r["verdict"]
+    print(f"acdt report {r['gate']}: veredito {v['status']} (critérios automáticos: {v['n_automaticos']}; "
+          + ", ".join(f"{k} {n}" for k, n in v["counts"].items() if n) + f"); {len(r['open_items'])} itens em aberto"
+          + (f"; decidem: {', '.join(v['motivos'])}" if v["motivos"] else ""))
+    for k in r["criteria"]:
+        if k["status"] in ("nao_cumpre", "insuficiente"):
+            print(f"  [{k['status']}] {k['id']}: {k['detail']}")
+    print("  ficheiros: " + ", ".join(Path(f).name for f in r.get("files", [])) + f" em {out}")
+    _emit(gate=r["gate"], verdict=v, criteria=[{"id": k["id"], "status": k["status"], "detail": k["detail"]}
+                                               for k in r["criteria"]],
+          open_items=len(r["open_items"]), standard=r["standard"]["id"], output=str(out))
+    return R.EXIT_CODE[v["status"]]
+
+
 def _run_with_provenance(a, argv) -> int:
     """Cada subcomando corre num âmbito de proveniência: entradas = argumentos que são ficheiros existentes,
     sementes = opções ``*seed*``, saída = ``-o/--output`` (pasta → provenance.json; ficheiro → x.provenance.json),
@@ -2203,6 +2238,21 @@ def build_parser() -> argparse.ArgumentParser:
     vvp.add_argument("--list", action="store_true", help="listar os casos registados")
     vvp.add_argument("--strict", action="store_true", help="código 1 também com nao_avaliado/desconhecido")
     vvp.set_defaults(fn=_cmd_vv)
+    rp = sub.add_parser("report", help="relatório de revisão de projeto SRR/PDR/CDR (NPR 7123.1D Ap. G): requisitos, "
+                                       "fidelidade, itens em aberto, UQ, MDO, V&V, calibração, rastreabilidade e "
+                                       "veredito pronto/nao_pronto/insuficiente; docs/RELATORIOS.md")
+    rp.add_argument("design", help="design.json ou a pasta que o contém (acdt.design/1)")
+    rp.add_argument("--level", required=True, type=str.upper, choices=["SRR", "PDR", "CDR"], help="revisão")
+    rp.add_argument("-o", "--output", help="pasta de saída (omissão <pasta do design>/revisao_<nível>)")
+    rp.add_argument("--uq", action="append", help="uq.json ou pasta (repetível; além dos encontrados na pasta)")
+    rp.add_argument("--mdo", action="append", help="mdo.json ou pasta (repetível)")
+    rp.add_argument("--vv", action="append", help="vv_report.json ou pasta (repetível)")
+    rp.add_argument("--calib", action="append", help="calibration_record.json ou pasta (repetível)")
+    rp.add_argument("--criteria", help="YAML de critérios: waivers, tailoring (com justificação), required_level, "
+                                       "primary_disciplines, headline")
+    rp.add_argument("--no-discover", action="store_true", help="não procurar registos na pasta do design.json")
+    rp.add_argument("--pdf", action="store_true", help="também PDF (requer WeasyPrint, opcional)")
+    rp.set_defaults(fn=_cmd_report)
     dbp = sub.add_parser("db", help="estado de projeto único acdt.design/1 (unidades, nível, proveniência): show / "
                          "get / diff / export / build / validate / add-uq (docs/DADOS.md)")
     dbp.add_argument("action", choices=["show", "get", "diff", "export", "build", "validate", "add-uq"])

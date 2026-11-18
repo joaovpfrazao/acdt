@@ -25,7 +25,7 @@ from acdt import __version__
 from ._deprecation import DEPRECATED, ACDTDeprecationWarning, deprecated
 
 #: Versão semântica da API pública (independente da versão do pacote, :data:`acdt.__version__`).
-API_VERSION = "1.0.0"
+API_VERSION = "1.1.0"
 
 #: Níveis de fidelidade aceites por :func:`size`/:func:`analyse` (``None`` = o que a missão declara).
 LEVELS: dict[str, str] = {"L0": "handbook", "L1": "lowfi"}
@@ -40,6 +40,8 @@ __all__ = [
     "uq", "uq_study", "mdo", "mdo_study", "function_model", "vv", "vv_cases", "calibrate", "load_test_data",
     # estado de projeto (design.json)
     "db_load", "db_save", "db_get", "db_diff", "db_validate",
+    # relatórios de revisão (SRR/PDR/CDR)
+    "report",
     # erros
     "errors",
 ]
@@ -61,10 +63,12 @@ def errors() -> dict[str, type[BaseException]]:
 
     Returns:
         ``{"InfeasibleError": …, "RequirementError": …, "UnitError": …, "UncertaintySpecError": …,
-        "MDOSpecError": …, "CalibrationError": …, "IngestError": …, "VVCaseError": KeyError}``.
+        "MDOSpecError": …, "CalibrationError": …, "IngestError": …, "VVCaseError": KeyError,
+        "ReviewInputError": …}`` (``ReviewInputError`` desde a API 1.1.0).
     """
     from acdt.core.calibration import CalibrationError, IngestError
     from acdt.core.pipeline import InfeasibleError
+    from acdt.core.review import ReviewInputError
     from acdt.core.requirements import RequirementError
     from acdt.core.sensitivity.distributions import UncertaintySpecError
     from acdt.core.sysmdo.spec import MDOSpecError
@@ -72,7 +76,8 @@ def errors() -> dict[str, type[BaseException]]:
 
     return {"InfeasibleError": InfeasibleError, "RequirementError": RequirementError, "UnitError": UnitError,
             "UncertaintySpecError": UncertaintySpecError, "MDOSpecError": MDOSpecError,
-            "CalibrationError": CalibrationError, "IngestError": IngestError, "VVCaseError": KeyError}
+            "CalibrationError": CalibrationError, "IngestError": IngestError, "VVCaseError": KeyError,
+            "ReviewInputError": ReviewInputError}
 
 
 # ----------------------------------------------------------------------------------------------------- projeto
@@ -473,3 +478,42 @@ def db_validate(db: Mapping[str, Any]) -> list[str]:
     from acdt.core import design_db as D
 
     return D.validate(db)
+
+
+# ------------------------------------------------------------------------------------- relatórios de revisão
+def report(design: PathLike, level: str, output: PathLike | None = None, *, uq: Sequence[PathLike] = (),
+           mdo: Sequence[PathLike] = (), vv: Sequence[PathLike] = (), calib: Sequence[PathLike] = (),
+           criteria: PathLike | Mapping[str, Any] | None = None, discover: bool = True,
+           pdf: bool = False) -> dict[str, Any]:
+    """Relatório de revisão de projeto (SRR, PDR ou CDR; docs/RELATORIOS.md; desde a API 1.1.0).
+
+    Avalia os critérios de entrada e de sucesso de NASA NPR 7123.1D, Apêndice G (Tabelas G-4, G-6, G-7) sobre o
+    estado de projeto ``acdt.design/1`` e os registos à volta (matriz de verificação, proveniência, UQ, MDO, V&V,
+    calibração), e calcula o veredito: ``pronto``, ``nao_pronto`` ou ``insuficiente`` (falta evidência — nunca
+    conta como cumprido). Os critérios que só um painel pode decidir ficam como ``revisao_humana``.
+
+    Args:
+        design: ``design.json`` ou a pasta que o contém.
+        level: ``"SRR"``, ``"PDR"`` ou ``"CDR"``.
+        output: pasta onde escrever ``relatorio_<nível>.json/.md/.html`` (``None`` = só devolve o ``dict``).
+        uq: estudos de incerteza extra (``uq.json`` ou pasta), além dos encontrados na pasta do projeto.
+        mdo: estudos MDO extra (``mdo.json`` ou pasta).
+        vv: relatórios de V&V extra (``vv_report.json`` ou pasta).
+        calib: registos de calibração extra (``calibration_record.json`` ou pasta).
+        criteria: ficheiro YAML ou ``dict`` com ``waivers``/``tailoring`` (com justificação),
+            ``required_level``, ``primary_disciplines``, ``headline``.
+        discover: procurar registos na pasta do ``design.json`` (até 3 níveis).
+        pdf: também PDF (requer WeasyPrint; ``RuntimeError`` se não estiver instalado).
+
+    Returns:
+        O relatório ``acdt.review/1``: ``{"gate", "verdict": {"status", "motivos", "counts"}, "criteria",
+        "requirements", "design", "fidelity", "open_items", "uq", "mdo", "vv", "calibration", "traceability",
+        "figures", …}`` e ``files`` quando escreve.
+
+    Raises:
+        ReviewInputError: ``design.json`` em falta, registo com esquema errado, critérios inválidos.
+    """
+    from acdt.core import review as R
+
+    return R.report(design, level, output, uq=uq, mdo=mdo, vv=vv, calib=calib, criteria=criteria,
+                    discover=discover, pdf=pdf)

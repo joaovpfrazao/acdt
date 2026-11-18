@@ -1,0 +1,174 @@
+{
+ "created_utc": "2026-11-18T00:00:00+00:00",
+ "definition": {
+  "input": {
+   "name": "exemplo analítico de teste",
+   "notas": "PRESSUPOSTO: modelo analítico só para testar o relatório"
+  },
+  "requirements": {},
+  "source": {
+   "path": "exemplo_analitico.yaml",
+   "sha256": null
+  }
+ },
+ "domain": "analitico",
+ "history": [
+  {
+   "utc": "2026-11-18T00:00:00+00:00",
+   "what": "gerar.py"
+  }
+ ],
+ "name": "exemplo analítico de teste",
+ "results": {
+  "dimensionamento": {
+   "L0": {
+    "evidence": "result.json",
+    "evidence_sha256": "4dbd371f54d78039380a214b3d1621e50c422d2ff514121e41c9472fa7d09255",
+    "method": "função analítica de teste",
+    "notes": [],
+    "provenance": {},
+    "quantities": {
+     "feasible": {
+      "unit": null,
+      "value": true
+     },
+     "sizing.m_kg": {
+      "unit": "kg",
+      "value": 10.0
+     },
+     "sizing.y": {
+      "unit": null,
+      "value": 1.0
+     }
+    },
+    "references": [],
+    "sections": {},
+    "source": "gerar.py",
+    "updated_utc": "2026-11-18T00:00:00+00:00"
+   }
+  },
+  "estruturas": {
+   "L1": {
+    "evidence": "result.json",
+    "evidence_sha256": "4dbd371f54d78039380a214b3d1621e50c422d2ff514121e41c9472fa7d09255",
+    "method": "valor fixo de teste",
+    "notes": [],
+    "provenance": {},
+    "quantities": {
+     "struct.sigma_max_Pa": {
+      "unit": "Pa",
+      "value": 120000000.0
+     }
+    },
+    "references": [],
+    "sections": {},
+    "source": "gerar.py",
+    "updated_utc": "2026-11-18T00:00:00+00:00"
+   }
+  }
+ },
+ "revision": 0,
+ "schema": "acdt.design/1",
+ "updated_utc": "2026-11-18T00:00:00+00:00",
+ "verification": {
+  "counts": {
+   "falha": 1,
+   "nao_avaliado": 1,
+   "no_limite": 1,
+   "passa": 1
+  },
+  "coverage": {
+   "avaliadores_nao_registados": [],
+   "avaliadores_sem_requisito": [],
+   "fracao_avaliada": 0.75,
+   "por_estado": {
+    "desconhecido": 0,
+    "falha": 1,
+    "nao_avaliado": 1,
+    "no_limite": 1,
+    "passa": 1
+   },
+   "requisitos": 4,
+   "requisitos_sem_avaliador": [
+    "R4"
+   ]
+  },
+  "evidence": "verification_matrix.json",
+  "provenance": {
+   "file": "provenance.json",
+   "fingerprint": "7d1f834c898f661bd95770492c02adb1055fb7ea6c856a2bd9b13f59795eb9a8",
+   "sha256": "1cfb7f2e4e536c1a9f65eaafdff2def01d11c8bd9c1ae796bc6306efe09d20e6"
+  },
+  "rows": [
+   {
+    "comparison": "max",
+    "evaluator": "resultado:sizing.y",
+    "evidence": "result.json#sizing.y",
+    "fidelity_evaluated": "N0",
+    "fidelity_required": "N0",
+    "id": "R1",
+    "margin": 0.3333333333333333,
+    "message": "",
+    "method": "analise",
+    "quantity": "y",
+    "status": "passa",
+    "threshold": 1.5,
+    "tolerance": 0.0,
+    "unit": "",
+    "value": 1.0
+   },
+   {
+    "comparison": "max",
+    "evaluator": "resultado:sizing.m_kg",
+    "evidence": "result.json#sizing.m_kg",
+    "fidelity_evaluated": "N0",
+    "fidelity_required": "N0",
+    "id": "R2",
+    "margin": 0.0,
+    "message": "dentro da banda ±0.5 (tolerância declarada)",
+    "method": "analise",
+    "quantity": "m",
+    "status": "no_limite",
+    "threshold": 10.0,
+    "tolerance": 0.5,
+    "unit": "kg",
+    "value": 10.0
+   },
+   {
+    "comparison": "max",
+    "evaluator": "resultado:struct.sigma_max_Pa",
+    "evidence": "result.json#struct.sigma_max_Pa",
+    "fidelity_evaluated": "N0",
+    "fidelity_required": "N0",
+    "id": "R3",
+    "margin": -0.2,
+    "message": "",
+    "method": "analise",
+    "quantity": "sigma",
+    "status": "falha",
+    "threshold": 100000000.0,
+    "tolerance": 0.0,
+    "unit": "Pa",
+    "value": 120000000.0
+   },
+   {
+    "comparison": "bool",
+    "evaluator": null,
+    "evidence": "",
+    "fidelity_evaluated": null,
+    "fidelity_required": "N0",
+    "id": "R4",
+    "margin": null,
+    "message": "sem avaliador declarado",
+    "method": "analise",
+    "quantity": "z",
+    "status": "nao_avaliado",
+    "threshold": null,
+    "tolerance": 0.0,
+    "unit": "",
+    "value": null
+   }
+  ],
+  "schema": "acdt.verification/1"
+ }
+}

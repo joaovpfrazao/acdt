@@ -1636,7 +1636,7 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 
 * **O que faz**: dá ao acdt uma porta de entrada estável para scripts, notebooks e outras ferramentas, com
   versionamento semântico verificado por teste, documentação gerada do código e uma CLI com convenções comuns.
-* **API Python `acdt.api`** (API 1.0.0; pacote 0.2.0):
+* **API Python `acdt.api`** (API 1.1.0 desde §32q; pacote 0.2.0):
   * `load_mission`, `size`, `analyse`, `verify`, `uq`, `uq_study`, `mdo`, `mdo_study`, `function_model`,
     `vv_cases`, `vv`, `calibrate`, `load_test_data`, `db_load`/`db_save`/`db_get`/`db_diff`/`db_validate`,
     `version_info`, `errors`;
@@ -1661,6 +1661,46 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   saída) e `tests/test_notebooks.py`; os três notebooks correm em ~20 s.
 * **Por fazer**: alargar a API a sistemas, fabrico/custo, certificação e simulação; `result` estruturado no
   `--json` dos restantes comandos; documentação por versão da API. Pormenor em [docs/API.md](docs/API.md).
+
+## 32q. Relatórios automáticos de revisão de projeto SRR/PDR/CDR (18 nov 2026)
+
+* **O que faz**: `acdt report <design.json|pasta> --level SRR|PDR|CDR` gera o relatório da revisão a partir do
+  estado de projeto (`acdt.design/1`) e dos registos de verificação, proveniência, UQ, MDO, V&V e calibração, em
+  Markdown, HTML autónomo e JSON (`acdt.review/1`). O PDF é opcional, com WeasyPrint (BSD-3-Clause), se estiver
+  instalado. Termina num **veredito calculado**: `pronto`, `nao_pronto` ou `insuficiente`, com os códigos de
+  saída 0, 1 e 3.
+* **Norma**: NASA NPR 7123.1D (2023, Alteração 2), Apêndice G. Usa a Tabela G-4 para a SRR, a G-6 para a PDR e
+  a G-7 para a CDR. Os excertos são literais e foram conferidos com o NODIS.
+  * Os critérios estão declarados como dados (`acdt/core/review/criteria.py`). Cada um tem um avaliador
+    automático, que dá `cumpre`, `nao_cumpre` ou `insuficiente`, ou fica para `revisao_humana`.
+  * A ligação entre o texto da NPR e o teste é uma interpretação do acdt (PRESSUPOSTO), apoiada na adaptação
+    que o G.1.2 prevê.
+* **Conteúdo do relatório**:
+  * conformidade com os requisitos nos cinco estados, sem nunca contar `nao_avaliado` como passa;
+  * resumo do projeto com unidades;
+  * fidelidade por disciplina e o que ainda está em L0/L1;
+  * itens em aberto e riscos (não avaliados, PRESSUPOSTOs, calibração sintética, fora da validade ou
+    `nao_aplicar`, V&V em falha, P(passa) abaixo do alvo, grandezas sem unidade, evidência alterada);
+  * incerteza (P5/P50/P95, P(passa) com intervalo de confiança);
+  * frente de Pareto do MDO;
+  * rastreabilidade com SHA-256 (confere, difere, sem_registo, em_falta);
+  * figuras já produzidas.
+* **Adaptação por projeto** (`--criteria`): nível exigido, disciplinas primárias, grandezas de resumo, dispensas
+  de requisitos e adaptação de critérios. Dispensas e adaptações exigem justificação.
+  * PRESSUPOSTO: o nível exigido por omissão é L0 na SRR, L1 na PDR e L2 na CDR.
+* **Genérico**: o domínio só regista um perfil (`register_profile`); o do aircraft está em
+  `domains/aircraft/review_profile.py`. Sem perfil, todas as disciplinas do estado de projeto são primárias.
+* **API**: `acdt.api.report(...)` (API 1.1.0) e `--json` com o envelope `acdt.cli/1`.
+* **Fidelidade**: não muda nenhum resultado de engenharia; só lê registos.
+* **Validado**: `tests/test_review.py` (17 testes), incluindo o relatório de referência byte a byte de um
+  exemplo analítico pequeno (`tests/data/review_small/`).
+* **Por fazer**:
+  * gerar figuras em falta;
+  * MDR/SDR, TRR e PRR;
+  * registo de decisões e `acdt certify` como evidência;
+  * ficha RID/RFA.
+
+  Pormenor em [docs/RELATORIOS.md](docs/RELATORIOS.md).
 
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 

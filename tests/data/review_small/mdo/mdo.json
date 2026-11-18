@@ -1,0 +1,336 @@
+{
+ "schema": "acdt.mdo/1",
+ "warnings": [],
+ "fixed": {},
+ "model": {
+  "domain": "analitico",
+  "text": "função analítica"
+ },
+ "strategy": "doe",
+ "options": {
+  "n": 9,
+  "seed": 0
+ },
+ "design_variables": [
+  {
+   "path": "x",
+   "type": "continuous",
+   "placement": "inner",
+   "source": "teste",
+   "lower": 0.0,
+   "upper": 2.0,
+   "x0": 1.0
+  }
+ ],
+ "objectives": [
+  {
+   "metric": "f1",
+   "sense": "min",
+   "ref": null
+  },
+  {
+   "metric": "f2",
+   "sense": "min",
+   "ref": null
+  }
+ ],
+ "constraints": [],
+ "filters": [],
+ "policy": "passa",
+ "derived": {},
+ "constants": {},
+ "closure": null,
+ "loops": [
+  {
+   "combo": {},
+   "iterations": [
+    {
+     "combo": {},
+     "phase": "c0",
+     "inner": {
+      "driver": "DOEDriver (OpenMDAO; lhs, 9 pontos)",
+      "n_eval": 9,
+      "seed": 0
+     },
+     "front": [
+      7,
+      8,
+      2,
+      4,
+      0,
+      1,
+      3,
+      6,
+      5
+     ],
+     "knee": {
+      "id": 4,
+      "method": "Das 1999: maior distância à reta entre extremos (frente normalizada)"
+     },
+     "chosen": 4,
+     "closure_pick": {
+      "id": 4,
+      "feasible": true
+     },
+     "robust": null
+    }
+   ],
+   "closure_status": null
+  }
+ ],
+ "n_evaluations": 9,
+ "n_model_calls": 9,
+ "n_failed": 0,
+ "n_feasible": 9,
+ "pareto": [
+  7,
+  8,
+  2,
+  4,
+  0,
+  1,
+  3,
+  6,
+  5
+ ],
+ "knee": {
+  "id": 4,
+  "method": "Das 1999: maior distância à reta entre extremos (frente normalizada)"
+ },
+ "best": {
+  "f1": 7,
+  "f2": 5
+ },
+ "chosen": 4,
+ "least_violation": 0,
+ "pressupostos": [
+  "viabilidade com margem relativa ≥ −1e-6 (ruído numérico dos fechos iterativos; options.feas_tol)"
+ ],
+ "evaluations": [
+  {
+   "id": 0,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 1.0236968390593733
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 1.0479552183001524,
+    "f2": 0.9531678620626594
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 1.0479552183001524,
+    "f2": 0.9531678620626594
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 1,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 1.273221457996444
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 1.6210928811025906,
+    "f2": 0.5282070491168146
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 1.6210928811025906,
+    "f2": 0.5282070491168146
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 2,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 0.5652499981034274
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 0.31950756035592465,
+    "f2": 2.058507567942215
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 0.31950756035592465,
+    "f2": 2.058507567942215
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 3,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 1.5411272052861706
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 2.3750730628731627,
+    "f2": 0.21056424172848018
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 2.3750730628731627,
+    "f2": 0.21056424172848018
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 4,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 0.8479674564714517
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 0.7190488072346632,
+    "f2": 1.3271789813488566
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 0.7190488072346632,
+    "f2": 1.3271789813488566
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 5,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 1.778386333371144
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 3.162657950721262,
+    "f2": 0.0491126172366857
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 3.162657950721262,
+    "f2": 0.0491126172366857
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 6,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 1.7460898392416822
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 3.0488297267030435,
+    "f2": 0.06447036973631481
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 3.0488297267030435,
+    "f2": 0.06447036973631481
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 7,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 0.007463461178992079
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 5.5703252770321836e-05,
+    "f2": 3.970201858536802
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 5.5703252770321836e-05,
+    "f2": 3.970201858536802
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 8,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "x": 0.38436787698443203
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "f1": 0.14773866485751946,
+    "f2": 2.6102671569197913
+   },
+   "constraints": {},
+   "metrics": {
+    "f1": 0.14773866485751946,
+    "f2": 2.6102671569197913
+   },
+   "requirements": {},
+   "status_counts": {},
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  }
+ ]
+}

@@ -4,7 +4,7 @@ O acdt tem duas portas de entrada estáveis: a **API Python `acdt.api`** e a **l
 resto (`acdt.core`, `acdt.domains`, `acdt.ai`, os internos de `acdt.cli`) é interno e pode mudar entre versões do
 pacote sem aviso. Referência gerada: [API Python](referencia/api.md) · [CLI](referencia/cli.md).
 
-## 1. Superfície pública (`acdt.api`, API 1.0.0)
+## 1. Superfície pública (`acdt.api`, API 1.1.0)
 
 | grupo | funções |
 |---|---|
@@ -16,6 +16,7 @@ pacote sem aviso. Referência gerada: [API Python](referencia/api.md) · [CLI](r
 | V&V | `vv_cases()`, `vv(cases=, disciplines=, max_cost=, output=)` |
 | dados de ensaio | `load_test_data(ficheiro, meta)`, `calibrate(estudo, saída)` |
 | estado de projeto | `db_load`, `db_save`, `db_get`, `db_diff`, `db_validate` |
+| revisões de projeto | `report(design, level, saída, uq=, mdo=, vv=, calib=, criteria=, discover=, pdf=)` — SRR/PDR/CDR (desde 1.1.0; [RELATORIOS.md](RELATORIOS.md)) |
 | descontinuação | `deprecated(since, removed_in=, alternative=)`, `ACDTDeprecationWarning`, `DEPRECATED` |
 
 Contratos comuns:
@@ -30,7 +31,8 @@ Contratos comuns:
 * grandezas desconhecidas são `None`, nunca zero; estados de verificação `passa`/`falha`/`no_limite`/
   `nao_avaliado`/`desconhecido` (docs/REQUISITOS.md);
 * erros de entrada levantam as exceções de `api.errors()` (`InfeasibleError`, `RequirementError`, `UnitError`,
-  `UncertaintySpecError`, `MDOSpecError`, `CalibrationError`, `IngestError`) ou `FileNotFoundError`/`KeyError`.
+  `UncertaintySpecError`, `MDOSpecError`, `CalibrationError`, `IngestError`, `ReviewInputError`) ou
+  `FileNotFoundError`/`KeyError`.
 
 ```python
 from acdt import api
@@ -45,7 +47,7 @@ print(r["W0_kg"], m["coverage"]["por_estado"], api.db_validate(db))
 
 Há duas versões, ambas `MAIOR.MENOR.CORREÇÃO`:
 
-* **`acdt.api.API_VERSION`** (1.0.0) — versão do contrato da API pública:
+* **`acdt.api.API_VERSION`** (1.1.0; 1.0.0 → 1.1.0 acrescentou `report`) — versão do contrato da API pública:
   * **MAIOR** — mudança incompatível: nome removido, parâmetro removido/renomeado/reordenado, tipo ou valor por
     omissão alterado, chave removida de um resultado documentado;
   * **MENOR** — acréscimo compatível: função nova, parâmetro novo com valor por omissão no fim, chave nova num
@@ -85,12 +87,12 @@ def dimensionar(...): ...
 
 ## 4. CLI: convenções comuns
 
-* `acdt --version` → `acdt 0.2.0 (API 1.0.0)`;
+* `acdt --version` → `acdt 0.2.0 (API 1.1.0)`;
 * `acdt <comando> --help` em todos os comandos (teste `tests/test_cli_contract.py` percorre-os todos);
 * `--json` em todos os comandos: o texto humano vai para stderr e stdout recebe um envelope `acdt.cli/1`:
 
   ```json
-  {"schema": "acdt.cli/1", "acdt": "0.2.0", "api": "1.0.0", "command": "vv", "exit_code": 0,
+  {"schema": "acdt.cli/1", "acdt": "0.2.0", "api": "1.1.0", "command": "vv", "exit_code": 0,
    "exit_meaning": "sucesso", "result": {"counts": {"passa": 1, …}, …}, "files": ["vv/vv_report.json", …]}
   ```
 

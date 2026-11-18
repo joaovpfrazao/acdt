@@ -1,0 +1,348 @@
+{
+ "epistemic_points": [],
+ "excluded_inputs": [],
+ "inputs": [
+  {
+   "describe": "N(μ=1, σ=0.1)",
+   "dist": "normal",
+   "name": "a",
+   "nominal": 1.0,
+   "notes": "",
+   "origin": "utilizador",
+   "params": {
+    "mean": 1.0,
+    "std": 0.1
+   },
+   "path": "a",
+   "pressuposto": false,
+   "source": "teste",
+   "unit": ""
+  },
+  {
+   "describe": "U(-1, 1)",
+   "dist": "uniform",
+   "name": "b",
+   "nominal": 0.0,
+   "notes": "",
+   "origin": "utilizador",
+   "params": {
+    "high": 1.0,
+    "low": -1.0
+   },
+   "path": "b",
+   "pressuposto": false,
+   "source": "teste",
+   "unit": ""
+  }
+ ],
+ "model": {
+  "domain": "analitico",
+  "text": "função analítica"
+ },
+ "nominal": null,
+ "pressupostos": [
+  "probabilidade-alvo 0.95 por omissão (PRESSUPOSTO: declare uncertainty.target_probability e a origem)",
+  "tolerância de convergência SE/média ≤ 0.01 por omissão (PRESSUPOSTO)"
+ ],
+ "propagation": {
+  "requirements": {
+   "R1": {
+    "alvo": 0.95,
+    "confianca": 0.95,
+    "counts": {
+     "passa": 200
+    },
+    "estado_probabilistico": "prob_passa",
+    "n": 200,
+    "nota": "P(passa)=1.000 IC95% [0.981, 1.000] vs alvo 0.95",
+    "p_falha": 0.0,
+    "p_falha_ic": [
+     0.0,
+     0.018845326407080483
+    ],
+    "p_no_limite": 0.0,
+    "p_no_limite_ic": [
+     0.0,
+     0.018845326407080483
+    ],
+    "p_passa": 1.0,
+    "p_passa_avaliadas": 1.0,
+    "p_passa_ic": [
+     0.9811546735929196,
+     1.0
+    ],
+    "p_passa_ou_no_limite": 1.0,
+    "p_passa_ou_no_limite_ic": [
+     0.9811546735929196,
+     1.0
+    ]
+   }
+  },
+  "runs": [
+   {
+    "epistemic": {},
+    "failures": [],
+    "n": 200,
+    "n_failed": 0,
+    "requirements": {
+     "R1": {
+      "alvo": 0.95,
+      "confianca": 0.95,
+      "counts": {
+       "passa": 200
+      },
+      "estado_probabilistico": "prob_passa",
+      "n": 200,
+      "nota": "P(passa)=1.000 IC95% [0.981, 1.000] vs alvo 0.95",
+      "p_falha": 0.0,
+      "p_falha_ic": [
+       0.0,
+       0.018845326407080483
+      ],
+      "p_no_limite": 0.0,
+      "p_no_limite_ic": [
+       0.0,
+       0.018845326407080483
+      ],
+      "p_passa": 1.0,
+      "p_passa_avaliadas": 1.0,
+      "p_passa_ic": [
+       0.9811546735929196,
+       1.0
+      ],
+      "p_passa_ou_no_limite": 1.0,
+      "p_passa_ou_no_limite_ic": [
+       0.9811546735929196,
+       1.0
+      ]
+     }
+    },
+    "summaries": {
+     "m_kg": {
+      "converged": true,
+      "convergence": "SE/|média| = 0.00707 ≤ 0.01 (tolerância declarada)",
+      "cv": 0.0999551395734958,
+      "max": 12.952907368721613,
+      "mean": 9.999247352535951,
+      "min": 7.276387073476494,
+      "n": 200,
+      "n_sem_valor": 0,
+      "p5": 8.380834840693412,
+      "p50": 9.99691902498066,
+      "p50_ic": [
+       9.817988994309676,
+       10.18764520804893
+      ],
+      "p5_ic": [
+       7.698762808729014,
+       8.6504915791375
+      ],
+      "p95": 11.607149418664264,
+      "p95_ic": [
+       11.365695558751224,
+       12.193774223958059
+      ],
+      "running_mean": [
+       {
+        "mean": 10.023077005808922,
+        "n": 2,
+        "se": 0.2535211762586185
+       },
+       {
+        "mean": 9.643078160639984,
+        "n": 4,
+        "se": 0.265753413351526
+       },
+       {
+        "mean": 9.533396267874949,
+        "n": 8,
+        "se": 0.23935908611631523
+       },
+       {
+        "mean": 9.72258723845079,
+        "n": 16,
+        "se": 0.1938927077422718
+       },
+       {
+        "mean": 9.697017966293142,
+        "n": 32,
+        "se": 0.14727551120149143
+       },
+       {
+        "mean": 9.79340040561735,
+        "n": 64,
+        "se": 0.11136169598714289
+       },
+       {
+        "mean": 9.933847868489028,
+        "n": 128,
+        "se": 0.08536806164311021
+       },
+       {
+        "mean": 9.999247352535951,
+        "n": 200,
+        "se": 0.07067363737309143
+       }
+      ],
+      "se_mean": 0.07067363737309143,
+      "se_rel": 0.007067895700686671,
+      "status": "ok",
+      "std": 0.9994761647526395
+     },
+     "y": {
+      "converged": true,
+      "convergence": "SE/|média| = 0.0082 ≤ 0.01 (tolerância declarada)",
+      "cv": 0.11592083539526266,
+      "max": 1.3904710606038244,
+      "mean": 0.9999356991407007,
+      "min": 0.7338301667289691,
+      "n": 200,
+      "n_sem_valor": 0,
+      "p5": 0.8009166657451465,
+      "p50": 0.9969573727090877,
+      "p50_ic": [
+       0.974671711101733,
+       1.0295045976116362
+      ],
+      "p5_ic": [
+       0.7489417902730036,
+       0.8482908927597627
+      ],
+      "p95": 1.191117710818421,
+      "p95_ic": [
+       1.1564432468647563,
+       1.2645839087604227
+      ],
+      "running_mean": [
+       {
+        "mean": 1.0371532583485623,
+        "n": 2,
+        "se": 0.015605210500511555
+       },
+       {
+        "mean": 1.0016830275845323,
+        "n": 4,
+        "se": 0.031224015433863574
+       },
+       {
+        "mean": 0.9757549972195492,
+        "n": 8,
+        "se": 0.0268006849777267
+       },
+       {
+        "mean": 0.9717957613264344,
+        "n": 16,
+        "se": 0.017303452660414675
+       },
+       {
+        "mean": 0.9747884090323581,
+        "n": 32,
+        "se": 0.013154301163489193
+       },
+       {
+        "mean": 0.9744668973754197,
+        "n": 64,
+        "se": 0.011059628036094246
+       },
+       {
+        "mean": 0.9914539458912247,
+        "n": 128,
+        "se": 0.00975185219425144
+       },
+       {
+        "mean": 0.9999356991407007,
+        "n": 200,
+        "se": 0.008196313814967927
+       }
+      ],
+      "se_mean": 0.008196313814967927,
+      "se_rel": 0.008196840878879978,
+      "status": "ok",
+      "std": 0.11591338158593605
+     }
+    }
+   }
+  ],
+  "summaries": {
+   "m_kg": {
+    "converged": true,
+    "convergence": "SE/|média| = 0.00707 ≤ 0.01 (tolerância declarada)",
+    "cv": 0.0999551395734958,
+    "max": 12.952907368721613,
+    "mean": 9.999247352535951,
+    "min": 7.276387073476494,
+    "n": 200,
+    "n_sem_valor": 0,
+    "p5": 8.380834840693412,
+    "p50": 9.99691902498066,
+    "p50_ic": [
+     9.817988994309676,
+     10.18764520804893
+    ],
+    "p5_ic": [
+     7.698762808729014,
+     8.6504915791375
+    ],
+    "p95": 11.607149418664264,
+    "p95_ic": [
+     11.365695558751224,
+     12.193774223958059
+    ],
+    "se_mean": 0.07067363737309143,
+    "se_rel": 0.007067895700686671,
+    "status": "ok",
+    "std": 0.9994761647526395
+   },
+   "y": {
+    "converged": true,
+    "convergence": "SE/|média| = 0.0082 ≤ 0.01 (tolerância declarada)",
+    "cv": 0.11592083539526266,
+    "max": 1.3904710606038244,
+    "mean": 0.9999356991407007,
+    "min": 0.7338301667289691,
+    "n": 200,
+    "n_sem_valor": 0,
+    "p5": 0.8009166657451465,
+    "p50": 0.9969573727090877,
+    "p50_ic": [
+     0.974671711101733,
+     1.0295045976116362
+    ],
+    "p5_ic": [
+     0.7489417902730036,
+     0.8482908927597627
+    ],
+    "p95": 1.191117710818421,
+    "p95_ic": [
+     1.1564432468647563,
+     1.2645839087604227
+    ],
+    "se_mean": 0.008196313814967927,
+    "se_rel": 0.008196840878879978,
+    "status": "ok",
+    "std": 0.11591338158593605
+   }
+  }
+ },
+ "references": [
+  "McKay, Beckman & Conover, Technometrics 21 (1979) 239–245 (LHS); Iman & Conover, Commun. Statist. Simul. Comput. 11 (1982) 311–334 (correlação de postos); Ang & Tang, Probability Concepts in Engineering, 2.ª ed., Wiley 2007 (lognormal); Ferson et al., SAND2002-4015 (2003) e Oberkampf & Roy, Verification and Validation in Scientific Computing, CUP 2010, Cap. 13 (intervalos / caixas de probabilidade)",
+  "Conover 1999 Sec. 3.2 (IC de quantis por estatísticas de ordem); Stein 1987 (variância do LHS); Wilson 1927 e Agresti & Coull 1998 (IC de proporção)"
+ ],
+ "schema": "acdt.uq/1",
+ "settings": {
+  "confidence": 0.95,
+  "correlations": null,
+  "method": "lhs",
+  "n": 200,
+  "percentiles": [
+   5.0,
+   50.0,
+   95.0
+  ],
+  "rel_tol": 0.01,
+  "requirement_targets": {},
+  "seed": 1,
+  "target_probability": 0.95,
+  "target_source": ""
+ }
+}

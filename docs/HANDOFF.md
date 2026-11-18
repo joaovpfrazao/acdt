@@ -1672,6 +1672,35 @@ Em aberto, por ordem:
 2. `result` estruturado no `--json` dos restantes comandos.
 3. Ativar o GitHub Pages (decisão do João) e, quando houver API 2.x, documentação por versão.
 
+### Relatórios automáticos de revisão SRR/PDR/CDR (18 nov 2026, ramo `eng-relatorios`)
+
+Pormenor em [RELATORIOS.md](RELATORIOS.md) e CAPABILITIES §32q.
+
+* `acdt/core/review/` (mypy estrito):
+  * `criteria.py`: critérios SRR/PDR/CDR de NPR 7123.1D Ap. G (Tabelas G-4, G-6, G-7) como dados, com
+    excertos literais conferidos no NODIS, avaliador ou `None` (revisão humana) e interpretação;
+    `DEFAULT_REQUIRED_LEVEL` (PRESSUPOSTO SRR L0, PDR L1, CDR L2);
+  * `bundle.py`: recolhe `design.json`, `verification_matrix.json`, `provenance.json`, `result.json` e os
+    registos `uq.json`/`mdo.json`/`vv_report.json`/`calibration_record.json` (descoberta até 3 níveis, mais os
+    dados explicitamente), figuras PNG e SHA-256 registados;
+  * `profile.py`: `ReviewProfile`/`register_profile` (o aircraft regista-se em
+    `domains/aircraft/review_profile.py`);
+  * `evaluate.py`: 14 avaliadores e `verdict()` (`nao_pronto` > `insuficiente` > `pronto`);
+  * `build.py`: relatório `acdt.review/1` (requisitos, resumo, fidelidade, itens em aberto, UQ, MDO, V&V,
+    calibração, rastreabilidade, figuras), ficheiro de critérios (`waivers`/`tailoring` com justificação);
+  * `render.py`: blocos → Markdown e HTML autónomo (figuras base64); PDF só com WeasyPrint instalado.
+* CLI `acdt report` (códigos 0/1/3/2; a saída não pode ser a pasta do `design.json`); API `acdt.api.report`
+  (API_VERSION 1.1.0, `api_surface.json` regenerado; `errors()` inclui `ReviewInputError`).
+* Testes: `tests/test_review.py` (17), exemplo `tests/data/review_small/` gerado por `gerar.py` (normalizado;
+  `.gitattributes` `-text` para os SHA-256 não mudarem no Windows) e `relatorio_pdr.golden.md`. Se o formato do
+  relatório mudar de propósito, regenerar com `python tests/data/review_small/gerar.py` e rever o diff do golden.
+
+Em aberto, por ordem:
+1. Gerar figuras em falta (Pareto, histogramas UQ) a partir dos registos.
+2. Critérios das revisões MDR/SDR, TRR e PRR (Tabelas G-5, G-10, G-8).
+3. Registo de decisões (`acdt decisions`) como evidência dos estudos de compromisso; `acdt certify` nos critérios
+   de segurança; ficha RID/RFA.
+
 ### Teste instável de reutilização de `run_id` (18 nov 2026, PR #12)
 
 Causa medida: falha transitória do AVL numa iteração intermédia do ciclo W0 → Schrenk só nessa iteração → ponto

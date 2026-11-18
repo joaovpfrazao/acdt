@@ -18,6 +18,7 @@ ficam marcados como **PRESSUPOSTO**; desconhecido nunca é zero e "não avaliado
 | casos de referência (V&V) | [V&V](VV.md) |
 | estado de projeto com unidades | [Dados](DADOS.md) |
 | calibrar com dados de ensaio | [Calibração](CALIBRACAO.md) |
+| relatório de revisão SRR/PDR/CDR com veredito | [Relatórios](RELATORIOS.md) |
 | CI, mypy, tolerâncias | [Qualidade](QUALIDADE.md) |
 
 O que o acdt faz, área a área, está em
