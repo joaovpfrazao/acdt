@@ -158,13 +158,15 @@ def validate(db: Mapping[str, Any]) -> list[str]:
     errs: list[str] = []
     if db.get("schema") != SCHEMA:
         return [f"schema '{db.get('schema')}' não é '{SCHEMA}'"]
+    js: Any
     try:
-        import jsonschema
-    except ImportError:
-        jsonschema = None  # type: ignore[assignment]
-    if jsonschema is not None:
+        import jsonschema as _js
+        js = _js
+    except ImportError:  # pragma: no cover — jsonschema é opcional (extra dev); sem ele, verificações essenciais
+        js = None
+    if js is not None:
         sch = json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
-        v = jsonschema.Draft202012Validator(sch)
+        v = js.Draft202012Validator(sch)
         for e in sorted(v.iter_errors(db), key=lambda e: list(e.absolute_path)):
             errs.append(f"{'/'.join(str(p) for p in e.absolute_path) or '(raiz)'}: {e.message}")
         return errs
@@ -232,7 +234,7 @@ def load(path: str | Path, check: bool = True) -> dict[str, Any]:
         p = p / DEFAULT_FILE
     if not p.is_file():
         raise FileNotFoundError(f"{p} não existe")
-    db = json.loads(p.read_text(encoding="utf-8"))
+    db: dict[str, Any] = json.loads(p.read_text(encoding="utf-8"))
     if check:
         errs = validate(db)
         if errs:
