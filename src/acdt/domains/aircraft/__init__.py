@@ -87,6 +87,13 @@ def _icing(st: DesignState):
     icing_stage(st["result"])
 
 
+def _reliability(st: DesignState):
+    """Disciplina fiabilidade L0 (reliability.py; docs/FIABILIDADE.md): RBD, MTBF/MTBCF, disponibilidades,
+    MMH/FH, sobressalentes (Poisson), frota e custo de manutenção (MIL-HDBK-338B)."""
+    from .reliability import reliability_stage
+    reliability_stage(st["result"])
+
+
 def _report(st: DesignState):
     out = st["options"].get("output")
     if out:
@@ -133,6 +140,8 @@ DOMAIN = register_domain(Domain(
                   "frio MIL-HDBK-310, ar dinâmico NACA, arrasto/massa/potência de arrefecimento"),
             Stage("icing", _icing, description="gelo L0/L1: envelopes 14 CFR 25 Ap. C, captação Langmuir & "
                   "Blodgett, Messinger (fração de congelação), espessura, potência de proteção"),
+            Stage("reliability", _reliability, description="fiabilidade L0: RBD (série/paralelo/k-de-n), MTBF/MTBCF, "
+                  "disponibilidades, MMH/FH, sobressalentes Poisson, frota (MIL-HDBK-338B)"),
             Stage("report", _report, description="markdown + plots + JSON"),
             Stage("verification", _verification, description="matriz de verificação dos requisitos rastreáveis "
                   "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)"),

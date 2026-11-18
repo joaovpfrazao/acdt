@@ -37,7 +37,14 @@ def fleet(on_station_h,off_station_flight_h,turnaround_h,settings):
     for name,v in (("on_station_h",on_station_h),("off_station_flight_h",off_station_flight_h),("turnaround_h",turnaround_h)):
         number(name,v)
     A=settings["availability"]
-    if isinstance(A,dict):
+    if isinstance(A,dict) and "reliability" in A:
+        # disciplina fiabilidade (acdt.core.reliability; docs/FIABILIDADE.md): A_o minorante (MIL-HDBK-338B Eq. 10.22)
+        mapping(A,{"reliability"},"availability")
+        from acdt.core.reliability.study import analyse as _rel
+        ao=_rel(A["reliability"])["availability"]["operational"]["lo"]
+        if ao is None: raise ValueError("availability.reliability: disponibilidade operacional desconhecida (declare taxas, MTTR e atrasos logísticos)")
+        A=ao
+    elif isinstance(A,dict):
         mapping(A,{"mtbf_h","mttr_h","mtbm_h","mdt_h"},"availability")
         for a,b in (("mtbf_h","mttr_h"),("mtbm_h","mdt_h")):
             if (a in A)!=(b in A): raise ValueError("availability needs complete time pairs")

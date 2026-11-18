@@ -639,3 +639,82 @@ def _ic_rle() -> Mapping[str, float | None]:
     from acdt.core.icing.impingement import naca4_le_radius
 
     return {"rle_c": naca4_le_radius(0.12, 1.0)}
+
+
+# ------------------------------------------------------------------------------------------------ fiabilidade
+M338 = "MIL-HDBK-338B, Electronic Reliability Design Handbook (DoD, 1 out. 1998)"
+_fb = builder("fiabilidade")
+
+
+@_fb("FIAB-338B-AVAIL-EX3", "Disponibilidades intrínseca, atingida e operacional (MIL-HDBK-338B §10.4.1.1, Ex. 3)",
+     "Radar terrestre: MTBF 100 h, MTTR 0,5 h, manutenção preventiva ativa média 0,25 h, tempo logístico 0,3 h, "
+     "administrativo 0,4 h, MTBM 75 h, tempo de prontidão 20 h. A_i (Eq. 10.18), A_a (Eq. 10.21) e A_o (Eq. 10.22). "
+     "O exemplo soma M̄ = 0,5 + 0,25 h (não pondera pelas frequências); o caso dá M̄ diretamente como no texto.",
+     "verificacao",
+     [Reference("A_i", 0.995, "-", M338 + ", §10.4.1.1 Ex. 3", tol_abs=5e-4, tol_source="impresso com 3 casas"),
+      Reference("A_a", 0.99, "-", M338 + ", §10.4.1.1 Ex. 3", tol_abs=5e-3, tol_source="impresso com 2 casas"),
+      Reference("A_o", 0.985, "-", M338 + ", §10.4.1.1 Ex. 3 (95/96,45)", tol_abs=5e-4,
+                tol_source="impresso com 3 casas")],
+     tests=("tests/test_reliability.py::test_mil338b_availability_example3",))
+def _fb_avail() -> Mapping[str, float | None]:
+    from acdt.core.reliability import maintenance as mt
+
+    return {"A_i": mt.inherent_availability(100.0, 0.5), "A_a": mt.achieved_availability(75.0, 0.5 + 0.25),
+            "A_o": mt.operational_availability(75.0, 0.5 + 0.25 + 0.3 + 0.4, 20.0)}
+
+
+@_fb("FIAB-338B-AAV-EX4", "Disponibilidade média num intervalo (MIL-HDBK-338B §10.4.1.2, Ex. 4)",
+     "Mesmo radar: λ = 0,01/h, μ = 2/h, missão de 1 h: A_AV(T) = μ/(λ+μ) + λ/(T(λ+μ)²)(1 − e^{−(λ+μ)T}) (Eq. 10.24).",
+     "verificacao",
+     [Reference("A_AV_1h", 0.9972, "-", M338 + ", §10.4.1.2 Ex. 4", tol_abs=5e-5, tol_source="impresso com 4 casas")],
+     tests=("tests/test_reliability.py::test_mil338b_interval_availability_example4",))
+def _fb_aav() -> Mapping[str, float | None]:
+    from acdt.core.reliability.maintenance import interval_availability
+
+    return {"A_AV_1h": interval_availability(0.01, 2.0, 1.0)}
+
+
+@_fb("FIAB-338B-POISSON-5381", "Sobressalentes por Poisson (MIL-HDBK-338B §5.3.8.1)",
+     "Projetor para 500 h, λ da lâmpada 0,001/h, duas lâmpadas de reserva: R(500) = P(X ≤ 2), X ~ Poisson(0,5) "
+     "(Eq. 5.58); o stock mínimo para 98 % de proteção é 2.", "verificacao",
+     [Reference("R_500h_S2", 0.986, "-", M338 + ", §5.3.8.1", tol_abs=5e-4, tol_source="impresso com 3 casas"),
+      Reference("stock_98pct", 2.0, "-", M338 + ", §5.3.8.1 (consequência: P(X ≤ 1) = 0,910 < 0,98 ≤ 0,986)",
+                tol_abs=1e-9, tol_source="inteiro (igualdade exata)")],
+     tests=("tests/test_reliability.py::test_mil338b_poisson_spares",))
+def _fb_poisson() -> Mapping[str, float | None]:
+    from acdt.core.reliability.spares import poisson_cdf, stock_for
+
+    return {"R_500h_S2": poisson_cdf(2, 0.5), "stock_98pct": float(stock_for(0.5, 0.98))}
+
+
+@_fb("FIAB-338B-EQ630", "Estrutura não série-paralelo (MIL-HDBK-338B §6.4.4.2.1.3, Eq. 6.30)",
+     "Sucesso se A e (C1 ou C2), ou B1 e C1, ou B2 e C2; P_A = 0,3, P_B = 0,1, P_C = 0,2. Calculado pelos caminhos "
+     "mínimos com enumeração exata (equivalente à Eq. 6.19 aplicada repetidamente).", "verificacao",
+     [Reference("P_S", 0.13572, "-", M338 + ", §6.4.4.2.1.3 (Eq. 6.30)", tol_abs=5e-6,
+                tol_source="impresso com 5 algarismos (exato)")],
+     tests=("tests/test_reliability.py::test_mil338b_eq630_paths",))
+def _fb_eq630() -> Mapping[str, float | None]:
+    from acdt.core.reliability.rbd import prob
+
+    P = {"A": 0.3, "B1": 0.1, "B2": 0.1, "C1": 0.2, "C2": 0.2}
+    node = {"type": "paths", "paths": [["A", "C1"], ["A", "C2"], ["B1", "C1"], ["B2", "C2"]]}
+    return {"P_S": prob(node, lambda c: P[c])}
+
+
+@_fb("FIAB-338B-PARALLEL-MTBF", "Ganho de MTBF com redundância ativa (MIL-HDBK-338B §7.5.5, Fig. 7.5-9)",
+     "n elementos idênticos em paralelo ativo: MTBF/MTBF₁ = Σ 1/i; o primeiro redundante dá +50 % (ΔM₂ = 0,50) e o "
+     "terceiro +0,33 (ΔM₃). Calculado por integração numérica de R(t) do RBD (Eq. 5.73).", "verificacao",
+     [Reference("ratio_n2", 1.5, "-", M338 + ", §7.5.5 (texto: +50 %) e Fig. 7.5-9(b)", tol_rel=1e-6,
+                tol_source="integração numérica (quad) do RBD"),
+      Reference("delta_n3", 0.33, "-", M338 + ", Fig. 7.5-9(b) (ΔM₃ = .33)", tol_abs=5e-3,
+                tol_source="impresso com 2 casas")],
+     tests=("tests/test_reliability.py::test_parallel_mttf_gain",))
+def _fb_parallel() -> Mapping[str, float | None]:
+    from acdt.core.reliability.rbd import mttf
+
+    lam = 1e-3
+    m1 = 1.0 / lam
+    m2 = mttf({"type": "parallel", "blocks": ["a", "b"]}, {"a": lam, "b": lam}, 0.0)
+    m3 = mttf({"type": "parallel", "blocks": ["a", "b", "c"]}, {"a": lam, "b": lam, "c": lam}, 0.0)
+    return {"ratio_n2": None if m2 is None else m2 / m1,
+            "delta_n3": None if (m2 is None or m3 is None) else (m3 - m2) / m1}

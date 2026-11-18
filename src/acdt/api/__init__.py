@@ -25,7 +25,7 @@ from acdt import __version__
 from ._deprecation import DEPRECATED, ACDTDeprecationWarning, deprecated
 
 #: Versão semântica da API pública (independente da versão do pacote, :data:`acdt.__version__`).
-API_VERSION = "1.4.0"
+API_VERSION = "1.5.0"
 
 #: Níveis de fidelidade aceites por :func:`size`/:func:`analyse` (``None`` = o que a missão declara).
 LEVELS: dict[str, str] = {"L0": "handbook", "L1": "lowfi"}
@@ -48,6 +48,8 @@ __all__ = [
     "thermal", "thermal_atmosphere",
     # gelo (L0/L1), genérico para qualquer tipo de aeronave
     "icing", "icing_envelope",
+    # fiabilidade e manutenção de frota (L0), genérica para qualquer tipo de aeronave
+    "reliability", "availability", "spares_stock",
     # erros
     "errors",
 ]
@@ -590,3 +592,44 @@ def icing_envelope(kind: str, T_C: float, mvd_um: float, *, horizontal_extent_nm
     if altitude_m is not None:
         out["envelope_status"] = in_envelope(kind, altitude_m, T_C)
     return out
+
+
+def reliability(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Fiabilidade e manutenção de frota (desde 1.5.0; docs/FIABILIDADE.md): taxas com proveniência (fornecedor com
+    fonte e data, base pública ou valor com fonte; sem fonte → desconhecido), RBD (série, paralelo ativo, k-de-n,
+    caminhos mínimos), fiabilidade de missão, MTBF básica e MTBCF, M_ct, MTBM, MMH/FH, disponibilidades A_i/A_a/A_o,
+    sobressalentes por Poisson, frota (cobertura ou surtidas) e custo de manutenção por FH (MIL-HDBK-338B). Saída em
+    intervalos ``{lo, hi}`` (desconhecido = ``None``)."""
+    from acdt.core.reliability.study import analyse
+
+    return analyse(spec)
+
+
+def availability(*, mtbf_h: float | None = None, mttr_h: float | None = None, mtbm_h: float | None = None,
+                 m_bar_h: float | None = None, mdt_h: float | None = None,
+                 ready_time_h: float = 0.0) -> dict[str, float]:
+    """Disponibilidades de MIL-HDBK-338B (desde 1.5.0): intrínseca A_i = MTBF/(MTBF+MTTR) (Eq. 10.18), atingida
+    A_a = MTBM/(MTBM+M̄) (Eq. 10.21) e operacional A_o = (MTBM+RT)/(MTBM+RT+MDT) (Eq. 10.22), conforme os pares dados."""
+    from acdt.core.reliability import maintenance as mt
+
+    out: dict[str, float] = {}
+    if mtbf_h is not None and mttr_h is not None:
+        out["inherent"] = mt.inherent_availability(mtbf_h, mttr_h)
+    if mtbm_h is not None and m_bar_h is not None:
+        out["achieved"] = mt.achieved_availability(mtbm_h, m_bar_h)
+    if mtbm_h is not None and mdt_h is not None:
+        out["operational"] = mt.operational_availability(mtbm_h, mdt_h, ready_time_h)
+    if not out:
+        raise ValueError("dê (mtbf_h, mttr_h), (mtbm_h, m_bar_h) e/ou (mtbm_h, mdt_h)")
+    return out
+
+
+def spares_stock(lambda_per_h: float, hours: float, confidence: float) -> dict[str, Any]:
+    """Stock de sobressalentes por Poisson (desde 1.5.0; MIL-HDBK-338B Eq. 5.58): menor S com P(X ≤ S) ≥ confiança,
+    X ~ Poisson(λ t) (λ e t da procura total, p. ex. frota × utilização × tempo de reabastecimento)."""
+    from acdt.core.reliability.spares import poisson_cdf, stock_for
+
+    a = float(lambda_per_h) * float(hours)
+    S = stock_for(a, confidence)
+    return {"demand_mean": a, "stock": S, "protection": poisson_cdf(S, a),
+            "source": "MIL-HDBK-338B Eq. 5.58 (§5.3.8.1)"}
