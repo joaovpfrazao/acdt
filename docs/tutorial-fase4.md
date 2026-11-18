@@ -55,6 +55,13 @@ gmsh aircraft_rans.geo -3 -format su2 -o aircraft_half.su2
 mpirun -n <N> SU2_CFD aircraft_rans.cfg   # repetir para α = 0, 2, 4 (+ varrimento de perda)
 ```
 
+A 18 nov 2026 a quarta malha 2-D da secção do C172 (refine = 2, α = 2°, 107922 células) foi corrida.
+O CD ficou com deriva 0,42 % nas últimas 10 % das iterações, por isso o GCI fino de 3,0 % não é aceite.
+Os α 0° e 4° não foram corridos. O RANS só da asa e da fuselagem estima 1,2×10⁷ células e 22 GB e não
+cabe nesta máquina; o caso do avião completo, e o avião com trem e hélice, continuam por correr.
+Números em `examples/output/cessna172_check_hifi_win/h5_c172_gci.json`. O `gci/gci.json` de três malhas
+não foi reescrito.
+
 ## 3. Ler o relatório
 
 * **Secção 2 (SU2 vs XFOIL):** o RANS é totalmente turbulento (SA) e o XFOIL tem transição; parte da
@@ -97,7 +104,7 @@ filtro e não como penalidade suave.
 
 ## 6. Limitações
 
-* GCI e Euler 3-D só correm se pedidos e se couberem na máquina; o RANS do avião completo fica preparado.
+* GCI e Euler 3-D só correm se pedidos e se couberem na máquina; o RANS do avião completo fica preparado. O RANS só da asa e da fuselagem do C172 foi estimado a 18 nov 2026 (22 GB) e não correu.
 * O deck Nastran SOL 145 é relido com pyNastran, mas não é corrido (sem MSC/NX Nastran).
 * C_h das superfícies de comando e V_H ≈ 1,1 V_C são pressupostos.
 * Roskam Classe II fora da base estatística (UAV de 25 kg) é só indicativo; as Eqs. 5.12–5.13

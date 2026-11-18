@@ -1,0 +1,235 @@
+{
+  "design": "cessna172_check",
+  "date": "2026-11-18",
+  "airfoil": "NACA 2412",
+  "Re": 4872545.763974179,
+  "mach": 0.15,
+  "alpha_deg": 2.0,
+  "solver": "SU2 8.5.0 RANS-SA OpenMP, 6 threads, one process",
+  "stored_triplet": "gci/gci.json",
+  "stored_triplet_rewritten": false,
+  "mesh": {
+    "refine": 2.0,
+    "cells": 107922,
+    "iterations": 16000,
+    "rounds": 4,
+    "iters_per_round": 4000,
+    "extra_rounds": 3,
+    "drift_tol": 0.001,
+    "cl": 0.479902776,
+    "cd": 0.01042138101,
+    "cm": -0.05604958364,
+    "rms_rho": -3.986274562,
+    "previous_round_rms_rho": -5.643872854,
+    "drift": {
+      "cl": 0.00044805721232168874,
+      "cd": 0.004158253110448486,
+      "cm": 0.0006902772061341414
+    },
+    "wall_s": [
+      485.1021091938019,
+      697.236,
+      687.233,
+      696.73
+    ],
+    "estimate_each_round": {
+      "mem_GB": 0.94,
+      "formula_min": 2.25,
+      "measured_first_round_min": 8.09,
+      "ram_available_GB": 19.63,
+      "disk_free_GB": 198.2
+    },
+    "note": "Publica-se o final da quarta ronda. O residual mais baixo foi o da terceira ronda e não substitui o final."
+  },
+  "triplet": {
+    "cells": [
+      107922,
+      59450,
+      34248
+    ],
+    "h": [
+      0.0030440025189253025,
+      0.00410132391597531,
+      0.005403590040938547
+    ],
+    "r21": 1.3473457694191722,
+    "r32": 1.3175233538347708,
+    "ref": "Celik et al. (2008) ASME JFE 130:078001",
+    "h_definition": "(1/N)^(1/2)",
+    "Fs": 1.25,
+    "angles_not_run_deg": [
+      0.0,
+      4.0
+    ],
+    "cl": {
+      "f": [
+        0.479902776,
+        0.4840306106,
+        0.4910535922
+      ],
+      "h": [
+        0.0030440025189253025,
+        0.00410132391597531,
+        0.005403590040938547
+      ],
+      "r21": 1.3473457694191722,
+      "r32": 1.3175233538347708,
+      "p": 2.132453315441809,
+      "oscillatory": false,
+      "f_ext": 0.4752567264226017,
+      "e_ext_fine": 0.009775873373472216,
+      "gci_fine": 0.01210153860778634,
+      "iter_drift": [
+        0.00044805721232168874,
+        1.6041960632099676e-05,
+        1.4684140620328284e-05
+      ],
+      "iterative_ok": true,
+      "ea21": 0.00860139762975667
+    },
+    "cd": {
+      "f": [
+        0.01042138101,
+        0.01078612799,
+        0.01158478508
+      ],
+      "h": [
+        0.0030440025189253025,
+        0.00410132391597531,
+        0.005403590040938547
+      ],
+      "r21": 1.3473457694191722,
+      "r32": 1.3175233538347708,
+      "p": 3.020064184755995,
+      "oscillatory": false,
+      "f_ext": 0.010171651184837068,
+      "e_ext_fine": 0.024551552213588013,
+      "gci_fine": 0.029954022519100357,
+      "iter_drift": [
+        0.004158253110448486,
+        0.0007542020646836133,
+        0.0007466810942339995
+      ],
+      "iterative_ok": false,
+      "ea21": 0.03499986994525982
+    },
+    "cm": {
+      "f": [
+        -0.05604958364,
+        -0.05716762472,
+        -0.05889266879
+      ],
+      "h": [
+        0.0030440025189253025,
+        0.00410132391597531,
+        0.005403590040938547
+      ],
+      "r21": 1.3473457694191722,
+      "r32": 1.3175233538347708,
+      "p": 1.7892756668702148,
+      "oscillatory": false,
+      "f_ext": -0.054463262398717044,
+      "e_ext_fine": 0.029126445449957503,
+      "gci_fine": 0.035377632139779125,
+      "iter_drift": [
+        0.0006902772061341414,
+        0.00015152125075036215,
+        5.3293390577893635e-05
+      ],
+      "iterative_ok": true,
+      "ea21": 0.01994735745373326
+    }
+  },
+  "pressuposto_angles": "PRESSUPOSTO: 0° e 4° são vizinhos da comparação cl = 0,5, não uma receita de Celik. Não foram corridos.",
+  "rans_wing_fuselage": {
+    "status": "nao_corrido",
+    "wetted_m2": {
+      "wing": 24.15070316215019,
+      "fuselage": 23.76638986223826
+    },
+    "nominal": {
+      "swet_m2": 47.91709302438845,
+      "surface_spacing_m": 0.013802602464351698,
+      "n_surface_tri": 251518,
+      "prism_layers": 42,
+      "cells_estimate": 12072848,
+      "ram_GB_1p8kB": 21.731126792695072,
+      "wall_h_8cores_formula": 40.242827393879764,
+      "wall_h_6threads_measured_rate": 218.6526955067467,
+      "fits_ram_formula": false,
+      "fits_24h_measured_rate": false
+    },
+    "nominal_one_alpha": {
+      "swet_m2": 47.91709302438845,
+      "surface_spacing_m": 0.013802602464351698,
+      "n_surface_tri": 251518,
+      "prism_layers": 42,
+      "cells_estimate": 12072848,
+      "ram_GB_1p8kB": 21.731126792695072,
+      "wall_h_8cores_formula": 13.41427579795992,
+      "wall_h_6threads_measured_rate": 72.88423183558224,
+      "fits_ram_formula": false,
+      "fits_24h_measured_rate": false
+    },
+    "coarsened_to_formula_ram": {
+      "swet_m2": 47.91709302438845,
+      "surface_spacing_m": 0.018253941759105118,
+      "n_surface_tri": 143806,
+      "prism_layers": 42,
+      "cells_estimate": 6902690,
+      "ram_GB_1p8kB": 12.424842274117134,
+      "wall_h_8cores_formula": 7.669655724763663,
+      "wall_h_6threads_measured_rate": 41.67179610454924,
+      "fits_ram_formula": true,
+      "fits_24h_measured_rate": false
+    },
+    "coarsened_three_alpha": {
+      "swet_m2": 47.91709302438845,
+      "surface_spacing_m": 0.018253941759105118,
+      "n_surface_tri": 143806,
+      "prism_layers": 42,
+      "cells_estimate": 6902690,
+      "ram_GB_1p8kB": 12.424842274117134,
+      "wall_h_8cores_formula": 23.00896717429099,
+      "wall_h_6threads_measured_rate": 125.01538831364773,
+      "fits_ram_formula": true,
+      "fits_24h_measured_rate": false
+    },
+    "cells_for_24h_one_alpha_at_measured_rate": 3975460.122699387,
+    "ram_GB_of_that_cell_count_formula": 7.155828220858896,
+    "ram_GB_of_that_cell_count_if_workset_factor_3p23": 23.11882963662105,
+    "ram_available_GB": 19.642,
+    "ram_limit_GB": 13.7494,
+    "disk_free_GB": 198.2,
+    "measured_rate_s_per_cell_iter_per_thread": 1.63e-05,
+    "workset_note": "PRESSUPOSTO: a taxa 1,63e-5 s/célula/iteração por thread e o conjunto de trabalho 8,4 GB contra 2,6 GB da fórmula são da malha hex da asa voadora, não desta malha.",
+    "reason": "A fórmula da asa e da fuselagem dá 21,7 GB, acima de 13,7 GB. A malha engrossada até caber na fórmula ainda leva 42 h num ângulo à taxa medida, acima de 24 h. Não há sólido só de asa e fuselagem e a camada de prismas 3-D não está verificada."
+  },
+  "rans_full_aircraft": {
+    "status": "proposta",
+    "same_as_stored_estimate": true,
+    "stored_estimate": "rans_case/estimate.json",
+    "wetted_m2": {
+      "wing": 24.15070316215019,
+      "fuselage": 23.76638986223826,
+      "htail": 5.538278162744849,
+      "vtail": 2.2927821306699565
+    },
+    "nominal_three_alpha": {
+      "swet_m2": 55.74815331780326,
+      "surface_spacing_m": 0.013802602464351698,
+      "n_surface_tri": 292623,
+      "prism_layers": 42,
+      "cells_estimate": 14045906,
+      "ram_GB_1p8kB": 25.282631139397026,
+      "wall_h_8cores_formula": 46.819687295179676,
+      "wall_h_6threads_measured_rate": 254.38696763714293,
+      "fits_ram_formula": false,
+      "fits_24h_measured_rate": false
+    },
+    "gear_and_propeller": "nao_incluido_na_area_molhada",
+    "reason": "O caso escrito do avião completo, e o avião com trem e hélice, não foram corridos."
+  },
+  "decision": "nao_aplicar",
+  "decision_reason": "Um ângulo. O CD da malha nova tem deriva 0,00416, acima de 0,001, e iterative_ok false. O GCI fino do CL é 1,21 % com iterative_ok true e não calibra a polar. O gci.json de três malhas não foi reescrito. O RANS da asa com fuselagem não coube. O yaml não muda."
+}
