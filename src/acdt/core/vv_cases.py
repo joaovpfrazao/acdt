@@ -446,7 +446,8 @@ _th = builder("termica")
      "verificacao",
      [Reference("D_mm", 0.706, "mm", INC6 + ", Ex. 5.1", tol_abs=5e-4, tol_source="resposta impressa a 3 algarismos"),
       Reference("t_s", 5.2, "s", INC6 + ", Ex. 5.1", tol_abs=0.05, tol_source="resposta impressa a 0,1 s (exato 5,16)"),
-      Reference("Bi", 0.1, "-", INC6 + ", Eq. 5.10 (critério)", kind="max", tol_source="critério de validade")],
+      Reference("Bi", 0.1, "-", INC6 + ", Eq. 5.10 (critério)", tol_abs=1e-9, kind="max",
+                tol_source="critério de validade Bi < 0,1 (tolerância só numérica)")],
      tests=("tests/test_thermal.py::test_incropera_ex51_lumped",))
 def _th_ex51() -> Mapping[str, float | None]:
     from acdt.core.thermal.convection import biot, lumped_time_to
