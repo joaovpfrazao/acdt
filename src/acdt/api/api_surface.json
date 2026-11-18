@@ -1,6 +1,6 @@
 {
  "schema": "acdt.api_surface/1",
- "api_version": "1.0.0",
+ "api_version": "1.1.0",
  "surface": {
   "ACDTDeprecationWarning": "class(DeprecationWarning)",
   "API_VERSION": "const:str",
@@ -21,6 +21,7 @@
   "load_test_data": "def(path: 'PathLike', meta: 'Mapping[str, Any] | PathLike | None' = None) -> 'Any'",
   "mdo": "def(mission: 'PathLike', output: 'PathLike | None' = None, *, mdo_file: 'PathLike | None' = None, overrides: 'Mapping[str, Any] | None' = None, plots: 'bool' = True) -> 'dict[str, Any]'",
   "mdo_study": "def(spec: 'Mapping[str, Any]', model: 'Any', output: 'PathLike | None' = None, *, plots: 'bool' = False) -> 'dict[str, Any]'",
+  "report": "def(design: 'PathLike', level: 'str', output: 'PathLike | None' = None, *, uq: 'Sequence[PathLike]' = (), mdo: 'Sequence[PathLike]' = (), vv: 'Sequence[PathLike]' = (), calib: 'Sequence[PathLike]' = (), criteria: 'PathLike | Mapping[str, Any] | None' = None, discover: 'bool' = True, pdf: 'bool' = False) -> 'dict[str, Any]'",
   "size": "def(mission: 'PathLike | Mapping[str, Any]', output: 'PathLike | None' = None, *, level: 'str | None' = None, no_systems: 'bool' = False) -> 'dict[str, Any]'",
   "uq": "def(mission: 'PathLike', output: 'PathLike | None' = None, *, uq_file: 'PathLike | None' = None, overrides: 'Mapping[str, Any] | None' = None, plots: 'bool' = True) -> 'dict[str, Any]'",
   "uq_study": "def(uncertainty: 'Mapping[str, Any]', model: 'Any', output: 'PathLike | None' = None, *, plots: 'bool' = False) -> 'dict[str, Any]'",

@@ -87,7 +87,8 @@ CRITERIA: dict[str, tuple[Criterion, ...]] = {
            "represent capabilities likely to be achieved within the scope of the project.", "conceito_viavel",
            "existe um dimensionamento registado e é viável (grandeza 'feasible')"),
         _c("SRR", 5, "sucesso", "Preliminary approaches have been determined for how requirements will be verified "
-           "and validated.", "metodo_por_requisito", "igual a SRR-E02"),
+           "and validated.", "metodo_por_requisito",
+           "cada linha da matriz tem método de verificação declarado"),
         _c("SRR", 6, "sucesso", "Major risks have been identified and technically assessed, and viable mitigation "
            "strategies have been defined.", None, _HUMAN + " (a lista de itens em aberto deste relatório é uma "
            "entrada para essa avaliação)"),
@@ -105,7 +106,8 @@ CRITERIA: dict[str, tuple[Criterion, ...]] = {
            "cada requisito tem avaliador declarado e registado (requisitos_sem_avaliador vazio)"),
         _c("PDR", 3, "sucesso", "The flow down of verifiable requirements is complete and proper, or, if not, an "
            "adequate plan exists for timely resolution of open items. Requirements are traceable to parent technical "
-           "requirements and to mission goals and objectives.", "arvore_requisitos", "igual a SRR-S03"),
+           "requirements and to mission goals and objectives.", "arvore_requisitos",
+           "a árvore de requisitos não tem problemas (tree_issues vazio) e cada requisito tem fonte"),
         _c("PDR", 4, "sucesso", "The preliminary design is expected to meet the requirements at an acceptable level "
            "of risk.", "incerteza_requisitos",
            "existe estudo de incerteza (acdt.uq/1) e nenhum requisito fica em prob_falha; inconclusivo → insuficiente"),

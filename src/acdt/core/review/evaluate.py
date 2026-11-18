@@ -201,14 +201,14 @@ def chk_margens(c: Ctx, cr: Criterion) -> Result:
     nl = [str(r["id"]) for r in num if r.get("status") == "no_limite"]
     ev = _ev_matrix(c)
     det = [f"{len(num)} requisitos com margem avaliada"]
-    if cr.params.get("require_uq"):
-        if not c.bundle.uq:
-            return "insuficiente", "; ".join(det + ["sem estudo de incerteza das margens (acdt uq)"]), ev
+    if cr.params.get("require_uq") and c.bundle.uq:
         ev += [c.bundle.rel(r.path) for r in c.bundle.uq]
         nl += sorted(rid for rid, lst in _uq_requirements(c).items()
                      if any(p.get("estado_probabilistico") == "prob_no_limite" for _, p in lst))
     if nl:
         return "nao_cumpre", f"margem dentro da tolerância (no_limite): {_list(sorted(set(nl)))}", ev
+    if cr.params.get("require_uq") and not c.bundle.uq:
+        return "insuficiente", "; ".join(det + ["sem estudo de incerteza das margens (acdt uq)"]), ev
     return "cumpre", "; ".join(det), ev
 
 
