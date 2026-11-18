@@ -1718,6 +1718,27 @@ no `design.json`, requisitos `noise` e `aural_detection_range`, avaliador `ruido
 * **Seguimentos**: validação contra medições publicadas; espessura (Deming) e voo (Garrick & Watkins); ruído de
   motor; Fidell et al. (1974) depois de consultar o original; ICAO Anexo 16 Cap. 10; ligação ao `acdt vtol`.
 
+### Gestão térmica L0/L1 (18 nov 2026, ramo `disc-termica`, PR #16)
+
+Segundo item das «disciplinas em falta». Núcleo `acdt/core/thermal/` (ar USSA 1976, MIL-HDBK-310, correlações de
+Incropera, conduto NACA RM A8I29, fontes de calor), etapa `thermal` do pipeline (`domains/aircraft/thermal.py`),
+disciplina `termica` no `design.json`, requisitos `thermal_margin`, `cold_thermal_margin` e `cooling_drag_area`,
+avaliador `termica:`, `acdt.api.thermal`/`thermal_atmosphere` (API 1.3.0) e seis casos V&V (todos passam). Doc:
+[TERMICA.md](TERMICA.md); CAPABILITIES §32s.
+
+* **Regra de completude**: fontes e temperaturas em intervalo; fonte sem majorante → margem a quente nunca passa;
+  ε/α não declarados valem [0, 1] (resultados largos: declarar a tinta); limites por enumeração dos vértices.
+* **Exemplo (teste, `examples/uav_endurance_payload.yaml` com um compartimento declarado, sem alterar o projeto)**:
+  η_ESC 0,97 e η_motor 0,90 declarados; cruzeiro quente (MIL-HDBK-310 1 %, 1120 W/m²) 102 W no compartimento,
+  entrada NACA dimensionada 7,1 cm², arrasto 0,096 N (ΔC_D0 2,8×10⁻⁴), conduto 0,038 kg. Compartimento 50–52 °C
+  em cruzeiro, 64–70 °C na subida e no solo ao sol; pacote a 60 °C máx. → margem a quente −28 a −23 K (falha: o
+  conduto foi dimensionado para o cruzeiro, não para a subida). Dia frio com obturador fechado: −40 a −35 °C,
+  margem a frio −14 a −9 K. `coupling: iterar`: W0 25,20 → 25,43 kg, converge em 3 iterações.
+* **Seguimentos**: no ciclo `iterar` o ponto de funcionamento usa o ponto de projeto enquanto a tabela de missão
+  não existe (área de arrasto da iteração ≈ 7 % abaixo da final); adaptadores VTOL/jato nativos; perdas do gerador
+  híbrido (`onboard`); potência de ventilador acoplada em motores térmicos; efeito Meredith e arrasto externo da
+  entrada; capacidade térmica por componente; permutadores líquidos; irradiância em altitude; Bernardi (baterias).
+
 ### Teste instável de reutilização de `run_id` (18 nov 2026, PR #12)
 
 Causa medida: falha transitória do AVL numa iteração intermédia do ciclo W0 → Schrenk só nessa iteração → ponto

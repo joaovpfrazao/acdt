@@ -14,7 +14,7 @@ from typing import Any, Mapping, Sequence
 from .air import MIL310, SOLAR_HOT_DAY_W_M2, ambient
 from .convection import INCROPERA, vertical_plate_natural
 from .cooling import MOMENTUM_REF, NACA_MFR_DESIGN, NACA_RM_A8I29, fan_power, size_ram_duct
-from .network import Bay, Bound, Condition, Phase, solve_bay_steady, solve_bay_transient
+from .network import Bay, Bound, Condition, Phase, corners, solve_bay_bounds, solve_bay_transient
 from .sources import HeatSource, from_spec, total
 
 SCHEMA = "acdt.thermal/1"
@@ -192,14 +192,16 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                 notes.append(f"compartimento '{bid}': conduto de ar dinâmico sem área (não dimensionado): "
                              "arrasto e massa de arrefecimento desconhecidos")
 
+        # condições com o conduto aberto (omissão: todas; um obturador fechado no dia frio declara-se aqui)
+        ram_open = set((ram or {}).get("open_conditions") or conds.keys())
         fan_conds = set((fan or {}).get("conditions") or [n for n, (c, _k) in conds.items() if c.V_m_s <= 0.5])
         for cn, (cond, case) in conds.items():
-            m_ram = mfr * cond.ambient.rho * cond.V_m_s * A_in if (A_in and cond.V_m_s > 0.5) else 0.0
+            m_ram = mfr * cond.ambient.rho * cond.V_m_s * A_in if (A_in and cond.V_m_s > 0.5 and cn in ram_open) \
+                else 0.0
             m_fan = float((fan or {}).get("mass_flow_kg_s", 0.0) or 0.0) if (fan and cn in fan_conds) else 0.0
             bay.vent_m_dot_kg_s = m_ram + m_fan
             Qlo, Qhi, det = bay_heat(cn)
-            hot = solve_bay_steady(bay, cond, Qhi, hot=True) if Qhi is not None else None
-            cold = solve_bay_steady(bay, cond, Qlo, hot=False)
+            cold, hot = solve_bay_bounds(bay, cond, Qlo, Qhi)
             if Qhi is None:
                 complete = False
             cres: dict[str, Any] = {
@@ -305,7 +307,8 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                         Q = hi if hotcase else lo
                         if Q is None:
                             return None
-                        m_ram = mfr * cond.ambient.rho * cond.V_m_s * A_in if (A_in and cond.V_m_s > 0.5) else 0.0
+                        m_ram = mfr * cond.ambient.rho * cond.V_m_s * A_in \
+                            if (A_in and cond.V_m_s > 0.5 and cn in ram_open) else 0.0
                         m_fan = float((fan or {}).get("mass_flow_kg_s", 0.0) or 0.0) if (fan and cn in fan_conds) \
                             else 0.0
                         out.append(Phase(cond, float(ph["duration_s"]), Q, m_ram + m_fan))
@@ -314,14 +317,18 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                 T0 = _num(tr.get("T0_C"))
                 T0K = first.ambient.T_K if T0 is None else T0 + 273.15
                 ph_hot, ph_cold = phases(True), phases(False)
-                th = solve_bay_transient(bay, ph_hot, T0K, hot=True) if ph_hot else None
-                tc = solve_bay_transient(bay, ph_cold, T0K, hot=False) if ph_cold else None
+                forced = any(conds[str(p["condition"])][0].V_m_s > 0.5 for p in tr["phases"])
+                cs = corners(bay, forced)
+                ths = [solve_bay_transient(bay, ph_hot, T0K, hot=c) for c in cs] if ph_hot else []
+                tcs = [solve_bay_transient(bay, ph_cold, T0K, hot=c) for c in cs] if ph_cold else []
+                th = max(ths, key=lambda r: r["T_max_K"]) if ths else None
+                tc_max = min(tcs, key=lambda r: r["T_max_K"]) if tcs else None
                 bres["transient"] = {
                     "T0_C": T0K - 273.15, "capacity_J_K": bay.capacity_J_K,
-                    "T_bay_max_C": _iv(None if tc is None else _C(tc["T_max_K"]),
+                    "T_bay_max_C": _iv(None if tc_max is None else _C(tc_max["T_max_K"]),
                                        None if th is None else _C(th["T_max_K"])),
-                    "T_bay_min_C": _iv(None if tc is None else _C(tc["T_min_K"]),
-                                       None if th is None else _C(th["T_min_K"])),
+                    "T_bay_min_C": _iv(None if not tcs else _C(min(r["T_min_K"] for r in tcs)),
+                                       None if not ths else _C(max(r["T_min_K"] for r in ths))),
                     "phase_at_max": None if th is None else th["phase_at_max"],
                     "history_hot": None if th is None else {"t_s": th["t_s"], "T_C": [x - 273.15 for x in th["T_K"]]},
                     "method": "capacidade concentrada (Incropera §5.3), RK45"}

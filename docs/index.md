@@ -20,6 +20,7 @@ ficam marcados como **PRESSUPOSTO**; desconhecido nunca é zero e "não avaliado
 | calibrar com dados de ensaio | [Calibração](CALIBRACAO.md) |
 | relatório de revisão SRR/PDR/CDR com veredito | [Relatórios](RELATORIOS.md) |
 | ruído de hélices/rotores, deteção auditiva, Parte 36 Ap. G | [Ruído](RUIDO.md) |
+| gestão térmica: compartimentos, dias quente/frio MIL-HDBK-310, arrefecimento e arrasto | [Térmica](TERMICA.md) |
 | CI, mypy, tolerâncias | [Qualidade](QUALIDADE.md) |
 
 O que o acdt faz, área a área, está em

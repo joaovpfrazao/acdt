@@ -91,22 +91,48 @@ class BaySolution:
     warnings: list[str]
 
 
-def _h_ext(cond: Condition, bay: Bay, T_s: float, hot: bool) -> tuple[float, str, list[str], bool]:
+Corner = tuple[float, float, float, bool]
+"""Vértice dos parâmetros incertos: (ε_ext, α_s, ε_int, camada limite turbulenta desde o bordo)."""
+
+
+def _corner(bay: Bay, hot: "bool | Corner") -> Corner:
+    if isinstance(hot, tuple):
+        return hot
+    if hot:
+        return (bay.eps_ext.lo, bay.alpha_solar.hi, bay.eps_int.lo, False)
+    return (bay.eps_ext.hi, bay.alpha_solar.lo, bay.eps_int.hi, True)
+
+
+def corners(bay: Bay, forced: bool = True) -> list[Corner]:
+    """Todos os vértices distintos da caixa de parâmetros incertos (ε_ext, α_s, ε_int e, com escoamento,
+    transição laminar/mista vs turbulenta desde o bordo).
+
+    PRESSUPOSTO: a temperatura é monótona em cada parâmetro (o sentido pode mudar — p. ex. ε_int aquece o
+    compartimento quando a pele está ao sol); os extremos estão então nos vértices."""
+    out: list[Corner] = []
+    for ee in sorted({bay.eps_ext.lo, bay.eps_ext.hi}):
+        for al in sorted({bay.alpha_solar.lo, bay.alpha_solar.hi}):
+            for ei in sorted({bay.eps_int.lo, bay.eps_int.hi}):
+                for tr in ((False, True) if forced else (False,)):
+                    out.append((ee, al, ei, tr))
+    return out
+
+
+def _h_ext(cond: Condition, bay: Bay, T_s: float, hot: "bool | Corner") -> tuple[float, str, list[str], bool]:
     a = cond.ambient
+    tripped = _corner(bay, hot)[3]
     if cond.V_m_s > 0.5:
-        c = flat_plate_forced(cond.V_m_s, bay.flow_length_m, T_s, a.T_K, a.p_Pa, tripped=not hot)
-        turb = (not hot) or (c.Re or 0.0) > 5e5
+        c = flat_plate_forced(cond.V_m_s, bay.flow_length_m, T_s, a.T_K, a.p_Pa, tripped=tripped)
+        turb = tripped or (c.Re or 0.0) > 5e5
         return c.h, c.correlation, c.warnings, turb
     c = vertical_plate_natural(bay.height_m, T_s if abs(T_s - a.T_K) > 1e-3 else a.T_K + 1e-3, a.T_K, a.p_Pa)
     return c.h, c.correlation + " (parado)", c.warnings, False
 
 
-def _state(bay: Bay, cond: Condition, T_b: float, hot: bool) -> dict[str, Any]:
+def _state(bay: Bay, cond: Condition, T_b: float, hot: "bool | Corner") -> dict[str, Any]:
     """Pele em equilíbrio para T_b imposto: devolve T_s, q_int, q_vent, h e correlações."""
     a = cond.ambient
-    eps_e = bay.eps_ext.lo if hot else bay.eps_ext.hi
-    alp = bay.alpha_solar.hi if hot else bay.alpha_solar.lo
-    eps_i = bay.eps_int.lo if hot else bay.eps_int.hi
+    eps_e, alp, eps_i, _tr = _corner(bay, hot)
     A = bay.skin_area_m2
     T_in = ram_temperature(a.T_K, cond.V_m_s)
     Pr = film_props(a.T_K, a.T_K, a.p_Pa).Pr
@@ -138,17 +164,17 @@ def _state(bay: Bay, cond: Condition, T_b: float, hot: bool) -> dict[str, Any]:
     return {"T_s": T_s, "q_int": qi, "q_vent": bay.vent_m_dot_kg_s * CP_AIR * (T_b - T_in), "T_in": T_in, **info}
 
 
-def losses(bay: Bay, cond: Condition, T_b: float, hot: bool) -> float:
+def losses(bay: Bay, cond: Condition, T_b: float, hot: "bool | Corner") -> float:
     """Calor que sai do compartimento à temperatura T_b (pele quase estacionária) [W]."""
     st = _state(bay, cond, T_b, hot)
     return float(st["q_int"] + st["q_vent"])
 
 
-def solve_bay_steady(bay: Bay, cond: Condition, Q_W: float, *, hot: bool) -> BaySolution:
+def solve_bay_steady(bay: Bay, cond: Condition, Q_W: float, *, hot: "bool | Corner") -> BaySolution:
     """Temperaturas de regime permanente do compartimento e da pele para a potência ``Q_W``.
 
-    ``hot=True``: extremo «quente» dos parâmetros desconhecidos (ε_ext mínimo, α_s máximo, ε_int mínimo, camada
-    limite laminar/mista); ``hot=False``: o extremo oposto."""
+    ``hot=True``: ε_ext mínimo, α_s máximo, ε_int mínimo, camada limite laminar/mista; ``hot=False``: o oposto;
+    ou um vértice explícito (``Corner``). Para limites rigorosos use :func:`solve_bay_bounds`."""
     a = cond.ambient
     T_in = ram_temperature(a.T_K, cond.V_m_s)
 
@@ -168,6 +194,17 @@ def solve_bay_steady(bay: Bay, cond: Condition, Q_W: float, *, hot: bool) -> Bay
                        [str(st["corr_e"]), str(st["corr_i"])], list(st["w_e"]) + list(st["w_i"]))
 
 
+def solve_bay_bounds(bay: Bay, cond: Condition, Q_lo: float, Q_hi: float | None
+                     ) -> tuple[BaySolution, BaySolution | None]:
+    """Minorante (com ``Q_lo``) e majorante (com ``Q_hi``; ``None`` = desconhecido) da temperatura do
+    compartimento: mínimo/máximo sobre todos os vértices de :func:`corners`."""
+    cs = corners(bay, cond.V_m_s > 0.5)
+    lo = min((solve_bay_steady(bay, cond, Q_lo, hot=c) for c in cs), key=lambda s: s.T_bay_K)
+    hi = None if Q_hi is None else max((solve_bay_steady(bay, cond, Q_hi, hot=c) for c in cs),
+                                       key=lambda s: s.T_bay_K)
+    return lo, hi
+
+
 @dataclass
 class Phase:
     """Fase do perfil para o transitório: condição, duração e potência gerada (função do tempo na fase)."""
@@ -178,7 +215,7 @@ class Phase:
     vent_m_dot_kg_s: float | None = None
 
 
-def solve_bay_transient(bay: Bay, phases: Sequence[Phase], T0_K: float, *, hot: bool, n_out: int = 40
+def solve_bay_transient(bay: Bay, phases: Sequence[Phase], T0_K: float, *, hot: "bool | Corner", n_out: int = 40
                         ) -> dict[str, Any]:
     """Integra C·dT_b/dt ao longo das fases (RK45, scipy). Precisa de ``bay.capacity_J_K``."""
     if not bay.capacity_J_K or bay.capacity_J_K <= 0:

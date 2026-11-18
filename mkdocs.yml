@@ -96,6 +96,7 @@ nav:
     - "Dados de ensaio e calibração de modelos (`acdt calib`)": CALIBRACAO.md
     - "Relatórios automáticos de revisão de projeto (`acdt report`)": RELATORIOS.md
     - "Ruído acústico (disciplina ruido, L0)": RUIDO.md
+    - "Gestão térmica (disciplina termica, L0/L1)": TERMICA.md
     - "Qualidade de software — CI, tipos, cobertura e tolerâncias numéricas": QUALIDADE.md
   - Referência:
     - API Python (acdt.api): referencia/api.md

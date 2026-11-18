@@ -1730,6 +1730,35 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   Anexo 16 Cap. 10 não implementados (fontes não verificadas); sem refração, atenuação do solo ou barreiras.
   Pormenor em [docs/RUIDO.md](docs/RUIDO.md).
 
+## 32s. Gestão térmica — L0/L1 (18 nov 2026)
+
+* **O que faz**: etapa `thermal` do pipeline (depois do ruído) para qualquer aeronave do adaptador `aircraft`
+  (elétrica, motor térmico, turbo-hélice; jatos com fontes declaradas). Fontes de calor a partir dos modelos
+  existentes (carga elétrica de bordo/carga útil, perdas da cadeia elétrica pelas eficiências, I²R da bateria,
+  calor rejeitado pelo motor térmico por balanço de energia), temperaturas de compartimento em regime permanente e
+  transitório concentrado, arrefecimento pela pele, por ar dinâmico (entrada NACA submersa + conduto) e por
+  ventilador, em dias quente e frio da MIL-HDBK-310. Limites de componentes como requisitos. `acdt.api.thermal`
+  aceita uma especificação genérica (VTOL, jatos, híbridos).
+* **Métodos**: Incropera 6.ª ed. (Eq. 1.7, 5.5–5.7, 5.10, 7.30, 7.38, 8.53/8.55/8.60, 9.26, 9.30–9.32), μ e k da
+  U.S. Standard Atmosphere 1976 (Eq. 51, 53), fator de recuperação (White), MIL-HDBK-310 (1997) perfis 1 %/20 %
+  e sol 1120 W/m², NACA RM A8I29 (MFR 0,60), arrasto interno pela quantidade de movimento (Anderson), Heywood
+  (1988) Cap. 12, PCI mínimos ASTM D910/D1655 (PRESSUPOSTO).
+* **Completude**: fontes, propriedades óticas e temperaturas são intervalos; fonte sem majorante → temperatura
+  máxima desconhecida → margem nunca passa; ε/α não declarados valem [0, 1]; conduto não dimensionável → arrasto
+  e massa desconhecidos (nunca 0).
+* **Acoplamento**: arrasto de arrefecimento (área de arrasto extra na polar), massa de conduto/permutador nos
+  pesos, potência do ventilador no balanço elétrico (elétricos). `coupling: relatorio` (omissão) só relata;
+  `coupling: iterar` faz ponto fixo com o dimensionamento.
+* **Integração**: secção `thermal` no `result.json`; disciplina `termica`/L0 no `design.json`; requisitos
+  `thermal_margin`, `cold_thermal_margin`, `cooling_drag_area` e avaliador `termica:<caminho>`; métricas de UQ e
+  MDO pelos caminhos `thermal.*`; API 1.3.0 (`thermal`, `thermal_atmosphere`).
+* **V&V**: `THERMAL-INC-EX5.1`, `-EX7.1`, `-EX9.2`, `-EX8.6` (exemplos resolvidos de Incropera), `THERMAL-MIL310`,
+  `THERMAL-AIR-PROPS` — todos passam. Sem validação contra ensaios ainda.
+* **Validado**: `tests/test_thermal.py`.
+* **Limites**: rede de dois nós por compartimento; sem permutadores líquidos, refrigeração, efeito Meredith ou
+  arrasto externo da entrada (só declarado); sol ao nível do mar a qualquer altitude; adaptadores VTOL/jato nativos
+  em falta. Pormenor em [docs/TERMICA.md](docs/TERMICA.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.
@@ -1835,7 +1864,7 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 11 | BAIXA | **Ingestão de dados de ensaio em voo** | calibrar polares, desempenho e estabilidade com dados reais (como a Fase 4 faz com CFD) | identificação de sistemas (output-error, Klein & Morelli); logs PX4/ArduPilot |
 | 12 | BAIXA (L0 feito 18 nov 2026, §32r) | **Ruído** | ruído de hélice para certificação e aceitação (UAV urbano) | feito: Gutin, Schlegel-King-Mull, ISO 9613-1, IEC 61672-1, ISO 226, Parte 36 Ap. G; falta Hanson, espessura, motor, ICAO Anexo 16 |
 | 13 | BAIXA | **Gelo** | penalização aerodinâmica e necessidade de proteção | NASA LEWICE (referência); CS-25 Anexo C (envelopes) |
-| 14 | BAIXA | **Gestão térmica** de aviónica e baterias | temperatura de células e eletrónica; dimensionamento de arrefecimento | balanços térmicos de parâmetros concentrados; modelo térmico de Bernardi (baterias) |
+| 14 | BAIXA (L0/L1 feito 18 nov 2026, §32s) | **Gestão térmica** de aviónica e baterias | temperatura de células e eletrónica; dimensionamento de arrefecimento | feito: parâmetros concentrados (Incropera), MIL-HDBK-310, entradas NACA; falta modelo térmico de Bernardi (baterias), permutadores líquidos |
 | 15 | BAIXA | **Custo do ciclo de vida, carbono e LCA** | custo total de posse e pegada (fabrico, operação, fim de vida) | LCC (Roskam VIII, a verificar); ISO 14040/44; fatores de emissão de bases públicas |
 | 16 | BAIXA | **Cadeia de abastecimento / BOM com preços em direto** | L2 do custo alimentado por preços atuais de distribuidores | pesquisa da IA com proveniência (já é a regra) + cache datada de cotações |
 | 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |

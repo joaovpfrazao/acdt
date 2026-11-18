@@ -10,7 +10,8 @@ import pytest
 from acdt.core.thermal.air import CP_AIR, ambient, air_props
 from acdt.core.thermal.convection import flat_plate_forced, vertical_plate_natural
 from acdt.core.thermal.cooling import fan_power, internal_drag, required_mass_flow, size_ram_duct
-from acdt.core.thermal.network import Bay, Bound, Condition, Phase, losses, solve_bay_steady, solve_bay_transient
+from acdt.core.thermal.network import (Bay, Bound, Condition, Phase, corners, losses, solve_bay_bounds, solve_bay_steady,
+                                       solve_bay_transient)
 from acdt.core.thermal.sources import electric_chain, ice_cooling, total
 from acdt.core.thermal.study import analyse
 
@@ -90,9 +91,18 @@ def test_steady_energy_balance_closes_and_bounds_are_ordered():
     assert s.q_skin_W + s.q_vent_W == pytest.approx(100.0, rel=1e-4)
     assert s.T_bay_K > cond.ambient.T_K
     wide = _bay(vent_m_dot_kg_s=0.01, eps_ext=Bound(0.0, 1.0, "t"), alpha_solar=Bound(0.0, 1.0, "t"), eps_int=Bound(0.0, 1.0, "t"))
-    hi = solve_bay_steady(wide, cond, 100.0, hot=True)
-    lo = solve_bay_steady(wide, cond, 100.0, hot=False)
-    assert lo.T_bay_K < s.T_bay_K < hi.T_bay_K
+    lo, hi = solve_bay_bounds(wide, cond, 100.0, 100.0)
+    assert hi is not None and lo.T_bay_K < s.T_bay_K < hi.T_bay_K
+    assert len(corners(wide)) == 16 and len(corners(_bay(), forced=False)) == 1
+    # qualquer ponto interior da caixa fica entre os limites (monotonia por parâmetro)
+    for c in [(0.5, 0.5, 0.5, False), (0.2, 0.9, 0.7, True), (0.95, 0.05, 0.3, False)]:
+        T = solve_bay_steady(wide, cond, 100.0, hot=c).T_bay_K
+        assert lo.T_bay_K - 1e-6 <= T <= hi.T_bay_K + 1e-6
+    # parado ao sol com pouca potência: a pele aquece o compartimento, logo ε_int alto é o vértice quente
+    sun = Condition("s", ambient("mil310_hot_1pct", 0.0), 0.0, 1120.0)
+    b2 = _bay(alpha_solar=Bound(0.9, 0.9, "t"), eps_int=Bound(0.1, 0.9, "t"))
+    lo2, hi2 = solve_bay_bounds(b2, sun, 5.0, 5.0)
+    assert hi2 is not None and hi2.T_bay_K >= solve_bay_steady(b2, sun, 5.0, hot=True).T_bay_K
     # sem calor, sem sol, parado: equilíbrio com o ambiente
     z = solve_bay_steady(_bay(), Condition("z", ambient("isa", 0.0), 0.0, 0.0), 0.0, hot=True)
     assert z.T_bay_K == pytest.approx(288.15, abs=0.05)
@@ -201,6 +211,11 @@ def test_generic_study_intervals_unknown_and_ram_air_coupling_outputs():
     cr = r3["bays"]["baia"]["conditions"]["cruz"]
     assert cr["vent_m_dot_kg_s"] > 0
     assert cr["T_bay_C"]["hi"] < c["T_bay_C"]["hi"]  # ventilado arrefece
+    # obturador: conduto fechado no dia frio → sem ventilação nessa condição
+    s5 = _spec(ram_air={"size_for": "cruz", "ram_recovery": 0.8, "duct_loss_q": 0.5, "open_conditions": ["cruz", "solo"]})
+    r5 = analyse(s5)
+    assert r5["bays"]["baia"]["conditions"]["frio"]["vent_m_dot_kg_s"] == 0.0
+    assert r5["bays"]["baia"]["conditions"]["cruz"]["vent_m_dot_kg_s"] > 0.0
     # conduto impossível (limite abaixo da temperatura de recuperação): arrasto desconhecido, nunca zero
     s4 = _spec(ram_air={"size_for": "cruz"}, air_T_max_C=30.0)
     r4 = analyse(s4)
@@ -276,7 +291,8 @@ def test_thermal_stage_electric_uav_in_pipeline_and_coupling():
     assert src["esc"]["lo_W"] == src["esc"]["hi_W"] > 0  # η declarados → bateria pela diferença, ESC exato
     assert th["bays"]["fuselagem"]["cooling"]["inlet_area_m2"] > 0
     assert th["cooling"]["drag_area_m2"]["hi"] > 0 and th["cooling"]["mass_kg"] > 0
-    assert th["bays"]["fuselagem"]["transient"]["T_bay_max_C"]["hi"] is not None
+    tmax = th["bays"]["fuselagem"]["transient"]["T_bay_max_C"]
+    assert tmax["hi"] is not None and tmax["lo"] <= tmax["hi"]
     rows = {r["id"]: r for r in st["verification"]["rows"]}
     assert rows["TH-01"]["status"] in ("passa", "falha", "desconhecido")
     assert rows["TH-02"]["status"] == "passa"

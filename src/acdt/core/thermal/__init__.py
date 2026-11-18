@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from .air import AIR_REF, Ambient, air_props, ambient
 from .convection import INCROPERA
-from .network import Bay, BaySolution, solve_bay_steady, solve_bay_transient
+from .network import Bay, BaySolution, corners, solve_bay_bounds, solve_bay_steady, solve_bay_transient
 
-__all__ = ["AIR_REF", "Ambient", "air_props", "ambient", "INCROPERA", "Bay", "BaySolution", "solve_bay_steady",
-           "solve_bay_transient"]
+__all__ = ["AIR_REF", "Ambient", "air_props", "ambient", "INCROPERA", "Bay", "BaySolution", "corners",
+           "solve_bay_bounds", "solve_bay_steady", "solve_bay_transient"]
