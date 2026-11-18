@@ -1739,6 +1739,28 @@ avaliador `termica:`, `acdt.api.thermal`/`thermal_atmosphere` (API 1.3.0) e seis
   híbrido (`onboard`); potência de ventilador acoplada em motores térmicos; efeito Meredith e arrasto externo da
   entrada; capacidade térmica por componente; permutadores líquidos; irradiância em altitude; Bernardi (baterias).
 
+### Gelo L0/L1 (18 nov 2026, ramo `disc-gelo`, PR #17)
+
+Terceiro item das «disciplinas em falta». Núcleo `acdt/core/icing/` (propriedades, captação, Messinger, envelopes
+do Ap. C, proteção, penalização, estudo genérico), etapa `icing` do pipeline (`domains/aircraft/icing.py`),
+disciplina `gelo` no `design.json`, requisitos `ice_protection_power`, `max_ice_thickness` e
+`flight_into_known_icing`, avaliador `gelo:`, `acdt.api.icing`/`icing_envelope` (API 1.4.0) e quatro casos V&V
+(todos passam). Doc: [GELO.md](GELO.md); CAPABILITIES §32t.
+
+* **Regra de completude**: espessura `lo` só com exposição padrão e condições dentro do envelope, `hi` com a
+  condição inteira, β₀/0,953 e ρ_i −10 %; FIKI nunca passa por análise; botas, gelo residual e ΔC_D0 desconhecidos.
+* **Exemplo (teste, `examples/uav_endurance_payload.yaml` sem alterar o projeto)**: superfícies por omissão sem
+  proteção; exposição 28–163 min (subida, espera, descida); espessura máxima 14,1–57,2 mm no estabilizador
+  horizontal (d = 5,4 mm); asa 11,3–45,4 mm; C_L,max com gelo 0,28–0,69 do limpo (Broeren, PRESSUPOSTO). Com degelo
+  eletrotérmico declarado na asa (0,2 m², ciclo 0,1, 10 kW/m², 0,3 kg) e `coupling: iterar`: 251 W no balanço,
+  W0 25,20 → 34,31 kg, converge em 2 iterações.
+* **Achados**: a Tabela 3 de Jeck (intermitente −30 °C/35 µm, 0,398) não bate com a Tabela 1 (0,350/1,100 = 0,318);
+  o power budget em malha fechada substitui `systems_power_W`, pelo que a proteção entra também como carga
+  `systems.loads` (o acoplamento térmico tem a mesma lacuna — seguimento).
+* **Seguimentos**: Ap. O (SLD); β local e gelo de retorno/intercíclico; geometria a evoluir com a acreção;
+  penalização por tipo de gelo e ΔC_D0; ar sangrado e botas; encontros mistos; carga de proteção só na fração de
+  exposição; adaptadores VTOL/jato nativos; validação contra formas de gelo medidas (NASA IRT).
+
 ### Teste instável de reutilização de `run_id` (18 nov 2026, PR #12)
 
 Causa medida: falha transitória do AVL numa iteração intermédia do ciclo W0 → Schrenk só nessa iteração → ponto

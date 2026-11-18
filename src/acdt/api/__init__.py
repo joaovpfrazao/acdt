@@ -25,7 +25,7 @@ from acdt import __version__
 from ._deprecation import DEPRECATED, ACDTDeprecationWarning, deprecated
 
 #: Versão semântica da API pública (independente da versão do pacote, :data:`acdt.__version__`).
-API_VERSION = "1.3.0"
+API_VERSION = "1.4.0"
 
 #: Níveis de fidelidade aceites por :func:`size`/:func:`analyse` (``None`` = o que a missão declara).
 LEVELS: dict[str, str] = {"L0": "handbook", "L1": "lowfi"}
@@ -46,6 +46,8 @@ __all__ = [
     "rotor_noise",
     # gestão térmica (L0/L1), genérica para qualquer tipo de aeronave
     "thermal", "thermal_atmosphere",
+    # gelo (L0/L1), genérico para qualquer tipo de aeronave
+    "icing", "icing_envelope",
     # erros
     "errors",
 ]
@@ -562,3 +564,29 @@ def thermal_atmosphere(profile: str, altitude_m: float, *, T_sl_C: float | None 
     a = ambient(profile, altitude_m, T_sl_C=T_sl_C)
     return {"profile": a.profile, "altitude_m": a.altitude_m, "T_C": a.T_C, "p_Pa": a.p_Pa, "rho_kg_m3": a.rho,
             "source": a.source}
+
+
+def icing(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Análise de gelo genérica (desde 1.4.0; docs/GELO.md): envelopes do 14 CFR 25 Ap. C (contínuo, intermitente,
+    descolagem; Jeck DOT/FAA/AR-00/30), captação na estagnação (Langmuir & Blodgett), fração de congelação e tipo de
+    gelo (Messinger), espessura acumulada e potência de proteção (anti-gelo térmico, degelo eletrotérmico), como
+    intervalos ``{lo, hi}`` (desconhecido = ``None``). Serve qualquer aeronave: o chamador dá ``conditions``
+    (altitude, velocidade, duração) e ``surfaces`` (d = 2 r_le ou corda + t/c, proteção)."""
+    from acdt.core.icing.study import analyse
+
+    return analyse(spec)
+
+
+def icing_envelope(kind: str, T_C: float, mvd_um: float, *, horizontal_extent_nmi: float | None = None,
+                   altitude_m: float | None = None) -> dict[str, Any]:
+    """LWC de projeto do 14 CFR 25 Ap. C (desde 1.4.0): ``continuous``, ``intermittent`` ou ``takeoff``; com
+    ``altitude_m`` diz também se o ponto está dentro do envelope altitude–temperatura (Figs. 2/5)."""
+    from acdt.core.icing.envelopes import design_lwc, in_envelope
+
+    r = design_lwc(kind, T_C, mvd_um, horizontal_extent_nmi)
+    out: dict[str, Any] = {"kind": kind, "T_C": T_C, "mvd_um": mvd_um, "lwc_g_m3": r.lwc_g_m3,
+                           "lwc_standard_g_m3": r.lwc_standard_g_m3, "F": r.F, "horizontal_extent_nmi": r.he_nmi,
+                           "note": r.note, "source": r.source}
+    if altitude_m is not None:
+        out["envelope_status"] = in_envelope(kind, altitude_m, T_C)
+    return out

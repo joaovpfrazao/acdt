@@ -59,6 +59,16 @@ _BUILTIN = [
                     reference="thermal.py: Incropera et al. 6th ed. correlations, MIL-HDBK-310 (docs/TERMICA.md)"),
     RequirementType("cooling_drag_area", "area", "Cooling drag area D/q at hot-day cruise (ram air + engine cooling)",
                     ("check",), ("max",), reference="thermal.py: momentum + Bernoulli, NACA RM A8I29 (docs/TERMICA.md)"),
+    RequirementType("ice_protection_power", "power", "Ice-protection power required (thermal anti-ice / "
+                    "electro-thermal de-ice) must not exceed the power available for it", ("check",), ("max",),
+                    reference="icing.py: Messinger (1953) heat balance via Anderson NASA/CR-2004-212875; 14 CFR 25 "
+                    "App. C (docs/GELO.md)"),
+    RequirementType("max_ice_thickness", "length", "Maximum stagnation-line ice thickness on unprotected surfaces "
+                    "over the design icing encounter (14 CFR 25 App. C)", ("check",), ("max",),
+                    reference="icing.py: Langmuir & Blodgett + Messinger via Anderson NASA/CR-2004-212875 (docs/GELO.md)"),
+    RequirementType("flight_into_known_icing", "category", "Flight into known icing intended (sim/nao); an L0 "
+                    "analysis can only fail or stay unknown, never demonstrate it (14 CFR 25.1419)", ("check",),
+                    ("target",), choices=("sim", "nao"), reference="icing.py (docs/GELO.md)"),
     RequirementType("regulatory_category", "category", "Regulatory / certification basis", ("check", "systems"),
                     ("target",), choices=("easa_open", "easa_specific", "easa_certified", "stanag_4703",
                                           "stanag_4671", "cs_23", "cs_vla", "cs_lsa", "far_23")),

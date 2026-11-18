@@ -19,6 +19,11 @@ de ``assumptions.constraints``).
   térmicas são **intervalos** {lo, hi}: num requisito ``min`` passa só se ``lo`` ≥ limiar, falha se ``hi`` < limiar;
   num ``max`` passa só se ``hi`` ≤ limiar, falha se ``lo`` > limiar; o resto (ou majorante desconhecido) fica
   desconhecido — nunca passa por omissão.
+* ``gelo:<caminho>`` — grandeza da secção ``icing`` (icing.py; docs/GELO.md), p. ex. ``max_thickness_m``,
+  ``protection.power_W``, ``protection.electrical_power_W``, ``exposure_s``, ``fiki``. Intervalos {lo, hi} com a
+  mesma regra da térmica (min: passa se lo ≥ limiar; max: passa se hi ≤ limiar; resto desconhecido). ``gelo:fiki``
+  (requisito ``flight_into_known_icing``): «no» passa por declaração; «yes» falha se uma superfície crítica sem
+  proteção acumula gelo e, senão, fica desconhecido (uma análise L0 não demonstra o 14 CFR 25.1419).
 * ``entrada:<requisito>`` — entradas do dimensionamento (velocidade/altitude de cruzeiro, payload, tripulação)
   lidas do que o dimensionamento usou: cumprido por construção, verificação por inspeção.
 """
@@ -137,6 +142,9 @@ def _list_evidence(ctx: VerificationContext) -> list[str]:
     th = ctx.result.get("thermal")
     if isinstance(th, dict) and th.get("evaluated"):
         out += ["termica:hot_margin_C", "termica:cold_margin_C", "termica:cooling.drag_area_m2"]
+    ic = ctx.result.get("icing")
+    if isinstance(ic, dict) and ic.get("evaluated"):
+        out += ["gelo:max_thickness_m", "gelo:protection.power_W", "gelo:fiki"]
     return out
 
 
@@ -224,6 +232,72 @@ def _eval_thermal(req: TracedRequirement, ctx: VerificationContext, key: str) ->
 register_evaluator(Evaluator("termica:", _eval_thermal, "disciplina térmica L0/L1 (Incropera et al. 6.ª ed., "
                              "MIL-HDBK-310, NACA RM A8I29); intervalos — desconhecido se atravessa o limiar",
                              "analise", "N0", "Incropera et al. 2007; MIL-HDBK-310; NACA RM A8I29", ("aircraft",)))
+def _eval_icing(req: TracedRequirement, ctx: VerificationContext, key: str) -> Evidence:
+    from acdt.core.verification import json_path
+
+    ic = ctx.result.get("icing")
+    if not isinstance(ic, dict):
+        return Evidence(ran=False, message="etapa de gelo não correu")
+    if not ic.get("evaluated"):
+        return Evidence(ran=False, message=f"gelo não avaliado: {ic.get('reason', '')}")
+    if key == "fiki":
+        want = str(req.threshold).lower() if req.threshold is not None else "yes"
+        if want in ("no", "nao", "não", "false", "n"):
+            return Evidence(None, ok=True, message="voo em gelo conhecido não pretendido (declaração)",
+                            pointer="icing.surfaces", fidelity="N0")
+        bad = [sid for sid, so in (ic.get("surfaces") or {}).items() if so.get("critical", True)
+               and so.get("protection") == "none" and ((so.get("thickness_mm") or {}).get("lo") or 0.0) > 0.0]
+        if bad:
+            return Evidence(None, ok=False, message=f"superfícies críticas sem proteção acumulam gelo: {bad}",
+                            pointer="icing.surfaces", fidelity="N0")
+        return Evidence(None, message="análise L0 não demonstra voo em gelo conhecido (14 CFR 25.1419 exige "
+                        "ensaios/análise certificada); nenhuma falha detetada", pointer="icing.surfaces",
+                        fidelity="N0")
+    try:
+        v = json_path(ic, key)
+    except (KeyError, ValueError, IndexError, TypeError):
+        return Evidence(ran=False, message=f"icing.{key} não existe", pointer=f"icing.{key}")
+    rt = REGISTRY.get(req.quantity)
+    u = units.default_unit(rt.dimension) if rt is not None else req.unit
+
+    def num(x: Any) -> float | None:
+        return float(x) if isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(float(x)) \
+            else None
+
+    if isinstance(v, dict) and ("lo" in v or "hi" in v):
+        lo, hi = num(v.get("lo")), num(v.get("hi"))
+        thr = num(req.threshold)
+        rng = f"[{'?' if lo is None else f'{lo:.4g}'}, {'?' if hi is None else f'{hi:.4g}'}]"
+        if thr is not None and req.comparison == "min":
+            if lo is not None and lo >= thr:
+                return Evidence(lo, u, pointer=f"icing.{key}.lo", fidelity="N0", message=f"intervalo {rng}: "
+                                "o minorante cumpre")
+            if hi is not None and hi < thr:
+                return Evidence(hi, u, pointer=f"icing.{key}.hi", fidelity="N0", message=f"intervalo {rng}: "
+                                "nem o majorante cumpre")
+            return Evidence(None, message=f"icing.{key} = {rng} atravessa o limiar ou tem extremo desconhecido",
+                            pointer=f"icing.{key}", fidelity="N0")
+        if thr is not None and req.comparison == "max":
+            if hi is not None and hi <= thr:
+                return Evidence(hi, u, pointer=f"icing.{key}.hi", fidelity="N0", message=f"intervalo {rng}: "
+                                "o majorante cumpre")
+            if lo is not None and lo > thr:
+                return Evidence(lo, u, pointer=f"icing.{key}.lo", fidelity="N0", message=f"intervalo {rng}: "
+                                "nem o minorante cumpre")
+            return Evidence(None, message=f"icing.{key} = {rng} atravessa o limiar ou tem extremo desconhecido "
+                            "(declare as entradas em falta)", pointer=f"icing.{key}", fidelity="N0")
+        return Evidence(None, message=f"icing.{key} é um intervalo {rng}: só comparações min/max",
+                        pointer=f"icing.{key}")
+    x = num(v)
+    if x is None:
+        return Evidence(None, message=f"icing.{key} sem valor", pointer=f"icing.{key}")
+    return Evidence(x, u, pointer=f"icing.{key}", fidelity="N0")
+
+
+register_evaluator(Evaluator("gelo:", _eval_icing, "disciplina gelo L0/L1 (14 CFR 25 Ap. C via Jeck "
+                             "DOT/FAA/AR-00/30; Langmuir & Blodgett e Messinger via Anderson NASA/CR-2004-212875); "
+                             "intervalos — desconhecido se atravessa o limiar", "analise", "N0",
+                             "14 CFR 25 Ap. C; Anderson 2004; Langmuir & Blodgett 1946; Messinger 1953", ("aircraft",)))
 register_evaluator(Evaluator("entrada:", _eval_input, "entrada do dimensionamento (por construção)",
                              "inspecao", "N0", domains=("aircraft",)))
 register_evidence_lister("aircraft", _list_evidence)
@@ -240,5 +314,8 @@ register_default_evaluator("aircraft", "aural_detection_range", "ruido:detection
 register_default_evaluator("aircraft", "thermal_margin", "termica:hot_margin_C", "analise", "N0")
 register_default_evaluator("aircraft", "cold_thermal_margin", "termica:cold_margin_C", "analise", "N0")
 register_default_evaluator("aircraft", "cooling_drag_area", "termica:cooling.drag_area_m2", "analise", "N0")
+register_default_evaluator("aircraft", "ice_protection_power", "gelo:protection.power_W", "analise", "N0")
+register_default_evaluator("aircraft", "max_ice_thickness", "gelo:max_thickness_m", "analise", "N0")
+register_default_evaluator("aircraft", "flight_into_known_icing", "gelo:fiki", "analise", "N0")
 for _k in ("regulatory_category", "unit_cost", "power_available", "thrust_available"):
     register_default_evaluator("aircraft", _k, f"check:{_k}", "analise", "N0")

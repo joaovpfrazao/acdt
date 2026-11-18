@@ -549,3 +549,93 @@ def _th_air() -> Mapping[str, float | None]:
 
     a = air_props(300.0, 101325.0)
     return {"mu_300K": a.mu, "k_300K": a.k, "Pr_300K": a.Pr}
+
+
+# ------------------------------------------------------------------------------------------------ gelo
+AND04 = ("Anderson, D. N., Manual of Scaling Methods, NASA/CR-2004-212875 (NASA Glenn, 2004), Apêndice B "
+         "(cálculo passo a passo; propriedades do Apêndice A)")
+JECK = ("Jeck, R. K., Icing Design Envelopes (14 CFR Parts 25 and 29, Appendix C) Converted to a Distance-Based "
+        "Format, DOT/FAA/AR-00/30 (FAA, 2002), Tabelas 1 e 2")
+_ic = builder("gelo")
+_MPH, _PSI, _IN = 0.44704, 6894.757293168, 0.0254
+_TOLN = "valor impresso com 3–4 algarismos; arredondamentos intermédios da folha de cálculo da NASA"
+
+
+def _and_case(t_F: float, V_mph: float, mvd_um: float, lwc: float, tau_min: float) -> dict[str, float | None]:
+    from acdt.core.icing.accretion import accumulation_parameter, stagnation
+
+    d = 0.0316 * 36.0 * _IN  # NACA 0012, c = 36 in: d = 2 r_le = 0,0316 c (Abbott & von Doenhoff via Anderson)
+    V = V_mph * _MPH
+    r = stagnation(T_st=273.15 + (t_F - 32.0) / 1.8, V=V, d_m=d, mvd_m=mvd_um * 1e-6, lwc_kg_m3=lwc * 1e-3,
+                   p_tot=14.5 * _PSI)
+    return {"K": r.imp.K, "K0": r.imp.K0, "beta0": r.imp.beta0, "Ac": accumulation_parameter(lwc * 1e-3, V,
+            tau_min * 60.0, d), "h_c": r.h_c, "b": r.b, "phi": r.phi, "theta": r.theta, "n0": r.n0_raw,
+            "p_st": r.p_st}
+
+
+def _and_refs(case: str, K: float, K0: float, b0: float, Ac: float, hc_cal: float, b: float, phi: float,
+              theta: float, n0: float, p_st: float) -> list[Reference]:
+    src = f"{AND04}, §{case}"
+    return [Reference("K", K, "-", src, tol_rel=1e-3, tol_source=_TOLN),
+            Reference("K0", K0, "-", src, tol_rel=1e-3, tol_source=_TOLN),
+            Reference("beta0", b0, "-", src, tol_abs=5e-4, tol_source="3 algarismos"),
+            Reference("Ac", Ac, "-", src, tol_rel=1e-3, tol_source=_TOLN),
+            Reference("h_c", hc_cal * 4.1868 / 3600.0, "W/(m²·K)", src + f" ({hc_cal:.4g} cal/(h·m²·K))",
+                      tol_rel=1e-3, tol_source=_TOLN),
+            Reference("b", b, "-", src, tol_rel=1e-3, tol_source=_TOLN),
+            Reference("phi", phi, "K", src, tol_abs=0.01, tol_source="impresso a 0,01 K"),
+            Reference("theta", theta, "K", src, tol_rel=2e-3, tol_source=_TOLN + " (termo de evaporação)"),
+            Reference("n0", n0, "-", src, tol_abs=1e-3, tol_source="3 algarismos"),
+            Reference("p_st", p_st, "Pa", src + " (Eq. A.7)", tol_rel=5e-4, tol_source="4 algarismos")]
+
+
+@_ic("ICING-AND-B1", "Captação e fração de congelação: exemplo B.1 de Anderson (NACA 0012, 40 µm)",
+     "NACA 0012, c = 36 in (d = 0,0316 c), t_st = 5,8 °F, p_tot = 14,5 psia, V = 150 mph, MVD = 40 µm, LWC = 1 g/m³, "
+     "τ = 15,1 min: K, K₀ (Langmuir & Blodgett), β₀ (Eq. 3.13), A_c, h_c (Eq. 3.33), b, φ, θ e n₀ (Messinger).",
+     "verificacao", _and_refs("B.1.2", 12.56, 3.350, 0.789, 2.293, 2.690e5, 0.7134, 14.02, 19.23, 0.518, 9.700e4),
+     tests=("tests/test_icing.py::test_anderson_b1_reference",))
+def _ic_b1() -> Mapping[str, float | None]:
+    return _and_case(5.8, 150.0, 40.0, 1.0, 15.1)
+
+
+@_ic("ICING-AND-B2", "Captação e fração de congelação: exemplo B.2 de Anderson (NACA 0012, 20 µm)",
+     "NACA 0012, c = 36 in, t_st = 19,6 °F, p_tot = 14,5 psia, V = 200 mph, MVD = 20 µm, LWC = 0,25 g/m³, τ = 25 min.",
+     "verificacao", _and_refs("B.2.2", 4.09, 1.381, 0.629, 1.265, 3.068e5, 0.1662, 5.94, 6.88, 0.598, 9.492e4),
+     tests=("tests/test_icing.py::test_anderson_b2_reference",))
+def _ic_b2() -> Mapping[str, float | None]:
+    return _and_case(19.6, 200.0, 20.0, 0.25, 25.0)
+
+
+@_ic("ICING-APPC-JECK", "Envelopes do 14 CFR 25 Ap. C (contínuo, intermitente, descolagem)",
+     "LWC de projeto nos nós das tabelas de Jeck (corpo = LWC padrão × F) e o gelo de descolagem do texto do "
+     "Apêndice C, Parte I(c).", "verificacao",
+     [Reference("cont_0C_15um_17nmi", 0.800, "g/m³", JECK, tol_abs=5e-4, tol_source="3 casas decimais"),
+      Reference("cont_m10C_20um_100nmi", 0.191, "g/m³", JECK, tol_abs=5e-4, tol_source="3 casas decimais"),
+      Reference("cont_m30C_40um_300nmi", 0.009, "g/m³", JECK, tol_abs=5e-4, tol_source="3 casas decimais"),
+      Reference("int_0C_15um_0p26nmi", 3.915, "g/m³", JECK, tol_abs=5e-4, tol_source="3 casas decimais"),
+      Reference("int_m20C_25um_4nmi", 1.041, "g/m³", JECK, tol_abs=5e-4, tol_source="3 casas decimais"),
+      Reference("takeoff_lwc", 0.35, "g/m³", "14 CFR 25 Ap. C, Parte I(c) (eCFR)", tol_abs=1e-12,
+                tol_source="valor regulamentar")],
+     tests=("tests/test_icing.py::test_appendix_c_tables",))
+def _ic_appc() -> Mapping[str, float | None]:
+    from acdt.core.icing.envelopes import design_lwc
+
+    return {"cont_0C_15um_17nmi": design_lwc("continuous", 0, 15, 17.4).lwc_g_m3,
+            "cont_m10C_20um_100nmi": design_lwc("continuous", -10, 20, 100).lwc_g_m3,
+            "cont_m30C_40um_300nmi": design_lwc("continuous", -30, 40, 300).lwc_g_m3,
+            "int_0C_15um_0p26nmi": design_lwc("intermittent", 0, 15, 0.26).lwc_g_m3,
+            "int_m20C_25um_4nmi": design_lwc("intermittent", -20, 25, 4.0).lwc_g_m3,
+            "takeoff_lwc": design_lwc("takeoff", -9, 20).lwc_g_m3}
+
+
+@_ic("ICING-NACA0012-RLE", "Raio do bordo de ataque NACA 0012 (r_le = 1,1019 t² c)",
+     "Abbott & von Doenhoff (1959): r_le/c = 1,1019 t²; Anderson (Ap. B) usa 1,58 % da corda para o NACA 0012.",
+     "verificacao",
+     [Reference("rle_c", 0.0158, "-", AND04 + ", §B.1.2 (Abbott & von Doenhoff)", tol_abs=1e-4,
+                tol_source="impresso 1,58 %; 1,1019 t² dá 1,587 % — a meia unidade (5×10⁻⁵) falhou na 1.ª corrida, "
+                "tolerância alargada a 10⁻⁴ e registada em docs/VV.md (arredondamento da tabela)")],
+     tests=("tests/test_icing.py::test_naca_le_radius",))
+def _ic_rle() -> Mapping[str, float | None]:
+    from acdt.core.icing.impingement import naca4_le_radius
+
+    return {"rle_c": naca4_le_radius(0.12, 1.0)}

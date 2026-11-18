@@ -26,13 +26,25 @@ def _size(st: DesignState):
         return run(sp), None
 
     th = (spec.assumptions.get("thermal") or {}) if isinstance(spec.assumptions, dict) else {}
-    if th.get("coupling") == "iterar" and th.get("enabled", True):
-        # acoplamento térmico (thermal.py; docs/TERMICA.md): ponto fixo dimensionamento ↔ arrefecimento
-        from .thermal import size_with_thermal
-        res, sysr, loop = size_with_thermal(spec, run_fn)
-        res.thermal_coupling = loop
+    ic = (spec.assumptions.get("icing") or {}) if isinstance(spec.assumptions, dict) else {}
+    th_iter = th.get("coupling") == "iterar" and th.get("enabled", True)
+
+    def run_th(sp):  # noqa: ANN001, ANN202
+        if th_iter:
+            # acoplamento térmico (thermal.py; docs/TERMICA.md): ponto fixo dimensionamento ↔ arrefecimento
+            from .thermal import size_with_thermal
+            r, s, loop_th = size_with_thermal(sp, run_fn)
+            r.thermal_coupling = loop_th
+            return r, s
+        return run_fn(sp)
+
+    if ic.get("coupling") == "iterar" and ic.get("enabled", True):
+        # acoplamento do gelo (icing.py; docs/GELO.md): ponto fixo dimensionamento ↔ proteção contra o gelo
+        from .icing import size_with_icing
+        res, sysr, loop = size_with_icing(spec, run_th)
+        res.icing_coupling = loop
     else:
-        res, sysr = run_fn(spec)
+        res, sysr = run_th(spec)
     st["result"] = res
     if use_sys:
         st["systems"] = sysr
@@ -66,6 +78,13 @@ def _thermal(st: DesignState):
     em regime permanente e transitório (Incropera), dia quente/frio MIL-HDBK-310, ar dinâmico e acoplamento."""
     from .thermal import thermal_stage
     thermal_stage(st["result"])
+
+
+def _icing(st: DesignState):
+    """Disciplina gelo L0/L1 (icing.py; docs/GELO.md): envelopes 14 CFR 25 Ap. C, captação Langmuir & Blodgett,
+    balanço de Messinger, espessura, potência de proteção e acoplamento ao balanço elétrico."""
+    from .icing import icing_stage
+    icing_stage(st["result"])
 
 
 def _report(st: DesignState):
@@ -112,6 +131,8 @@ DOMAIN = register_domain(Domain(
                   "ponderação A IEC 61672-1, deteção auditiva ISO 226, 14 CFR 36 Ap. G opcional"),
             Stage("thermal", _thermal, description="gestão térmica L0/L1: compartimentos (Incropera), dia quente/"
                   "frio MIL-HDBK-310, ar dinâmico NACA, arrasto/massa/potência de arrefecimento"),
+            Stage("icing", _icing, description="gelo L0/L1: envelopes 14 CFR 25 Ap. C, captação Langmuir & "
+                  "Blodgett, Messinger (fração de congelação), espessura, potência de proteção"),
             Stage("report", _report, description="markdown + plots + JSON"),
             Stage("verification", _verification, description="matriz de verificação dos requisitos rastreáveis "
                   "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)"),

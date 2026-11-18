@@ -4,7 +4,7 @@ O acdt tem duas portas de entrada estáveis: a **API Python `acdt.api`** e a **l
 resto (`acdt.core`, `acdt.domains`, `acdt.ai`, os internos de `acdt.cli`) é interno e pode mudar entre versões do
 pacote sem aviso. Referência gerada: [API Python](referencia/api.md) · [CLI](referencia/cli.md).
 
-## 1. Superfície pública (`acdt.api`, API 1.3.0)
+## 1. Superfície pública (`acdt.api`, API 1.4.0)
 
 | grupo | funções |
 |---|---|
@@ -19,6 +19,7 @@ pacote sem aviso. Referência gerada: [API Python](referencia/api.md) · [CLI](r
 | revisões de projeto | `report(design, level, saída, uq=, mdo=, vv=, calib=, criteria=, discover=, pdf=)` — SRR/PDR/CDR (desde 1.1.0; [RELATORIOS.md](RELATORIOS.md)) |
 | ruído | `rotor_noise(blades=, diameter_m=, rpm=, thrust_N=, power_W=, n_rotors=, altitude_m=, speed_m_s=, …)` — ruído L0 de rotores/hélices dados explicitamente (desde 1.2.0; [RUIDO.md](RUIDO.md)) |
 | térmica | `thermal(spec)` — compartimentos, margens e arrefecimento a partir de uma especificação genérica `acdt.thermal/1`; `thermal_atmosphere(perfil, altitude_m, T_sl_C=)` — dias quente/frio MIL-HDBK-310 (desde 1.3.0; [TERMICA.md](TERMICA.md)) |
+| gelo | `icing(spec)` — envelopes do 14 CFR 25 Ap. C, captação, fração de congelação, espessura, potência de proteção e penalização a partir de uma especificação genérica `acdt.icing/1`; `icing_envelope(tipo, T_C, mvd_um, horizontal_extent_nmi=, altitude_m=)` — LWC de projeto e estado face ao envelope (desde 1.4.0; [GELO.md](GELO.md)) |
 | descontinuação | `deprecated(since, removed_in=, alternative=)`, `ACDTDeprecationWarning`, `DEPRECATED` |
 
 Contratos comuns:
@@ -49,7 +50,7 @@ print(r["W0_kg"], m["coverage"]["por_estado"], api.db_validate(db))
 
 Há duas versões, ambas `MAIOR.MENOR.CORREÇÃO`:
 
-* **`acdt.api.API_VERSION`** (1.3.0; 1.0.0 → 1.1.0 acrescentou `report`; 1.1.0 → 1.2.0 acrescentou `rotor_noise`; 1.2.0 → 1.3.0 acrescentou `thermal` e `thermal_atmosphere`) — versão do contrato da API pública:
+* **`acdt.api.API_VERSION`** (1.4.0; 1.0.0 → 1.1.0 acrescentou `report`; 1.1.0 → 1.2.0 acrescentou `rotor_noise`; 1.2.0 → 1.3.0 acrescentou `thermal` e `thermal_atmosphere`; 1.3.0 → 1.4.0 acrescentou `icing` e `icing_envelope`) — versão do contrato da API pública:
   * **MAIOR** — mudança incompatível: nome removido, parâmetro removido/renomeado/reordenado, tipo ou valor por
     omissão alterado, chave removida de um resultado documentado;
   * **MENOR** — acréscimo compatível: função nova, parâmetro novo com valor por omissão no fim, chave nova num
@@ -89,12 +90,12 @@ def dimensionar(...): ...
 
 ## 4. CLI: convenções comuns
 
-* `acdt --version` → `acdt 0.2.0 (API 1.3.0)`;
+* `acdt --version` → `acdt 0.2.0 (API 1.4.0)`;
 * `acdt <comando> --help` em todos os comandos (teste `tests/test_cli_contract.py` percorre-os todos);
 * `--json` em todos os comandos: o texto humano vai para stderr e stdout recebe um envelope `acdt.cli/1`:
 
   ```json
-  {"schema": "acdt.cli/1", "acdt": "0.2.0", "api": "1.3.0", "command": "vv", "exit_code": 0,
+  {"schema": "acdt.cli/1", "acdt": "0.2.0", "api": "1.4.0", "command": "vv", "exit_code": 0,
    "exit_meaning": "sucesso", "result": {"counts": {"passa": 1, …}, …}, "files": ["vv/vv_report.json", …]}
   ```
 

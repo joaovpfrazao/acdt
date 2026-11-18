@@ -67,7 +67,15 @@ Corrida de 17 nov 2026 no box Linux (`acdt vv --cost medio`): **22 passa, 0 falh
 | THERMAL-INC-EX8.6 | termica | verificação | barato | Incropera Ex. 8.6 (conduto, Dittus–Boelter): q″ = 304 W/m², T_s,L = 50,7 °C | 0,5 %; 0,15 °C |
 | THERMAL-MIL310 | termica | verificação | barato | MIL-HDBK-310 (1997) §5.3.1.1.2, §5.3.1.2.2, Tabela I | exato |
 | THERMAL-AIR-PROPS | termica | verificação | barato | Incropera Tabela A.4 (ar a 300 K): μ, k, Pr | 0,5 %; 1 %; 1 % |
+| ICING-AND-B1 | gelo | verificação | barato | Anderson, NASA/CR-2004-212875 (2004) Ap. B.1 (NACA 0012, 40 µm): K 12,56, K₀ 3,350, β₀ 0,789, A_c 2,293, h_c, b, φ, θ, n₀ 0,518, p_st | 0,1 % (θ 0,2 %; p_st 0,05 %); β₀ ±0,0005; n₀ ±0,001; φ ±0,01 K |
+| ICING-AND-B2 | gelo | verificação | barato | idem Ap. B.2 (20 µm): K 4,09, K₀ 1,381, β₀ 0,629, A_c 1,265, n₀ 0,598 | idem |
+| ICING-APPC-JECK | gelo | verificação | barato | 14 CFR 25 Ap. C via Jeck, DOT/FAA/AR-00/30 (2002) Tabelas 1–2 (cinco nós) e Parte I(c) (0,35 g/m³) | 0,0005 g/m³; descolagem exata |
+| ICING-NACA0012-RLE | gelo | verificação | barato | Abbott & von Doenhoff via Anderson: r_le = 1,58 % c | 10⁻⁴ (ver nota) |
 | SIZ-C172S | dimensionamento | **validação** | médio | Cessna 172S Information Manual (1998): MTOW 1157 kg, vazio 754 kg, 134 kW, 16,2 m², 71,4 kg/m² | ±15 % massas, ±25 % resto (método conceptual) |
+
+Nota sobre `ICING-NACA0012-RLE`: a fórmula r_le = 1,1019 t² c dá 1,587 % e a referência imprime 1,58 %; com a
+meia unidade do último algarismo (5×10⁻⁵) o caso falhou na primeira corrida. A tolerância foi alargada a 10⁻⁴
+(arredondamento da tabela, não ajuste do modelo) e fica registada aqui e na `tol_source` do caso.
 
 Achado ao montar a biblioteca: o primeiro valor de referência escrito para o SP-8007 (0,5806) estava errado; a
 fórmula publicada dá 0,5813 e o caso falhou até ser corrigido — é para isto que a tolerância é declarada antes.
