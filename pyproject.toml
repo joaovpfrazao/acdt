@@ -137,6 +137,14 @@ files = [
   "src/acdt/core/thermal/cooling.py",
   "src/acdt/core/thermal/sources.py",
   "src/acdt/core/thermal/study.py",
+  "src/acdt/core/icing/__init__.py",
+  "src/acdt/core/icing/properties.py",
+  "src/acdt/core/icing/impingement.py",
+  "src/acdt/core/icing/accretion.py",
+  "src/acdt/core/icing/envelopes.py",
+  "src/acdt/core/icing/protection.py",
+  "src/acdt/core/icing/penalty.py",
+  "src/acdt/core/icing/study.py",
 ]
 strict = true
 follow_imports = "silent"

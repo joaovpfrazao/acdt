@@ -163,7 +163,8 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                                      lwc_kg_m3=1e-3, p_st=p_st)
                 except ValueError as ex:
                     cnotes.add(str(ex))
-                    th_lo.append(None), th_hi.append(None), p_lo.append(None), p_hi.append(None)
+                    for lst in (th_lo, th_hi, p_lo, p_hi):
+                        lst.append(None)
                     continue
                 tau_hi = dur
                 if kind == "intermittent" and dur is not None:

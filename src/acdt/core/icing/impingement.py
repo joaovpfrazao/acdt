@@ -58,7 +58,7 @@ def beta0(K0: float) -> float:
     """β₀ na linha de estagnação, Eq. (3.13). K₀ ≤ 1/8 → 0."""
     if K0 <= 0.125:
         return 0.0
-    x = 1.40 * (K0 - 0.125) ** 0.84
+    x = float(1.40 * (K0 - 0.125) ** 0.84)
     return x / (1.0 + x)
 
 

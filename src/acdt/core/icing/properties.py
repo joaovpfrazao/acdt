@@ -69,7 +69,7 @@ def mu_air(T: float) -> float:
 
 def diffusivity_vapour(T_film: float, p_st: float) -> float:
     """Difusividade do vapor de água no ar [m²/s], Eq. (A.4): 0,211 (T/273,15)^1,94 (1,0132×10⁵/p) cm²/s."""
-    return 0.211e-4 * (T_film / T0) ** 1.94 * (1.0132e5 / p_st)
+    return float(0.211e-4 * (T_film / T0) ** 1.94 * (1.0132e5 / p_st))
 
 
 def lambda_fusion(Ts: float) -> float:
@@ -81,7 +81,7 @@ def lambda_fusion(Ts: float) -> float:
 def lambda_vaporisation(Ts: float) -> float:
     """Calor latente de vaporização [J/kg], Eq. (A.21)–(A.22): 597,3 (273,15/T)^E cal/g, E = 0,167 + 3,67×10⁻⁴ T."""
     E = 0.167 + 3.670e-4 * Ts
-    return 597.3 * (T0 / Ts) ** E * CAL_IT * 1e3
+    return float(597.3 * (T0 / Ts) ** E * CAL_IT * 1e3)
 
 
 def total_temperature(T_st: float, V: float) -> float:
@@ -102,4 +102,4 @@ def total_pressure_from_static(p_st: float, T_st: float, V: float) -> float:
 def static_pressure_compressible(p_tot: float, T_st: float, V: float) -> float:
     """Eq. (A.7): p_st = p_tot/(1 + (γ−1)/2 M²)^(γ/(γ−1)), M = V/√(γ R T_st) (Eq. A.38)."""
     M2 = V * V / (GAMMA_AIR * R_AIR * T_st)
-    return p_tot / (1.0 + 0.5 * (GAMMA_AIR - 1.0) * M2) ** (GAMMA_AIR / (GAMMA_AIR - 1.0))
+    return float(p_tot / (1.0 + 0.5 * (GAMMA_AIR - 1.0) * M2) ** (GAMMA_AIR / (GAMMA_AIR - 1.0)))
