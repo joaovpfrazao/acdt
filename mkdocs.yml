@@ -94,6 +94,7 @@ nav:
     - "MDO global de sistema (`acdt mdo`)": MDO.md
     - "Verificação e validação como produto (`acdt vv`)": VV.md
     - "Dados de ensaio e calibração de modelos (`acdt calib`)": CALIBRACAO.md
+    - "Relatórios automáticos de revisão de projeto (`acdt report`)": RELATORIOS.md
     - "Qualidade de software — CI, tipos, cobertura e tolerâncias numéricas": QUALIDADE.md
   - Referência:
     - API Python (acdt.api): referencia/api.md
