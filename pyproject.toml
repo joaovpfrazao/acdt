@@ -154,6 +154,11 @@ files = [
   "src/acdt/core/reliability/study.py",
   "src/acdt/domains/aircraft/manufacturing/series.py",
   "src/acdt/domains/aircraft/series_cost.py",
+  "src/acdt/core/lcc/__init__.py",
+  "src/acdt/core/lcc/discount.py",
+  "src/acdt/core/lcc/lcc.py",
+  "src/acdt/core/lcc/environment.py",
+  "src/acdt/domains/aircraft/life_cycle.py",
 ]
 strict = true
 follow_imports = "silent"

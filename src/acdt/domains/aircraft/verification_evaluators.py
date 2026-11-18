@@ -30,6 +30,10 @@ de ``assumptions.constraints``).
 * ``custo_serie:<caminho>`` — grandeza da secção ``series_cost`` (series_cost.py; docs/CUSTO_SERIE.md), p. ex.
   ``unit_cost_at_quantity_USD``, ``flyaway_cost_USD``, ``break_even_quantity``, ``at_quantity.rdte_amortisation_USD``. Escalares ou
   intervalos {lo, hi} com a regra da térmica; ponto de equilíbrio não atingido / sem preço → desconhecido.
+* ``ciclo_vida:<caminho>`` — grandeza da secção ``life_cycle`` (life_cycle.py; docs/CICLO_VIDA.md), p. ex.
+  ``life_cycle_cost_USD``, ``cost_per_flight_hour_USD``, ``co2e_per_flight_hour_kg``, ``life_cycle_co2e_kg``,
+  ``present_value_USD.operation_support``. Intervalos {lo, hi}; majorante desconhecido (entrada em falta) → num
+  requisito ``max`` nunca passa.
 * ``entrada:<requisito>`` — entradas do dimensionamento (velocidade/altitude de cruzeiro, payload, tripulação)
   lidas do que o dimensionamento usou: cumprido por construção, verificação por inspeção.
 """
@@ -158,6 +162,10 @@ def _list_evidence(ctx: VerificationContext) -> list[str]:
     sc = ctx.result.get("series_cost")
     if isinstance(sc, dict) and sc.get("evaluated"):
         out += ["custo_serie:unit_cost_at_quantity_USD", "custo_serie:flyaway_cost_USD", "custo_serie:break_even_quantity"]
+    lc = ctx.result.get("life_cycle")
+    if isinstance(lc, dict) and lc.get("evaluated"):
+        out += ["ciclo_vida:life_cycle_cost_USD", "ciclo_vida:cost_per_flight_hour_USD",
+                "ciclo_vida:co2e_per_flight_hour_kg", "ciclo_vida:life_cycle_co2e_kg"]
     return out
 
 
@@ -421,6 +429,14 @@ register_evaluator(Evaluator("custo_serie:", _eval_series_cost, "disciplina cust
                              "equilíbrio); desconhecido se faltar preço/NRE ou o equilíbrio não for atingido",
                              "analise", "N0", "Gudmundsson (2014) Cap. 2; Raymer (2018) Cap. 18; FAA Pricing "
                              "Handbook (1998) Cap. 18", ("aircraft",)))
+def _eval_life_cycle(req: TracedRequirement, ctx: VerificationContext, key: str) -> Evidence:
+    return eval_section_interval("life_cycle", "ciclo de vida", req, ctx, key)
+
+
+register_evaluator(Evaluator("ciclo_vida:", _eval_life_cycle, "disciplina ciclo de vida L0 (LCC OSD CAPE/NIST HB "
+                             "135, CO₂e CORSIA/rede declarada/IVL C 444); intervalos — desconhecido se atravessa o "
+                             "limiar ou falta o majorante", "analise", "N0",
+                             "OSD CAPE (2020); NIST Handbook 135 (1995); ICAO Anexo 16 Vol. IV", ("aircraft",)))
 register_evaluator(Evaluator("fiabilidade:", _eval_reliability, "disciplina fiabilidade L0 (MIL-HDBK-338B: RBD, "
                              "MTBCF, disponibilidades, DMMH, Poisson); intervalos — desconhecido se atravessa o limiar",
                              "analise", "N0", "MIL-HDBK-338B (1998)", ("aircraft",)))
@@ -454,5 +470,9 @@ register_default_evaluator("aircraft", "fleet_size", "fiabilidade:fleet_size", "
 register_default_evaluator("aircraft", "unit_cost_at_quantity", "custo_serie:unit_cost_at_quantity_USD", "analise", "N0")
 register_default_evaluator("aircraft", "flyaway_cost", "custo_serie:flyaway_cost_USD", "analise", "N0")
 register_default_evaluator("aircraft", "break_even_quantity", "custo_serie:break_even_quantity", "analise", "N0")
+register_default_evaluator("aircraft", "life_cycle_cost", "ciclo_vida:life_cycle_cost_USD", "analise", "N0")
+register_default_evaluator("aircraft", "life_cycle_cost_per_fh", "ciclo_vida:cost_per_flight_hour_USD", "analise", "N0")
+register_default_evaluator("aircraft", "co2e_per_flight_hour", "ciclo_vida:co2e_per_flight_hour_kg", "analise", "N0")
+register_default_evaluator("aircraft", "life_cycle_co2e", "ciclo_vida:life_cycle_co2e_kg", "analise", "N0")
 for _k in ("regulatory_category", "unit_cost", "power_available", "thrust_available"):
     register_default_evaluator("aircraft", _k, f"check:{_k}", "analise", "N0")

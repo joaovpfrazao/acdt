@@ -101,6 +101,13 @@ def _series_cost(st: DesignState):
     series_cost_stage(st["result"])
 
 
+def _life_cycle(st: DesignState):
+    """Disciplina ciclo_vida L0 (life_cycle.py; docs/CICLO_VIDA.md): LCC RDT&E + produção + O&S + abate em valor
+    presente (NIST HB 135), custo por hora de voo, CO₂e da energia (CORSIA) e do fabrico de baterias (opcional)."""
+    from .life_cycle import life_cycle_stage
+    life_cycle_stage(st["result"])
+
+
 def _report(st: DesignState):
     out = st["options"].get("output")
     if out:
@@ -151,6 +158,8 @@ DOMAIN = register_domain(Domain(
                   "disponibilidades, MMH/FH, sobressalentes Poisson, frota (MIL-HDBK-338B)"),
             Stage("series_cost", _series_cost, description="custo de série L0: CER Eastlake/DAPCA IV em função de N, "
                   "RDT&E vs produção, ferramentas, aprendizagem Wright/Crawford, ponto de equilíbrio"),
+            Stage("life_cycle", _life_cycle, description="ciclo de vida L0: LCC por categorias (OSD CAPE) em valor "
+                  "presente (NIST HB 135), custo/FH e por missão, CO₂e da energia (CORSIA) e de baterias"),
             Stage("report", _report, description="markdown + plots + JSON"),
             Stage("verification", _verification, description="matriz de verificação dos requisitos rastreáveis "
                   "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)"),

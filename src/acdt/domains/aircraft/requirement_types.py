@@ -57,6 +57,18 @@ _BUILTIN = [
                     "(series_cost.price × N) covers the programme cost", ("check",), ("max",),
                     reference="series_cost.py: break-even definition, fixed/variable split of Gudmundsson (2014) "
                     "Ch. 2 (docs/CUSTO_SERIE.md)"),
+    RequirementType("life_cycle_cost", "currency", "Programme life-cycle cost (RDT&E + production + O&S + disposal − "
+                    "residual), present value at the declared real discount rate (constant dollars if none)",
+                    ("check",), ("max",), reference="life_cycle.py: OSD CAPE O&S Guide (2020) §2.1; NIST Handbook 135 "
+                    "Eq. 5.1 (docs/CICLO_VIDA.md)"),
+    RequirementType("life_cycle_cost_per_fh", "currency", "Life-cycle cost per fleet flight hour (constant dollars)",
+                    ("check",), ("max",), reference="life_cycle.py (docs/CICLO_VIDA.md)"),
+    RequirementType("co2e_per_flight_hour", "mass", "CO2-equivalent emitted per flight hour (energy in flight + "
+                    "battery manufacturing share when declared)", ("check",), ("max",),
+                    reference="life_cycle.py: ICAO Annex 16 Vol. IV (fuel conversion factors), CORSIA LC baseline, "
+                    "declared grid intensity, IVL C 444 (docs/CICLO_VIDA.md)"),
+    RequirementType("life_cycle_co2e", "mass", "Fleet life-cycle CO2-equivalent (L0 scope: energy + batteries)",
+                    ("check",), ("max",), reference="life_cycle.py (docs/CICLO_VIDA.md)"),
     RequirementType("noise", "sound", "Flyover L_A,max at a ground observer below the loiter/cruise track", ("check",),
                     ("max",), reference="Gutin 1936 + Schlegel-King-Mull 1966 (Marte & Kurtz 1970), ISO 9613-1, "
                     "IEC 61672-1 A-weighting (noise.py; docs/RUIDO.md)"),
