@@ -820,7 +820,7 @@ def _lc_rates() -> Mapping[str, float | None]:
 def _lc_ex51a() -> Mapping[str, float | None]:
     from acdt.core.lcc.lcc import present_value
 
-    items = [{"amount": 103000.0, "year": 0}, {"amount": 12000.0, "year": 12}, {"amount": -3500.0, "year": 20},
+    items: list[Mapping[str, Any]] = [{"amount": 103000.0, "year": 0}, {"amount": 12000.0, "year": 12}, {"amount": -3500.0, "year": 20},
              {"amount": 20000.0, "factor": 15.13, "factor_source": "FEMP UPV* (NIST HB 135, Tabela 5-2)"},
              {"amount": 7000.0, "annual": [1, 20]}]
     return {"LCC": present_value(items, 0.03)}

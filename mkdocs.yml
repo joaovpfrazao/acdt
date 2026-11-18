@@ -100,6 +100,7 @@ nav:
     - "Gelo (disciplina gelo, L0/L1)": GELO.md
     - "Fiabilidade e manutenção de frota (disciplina fiabilidade, L0)": FIABILIDADE.md
     - "Custo de produção em série (disciplina custo_serie, L0)": CUSTO_SERIE.md
+    - "Custo do ciclo de vida e CO₂e (disciplina ciclo_vida, L0)": CICLO_VIDA.md
     - "Qualidade de software — CI, tipos, cobertura e tolerâncias numéricas": QUALIDADE.md
   - Referência:
     - API Python (acdt.api): referencia/api.md

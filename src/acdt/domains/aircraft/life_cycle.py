@@ -92,8 +92,9 @@ def build_specs(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], dict[str, 
     from .reliability import mission_duration_h
 
     notes: list[str] = []
-    sc = getattr(res, "series_cost", None)
-    sc_ok = isinstance(sc, dict) and sc.get("evaluated") and isinstance(sc.get("at_quantity"), dict)
+    sc_raw = getattr(res, "series_cost", None)
+    sc: dict[str, Any] = sc_raw if isinstance(sc_raw, dict) else {}
+    sc_ok = bool(sc.get("evaluated")) and isinstance(sc.get("at_quantity"), dict)
     n = o.get("fleet_size")
     if n is None and sc_ok:
         n = int(sc["quantity"])

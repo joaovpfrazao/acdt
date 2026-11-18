@@ -1772,6 +1772,17 @@ disciplina `gelo` no `design.json`, requisitos `ice_protection_power`, `max_ice_
   O resultado do exemplo de teste do PR #17 (W0 25,20 → 34,31 kg com ciclo 1) passa a ser mais baixo com a
   omissão; `power_schedule: missao` reproduz o majorante.
 
+### Custo do ciclo de vida e CO₂e L0 (18 nov 2026, ramo `disc-ciclo-vida`)
+
+Núcleo `acdt/core/lcc/` (`discount`: SPV/UPV/UPV*/taxas NIST HB 135; `lcc`: categorias OSD CAPE com calendário,
+intervalos e `present_value`; `environment`: FCF ICAO, LC CORSIA, rede declarada, baterias IVL C 444) e etapa
+`life_cycle` (`domains/aircraft/life_cycle.py`, depois de `series_cost`, só se pedida). Reutiliza o custo de série
+(RDT&E, produção/aeronave, frota), o custo operacional da fiabilidade ou `costing.operating_cost` (sem depreciação)
+e `reliability.mission_duration_h`. Disciplina `ciclo_vida`, quatro requisitos, avaliador `ciclo_vida:`, API 1.7.0,
+quatro casos V&V (NIST HB 135 e CORSIA), todos a passar. Doc: [CICLO_VIDA.md](CICLO_VIDA.md); CAPABILITIES §32w.
+
+* **Falta**: fabrico da estrutura e fim de vida na pegada, efeitos não-CO₂, fatores PV por item no calendário.
+
 ### Custo de produção em série L0 (18 nov 2026, ramo `disc-custo-serie`, PR #20)
 
 Estudo `manufacturing/series.py` e etapa `series_cost` (`domains/aircraft/series_cost.py`, depois da fiabilidade, só

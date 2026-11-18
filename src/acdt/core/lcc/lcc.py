@@ -82,7 +82,7 @@ def schedule(n_aircraft: int, rdte_years: int, rate: float, life: int) -> dict[s
     return {"deliveries": deliveries, "active": active, "retirements": retire, "last_year": last}
 
 
-def flows(p: Mapping[str, float], sch: Mapping[str, Any], rdte_years: int) -> dict[int, dict[str, float]]:
+def flows(p: Mapping[str, Any], sch: Mapping[str, Any], rdte_years: int) -> dict[int, dict[str, float]]:
     """Fluxos em dólares constantes por ano e categoria para um conjunto de valores escalares."""
     out: dict[int, dict[str, float]] = {}
 
