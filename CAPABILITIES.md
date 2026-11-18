@@ -245,7 +245,7 @@ N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nív
   `rcs(mode="validate"|"study")`.
 * **Pedir à IA**: "Qual o RCS frontal médio do UAV e quanto baixa com fuselagem facetada a 30°?" /
   "Corre o estudo aero/RCS sobre a montagem com chine."
-* **Limites**: só PEC, sem difração de arestas e sem RAM. Não é um solver de onda completa. No co-pol
+* **Limites**: só PEC, sem difração de arestas e sem RAM. Não é um solver de onda completa. A proposta de 18 nov 2026 (`docs/proposta-rcs-onda-completa.md`) não corre o openEMS e não conta células: sem caixa de cálculo, o número fica em falta. O PO não fica validado por essa proposta. No co-pol
   monostático o factor da faceta reduz-se a −n̂·k̂, por isso VV e HH coincidem. Numa malha facetada da montagem
   os nulos à esquerda e à direita podem diferir vários dB (HANDOFF §4b G4). O DOE da montagem varia
   `chine_deg` nos corpos já com chine; não inventa uma aeronave facetada paralela.
