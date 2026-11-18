@@ -28,6 +28,7 @@ acdt db export out/x --format csv|md|json [-o tabela.csv] ['filtro']
 acdt db build missao.yaml out/x [-o design.json]        # a partir de uma pasta já corrida
 acdt db add-uq out/x output/uq_estudo [--map metrica=nome.da.grandeza]
 acdt db validate out/x                  # contra o esquema
+acdt calib db registo.json --db out/x   # calibração contra ensaio: results.calibracao.<nível>, fidelity ensaio (docs/CALIBRACAO.md)
 ```
 
 `acdt verify missao.yaml out/x` reescreve a matriz e, se existir `design.json` na pasta, atualiza a secção

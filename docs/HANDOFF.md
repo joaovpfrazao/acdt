@@ -1610,6 +1610,41 @@ Em aberto, por ordem:
    unidade declarada.
 5. Unidades em texto nas specs de `mdo`/`uq`.
 
+### Dados de ensaio e calibração (18 nov 2026, ramo `eng-calibracao`)
+
+Pormenor em [CALIBRACAO.md](CALIBRACAO.md) e CAPABILITIES §32o.
+
+* `acdt/core/calibration/` (mypy estrito), domínio-agnóstico:
+  * `ingest.py` (`acdt.testdata/1`):
+    * `load` (CSV/Parquet/ULog + `<dados>.meta.yaml`) e `from_arrays`;
+    * `Channel.to`/`sd_to`, com conversão afim pint;
+    * `standard_uncertainty` (GUM: `sd`, `half_width`, `resolution`, `rel`);
+    * o `.bin` do ArduPilot é recusado com a indicação de converter fora do processo.
+  * `fitting.py`:
+    * `ModelSpec`/`Parameter` sobre uma expressão vetorial segura (sem `eval`);
+    * `fit` → `FitResult`, com dois métodos: `wls` (variância efetiva, Birge, ν < 1 → covariância `None`) e
+      `koh` (MAP + Laplace, prior obrigatório).
+  * `record.py` (`acdt.calib/1`):
+    * `decide` (critérios em `CRITERIA`; sem critérios → `nao_aplicar`), `build_record` e `applicable_at` (todas
+      as entradas da gama são obrigatórias);
+    * exportações: `factors_file`, `overlay`, `uq_inputs` (ρ de Pearson → postos) e `to_design_db`;
+    * `run_study`, `to_markdown` e `residuals_csv`.
+* Alterações fora do pacote:
+  * `hifi/calibration.factor_acceptable` também recusa `decision: nao_aplicar`;
+  * `uq_run.calibration_inputs` aceita fatores de ensaio (`fidelity: ensaio` ou `calibration`) como N(valor, σ);
+  * `design_db.set_results(..., fidelity=)`, com `FIDELITIES = ("modelo", "ensaio")`, campo opcional no esquema
+    e herdado por `flatten`.
+* CLI `acdt calib`. Novo extra `[dados]` (pandas, pyarrow, pyulog); THIRD_PARTY atualizado.
+* Exemplos SINTÉTICOS em `examples/calibration/` (`gerar_sintetico.py`, polar de túnel e flexão estática).
+* Testes: `tests/test_calibration.py` (17).
+
+Em aberto, por ordem:
+1. Ligar uma função do pipeline como η(x, θ). Hoje a previsão do modelo entra como canal.
+2. ULog: alinhar tópicos e detetar segmentos estabilizados (ensaio de desempenho em voo).
+3. KOH completo: MCMC, ℓ por entrada e emulador PG do modelo.
+4. Dados de ensaio reais (túnel, voo ou estático) com relatório e incerteza. Sem eles, nenhum fator de ensaio é
+   aplicado a um projeto.
+
 ## Melhorias futuras em espera
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
