@@ -58,9 +58,11 @@ não validações independentes. As variantes públicas são ilustrativas e não
 
 ## Continuação L2
 
-pyCycle/OpenMDAO fica adiado: um adaptador futuro deverá fornecer os mesmos campos
+pyCycle/OpenMDAO fica fora do processo acdt. Um adaptador futuro deverá fornecer os mesmos campos
 `thrust_installed_N` e `TSFC_kg_N_s` por Mach/altitude/rating, com dados e versão do
-deck, e calibrar a correlação L0; não instalar nem executar pyCycle nesta fatia.
+deck, e calibrar a correlação L0. A 18 nov 2026 o turbojato simples publicado correu noutro
+intérprete (pyCycle 4.4.0). O TSFC no ponto de projecto foi 0,799 lb/(lbf·h), contra 0,400
+desta correlação de turbofan. Não há deck L1, e nenhum factor entrou. A correlação não mudou.
 Faltam fecho MDA de jato, mapas ECS, build-up Torenbeek completo,
 ajuste de throttle, rajadas/Mach/buffet e validação CFD/ensaio e referência 737.
 
