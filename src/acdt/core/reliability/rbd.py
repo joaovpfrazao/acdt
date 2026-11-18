@@ -167,8 +167,8 @@ def mttf(node: NodeT, lam: Mapping[str, float | None], unknown_R: float) -> floa
         edges.append(x)
         x *= 10.0
     edges.append(t_far)
-    tot = sum(quad(f, a, b, limit=200, epsabs=0.0, epsrel=1e-11)[0] for a, b in zip(edges[:-1], edges[1:]))
-    tot += quad(f, t_far, math.inf, limit=200)[0]
+    tot = sum(float(quad(f, a, b, limit=200, epsabs=0.0, epsrel=1e-11)[0]) for a, b in zip(edges[:-1], edges[1:]))
+    tot += float(quad(f, t_far, math.inf, limit=200)[0])
     return tot
 
 

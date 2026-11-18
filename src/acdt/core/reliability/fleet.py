@@ -24,7 +24,8 @@ def coverage(cfg: Mapping[str, Any], A: float) -> dict[str, Any]:
                                 "handoff_overlap_h": float(cfg.get("handoff_overlap_h", 0.0) or 0.0)}
     if cfg.get("confidence") is not None:
         settings["confidence"] = float(cfg["confidence"])
-    r = fleet(float(cfg["on_station_h"]), float(cfg["transit_h"]), float(cfg["turnaround_h"]), settings)
+    r: dict[str, Any] = fleet(float(cfg["on_station_h"]), float(cfg["transit_h"]),  # type: ignore[no-untyped-call]
+                              float(cfg["turnaround_h"]), settings)
     n = r.get("fleet_for_confidence") if "confidence" in settings else r.get("fleet_expected")
     return {"fleet": n, "aircraft_needed_in_cycle": r.get("aircraft_needed_in_cycle"),
             "feasible": bool(r["cycle"]["feasible"]), "detail": r}

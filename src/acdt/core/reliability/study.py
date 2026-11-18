@@ -76,23 +76,29 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
 
     unit: dict[str, tuple[float | None, float | None]] = {}
     comp_out: dict[str, Any] = {}
-    for cid, c in comps.items():
+    for cid, cd0 in comps.items():
         r = rates[cid]
-        duty = _num(c.get("duty"))
+        duty = _num(cd0.get("duty"))
         duty = 1.0 if duty is None else duty
-        if c.get("duty") is None:
+        if cd0.get("duty") is None:
             r.notes.append("duty 1 (PRESSUPOSTO: funciona durante todo o voo)")
-        u = (None, None) if not r.known else (float(r.lo or 0.0) * duty, float(r.hi or 0.0) * duty)
+        u: tuple[float | None, float | None] = (None, None) if not r.known else (
+            float(r.lo or 0.0) * duty, float(r.hi or 0.0) * duty)
         unit[cid] = u
+        u0, u1 = u
         comp_out[cid] = {"lambda_per_h": _iv(r.lo, r.hi), "kind": r.kind, "source": r.source, "notes": r.notes,
                          "duty": duty, "n": n_of[cid], "units_total": mult[cid], "in_mission_model": cid in used,
-                         "lambda_per_fh_total": _iv(None if u[0] is None else u[0] * mult[cid],
-                                                    None if u[1] is None else u[1] * mult[cid])}
+                         "lambda_per_fh_total": _iv(None if u0 is None else u0 * mult[cid],
+                                                    None if u1 is None else u1 * mult[cid])}
     unknown = sorted(cid for cid in comps if unit[cid][0] is None)
 
     # ---- missão: R(t) e MTBCF (blocos folha com n em série: λ_bloco = λ_u n)
-    blk_lo = {cid: (None if unit[cid][1] is None else unit[cid][1] * n_of[cid]) for cid in comps}  # → R_lo
-    blk_hi = {cid: (None if unit[cid][0] is None else unit[cid][0] * n_of[cid]) for cid in comps}  # → R_hi
+    blk_lo: dict[str, float | None] = {}  # → R_lo (λ_hi)
+    blk_hi: dict[str, float | None] = {}  # → R_hi (λ_lo)
+    for cid in comps:
+        a0, a1 = unit[cid]
+        blk_lo[cid] = None if a1 is None else a1 * n_of[cid]
+        blk_hi[cid] = None if a0 is None else a0 * n_of[cid]
     t_m = _num(spec.get("mission_duration_h"))
     mission: dict[str, Any] = {"duration_h": t_m, "rbd": copy.deepcopy(tree)}
     if t_m is not None and t_m > 0:
@@ -160,10 +166,11 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
     mmh_hi: float | None = 0.0
     for c in comps:
         m = _num(comps[c].get("mmh_per_action"))
-        if m is None or unit[c][0] is None:
+        ul = unit[c][0]
+        if m is None or ul is None:
             mmh_hi = None
-        if m is not None and unit[c][0] is not None:
-            mmh_lo += float(unit[c][0]) * mult[c] * m
+        if m is not None and ul is not None:
+            mmh_lo += ul * mult[c] * m
             if mmh_hi is not None:
                 mmh_hi += float(unit[c][1] or 0.0) * mult[c] * m
     for p in prev_out:
@@ -245,8 +252,9 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
             cost_hi = None
             continue
         k = ffh * days * mult[c]
-        a_lo = None if unit[c][0] is None else unit[c][0] * k
-        a_hi = None if unit[c][1] is None else unit[c][1] * k
+        ul, uh = unit[c]
+        a_lo = None if ul is None else ul * k
+        a_hi = None if uh is None else uh * k
         st = _iv(None if a_lo is None else stock_for(a_lo, conf), None if a_hi is None else stock_for(a_hi, conf))
         uc = _num(cd.get("replacement_cost"))
         cst = _iv(None if (uc is None or st["lo"] is None) else uc * st["lo"],
@@ -264,10 +272,11 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
     parts_hi: float | None = 0.0
     for c, cd in comps.items():
         uc = _num(cd.get("replacement_cost"))
-        if uc is None or unit[c][0] is None:
+        ul = unit[c][0]
+        if uc is None or ul is None:
             parts_hi = None
-        if uc is not None and unit[c][0] is not None:
-            parts_lo += float(unit[c][0]) * mult[c] * uc
+        if uc is not None and ul is not None:
+            parts_lo += ul * mult[c] * uc
             if parts_hi is not None:
                 parts_hi += float(unit[c][1] or 0.0) * mult[c] * uc
     for p in prev_out:
@@ -282,7 +291,7 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
     rate = _num((oc or {}).get("maintenance_rate_per_h")) if oc else _num(spec.get("labour_rate_per_h"))
     if rate is None:
         rate = _num(spec.get("labour_rate_per_h"))
-    mc = {"parts_per_fh": _iv(parts_lo, parts_hi), "labour_rate_per_h": rate,
+    mc: dict[str, Any] = {"parts_per_fh": _iv(parts_lo, parts_hi), "labour_rate_per_h": rate,
           "labour_per_fh": _iv(None if rate is None else rate * mmh_lo,
                                None if (rate is None or mmh_hi is None) else rate * mmh_hi)}
     mc["total_per_fh"] = _iv(None if mc["labour_per_fh"]["lo"] is None else mc["labour_per_fh"]["lo"] + parts_lo,

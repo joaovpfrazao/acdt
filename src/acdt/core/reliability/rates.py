@@ -84,8 +84,8 @@ def resolve(comp: Mapping[str, Any], *, accept_assumptions: bool = False) -> Rat
             return Rate(None, None, "desconhecido", None, [str(ex)])
         kind = str(e.get("kind", "?"))
         src = f"{e.get('source', '')} {e.get('url', '')}".strip()
-        lam = _num(e.get("lambda_per_h"))
-        if lam is None:
+        lam_db = _num(e.get("lambda_per_h"))
+        if lam_db is None:
             return Rate(None, None, "desconhecido", src, [f"failure_rates.yaml[{key}] sem lambda_per_h"])
         if kind == "assumption" and not accept_assumptions:
             return Rate(None, None, "desconhecido", src,
@@ -96,7 +96,7 @@ def resolve(comp: Mapping[str, Any], *, accept_assumptions: bool = False) -> Rat
             notes.append("declaração do fabricante, não verificada independentemente")
         if kind == "assumption":
             notes.append("PRESSUPOSTO aceite por accept_assumptions: true")
-        return Rate(lam, lam, kind, src, notes)
+        return Rate(lam_db, lam_db, kind, src, notes)
     if comp.get("lambda_per_h") is not None or comp.get("mtbf_h") is not None:
         src = str(comp.get("source") or "").strip()
         if not src:
