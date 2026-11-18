@@ -1756,10 +1756,21 @@ disciplina `gelo` no `design.json`, requisitos `ice_protection_power`, `max_ice_
   W0 25,20 → 34,31 kg, converge em 2 iterações.
 * **Achados**: a Tabela 3 de Jeck (intermitente −30 °C/35 µm, 0,398) não bate com a Tabela 1 (0,350/1,100 = 0,318);
   o power budget em malha fechada substitui `systems_power_W`, pelo que a proteção entra também como carga
-  `systems.loads` (o acoplamento térmico tem a mesma lacuna — seguimento).
+  `systems.loads` (a mesma lacuna da térmica foi corrigida no ramo `fix-acoplamento-termico`).
 * **Seguimentos**: Ap. O (SLD); β local e gelo de retorno/intercíclico; geometria a evoluir com a acreção;
-  penalização por tipo de gelo e ΔC_D0; ar sangrado e botas; encontros mistos; carga de proteção só na fração de
-  exposição; adaptadores VTOL/jato nativos; validação contra formas de gelo medidas (NASA IRT).
+  penalização por tipo de gelo e ΔC_D0; ar sangrado e botas; encontros mistos; adaptadores VTOL/jato nativos; validação contra formas de gelo medidas (NASA IRT).
+
+### Acoplamento térmico no balanço em malha fechada (18 nov 2026, ramo `fix-acoplamento-termico`)
+
+* **Erro corrigido**: com bloco `systems` (power budget em malha fechada, `run_with_systems`) o `systems_power_W`
+  é substituído pela média do balanço, pelo que a potência do ventilador do modo `iterar` da térmica se perdia em
+  silêncio. Agora entra também como carga `systems.loads` (ciclo 1, conservador), como já fazia o gelo. Helper
+  comum `thermal.with_load` (substitui a carga com o mesmo nome; o gelo reutiliza-o). Teste de regressão: o W0
+  sobe com a pressão do ventilador (10 → 2000 Pa, mesmo caudal).
+* **Gelo**: a potência de proteção passa a contar só na fração da missão em segmentos dentro do envelope
+  (`icing.power_schedule: exposicao`, omissão; pico inalterado); `missao` ou durações desconhecidas → ciclo 1.
+  O resultado do exemplo de teste do PR #17 (W0 25,20 → 34,31 kg com ciclo 1) passa a ser mais baixo com a
+  omissão; `power_schedule: missao` reproduz o majorante.
 
 ### Teste instável de reutilização de `run_id` (18 nov 2026, PR #12)
 

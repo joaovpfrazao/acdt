@@ -23,7 +23,8 @@ partir do que o dimensionamento já calculou — nada de novo é estimado:
 * ``iterar``: dentro da etapa de dimensionamento, ciclo de ponto fixo — dimensiona, avalia a térmica no ponto de
   projeto, injeta ``aero.extra_drag_areas_m2.arrefecimento_termico`` (majorante do intervalo de arrasto),
   ``weights.fixed_mass_kg`` (+ massa de arrefecimento conhecida) e, nos elétricos,
-  ``propulsion.systems_power_W`` (+ potência do ventilador em cruzeiro), e redimensiona até variação < ``tol``.
+  ``propulsion.systems_power_W`` (+ potência do ventilador em cruzeiro; com power budget em malha fechada também
+  como carga ``systems.loads``, porque o fecho substitui ``systems_power_W``), e redimensiona até variação < ``tol``.
   Grandezas desconhecidas não são acopladas (ficam registadas como não acopladas, nunca como zero).
 """
 from __future__ import annotations
@@ -445,7 +446,30 @@ def size_with_thermal(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]
         sp.assumptions["weights"]["fixed_mass_kg"] = base_mass + new["mass_kg"]
         if spec.propulsion_kind == "electric":
             sp.assumptions["propulsion"]["systems_power_W"] = base_P + new["power_W"]
-    return res, sysr, {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ térmica"}
+            # com power budget em malha fechada (systems_integration.run_with_systems) systems_power_W é substituído
+            # pela média do balanço: sem isto a potência do ventilador perdia-se em silêncio. Entra também como
+            # carga do balanço (ciclo 1 — PRESSUPOSTO conservador: o ventilador corre em todo o cruzeiro quente)
+            if new["power_W"] and getattr(spec, "systems", None):
+                sp.systems = with_load(spec.systems, FAN_LOAD_NAME, new["power_W"], 1.0)
+    return res, sysr, {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ térmica",
+                       "electrical_load": "propulsion.systems_power_W + systems.loads (ciclo 1, conservador)"}
+
+
+FAN_LOAD_NAME = "ventilador de arrefecimento (acdt.thermal)"
+
+
+def with_load(systems: Any, name: str, power_w: float, duty: float, peak_w: float | None = None) -> dict[str, Any]:
+    """Cópia de ``spec.systems`` com a carga ``name`` (substitui uma anterior com o mesmo nome) no balanço elétrico.
+
+    Usado pelos acoplamentos ``iterar`` (térmica, gelo): ``run_with_systems`` substitui ``systems_power_W`` pela média
+    do balanço, por isso a potência acoplada tem de entrar como carga do balanço."""
+    ss = copy.deepcopy(dict(systems or {}))
+    loads = [L for L in list(ss.get("loads") or []) if L.get("name") != name]
+    load: dict[str, Any] = {"name": name, "power_w": float(power_w), "duty": float(duty)}
+    if peak_w is not None:
+        load["peak_w"] = float(peak_w)
+    ss["loads"] = loads + [load]
+    return ss
 
 
 def thermal_stage(res: Any) -> None:

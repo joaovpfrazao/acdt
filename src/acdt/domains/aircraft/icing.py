@@ -15,8 +15,9 @@ que o dimensionamento já calculou:
   ``surface_temperature_C``, ``duty_cycle``, ``power_density_W_m2``, ``mass_kg``.
 
 **Acoplamento** (``icing.coupling``): ``relatorio`` (omissão) — só relata; ``iterar`` — ponto fixo com o
-dimensionamento: potência elétrica de proteção (majorante) em ``propulsion.systems_power_W`` (só aeronaves
-elétricas) e massa declarada dos sistemas em ``weights.fixed_mass_kg``. Desconhecidos não são acoplados (listados).
+dimensionamento: potência elétrica de proteção (majorante) × ciclo (fração da missão em segmentos dentro do envelope,
+``power_schedule: exposicao``; 1 com ``missao`` ou sem durações) em ``propulsion.systems_power_W`` e como carga de
+``systems.loads`` (só aeronaves elétricas) e massa declarada dos sistemas em ``weights.fixed_mass_kg``. Desconhecidos não são acoplados (listados).
 """
 from __future__ import annotations
 
@@ -26,7 +27,7 @@ from typing import Any
 
 from acdt.core.icing.study import analyse
 
-from .thermal import _f, _h_range, _segments, operating_points
+from .thermal import _f, _h_range, _segments, operating_points, with_load
 
 LEVEL = "L0"
 DEFAULTS: dict[str, Any] = {
@@ -34,6 +35,9 @@ DEFAULTS: dict[str, Any] = {
     "envelopes": ["continuous", "intermittent"], "mvd_um": None, "conditions": None, "surfaces": None,
     "temperature": "envelope",   # envelope (varre o Ap. C) | isa (só a temperatura ISA+dT de cada segmento)
     "isa_dT_K": 0.0, "fiki": None, "max_altitude_m": None,
+    # exposicao: potência de proteção só na fração da missão em segmentos dentro do envelope (majorante da exposição);
+    # missao: toda a missão (majorante conservador). Sem durações conhecidas → missao.
+    "power_schedule": "exposicao",
 }
 
 
@@ -151,8 +155,31 @@ def coupling_effect(res: Any, out: dict[str, Any], spec: dict[str, Any]) -> dict
     return eff
 
 
-def coupling_increments(out: dict[str, Any], spec: dict[str, Any], kind: str) -> dict[str, Any]:
+def exposure_duty(out: dict[str, Any], schedule: str = "exposicao") -> tuple[float, str]:
+    """Fração da missão em que a proteção corre (ciclo da carga no balanço elétrico).
+
+    ``exposicao``: Σ duração dos segmentos com algum caso dentro do envelope do Ap. C (``exposure_s.hi``, majorante da
+    exposição) / Σ duração de todos os segmentos analisados. Se alguma duração for desconhecida, ou com
+    ``missao``, devolve 1 (toda a missão, majorante conservador)."""
+    if schedule == "missao":
+        return 1.0, "toda a missão (icing.power_schedule: missao)"
+    conds = out.get("conditions") or {}
+    durs = [_f(c.get("duration_s")) for c in conds.values()]
+    exp = _f((out.get("exposure_s") or {}).get("hi"))
+    if not durs or any(d is None for d in durs) or exp is None:
+        return 1.0, "toda a missão (durações dos segmentos desconhecidas — majorante conservador)"
+    tot = sum(float(d or 0.0) for d in durs)
+    if tot <= 0:
+        return 1.0, "toda a missão (duração total nula — majorante conservador)"
+    frac = min(1.0, max(0.0, exp / tot))
+    return frac, (f"fração da missão em segmentos dentro do envelope = {exp:.0f} s / {tot:.0f} s = {frac:.3f} "
+                  "(majorante da exposição; potência de pico inalterada)")
+
+
+def coupling_increments(out: dict[str, Any], spec: dict[str, Any], kind: str,
+                        schedule: str = "exposicao") -> dict[str, Any]:
     inc: dict[str, Any] = {"power_W": None, "mass_kg": None, "not_coupled": []}
+    inc["duty"], inc["duty_note"] = exposure_duty(out, schedule)
     p = ((out.get("protection") or {}).get("electrical_power_W") or {}).get("hi")
     if p is None:
         inc["not_coupled"].append("potência elétrica de proteção desconhecida (majorante)")
@@ -182,9 +209,11 @@ def size_with_icing(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]:
         res, sysr = run_fn(sp)
         ic_spec, _n = build_spec(res, o)
         out = analyse(ic_spec)
-        inc = coupling_increments(out, ic_spec, spec.propulsion_kind)
+        inc = coupling_increments(out, ic_spec, spec.propulsion_kind, str(o.get("power_schedule") or "exposicao"))
         new = {k: float(inc[k] or 0.0) for k in ("power_W", "mass_kg")}
-        hist.append({"iter": it, "W0_kg": res.sizing.W0, **new, "not_coupled": inc["not_coupled"]})
+        duty = float(inc["duty"])
+        hist.append({"iter": it, "W0_kg": res.sizing.W0, **new, "duty": duty, "duty_note": inc["duty_note"],
+                     "not_coupled": inc["not_coupled"]})
         dif = max(abs(new[k] - cur[k]) / max(abs(new[k]), abs(cur[k]), 1e-9) for k in new) if any(
             new[k] or cur[k] for k in new) else 0.0
         if it > 0 and dif < float(o["tol"]):
@@ -198,17 +227,18 @@ def size_with_icing(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]:
         sp.assumptions = copy.deepcopy(spec.assumptions)
         sp.assumptions["weights"]["fixed_mass_kg"] = base_mass + new["mass_kg"]
         if spec.propulsion_kind == "electric":
-            sp.assumptions["propulsion"]["systems_power_W"] = base_P + new["power_W"]
-            # com power budget em malha fechada (systems_integration.run_with_systems) systems_power_W é substituído
-            # pela média do balanço; a proteção entra também como carga do balanço, com ciclo 1 (toda a missão —
-            # PRESSUPOSTO conservador: a exposição real é só a fração em gelo)
-            if new["power_W"]:
-                ss = copy.deepcopy(dict(getattr(spec, "systems", None) or {}))
-                ss["loads"] = list(ss.get("loads") or []) + [
-                    {"name": "proteção contra o gelo (acdt.icing)", "power_w": new["power_W"], "duty": 1.0}]
-                sp.systems = ss
+            # energia: potência × ciclo (fração da missão em gelo); com power budget em malha fechada
+            # (systems_integration.run_with_systems) systems_power_W é substituído pela média do balanço, por isso a
+            # proteção entra também como carga do balanço (potência média × ciclo; pico = potência total)
+            sp.assumptions["propulsion"]["systems_power_W"] = base_P + new["power_W"] * duty
+            if new["power_W"] and getattr(spec, "systems", None):
+                sp.systems = with_load(spec.systems, ICE_LOAD_NAME, new["power_W"], duty, peak_w=new["power_W"])
     return res, sysr, {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ gelo",
-                       "electrical_load": "propulsion.systems_power_W + systems.loads (ciclo 1, conservador)"}
+                       "electrical_load": "propulsion.systems_power_W (+ P × ciclo) e systems.loads (ciclo = fração da "
+                                          "missão em gelo, ou 1 sem durações; pico = P)"}
+
+
+ICE_LOAD_NAME = "proteção contra o gelo (acdt.icing)"
 
 
 def icing_stage(res: Any) -> None:

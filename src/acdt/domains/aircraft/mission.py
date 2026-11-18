@@ -144,7 +144,8 @@ DEFAULT_ASSUMPTIONS: dict = {
     # electric, mass_kg}]; sem surfaces → asa + estabilizadores sem proteção. temperature: envelope | isa.
     "icing": {"enabled": True, "coupling": "relatorio", "max_iter": 6, "tol": 0.01,
               "envelopes": ["continuous", "intermittent"], "mvd_um": None, "conditions": None, "surfaces": None,
-              "temperature": "envelope", "isa_dT_K": 0.0, "fiki": None, "max_altitude_m": None},
+              "temperature": "envelope", "isa_dT_K": 0.0, "fiki": None, "max_altitude_m": None,
+              "power_schedule": "exposicao"},
 }
 
 

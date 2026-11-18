@@ -144,6 +144,14 @@ potência do ventilador a `propulsion.systems_power_W`; repete até a variação
 (histórico em `thermal.coupling_loop`). Grandezas desconhecidas não são acopladas e ficam listadas em
 `not_coupled`.
 
+Com power budget em malha fechada (bloco `systems`, `systems_integration.run_with_systems`) o valor de
+`systems_power_W` é substituído pela média do balanço elétrico; por isso a potência do ventilador entra também como
+carga `systems.loads` («ventilador de arrefecimento (acdt.thermal)», ciclo 1 — PRESSUPOSTO conservador: corre em
+todo o cruzeiro quente). Antes desta correção (ramo `fix-acoplamento-termico`) a potência perdia-se em silêncio
+nesses projetos; o teste de regressão
+`test_thermal_iterar_fan_power_survives_closed_loop_power_budget` confirma que o W0 sobe com a potência do
+ventilador.
+
 ## 6. V&V (`acdt vv --discipline termica`)
 
 | Caso | Referência | Calculado | Tolerância |

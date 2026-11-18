@@ -329,3 +329,38 @@ def test_thermal_stage_piston_engine_cooling_and_defaults():
     ec2 = st2["result"].thermal["engine_cooling"]["by_condition"]["cruzeiro_quente"]
     assert ec2["Q_W"]["lo"] == 0.0 and ec2["Q_W"]["hi"] > 0
     assert ec2["drag_N"]["lo"] == 0.0 and ec2["drag_N"]["hi"] > 0  # perdas não declaradas: [0, ṁV]
+
+
+@pytest.mark.slow
+def test_thermal_iterar_fan_power_survives_closed_loop_power_budget():
+    """Regressão: com power budget em malha fechada (systems_integration.run_with_systems) ``systems_power_W`` é
+    substituído pela média do balanço; a potência do ventilador do modo iterar entra como carga de ``systems.loads``
+    e o W0 sobe com ela (antes perdia-se em silêncio). Só a pressão do ventilador muda entre os dois casos."""
+    import yaml
+
+    from acdt.core.pipeline import run_pipeline
+    from acdt.domains.aircraft.mission import MissionSpec
+    from acdt.domains.aircraft.thermal import FAN_LOAD_NAME
+
+    d = yaml.safe_load((EX / "uav_endurance_payload.yaml").read_text(encoding="utf-8"))
+    assert d.get("systems")  # caso com power budget em malha fechada
+    d.setdefault("assumptions", {}).setdefault("aero", {})["fidelity"] = "handbook"
+    d["assumptions"].setdefault("stability", {})["use_avl"] = False
+
+    def run(dp_Pa: float):  # noqa: ANN202
+        bay = {"id": "fuselagem", "skin_area_m2": 1.0, "flow_length_m": 1.6, "height_m": 0.2, "eps_ext": 0.85,
+               "alpha_solar": 0.3, "eps_int": [0.1, 0.9], "sources": ["avionica", "bateria", "esc"],
+               "fan": {"mass_flow_kg_s": 0.05, "pressure_rise_Pa": dp_Pa, "efficiency": 0.3, "mass_kg": 0.1,
+                       "conditions": ["cruzeiro_quente"]}}
+        d["assumptions"]["thermal"] = {"bays": [bay], "coupling": "iterar",
+                                       "electric": {"eta_esc": 0.97, "eta_motor": 0.9}}
+        return run_pipeline("aircraft", MissionSpec.from_dict(d, EX / "uav_endurance_payload.yaml"))
+
+    lo, hi = run(10.0), run(2000.0)
+    p_lo = lo["result"].thermal["coupling_loop"]["history"][-1]["power_W"]
+    p_hi = hi["result"].thermal["coupling_loop"]["history"][-1]["power_W"]
+    assert p_hi > p_lo > 0
+    assert hi["result"].thermal["coupling_loop"]["converged"]
+    loads = {L["name"]: L for L in hi["result"].spec.systems.get("loads", [])}
+    assert loads[FAN_LOAD_NAME]["power_w"] > 0
+    assert hi["result"].sizing.W0 > lo["result"].sizing.W0
