@@ -19,7 +19,7 @@ nova aqui:
 * **Ponto de equilíbrio**: menor N com receita P·N ≥ custo do programa(N) (definição; estrutura custos fixos /
   variáveis de Gudmundsson 2014 Cap. 2). Se não for atingido até ``n_max`` → ``None`` (não atingido ≠ zero).
 * **Efeito de cadência**: só o que a CER de Eastlake já tem (horas de ferramentas ∝ Q_m^0,066, Gudmundsson 2014
-  Eq. 2.3); nenhum outro modelo de cadência (sem fonte verificável).
+  Cap. 2, Eq. 2.2–2.13); nenhum outro modelo de cadência (sem fonte verificável).
 """
 from __future__ import annotations
 
