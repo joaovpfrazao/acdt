@@ -97,6 +97,24 @@ def _cmd_db(a) -> int:
     if a.action == "show":
         print(D.summary(db))
         return 0
+    if a.action == "add-uq":
+        if len(a.paths) != 2:
+            print("[acdt] db add-uq <design.json> <uq.json|pasta do estudo>", file=sys.stderr)
+            return 2
+        from acdt.domains.aircraft.design_db_run import uq_into_db
+        mp = {}
+        for m in a.map or []:
+            k, _, v = m.partition("=")
+            if not k or not v:
+                print(f"[acdt] --map espera nome=caminho (recebido '{m}')", file=sys.stderr)
+                return 2
+            mp[k] = v
+        rep = uq_into_db(db, a.paths[1], mp)
+        dst = Path(a.paths[0])
+        D.save(db, dst / D.DEFAULT_FILE if dst.is_dir() else dst)
+        print(f"[acdt] incerteza ligada a {len(rep['ligadas'])} grandezas; sem grandeza no estado: "
+              f"{rep['sem_grandeza'] or '—'}; sem resumo válido: {rep['sem_resumo'] or '—'}")
+        return 0
     if a.action == "get":
         if len(a.paths) < 2:
             print("[acdt] db get <design.json> <caminho|glob|nome> [--unit U]", file=sys.stderr)
@@ -2045,8 +2063,8 @@ def main(argv=None) -> int:
     vvp.add_argument("--strict", action="store_true", help="código 1 também com nao_avaliado/desconhecido")
     vvp.set_defaults(fn=_cmd_vv)
     dbp = sub.add_parser("db", help="estado de projeto único acdt.design/1 (unidades, nível, proveniência): show / "
-                         "get / diff / export / build / validate (docs/DADOS.md)")
-    dbp.add_argument("action", choices=["show", "get", "diff", "export", "build", "validate"])
+                         "get / diff / export / build / validate / add-uq (docs/DADOS.md)")
+    dbp.add_argument("action", choices=["show", "get", "diff", "export", "build", "validate", "add-uq"])
     dbp.add_argument("paths", nargs="*", help="design.json ou pasta; get: + caminho/glob/nome; diff: A B; "
                      "export: + filtro opcional; build: missão.yaml pasta")
     dbp.add_argument("-o", "--output")
@@ -2055,6 +2073,7 @@ def main(argv=None) -> int:
     dbp.add_argument("--rtol", type=float, default=1e-6, help="diff: tolerância relativa")
     dbp.add_argument("--include", help="diff: só caminhos que correspondem a este glob")
     dbp.add_argument("--json", action="store_true")
+    dbp.add_argument("--map", action="append", help="add-uq: métrica=nome.da.grandeza (repetível)")
     dbp.set_defaults(fn=_cmd_db)
     r = sub.add_parser("requirements", help="listar os tipos de requisito registados")
     r.add_argument("--domain", default="aircraft")

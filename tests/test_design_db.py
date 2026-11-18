@@ -287,3 +287,45 @@ def test_pipeline_writes_design_json_and_cli(tmp_path, capsys):
     assert main(["db", "diff", str(out / "design.json"), str(out / "design.json")]) == 0
     assert main(["db", "build", str(EX / "ga_range_speed.yaml"), str(out), "-o", str(tmp_path / "b.json")]) == 0
     assert D.load(tmp_path / "b.json")["revision"] == 4
+
+
+def test_attach_uq_scalar_and_epistemic(tmp_path):
+    db = _db()
+    D.set_results(db, "dimensionamento", "L0", D.quantities_from_tree({"weights": {"W0_kg": 150.0, "We_kg": 90.0}}),
+                  method="Raymer", source="teste")
+    uq = {"schema": "acdt.uq/1", "settings": {"n": 4000},
+          "propagation": {"summaries": {
+              "W0_kg": {"status": "ok", "converged": True, "mean": 151.0, "std": 7.0, "p5": 140.0, "p50": 150.5,
+                        "p95": 163.0},
+              "We_kg": {"status": "ok", "intervalo": True, "converged": True, "mean": [90.0, 94.0],
+                        "std": [5.0, 5.2], "p5": [82.0, 85.0], "p50": [89.0, 93.0], "p95": [99.0, 104.0]},
+              "CD0": {"status": "sem_amostras"}}}}
+    rep = D.attach_uq(db, uq, {"W0_kg": "weights.W0_kg", "We_kg": "weights.We_kg", "CD0": "aero.CD0",
+                              "S_m2": "geometry.wing.S_m2"}, source="teste")
+    assert rep["ligadas"] == ["results.dimensionamento.L0.weights.W0_kg", "results.dimensionamento.L0.weights.We_kg"]
+    assert set(rep["sem_resumo"]) == {"CD0", "S_m2"}
+    q = db["results"]["dimensionamento"]["L0"]["quantities"]
+    assert q["weights.W0_kg"]["uncertainty"]["p95"] == 163.0 and q["weights.W0_kg"]["uncertainty"]["n"] == 4000
+    u = q["weights.We_kg"]["uncertainty"]
+    assert u["p5"] == 82.0 and u["p95"] == 104.0 and u["p50"] is None and u["epistemico"]   # envelope, sem P50 único
+    D.save(db, tmp_path / "d.json")
+    assert D.validate(D.load(tmp_path / "d.json")) == []
+    with pytest.raises(D.DesignDBError):
+        D.attach_uq(db, {"schema": "acdt.mdo/1"}, {})
+
+
+def test_uq_into_db_reads_file_and_model_metrics(tmp_path):
+    from acdt.domains.aircraft.design_db_run import uq_into_db
+    db = _db()
+    D.set_results(db, "dimensionamento", "L0", D.quantities_from_tree({"weights": {"W0_kg": 150.0}}),
+                  method="Raymer", source="teste")
+    D.set_results(db, "trem", "L0", D.quantities_from_tree({"landing_gear": {"track_m": 1.2}}), method="x",
+                  source="teste")
+    uq = {"schema": "acdt.uq/1", "settings": {"n": 10}, "model": {"result_metrics": {"bitola": "landing_gear.track_m"}},
+          "propagation": {"summaries": {"W0_kg": {"status": "ok", "p5": 1.0, "p50": 2.0, "p95": 3.0},
+                                        "bitola": {"status": "ok", "p5": 1.1, "p50": 1.2, "p95": 1.3}}}}
+    (tmp_path / "uq.json").write_text(json.dumps(uq), encoding="utf-8")
+    rep = uq_into_db(db, tmp_path)
+    assert "results.trem.L0.landing_gear.track_m" in rep["ligadas"]
+    assert "results.dimensionamento.L0.weights.W0_kg" in rep["ligadas"]
+    assert "sha256" in db["results"]["trem"]["L0"]["quantities"]["landing_gear.track_m"]["uncertainty"]["source"]

@@ -201,3 +201,33 @@ def build_from_output(mission: str | Path, outdir: str | Path) -> dict[str, Any]
             pass
     base = D.load(d / D.DEFAULT_FILE) if (d / D.DEFAULT_FILE).is_file() else None
     return build(spec, result, m, evidence="result.json", evidence_sha256=sha256_file(rf), provenance=prov, base=base)
+
+
+# métrica de acdt.core.sensitivity.oat.extract_metrics → nome da grandeza no estado (mesma origem em report.to_dict)
+UQ_METRIC_MAP: dict[str, str] = {
+    "W0_kg": "weights.W0_kg",                    # sizing.W0
+    "We_kg": "weights.We_kg",                    # sizing.We
+    "Wf_kg": "weights.Wfuel_or_battery_kg",      # sizing.Wf
+    "E_Wh": "weights.battery_energy_Wh",         # sizing.energy_J / 3600
+    "CD0": "aero.CD0",                           # polar.CD0
+    "K": "aero.K",                               # polar.K
+    "V_cruise_mps": "aero.cruise_speed_m_s",     # res.cruise_speed
+    "ws_Pa": "design_point.W_S_N_m2",            # design_point.ws
+}
+
+
+def uq_into_db(db: dict[str, Any], uq_file: str | Path, extra_map: Mapping[str, str] | None = None
+               ) -> dict[str, list[str]]:
+    """``acdt db add-uq``: percentis de um ``uq.json`` nas grandezas do estado. As métricas declaradas em
+    ``uncertainty.result_metrics`` (nome → caminho do result.json, guardado em ``model.result_metrics``) ligam-se
+    pelo próprio caminho; ``extra_map`` (``--map nome=caminho``) junta ou corrige ligações."""
+    from acdt.core.provenance import sha256_file
+
+    f = Path(uq_file)
+    if f.is_dir():
+        f = f / "uq.json"
+    uq = json.loads(f.read_text(encoding="utf-8"))
+    mapping = dict(UQ_METRIC_MAP)
+    mapping.update({k: str(v) for k, v in ((uq.get("model") or {}).get("result_metrics") or {}).items()})
+    mapping.update(dict(extra_map or {}))
+    return D.attach_uq(db, uq, mapping, source=f"acdt uq ({f.name}, sha256 {sha256_file(f)[:12]})")

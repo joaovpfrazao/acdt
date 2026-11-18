@@ -128,6 +128,52 @@ def set_uncertainty(db: dict[str, Any], path: str, uncertainty: Mapping[str, Any
     _touch(db, path)
 
 
+def attach_uq(db: dict[str, Any], uq: Mapping[str, Any], mapping: Mapping[str, str], source: str = "acdt uq"
+              ) -> dict[str, list[str]]:
+    """Junta os resumos de propagação de um estudo ``acdt.uq/1`` às grandezas do estado (``uncertainty`` do tipo
+    ``percentis``). ``mapping``: nome da métrica no estudo → nome da grandeza nos blocos de resultados (p. ex.
+    ``W0_kg`` → ``weights.W0_kg``); a grandeza é procurada em todas as disciplinas e níveis.
+
+    Com entradas epistémicas (intervalos sem distribuição) cada estatística é um intervalo [mín, máx] sobre os
+    pontos: guarda-se o envelope (``p5`` = o menor P5, ``p95`` = o maior P95) e os intervalos de cada estatística;
+    ``p50`` fica ``null`` (não há um só P50). Métricas sem resumo ``ok`` não entram (desconhecido ≠ zero).
+    Devolve ``{"ligadas": [...], "sem_grandeza": [...], "sem_resumo": [...]}``."""
+    if uq.get("schema") != "acdt.uq/1":
+        raise DesignDBError(f"estudo de incerteza com schema '{uq.get('schema')}' (esperado acdt.uq/1)")
+    summ = ((uq.get("propagation") or {}).get("summaries")) or {}
+    n = (uq.get("settings") or {}).get("n")
+    rep: dict[str, list[str]] = {"ligadas": [], "sem_grandeza": [], "sem_resumo": []}
+    for metric, qname in mapping.items():
+        sm = summ.get(metric)
+        if not sm or sm.get("status") != "ok":
+            rep["sem_resumo"].append(metric)
+            continue
+        hits = [k for k in flatten(db) if k.startswith("results.") and k.split(".", 3)[3] == qname]
+        if not hits:
+            rep["sem_grandeza"].append(metric)
+            continue
+        if sm.get("intervalo"):
+            def lo(x: Any) -> Any:
+                return min(x) if isinstance(x, list) and x else x
+
+            def hi(x: Any) -> Any:
+                return max(x) if isinstance(x, list) and x else x
+            unc: dict[str, Any] = {"kind": "percentis", "p5": lo(sm.get("p5")), "p50": None, "p95": hi(sm.get("p95")),
+                                   "intervalos": {k: sm.get(k) for k in ("mean", "std", "p5", "p50", "p95")},
+                                   "epistemico": True}
+        else:
+            unc = {"kind": "percentis", "p5": sm.get("p5"), "p50": sm.get("p50"), "p95": sm.get("p95"),
+                   "mean": sm.get("mean"), "std": sm.get("std")}
+        if isinstance(n, int) and n >= 1:
+            unc["n"] = n
+        unc["source"] = f"{source}: métrica '{metric}'"
+        unc["converged"] = sm.get("converged")
+        for k in hits:
+            set_uncertainty(db, k, unc)
+            rep["ligadas"].append(k)
+    return rep
+
+
 def set_verification(db: dict[str, Any], matrix: Mapping[str, Any] | None, evidence: str | None = None) -> None:
     """Guarda o resumo e as linhas da matriz (``acdt.verification/1``) — os campos que a rastreiam."""
     if not matrix:
