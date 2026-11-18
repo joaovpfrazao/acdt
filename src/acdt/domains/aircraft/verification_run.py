@@ -58,4 +58,14 @@ def verify_output(mission: str | Path, outdir: str | Path) -> dict[str, Any]:
     spec = MissionSpec.from_yaml(mission)
     ctx = V.context_from_output(outdir, domain="aircraft")
     ctx.extra["spec"] = spec
-    return V.verify(traced_requirements(spec), ctx, outdir)
+    m = V.verify(traced_requirements(spec), ctx, outdir)
+    from acdt.core import design_db as D
+    dbf = Path(outdir) / D.DEFAULT_FILE
+    if dbf.is_file():  # o estado de projeto acompanha a matriz reescrita (docs/DADOS.md)
+        try:
+            db = D.load(dbf)
+            D.set_verification(db, m, evidence="verification_matrix.json")
+            D.save(db, dbf)
+        except (ValueError, OSError):
+            pass  # estado inválido: fica como estava; `acdt db validate` explica
+    return m

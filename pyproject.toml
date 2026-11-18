@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "Apache-2.0"}
 authors = [{name = "João Frazão"}]
 requires-python = ">=3.10"
-dependencies = ["numpy>=2.0", "matplotlib>=3.6", "pyyaml>=6.0"]
+dependencies = ["numpy>=2.0", "matplotlib>=3.6", "pyyaml>=6.0", "pint>=0.23"]
 keywords = ["aircraft design", "aerospace", "UAV", "sizing", "constraint diagram", "MDO"]
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
@@ -47,7 +47,7 @@ acdt = "acdt.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"acdt.core" = ["data/*.yaml"]
+"acdt.core" = ["data/*.yaml", "data/*.json"]
 "acdt.ai" = ["prompts/*.md"]
 
 [tool.pytest.ini_options]
