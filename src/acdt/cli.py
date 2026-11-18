@@ -60,7 +60,23 @@ def _cmd_size(a) -> int:
     for i in st.issues:
         if "design.json" in i.message:
             print(f"  [{i.severity}] {i.message}")
+    vm = st.get("verification") or {}
+    _emit(name=spec.name, feasible=res.feasible, W0_kg=_finite(res.sizing.W0),
+          empty_fraction=_finite(res.sizing.empty_fraction), S_m2=_finite(res.S), iterations=res.iterations,
+          failed_checks=[c.key for c in res.checks if c.ok is False],
+          issues=[{"severity": i.severity, "message": i.message} for i in res.issues],
+          verification=(vm.get("coverage") or {}).get("por_estado"), report=str(rep) if rep else None,
+          output=str(out))
     return 0 if res.feasible else 1
+
+
+def _finite(x) -> float | None:
+    """Número finito ou ``None`` (desconhecido nunca é zero nem NaN no JSON)."""
+    try:
+        v = float(x)
+    except (TypeError, ValueError):
+        return None
+    return v if math.isfinite(v) else None
 
 
 def _cmd_calib(a) -> int:
@@ -91,6 +107,7 @@ def _cmd_calib(a) -> int:
             rec = R.run_study(a.path, out)
             print(R.to_markdown(rec))
             print(f"[acdt] registo: {out / 'calibration_record.json'}")
+            _emit(record_file=str(out / "calibration_record.json"), record=rec, output=str(out))
             return 0
         rec = R.load_record(a.path)
         if a.action == "show":
@@ -1639,6 +1656,8 @@ def _cmd_verify(a) -> int:
     if m["tree_issues"]:
         print(f"  árvore: {'; '.join(m['tree_issues'])}")
     print(f"  ficheiros: {Path(a.output_dir) / 'verification_matrix.md'} (+ .json, .csv)")
+    _emit(coverage=cov, rows=[{"id": r["id"], "status": r["status"], "value": r.get("value")} for r in m["rows"]],
+          output=str(a.output_dir))
     if a.strict:
         return 1 if any(cov["por_estado"][s] for s in ("falha", "nao_avaliado", "desconhecido")) else 0
     return 1 if cov["por_estado"]["falha"] else 0
@@ -1681,6 +1700,9 @@ def _cmd_uq(a) -> int:
         if r.get(kind):
             print(f"  {kind}: {r[kind]['n_evaluations']} avaliações")
     print(f"  ficheiros: {Path(out) / 'uq.md'} (+ uq.json, verification_matrix.* com P(passa))")
+    _emit(settings=s, n_failed=nf, summaries={m: {k: v for k, v in sm.items() if k != "running_mean"}
+                                              for m, sm in pr["summaries"].items()},
+          requirements=pr["requirements"], output=str(out))
     return 0
 
 
@@ -1714,6 +1736,11 @@ def _cmd_mdo(a) -> int:
     else:
         print("  nenhum projeto viável (ver menor violação em mdo.md)")
     print("  ficheiros: " + ", ".join(Path(f).name for f in r.get("files", [])) + f" em {out}")
+    ch = r["evaluations"][r["chosen"]] if r.get("chosen") is not None else None
+    _emit(strategy=r["strategy"], n_evaluations=r["n_evaluations"], n_failed=r["n_failed"],
+          n_feasible=r["n_feasible"], pareto=r["pareto"], knee=r.get("knee"),
+          chosen=({"x": ch["x"], "combo": ch["combo"], "objectives": ch["objectives"]} if ch else None),
+          output=str(out))
     return 0 if r.get("chosen") is not None else 1
 
 
@@ -1725,6 +1752,8 @@ def _cmd_vv(a) -> int:
         for c in sorted(vv.cases(), key=lambda c: (c.discipline, c.id)):
             print(f"  {c.id:28s} {c.discipline:15s} {c.kind:12s} {c.cost:7s} {c.title}")
         print(f"  registo {vv.REGISTRY_VERSION}, impressão digital {vv.registry_fingerprint()[:16]}")
+        _emit(registry_version=vv.REGISTRY_VERSION, cases=[{"id": c.id, "discipline": c.discipline, "kind": c.kind,
+                                                            "cost": c.cost, "title": c.title} for c in vv.cases()])
         return 0
     try:
         rep = vv.run(ids=a.case or None, disciplines=a.discipline or None, max_cost=a.cost,
@@ -1738,6 +1767,9 @@ def _cmd_vv(a) -> int:
     print(f"acdt vv: passa {c['passa']}, falha {c['falha']}, nao_avaliado {c['nao_avaliado']}, "
           f"desconhecido {c['desconhecido']} (registo {rep['registry_version']}); "
           + ", ".join(f.name for f in files) + f" em {out}")
+    _emit(counts=c, registry_version=rep["registry_version"], max_cost=rep["max_cost"],
+          cases=[{"id": r["id"], "discipline": r["discipline"], "status": r["status"]} for r in rep["cases"]],
+          output=str(out))
     if c["falha"] or (a.strict and (c["desconhecido"] or c["nao_avaliado"])):
         return 1
     return 0
@@ -1767,11 +1799,37 @@ def _run_with_provenance(a, argv) -> int:
                     P.note_output(v)
 
 
-def main(argv=None) -> int:
-    if os.name == "nt" and not sys.flags.utf8_mode:  # ficheiros md/csv com →, ≤, Δ: cp1252 falharia
-        print("[acdt] aviso: defina PYTHONUTF8=1 no Windows (ver docs/DEV-SETUP-WINDOWS.md)", file=sys.stderr)
-    p = argparse.ArgumentParser(prog="acdt", description="acdt — engineering design framework (domínio: aircraft)")
-    sub = p.add_subparsers(dest="cmd", required=True)
+# Códigos de saída de todos os subcomandos (docs/API.md §4). Cada comando devolve um destes; o argparse usa 2 para
+# argumentos inválidos; exceções não tratadas viram 4 (pilha com --debug ou ACDT_DEBUG=1).
+EXIT_CODES: dict[int, str] = {
+    0: "sucesso",
+    1: "resultado avaliado com falha (inviável, requisito em falha, nenhum projeto viável, caso V&V em falha)",
+    2: "erro de utilização ou de entrada (argumentos, ficheiro em falta, especificação inválida, unidades)",
+    3: "indeterminado (o comando distingue 'desconhecido'/'não avaliado' de passa/falha)",
+    4: "erro interno (exceção não tratada; --debug mostra a pilha)",
+    130: "interrompido (Ctrl-C)",
+}
+# Comandos cujo --json já é o formato próprio do comando (não levam o envelope comum).
+NATIVE_JSON = frozenset({"db", "provenance"})
+_RESULT: dict = {}
+
+
+def _emit(**kw) -> None:
+    """Resultado estruturado do comando para o envelope ``--json`` (só chaves serializáveis em JSON)."""
+    _RESULT.update(kw)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Parser completo do ``acdt`` (usado por :func:`main`, pela referência da CLI na documentação e pelos testes)."""
+    from acdt import __version__
+    from acdt.api import API_VERSION
+
+    p = argparse.ArgumentParser(
+        prog="acdt", description="acdt — engineering design framework (domínio: aircraft)",
+        epilog="Códigos de saída: " + "; ".join(f"{k} {v}" for k, v in EXIT_CODES.items())
+               + ". Ajuda de cada comando: acdt <comando> --help. Documentação: docs/API.md.")
+    p.add_argument("--version", action="version", version=f"acdt {__version__} (API {API_VERSION})")
+    sub = p.add_subparsers(dest="cmd", required=True, metavar="<comando>")
     s = sub.add_parser("size", help="dimensionar a partir de um ficheiro de missão YAML")
     s.add_argument("mission")
     s.add_argument("-o", "--output")
@@ -2181,8 +2239,70 @@ def main(argv=None) -> int:
     pv.add_argument("-o", "--output", help="capture: ficheiro JSON")
     pv.add_argument("--json", action="store_true", help="diff: saída JSON")
     pv.set_defaults(fn=_cmd_provenance)
-    a = p.parse_args(argv)
-    return _run_with_provenance(a, argv)
+    for name, sp in sub.choices.items():  # opções comuns em todos os subcomandos
+        have = sp._option_string_actions
+        if "--json" not in have:
+            sp.add_argument("--json", action="store_true",
+                            help="saída JSON em stdout (envelope acdt.cli/1: comando, código de saída, resultado, "
+                                 "ficheiros); o texto humano vai para stderr")
+        if "--debug" not in have:
+            sp.add_argument("--debug", action="store_true", help="mostrar a pilha completa num erro interno")
+    return p
+
+
+def _json_envelope(a, code: int, files: list[str]) -> str:
+    import json
+
+    from acdt import __version__
+    from acdt.api import API_VERSION
+
+    env = {"schema": "acdt.cli/1", "acdt": __version__, "api": API_VERSION, "command": a.cmd,
+           "exit_code": code, "exit_meaning": EXIT_CODES.get(code, "específico do comando"),
+           "result": _RESULT or None, "files": files}
+    return json.dumps(env, indent=1, ensure_ascii=False, default=str)
+
+
+def _output_files(a) -> list[str]:
+    out = getattr(a, "output", None)
+    if not isinstance(out, str) or not out:
+        return []
+    q = Path(out)
+    if q.is_file():
+        return [str(q)]
+    if q.is_dir():
+        return [str(f) for f in sorted(q.rglob("*")) if f.is_file()][:500]
+    return []
+
+
+def main(argv=None) -> int:
+    """Ponto de entrada ``acdt``. Devolve o código de saída (ver ``EXIT_CODES``)."""
+    import contextlib
+    import traceback
+
+    if os.name == "nt" and not sys.flags.utf8_mode:  # ficheiros md/csv com →, ≤, Δ: cp1252 falharia
+        print("[acdt] aviso: defina PYTHONUTF8=1 no Windows (ver docs/DEV-SETUP-WINDOWS.md)", file=sys.stderr)
+    a = build_parser().parse_args(argv)
+    _RESULT.clear()
+    envelope = bool(getattr(a, "json", False)) and a.cmd not in NATIVE_JSON
+    debug = bool(getattr(a, "debug", False)) or os.environ.get("ACDT_DEBUG", "") not in ("", "0")
+    ctx = contextlib.redirect_stdout(sys.stderr) if envelope else contextlib.nullcontext()
+    try:
+        with ctx:
+            code = _run_with_provenance(a, argv)
+    except KeyboardInterrupt:
+        print("[acdt] interrompido", file=sys.stderr)
+        code = 130
+    except Exception as e:  # noqa: BLE001 - erro interno → código 4 (pilha só com --debug)
+        print(f"[acdt] erro interno em '{a.cmd}': {type(e).__name__}: {e}", file=sys.stderr)
+        if debug:
+            traceback.print_exc()
+        else:
+            print("  (--debug ou ACDT_DEBUG=1 para a pilha completa)", file=sys.stderr)
+        code = 4
+    code = int(code or 0)
+    if envelope:
+        print(_json_envelope(a, code, _output_files(a)))
+    return code
 
 
 if __name__ == "__main__":
