@@ -121,6 +121,14 @@ files = [
   "src/acdt/core/review/build.py",
   "src/acdt/core/review/render.py",
   "src/acdt/domains/aircraft/review_profile.py",
+  "src/acdt/core/acoustics/__init__.py",
+  "src/acdt/core/acoustics/levels.py",
+  "src/acdt/core/acoustics/weighting.py",
+  "src/acdt/core/acoustics/absorption.py",
+  "src/acdt/core/acoustics/hearing.py",
+  "src/acdt/core/acoustics/rotor.py",
+  "src/acdt/core/acoustics/propagation.py",
+  "src/acdt/core/acoustics/certification.py",
 ]
 strict = true
 follow_imports = "silent"

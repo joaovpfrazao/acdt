@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 SCHEMA = "acdt.vv/1"
-REGISTRY_VERSION = "2026.11.17"
+REGISTRY_VERSION = "2026.11.18"
 STATUSES = ("passa", "falha", "nao_avaliado", "desconhecido")
 KINDS = ("verificacao", "validacao")
 COSTS = ("barato", "medio", "pesado")  # barato: < ~10 s, corre na CI; medio: pipeline/otimização; pesado: no PC

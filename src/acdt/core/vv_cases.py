@@ -322,3 +322,111 @@ def _register_po() -> None:
 
 
 _register_po()
+
+
+# ------------------------------------------------------------------------------------------------ ruído
+_nz = builder("ruido")
+MK1970 = ("Marte, J. E. & Kurtz, D. W., A Review of Aerodynamic Noise From Propellers, Rotors, and Lift Fans, JPL "
+          "Technical Report 32-1462, NASA, 1970, Apêndice C («Sample calculation of rotor vortex noise»): T = 10 000 "
+          "lb, R = 21,3 ft, 270 rpm, 3 pás, corda 1,0 ft, espessura 0,16 ft, α com cos α = 0,999 e sin α = 0,052 → "
+          "SPL_300 = 78,7 dB, SPL_1000 = 68,2 dB, f = 556 Hz, banda de f: 68,2 − 4,0 = 64,2 dB")
+
+
+@_nz("NOISE-SKM-EXAMPLE", "Ruído de vórtices de rotor: exemplo de Marte & Kurtz (1970)",
+     "Fórmula de Schlegel, King & Mull (1966) para o nível global de banda larga a 300 ft e a 1000 ft (divergência "
+     "esférica), frequência de pico de Strouhal (St = 0,28) e a banda de oitava do pico (Fig. 10a), com os dados do "
+     "exemplo do Apêndice C; ρ = ISA ao nível do mar (o exemplo usa a forma ao nível do mar com −3,57).",
+     "verificacao",
+     [Reference("SPL_300ft", 78.7, "dB", MK1970, tol_abs=0.1, tol_source="valor impresso a 0,1 dB; o exemplo "
+                "arredonda V_0,7 = 421 ft/s e a constante 3,57"),
+      Reference("SPL_1000ft", 68.2, "dB", MK1970, tol_abs=0.1, tol_source="valor impresso a 0,1 dB (78,7 arredondado "
+                "menos 10,46)"),
+      Reference("f_peak", 556.0, "Hz", MK1970, tol_rel=3e-3, tol_source="o exemplo arredonda V_0,7 = 421 ft/s "
+                "(exato 421,57: +0,14 %) e h = 0,212 ft (0,2118: −0,1 %)"),
+      Reference("band_f_1000ft", 64.2, "dB", MK1970, tol_abs=0.1, tol_source="valor impresso a 0,1 dB (como "
+                "SPL_1000ft)")],
+     tests=("tests/test_noise.py::test_skm_marte_kurtz_example",))
+def _nz_skm() -> Mapping[str, float | None]:
+    from acdt.core.acoustics.rotor import FT, projected_thickness, vortex_noise
+    from acdt.core.atmosphere import isa
+
+    lbf = 4.4482216152605
+    R = 21.3 * FT
+    V07 = 0.7 * 2.0 * math.pi * R * 270.0 / 60.0
+    h = projected_thickness(0.16 * FT, 1.0 * FT, math.asin(0.052))
+    v = vortex_noise(10000.0 * lbf, 3 * 21.3 * 1.0 * FT ** 2, V07, isa(0.0).rho, h)
+    bands = dict(v.octave_bands())
+    return {"SPL_300ft": v.spl_300ft_dB, "SPL_1000ft": v.spl_300ft_dB - 20.0 * math.log10(1000.0 / 300.0),
+            "f_peak": v.f_peak_Hz,
+            "band_f_1000ft": None if v.f_peak_Hz is None else bands[v.f_peak_Hz] - 20.0 * math.log10(1000.0 / 300.0)}
+
+
+IEC61672 = ("IEC 61672-1:2013, Tabela 3 (ponderações nominais A), transcrita no código-fonte do pyfar "
+            "(pyfar.constants.frequency_weighting, «taken from table 3 in IEC 61672-1»); expressão analítica do "
+            "Anexo E, Eq. (E.6)")
+_AW = {31.5: (-15, -39.4), 63: (-12, -26.2), 125: (-9, -16.1), 250: (-6, -8.6), 500: (-3, -3.2), 1000: (0, 0.0),
+       2000: (3, 1.2), 4000: (6, 1.0), 8000: (9, -1.1), 16000: (12, -6.6)}
+
+
+@_nz("NOISE-AWEIGHT", "Ponderação A (IEC 61672-1)",
+     "Eq. (E.6) avaliada nas frequências exatas de base 10 (f = 1000·10^(k/10)) contra os valores nominais da "
+     "Tabela 3 nas bandas de oitava de 31,5 Hz a 16 kHz.", "verificacao",
+     [Reference(f"A_{f:g}Hz", v, "dB", IEC61672, tol_abs=0.05, tol_source="Tabela 3 arredondada a 0,1 dB")
+      for f, (_k, v) in _AW.items()],
+     tests=("tests/test_noise.py::test_a_weighting_table",))
+def _nz_aw() -> Mapping[str, float | None]:
+    from acdt.core.acoustics.weighting import a_weighting
+
+    return {f"A_{f:g}Hz": a_weighting(1000.0 * 10.0 ** (k / 10.0)) for f, (k, _v) in _AW.items()}
+
+
+ETH_ATM = ("Tabela de α [dB/km] (125 Hz – 8 kHz) calculada com a ISO 9613-1, reproduzida em ETH Zürich, curso "
+           "Akustik I, «Sound propagation outdoors» (people.ee.ethz.ch/~isistaff/courses/ak1/"
+           "acoustics-sound-propagation-outdoors.pdf); as tabelas da norma usam as frequências médias exatas "
+           "1000·10^(k/10) (ISO 9613-1, nota da Tabela 1)")
+_ATM_ROWS = {(10, 70): (0.4, 1.0, 1.9, 3.7, 9.7, 33, 117), (20, 70): (0.3, 1.1, 2.8, 5.0, 9.0, 23, 77),
+             (15, 50): (0.5, 1.2, 2.2, 4.2, 11, 36, 129), (15, 80): (0.3, 1.1, 2.4, 4.1, 8.3, 24, 83)}
+_ATM_K = (-9, -6, -3, 0, 3, 6, 9)
+_ATM_F = (125, 250, 500, 1000, 2000, 4000, 8000)
+
+
+def _atm_tol(v: float) -> float:
+    s = repr(float(v))
+    dec = 0 if float(v) >= 10.0 else len(s.split(".")[1])
+    return 0.5 * 10.0 ** (-dec) + 0.01
+
+
+@_nz("NOISE-ISO9613-ALPHA", "Absorção atmosférica (ISO 9613-1)",
+     "Coeficiente de atenuação de tons puros a 101,325 kPa para 10 °C/70 %, 20 °C/70 %, 15 °C/50 % e 15 °C/80 % "
+     "nas bandas de oitava 125 Hz – 8 kHz.", "verificacao",
+     [Reference(f"a_{T}C_{rh}pct_{f}Hz", v, "dB/km", ETH_ATM, tol_abs=_atm_tol(v),
+                tol_source="meia unidade do último algarismo impresso + 0,01 dB/km (arredondamento da transcrição)")
+      for (T, rh), vals in _ATM_ROWS.items() for f, v in zip(_ATM_F, vals)],
+     tests=("tests/test_noise.py::test_iso9613_table",))
+def _nz_atm() -> Mapping[str, float | None]:
+    from acdt.core.acoustics.absorption import alpha_iso9613
+
+    return {f"a_{T}C_{rh}pct_{f}Hz": 1000.0 * alpha_iso9613(1000.0 * 10.0 ** (k / 10.0), float(T), float(rh))
+            for (T, rh) in _ATM_ROWS for f, k in zip(_ATM_F, _ATM_K)}
+
+
+P36G = ("14 CFR Parte 36, Apêndice G, G36.301(b) e (c) (eCFR, consultado a 18 nov 2026): (b) 76 dB(A) até 600 kg, "
+        "+9,83 dB(A) por duplicação do peso até 88 dB(A); (c) 70 dB(A) até 570 kg, +10,75 dB(A) por duplicação até "
+        "85 dB(A); constante até 8618 kg")
+
+
+@_nz("NOISE-P36G-LIMITS", "Limites de ruído de descolagem da Parte 36 Ap. G",
+     "Limite em função da massa máxima de descolagem nas duas regras de G36.301.", "verificacao",
+     [Reference("b_500kg", 76.0, "dB(A)", P36G, tol_abs=1e-9, tol_source="texto da norma (exato)"),
+      Reference("b_1200kg", 76.0 + 9.83, "dB(A)", P36G, tol_abs=1e-9, tol_source="texto da norma (uma duplicação)"),
+      Reference("b_5000kg", 88.0, "dB(A)", P36G, tol_abs=1e-9, tol_source="texto da norma (patamar)"),
+      Reference("c_570kg", 70.0, "dB(A)", P36G, tol_abs=1e-9, tol_source="texto da norma (exato)"),
+      Reference("c_1140kg", 70.0 + 10.75, "dB(A)", P36G, tol_abs=1e-9, tol_source="texto da norma (uma duplicação)"),
+      Reference("c_3000kg", 85.0, "dB(A)", P36G, tol_abs=1e-9, tol_source="texto da norma (patamar)")],
+     tests=("tests/test_noise.py::test_part36_limits",))
+def _nz_p36() -> Mapping[str, float | None]:
+    from acdt.core.acoustics.certification import part36_g_limit
+
+    return {"b_500kg": part36_g_limit(500, False), "b_1200kg": part36_g_limit(1200, False),
+            "b_5000kg": part36_g_limit(5000, False), "c_570kg": part36_g_limit(570, True),
+            "c_1140kg": part36_g_limit(1140, True), "c_3000kg": part36_g_limit(3000, True)}
