@@ -174,7 +174,8 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                         cnotes.add("intermitente máximo limitado a 5 nmi (Fig. 6); encontros mistos contínuo+"
                                    "intermitente não combinados")
                 he_full = None if tau_hi is None else V * tau_hi / env.NMI
-                L_hi = env.design_lwc(kind, x["T_C"], x["mvd_um"], he_full if kind != "takeoff" else None)
+                L_hi = env.design_lwc(kind, x["T_C"], x["mvd_um"], he_full if kind != "takeoff" else None,
+                                      short_bound=True)
                 L_lo = env.design_lwc(kind, x["T_C"], x["mvd_um"], None)
                 if L_hi.note:
                     cnotes.add(L_hi.note)
@@ -193,10 +194,12 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                 else:
                     b_hi = stg_hi.imp.beta0_hi
                     t_hi = stg_hi.n0 * b_hi * lwc_hi * 1e-3 * V * float(tau_hi or 0.0) / RHO_ICE_LO
-                if not ok_lo or tau_std is None or lwc_lo is None or stg_lo is None:
+                tau_k = None if dur is None else (dur if kind == "takeoff" else
+                                                   min(dur, env.STANDARD_HE_NMI[kind] * env.NMI / max(V, 1e-9)))
+                if not ok_lo or tau_k is None or lwc_lo is None or stg_lo is None:
                     t_lo: float | None = 0.0 if (not ok_lo or stg_lo is None) and lwc_lo is not None else None
                 else:
-                    t_lo = stg_lo.n0 * stg_lo.imp.beta0_lo * lwc_lo * 1e-3 * V * tau_std / pr.RHO_ICE
+                    t_lo = stg_lo.n0 * stg_lo.imp.beta0_lo * lwc_lo * 1e-3 * V * tau_k / pr.RHO_ICE
                 th_lo.append(None if t_lo is None else t_lo * 1e3)
                 th_hi.append(None if t_hi is None else t_hi * 1e3)
                 if so["protection"] != "none":
@@ -236,7 +239,10 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
     for sid, so in surf_out.items():
         tl = [e["thickness_mm"]["lo"] for e in so["by_condition"].values()]
         thh = [e["thickness_mm"]["hi"] for e in so["by_condition"].values()]
-        so["thickness_mm"] = {"lo": _imax(tl), "hi": _imax(thh)}
+        # acreção acumulada ao longo da missão (superfície sem proteção não liberta gelo): majorante = soma das
+        # condições (todas em gelo); minorante = o maior encontro padrão isolado. PRESSUPOSTO: geometria limpa
+        # (β₀ e h_c não mudam com o gelo acumulado — Anderson §3.4)
+        so["thickness_mm"] = {"lo": _imax(tl), "hi": _sum(thh)}
         pl = [e["power_W"]["lo"] for e in so["by_condition"].values()]
         ph = [e["power_W"]["hi"] for e in so["by_condition"].values()]
         so["power_W"] = {"lo": _imax(pl), "hi": _imax(ph)}
@@ -263,6 +269,8 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
         "schema": SCHEMA, "evaluated": True,
         "envelopes": kinds, "mvd_um": mvds, "conditions": res_conds, "surfaces": surf_out,
         "exposure_s": {"lo": _sum(exp_lo), "hi": _sum(exp_hi)},
+        "exposure_min": {"lo": None if _sum(exp_lo) is None else float(_sum(exp_lo) or 0.0) / 60.0,
+                         "hi": None if _sum(exp_hi) is None else float(_sum(exp_hi) or 0.0) / 60.0},
         "max_thickness_mm": {"lo": max(lo_unp) if len(lo_unp) == len(max_unprot_lo) and lo_unp else
                              (0.0 if not max_unprot_lo else None), "hi": _imax(max_unprot)},
         "protection": {"power_W": {"lo": _sum(tot_lo), "hi": _sum(tot_hi)},
@@ -273,6 +281,8 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                     "heat_balance": "Messinger (1953) via Anderson NASA/CR-2004-212875 Eq. (3.26)–(3.59), Ap. A",
                     "penalty": "Broeren et al. NASA/TP-2011-216929 (2011)"},
     }
+    mt = out["max_thickness_mm"]
+    out["max_thickness_m"] = {k: (None if mt[k] is None else mt[k] * 1e-3) for k in ("lo", "hi")}
     out["fiki"] = fiki_assessment(spec.get("fiki"), out)
     return out
 

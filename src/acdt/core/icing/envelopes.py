@@ -105,11 +105,14 @@ class LWCResult:
 
 
 def design_lwc(kind: str, T_C: float, mvd_um: float, he_nmi: float | None = None,
-               clamp_long: bool = True) -> LWCResult:
+               clamp_long: bool = True, short_bound: bool = False) -> LWCResult:
     """LWC de projeto [g/m³] para o envelope ``continuous``/``intermittent``/``takeoff``.
 
     ``he_nmi`` = extensão horizontal da exposição (None → distância padrão). Contínuo acima de 300 nmi com
-    ``clamp_long``: usa F(300 nmi) — PRESSUPOSTO conservador (F decresce com HE, logo sobrestima o LWC)."""
+    ``clamp_long``: usa F(300 nmi) — PRESSUPOSTO conservador (F decresce com HE, logo sobrestima o LWC).
+    Abaixo da menor HE tabelada com ``short_bound``: **majorante** LWC_ef = LWC(HE_min)·HE_min/HE — a água numa
+    exposição mais curta não excede a água da janela HE_min que a contém (PRESSUPOSTO: o limite médio de HE_min
+    vale para qualquer janela); com a acreção côncava na água captada, a distribuição uniforme é a pior."""
     if kind == "takeoff":
         ok = abs(T_C - TAKEOFF["T_C"]) < 1e-9 and abs(mvd_um - TAKEOFF["mvd_um"]) < 1e-9
         return LWCResult(TAKEOFF["lwc_g_m3"] if ok else None, TAKEOFF["lwc_g_m3"], 1.0, he_nmi, he_nmi,
@@ -129,6 +132,11 @@ def design_lwc(kind: str, T_C: float, mvd_um: float, he_nmi: float | None = None
     if kind == "continuous" and he_nmi > nodes[-1][0] and clamp_long:
         he_used = nodes[-1][0]
         note = f"HE = {he_nmi:.0f} nmi > 300 nmi: F(300 nmi) — PRESSUPOSTO conservador"
+    if short_bound and he_nmi < nodes[0][0]:
+        F0 = nodes[0][1]
+        return LWCResult(std * F0 * nodes[0][0] / he_nmi, std, F0 * nodes[0][0] / he_nmi, he_nmi, nodes[0][0],
+                         f"HE = {he_nmi:.3g} nmi < {nodes[0][0]} nmi: majorante LWC(HE_min)·HE_min/HE",
+                         SOURCE_LWC + "; " + SOURCE_F)
     F = he_factor(kind, he_used)
     if F is None:
         return LWCResult(None, std, None, he_nmi, None,

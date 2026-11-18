@@ -47,6 +47,8 @@ SECTION_MAP: dict[str, tuple[str, str, str, str]] = {
               "ISO 226", "CAPABILITIES §32r"),
     "thermal": ("termica", "L0", "gestão térmica: Incropera et al. 6.ª ed. (convecção/radiação/capacidade "
                 "concentrada), MIL-HDBK-310, NACA RM A8I29", "CAPABILITIES §32s"),
+    "icing": ("gelo", "L0", "gelo: 14 CFR 25 Ap. C (Jeck DOT/FAA/AR-00/30), Langmuir & Blodgett, Messinger via "
+              "Anderson NASA/CR-2004-212875", "CAPABILITIES §32t"),
     "systems": ("sistemas", "L0", "seleção de sistemas (hélice, motor, bateria, servos)", "CAPABILITIES §12"),
 }
 # metadados, listas de mensagens e históricos: ficam no result.json (referenciado pelo SHA-256)

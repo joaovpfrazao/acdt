@@ -138,6 +138,13 @@ DEFAULT_ASSUMPTIONS: dict = {
                            "air_temperature_rise_K": None, "ram_recovery": None, "duct_loss_q": None,
                            "mass_flow_ratio": None, "source": None},
                 "components": [], "transient": None},
+    # Disciplina gelo L0/L1 (icing.py; docs/GELO.md). surfaces: [{id, chord_m + t_c | le_radius_m | d_m, lifting,
+    # critical, protection: none|anti_ice_thermal|deice_electrothermal|boots, protected_area_m2 |
+    # protected_chord_fraction, surface_temperature_C, duty_cycle, power_density_W_m2, parting_strip_area_m2,
+    # electric, mass_kg}]; sem surfaces → asa + estabilizadores sem proteção. temperature: envelope | isa.
+    "icing": {"enabled": True, "coupling": "relatorio", "max_iter": 6, "tol": 0.01,
+              "envelopes": ["continuous", "intermittent"], "mvd_um": None, "conditions": None, "surfaces": None,
+              "temperature": "envelope", "isa_dT_K": 0.0, "fiki": None, "max_altitude_m": None},
 }
 
 

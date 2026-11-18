@@ -88,6 +88,8 @@ class DesignResult:
     noise: dict | None = None             # noise.analyse_noise (disciplina ruído, L0)
     thermal: dict | None = None           # thermal.analyse_thermal (disciplina térmica, L0/L1)
     thermal_coupling: dict | None = None  # thermal.size_with_thermal (acoplamento iterar)
+    icing: dict | None = None             # icing.analyse_icing (disciplina gelo, L0/L1)
+    icing_coupling: dict | None = None    # icing.size_with_icing (acoplamento iterar)
     structures_l1: object | None = None   # structures_l1.StructuresL1 (masses, deflections, elastic correction)
     launch_recovery: dict | None = None   # opt-in catapult / belly landing (launch_recovery.py)
     gear_drag: dict | None = None         # opt-in gear drag in the polar (aero/gear_drag.py)
@@ -197,6 +199,13 @@ def _chk_cat(r, res):
 @register_handler("check", "cooling_drag_area")
 def _chk_thermal(r, res):
     return CheckResult(r.key, None, "avaliado na etapa térmica (verificação: termica:…)")
+
+
+@register_handler("check", "ice_protection_power")
+@register_handler("check", "max_ice_thickness")
+@register_handler("check", "flight_into_known_icing")
+def _chk_icing(r, res):
+    return CheckResult(r.key, None, "avaliado na etapa de gelo (verificação: gelo:…)")
 
 
 @register_handler("check", "noise")
