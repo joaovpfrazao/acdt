@@ -34,6 +34,7 @@ from typing import Any, Iterable, Mapping
 
 SCHEMA = "acdt.design/1"
 LEVELS = ("L0", "L1", "L2", "L3")
+FIDELITIES = ("modelo", "ensaio")  # origem do bloco: corrida do modelo (omissão) ou dados medidos
 SCHEMA_FILE = Path(__file__).parent / "data" / "design.schema.json"
 DEFAULT_FILE = "design.json"
 UNCERTAINTY_KINDS = ("desvio_padrao", "intervalo", "percentis")
@@ -103,9 +104,13 @@ def quantities_from_tree(tree: Any, prefix: str = "", unit_of: Any = None) -> di
 def set_results(db: dict[str, Any], discipline: str, level: str, quantities: Mapping[str, Mapping[str, Any]], *,
                 method: str = "", references: Iterable[str] = (), source: str = "", evidence: str | None = None,
                 evidence_sha256: str | None = None, provenance: Mapping[str, Any] | None = None,
-                notes: Iterable[str] = (), sections: Mapping[str, str] | None = None) -> dict[str, Any]:
+                notes: Iterable[str] = (), sections: Mapping[str, str] | None = None,
+                fidelity: str | None = None) -> dict[str, Any]:
     """Escreve (substitui) o bloco ``results.<disciplina>.<nível>``. Devolve o bloco. ``sections``: método por
-    prefixo de nome (``{"aero": "…"}``) quando o bloco junta várias secções da fonte."""
+    prefixo de nome (``{"aero": "…"}``) quando o bloco junta várias secções da fonte. ``fidelity``: origem do
+    bloco quando não é o modelo (``"ensaio"`` = dados medidos / calibração contra ensaio, ``acdt calib``)."""
+    if fidelity is not None and fidelity not in FIDELITIES:
+        raise DesignDBError(f"fidelidade '{fidelity}' não é uma de {FIDELITIES}")
     if level not in LEVELS:
         raise DesignDBError(f"nível '{level}' não é um de {LEVELS}")
     if not discipline or "." in discipline:
@@ -114,6 +119,8 @@ def set_results(db: dict[str, Any], discipline: str, level: str, quantities: Map
            "evidence_sha256": evidence_sha256, "provenance": dict(provenance or {}), "updated_utc": _now(),
            "notes": list(notes), "sections": dict(sections or {}),
            "quantities": {k: dict(v) for k, v in quantities.items()}}
+    if fidelity is not None:
+        blk["fidelity"] = fidelity
     db.setdefault("results", {}).setdefault(discipline, {})[level] = blk
     _touch(db, f"results.{discipline}.{level}")
     return blk
@@ -307,6 +314,8 @@ def flatten(db: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
             for n, q in (blk.get("quantities") or {}).items():
                 e = {"discipline": d, "level": lvl, "provenance_fingerprint": fp}
                 e.update({k: blk.get(k) for k in _INHERIT})
+                if blk.get("fidelity"):
+                    e["fidelity"] = blk["fidelity"]
                 sec = (blk.get("sections") or {}).get(n.split(".", 1)[0])
                 if sec:
                     e["method"] = sec

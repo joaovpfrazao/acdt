@@ -1,0 +1,25 @@
+# Estudo de calibração: fator k_EI da viga L1 (EI_usado = k_EI·EI_viga) contra um ensaio estático SINTÉTICO.
+#   acdt calib fit examples/calibration/flexao_estatica_sintetica.yaml -o output/calib_flexao
+#   acdt calib export output/calib_flexao/calibration_record.json --at "load=1500 N"
+calibration:
+  name: flexao_estatica_sintetica
+  discipline: estruturas
+  level: L1
+  data: {file: flexao_estatica_sintetica.csv}
+  model:
+    expr: "w_beam / k_EI"
+    output: w
+    units: {w: m, w_beam: m, load: N}
+  method: wls
+  parameters:
+    k_EI: {initial: 1.0, bounds: [0.2, 5.0], nominal: 1.0, factor: k_EI, group: structures,
+           what: "rigidez de flexão efetiva: EI_usado = k_EI · EI_viga (flecha da viga / flecha medida)"}
+  acceptance:
+    min_points: 6
+    require_instrument_uncertainty: true
+    max_chi2_red: 2.0
+    max_rel_sd: 0.05
+    band: {k_EI: [0.5, 2.0]}
+    allow_synthetic: true
+  # Gama de validade na carga de ensaio (condição de aplicação), não na flecha prevista
+  validity: {channels: [load], only_channels: true}

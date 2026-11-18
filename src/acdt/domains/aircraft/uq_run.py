@@ -223,6 +223,21 @@ def calibration_inputs(raw: Mapping[str, Any], cal: Mapping[str, Any], base: Pat
             exc.append({"name": name, "path": path, "reason": f"grupo '{group}' não está em "
                                                               "assumptions.calibration.apply (não muda o modelo)"})
             continue
+        if fac.get("fidelity") == "ensaio" or isinstance(fac.get("calibration"), Mapping):
+            # fator de ensaio (acdt calib, acdt.calib/1): distribuição calibrada N(valor, σ do ajuste)
+            sdv = fac.get("sd")
+            if sdv is None or not math.isfinite(float(sdv)) or float(sdv) <= 0:
+                exc.append({"name": name, "path": path, "reason": "ensaio: σ do ajuste desconhecido, não propagado"})
+                continue
+            crec = fac.get("calibration") or {}
+            ins.append(D.UncertainInput(path=path, dist="normal", params={"mean": float(fac["value"]), "std": float(sdv)},
+                                        source=f"{fp.name}: calibração contra ensaio ({crec.get('method', '?')}, "
+                                               f"registo {crec.get('record', '?')})" +
+                                               (" — DADOS SINTÉTICOS" if fac.get("synthetic") else ""),
+                                        pressuposto=bool(fac.get("synthetic")), nominal=float(fac["value"]),
+                                        name=name, origin="calibracao",
+                                        notes="σ do ajuste (covariância dos parâmetros); válido só na gama de validade"))
+            continue
         g = fac.get("gci_fine")
         how = "GCI fina (Celik et al. 2008)"
         q = name[2:] if name.startswith("k_") else name

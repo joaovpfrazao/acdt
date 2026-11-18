@@ -1598,6 +1598,40 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   fidelidade, e unidades declaradas para as chaves de resultado sem sufixo. Pormenor em
   [docs/DADOS.md](docs/DADOS.md).
 
+## 32o. Dados de ensaio e calibração de modelos (18 nov 2026)
+
+* **O que faz**: ingere dados medidos e calibra fatores e parâmetros dos modelos contra eles, com incerteza,
+  gama de validade e uma decisão explícita `aplicar`/`nao_aplicar`, tomada contra critérios de aceitação
+  declarados. Nunca se aplica fora da gama de validade.
+* **Ingestão** (`acdt.testdata/1`):
+  * formatos CSV, Parquet e PX4 ULog (pyulog, BSD-3-Clause), com unidades pint por canal;
+  * metadados obrigatórios (origem, data, tipo, condições, instrumento);
+  * incerteza de instrumento conforme o GUM, e SHA-256 do ficheiro;
+  * o ArduPilot `.bin` não é lido no processo, porque o pymavlink é LGPL: converte-se para CSV fora do processo.
+* **Métodos**:
+  * mínimos quadrados ponderados (Bard 1974; Seber & Wild 1989), com variância efetiva para entradas incertas
+    (Orear 1982), σ pelos resíduos quando não é declarado, escala de Birge e IC t de Student;
+  * Kennedy & O'Hagan (2001) leve: discrepância PG + MAP/Laplace modular (Bayarri et al. 2007), com prior
+    obrigatório.
+* **Registo** (`acdt.calib/1`): fatores ± σ, IC 95 %, covariância e correlação, resíduos por ponto, gama de
+  validade e critérios avaliados.
+* **Exportações**: fatores no formato de `assumptions.calibration.file` (mesmas regras de opt-in dos fatores da
+  Fase 4), overlay de `assumptions`, entradas normais e correlacionadas para `acdt uq`, e bloco
+  `results.calibracao.<nível>` com `fidelity: ensaio` no `design.json`.
+* **CLI**: `acdt calib ingest | fit | show | export | db`.
+* **Fidelidade**: ensaio (dados). Não muda nenhum número do modelo enquanto o utilizador não ativar o grupo ou
+  o overlay.
+* **Validado**: testes com dados sintéticos de fatores verdadeiros conhecidos:
+  * recuperação dentro da incerteza;
+  * cobertura empírica do IC 95 % em 200 réplicas;
+  * KOH com discrepância de forma.
+
+  Com o ponto publicado do C172S (V_S0), ν = 0, por isso a incerteza fica desconhecida e a decisão é
+  `nao_aplicar`.
+* **Por fazer**: o modelo do acdt diretamente como η(x, θ) dentro do ajuste; MCMC/emulador para KOH;
+  alinhamento de tópicos ULog e segmentos estabilizados; dados de ensaio reais. Pormenor em
+  [docs/CALIBRACAO.md](docs/CALIBRACAO.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.

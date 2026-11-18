@@ -63,6 +63,89 @@ def _cmd_size(a) -> int:
     return 0 if res.feasible else 1
 
 
+def _cmd_calib(a) -> int:
+    """Dados de ensaio e calibração (docs/CALIBRACAO.md): ingest / fit / show / export / db."""
+    import json
+
+    import yaml
+
+    from acdt.core.calibration import ingest as I
+    from acdt.core.calibration import record as R
+    from acdt.core.calibration.fitting import CalibrationError
+
+    try:
+        if a.action == "ingest":
+            ds = I.load(a.path, a.meta, topics=a.topic)
+            d = ds.to_dict()
+            if a.output:
+                Path(a.output).write_text(json.dumps(d, indent=1, ensure_ascii=False), encoding="utf-8")
+            print(f"[acdt] {ds.name}: {ds.n} linhas, formato {ds.fmt}, origem: {ds.meta.get('source')}"
+                  + ("  [DADOS SINTÉTICOS]" if ds.synthetic else ""))
+            for k, c in d["channels"].items():
+                u = c["unit"] if c["unit"] is not None else "(unidade não declarada)"
+                unc = "" if not c["uncertainty"] else f"  u = {c['uncertainty'].get('sd', c['uncertainty'].get('rel'))}"
+                print(f"  {k:<28} {u:<14} n {c['n']:<6} [{c['min']}, {c['max']}]{unc}")
+            return 0
+        if a.action == "fit":
+            out = Path(a.output) if a.output else Path("output") / ("calib_" + Path(a.path).stem)
+            rec = R.run_study(a.path, out)
+            print(R.to_markdown(rec))
+            print(f"[acdt] registo: {out / 'calibration_record.json'}")
+            return 0
+        rec = R.load_record(a.path)
+        if a.action == "show":
+            print(R.to_markdown(rec))
+            return 0
+        at = R.parse_at(a.at or [])
+        if a.action == "export":
+            from acdt.domains.aircraft.hifi.calibration import _group_of
+            out = Path(a.output) if a.output else Path(a.path).parent
+            out.mkdir(parents=True, exist_ok=True)
+            ff = R.factors_file(rec, at, group_of=_group_of, source_path=str(a.path))
+            ov, refused = R.overlay(rec, at)
+            uq = R.uq_inputs(rec, source_path=str(a.path))
+            if ff["factors"]:
+                (out / "calibration_factors.json").write_text(json.dumps(ff, indent=1, ensure_ascii=False),
+                                                             encoding="utf-8")
+            if ov:
+                (out / "calibration_overlay.yaml").write_text(
+                    "# acdt calib export — substituições aplicáveis no ponto dado (fundir em assumptions)\n"
+                    + yaml.safe_dump(ov, sort_keys=False, allow_unicode=True), encoding="utf-8")
+            frag: dict = {"inputs": uq["inputs"], "correlations": uq["correlations"]}
+            if ff["factors"]:
+                frag["calibration"] = {"file": str((out / "calibration_factors.json").resolve()),
+                                       "factors": sorted(ff["factors"])}
+            (out / "calibration_uq.yaml").write_text(
+                "# acdt calib export — entradas calibradas para a secção uncertainty de acdt uq\n"
+                + yaml.safe_dump(frag, sort_keys=False, allow_unicode=True), encoding="utf-8")
+            for k, f in ff["factors"].items():
+                print(f"  fator {k} = {f['value']:.5g} ± {format(f['sd'], '.3g') if f['sd'] is not None else 'desconhecido'}: "
+                      f"{f['decision']}" + (f" ({f['invalid_reason']})" if f["invalid_reason"] else ""))
+            for r in refused:
+                print(f"  {r['target']}: nao_aplicar ({'; '.join(r['reasons'])})")
+            for e in uq["excluded"]:
+                print(f"  uq: {e['parameter']} não propagado ({e['reason']})")
+            print(f"[acdt] exportado para {out}")
+            return 0
+        if a.action == "db":
+            from acdt.core import design_db as D
+            if not a.db:
+                print("[acdt] calib db precisa de --db design.json", file=sys.stderr)
+                return 2
+            dbp = Path(a.db)
+            dbp = dbp / D.DEFAULT_FILE if dbp.is_dir() else dbp
+            db = D.load(dbp) if dbp.is_file() else D.new(rec["name"], rec.get("discipline") or "generico")
+            from acdt.core.provenance import sha256_file
+            R.to_design_db(db, rec, evidence=str(a.path), evidence_sha256=sha256_file(a.path))
+            D.save(db, dbp)
+            print(f"[acdt] calibração '{rec['name']}' em {dbp}: results.calibracao.{rec['level']} (fidelity ensaio)")
+            return 0
+    except (I.IngestError, CalibrationError, OSError, ValueError) as e:
+        print(f"[acdt] {e}", file=sys.stderr)
+        return 2
+    return 2
+
+
 def _cmd_db(a) -> int:
     """Estado de projeto ``acdt.design/1`` (docs/DADOS.md): show / get / diff / export / build / validate."""
     import json
@@ -2075,6 +2158,19 @@ def main(argv=None) -> int:
     dbp.add_argument("--json", action="store_true")
     dbp.add_argument("--map", action="append", help="add-uq: métrica=nome.da.grandeza (repetível)")
     dbp.set_defaults(fn=_cmd_db)
+    clp = sub.add_parser("calib", help="dados de ensaio (CSV/Parquet/PX4 ULog, unidades, metadados) e calibração de "
+                         "fatores/parâmetros com incerteza e decisão aplicar/não aplicar: ingest / fit / show / "
+                         "export / db (docs/CALIBRACAO.md)")
+    clp.add_argument("action", choices=["ingest", "fit", "show", "export", "db"])
+    clp.add_argument("path", help="ingest: ficheiro de dados; fit: estudo YAML; show/export/db: "
+                     "calibration_record.json")
+    clp.add_argument("--meta", help="ingest: metadados YAML (omissão <dados>.meta.yaml)")
+    clp.add_argument("--topic", action="append", help="ingest ULog: só este tópico (repetível)")
+    clp.add_argument("--at", action="append", help="export: condição do ponto de aplicação nome=valor[unidade] "
+                     "(repetível; todas as entradas da gama de validade são obrigatórias)")
+    clp.add_argument("--db", help="db: design.json (ou pasta) a atualizar")
+    clp.add_argument("-o", "--output")
+    clp.set_defaults(fn=_cmd_calib)
     r = sub.add_parser("requirements", help="listar os tipos de requisito registados")
     r.add_argument("--domain", default="aircraft")
     r.set_defaults(fn=_cmd_requirements)

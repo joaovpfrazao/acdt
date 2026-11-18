@@ -1,0 +1,23 @@
+# Estudo de calibração (docs/CALIBRACAO.md): polar parabólica contra a polar de túnel SINTÉTICA.
+#   acdt calib fit examples/calibration/polar_tunel_sintetico.yaml -o output/calib_polar
+calibration:
+  name: polar_tunel_sintetico
+  discipline: aero
+  level: L1
+  data: {file: polar_tunel_sintetico.csv}
+  model:
+    expr: "CD0 + CL**2 / (pi * AR * e)"
+    output: CD
+    constants: {AR: {value: 8.0, source: "geometria do modelo de túnel (sintético)"}}
+  method: wls
+  parameters:
+    CD0: {initial: 0.03, bounds: [0.0, 0.2], what: "CD0 da polar parabólica (reportado; não há caminho a substituir)"}
+    e: {initial: 0.8, bounds: [0.3, 1.0], nominal: 0.80, target: assumptions.aero.oswald,
+        what: "fator de Oswald da polar parabólica"}
+  acceptance:
+    min_points: 10
+    require_instrument_uncertainty: true
+    max_chi2_red: 2.0
+    max_rel_sd: 0.05
+    band: {e: [0.5, 0.95]}
+    allow_synthetic: true   # SÓ para a demonstração: dados sintéticos nunca entram num projeto real
