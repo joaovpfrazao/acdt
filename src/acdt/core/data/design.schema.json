@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/joaovpfrazao/acdt/schemas/acdt.design-1.json",
+  "title": "acdt.design/1 — estado de projeto único",
+  "description": "Definição + resultados por disciplina e nível (L0..L3) + verificação. Cada grandeza tem unidade explícita (sintaxe pint; '1' = adimensional; null = não declarada) e value null = desconhecido (nunca zero). Ver docs/DADOS.md.",
+  "type": "object",
+  "required": ["schema", "name", "domain", "revision", "created_utc", "updated_utc", "definition", "results"],
+  "properties": {
+    "schema": {"const": "acdt.design/1"},
+    "name": {"type": "string"},
+    "domain": {"type": "string"},
+    "revision": {"type": "integer", "minimum": 0},
+    "created_utc": {"type": "string"},
+    "updated_utc": {"type": "string"},
+    "definition": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": ["object", "null"],
+          "properties": {"path": {"type": ["string", "null"]}, "sha256": {"type": ["string", "null"]}}
+        },
+        "input": {"description": "a entrada tal como escrita (YAML → JSON)"},
+        "requirements": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/requirement"}
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[^.]+$"},
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {"enum": ["L0", "L1", "L2", "L3"]},
+        "additionalProperties": {"$ref": "#/$defs/block"}
+      }
+    },
+    "verification": {
+      "type": ["object", "null"],
+      "required": ["rows", "counts"],
+      "properties": {
+        "schema": {"type": ["string", "null"]},
+        "evidence": {"type": ["string", "null"]},
+        "provenance": {"type": "object"},
+        "counts": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "coverage": {},
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "status"],
+            "properties": {
+              "id": {"type": "string"},
+              "status": {"enum": ["passa", "falha", "no_limite", "nao_avaliado", "desconhecido"]}
+            }
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {"type": "object", "required": ["utc", "what"]}
+    }
+  },
+  "$defs": {
+    "scalar": {"type": ["number", "string", "boolean", "null"]},
+    "uncertainty": {
+      "type": "object",
+      "required": ["kind", "source"],
+      "properties": {
+        "kind": {"enum": ["desvio_padrao", "intervalo", "percentis"]},
+        "source": {"type": "string"},
+        "sd": {"type": "number", "minimum": 0},
+        "lo": {"type": "number"},
+        "hi": {"type": "number"},
+        "p5": {"type": ["number", "null"]},
+        "p50": {"type": ["number", "null"]},
+        "p95": {"type": ["number", "null"]},
+        "n": {"type": "integer", "minimum": 1}
+      }
+    },
+    "quantity": {
+      "type": "object",
+      "required": ["value", "unit"],
+      "properties": {
+        "value": {"$ref": "#/$defs/scalar"},
+        "unit": {"type": ["string", "null"]},
+        "source": {"type": "string"},
+        "uncertainty": {"$ref": "#/$defs/uncertainty"},
+        "note": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "requirement": {
+      "type": "object",
+      "required": ["value", "unit", "sense"],
+      "properties": {
+        "value": {"$ref": "#/$defs/scalar"},
+        "unit": {"type": ["string", "null"]},
+        "sense": {"type": "string"},
+        "raw": {"$ref": "#/$defs/scalar"},
+        "raw_unit": {"type": ["string", "null"]},
+        "source": {"type": "string"},
+        "id": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "block": {
+      "type": "object",
+      "required": ["method", "source", "quantities"],
+      "properties": {
+        "method": {"type": "string"},
+        "references": {"type": "array", "items": {"type": "string"}},
+        "source": {"type": "string"},
+        "evidence": {"type": ["string", "null"]},
+        "evidence_sha256": {"type": ["string", "null"]},
+        "provenance": {"type": "object"},
+        "updated_utc": {"type": "string"},
+        "notes": {"type": "array", "items": {"type": "string"}},
+        "sections": {"type": "object", "additionalProperties": {"type": "string"}},
+        "quantities": {"type": "object", "additionalProperties": {"$ref": "#/$defs/quantity"}}
+      }
+    }
+  }
+}

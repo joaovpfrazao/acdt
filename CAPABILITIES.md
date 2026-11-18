@@ -1576,6 +1576,28 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * **Limites**: pouca validação contra dados físicos (só o C172S); XFOIL/AVL/POH de desempenho ficam de fora até
   haver valores publicados transcritos com fonte. Pormenor em [docs/VV.md](docs/VV.md).
 
+## 32n. Estado de projeto único com unidades (18 nov 2026)
+
+* **O que faz**: um ficheiro `design.json` com esquema versionado `acdt.design/1` (JSON Schema em
+  `src/acdt/core/data/design.schema.json`). Guarda a definição (entrada YAML, SHA-256 e requisitos em SI), os
+  resultados por disciplina e nível L0…L3 (método, referências, origem, evidência e proveniência por bloco), a
+  matriz de verificação e a incerteza por grandeza, quando é conhecida.
+* **Grandezas**: cada uma tem unidade explícita em sintaxe pint, `"1"` para adimensional declarado ou `null` para
+  não declarada (nunca se presume adimensional). `value: null` quer dizer desconhecido, nunca zero.
+* **Unidades na entrada** (pint, BSD-3-Clause): requisitos e `assumptions` aceitam `"150 kg"`, `"27 m/s"` ou
+  `{value, unit}`. Os valores são convertidos para o SI dos requisitos ou para a unidade que o sufixo da chave
+  declara (`_m`, `_kg`, `_in`, …), e uma dimensão errada dá um erro claro com o caminho. Os YAML sem unidades
+  continuam iguais, verificado sobre todos os exemplos.
+* **CLI**: `acdt db show | get | diff | export | build | validate | add-uq`. `acdt size -o PASTA` escreve
+  `design.json` e continua a revisão; `acdt verify` atualiza a matriz. O `diff` converte unidades e assinala as
+  mudanças de unidade e de fidelidade.
+* **Fidelidade**: — (dados). Não muda nenhum número do dimensionamento.
+* **Integrado**: o pipeline aircraft (todas as etapas), a matriz de verificação e `acdt uq`, por `db add-uq`,
+  com envelope para entradas epistémicas.
+* **Por fazer**: `acdt mdo` (ótimo e Pareto como blocos L2), `acdt vv`, os blocos L3 das ferramentas de alta
+  fidelidade, e unidades declaradas para as chaves de resultado sem sufixo. Pormenor em
+  [docs/DADOS.md](docs/DADOS.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.

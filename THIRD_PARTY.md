@@ -12,6 +12,8 @@ or the official project pages) in **October 2026**. Re-check them before any red
 | NumPy | BSD-3-Clause | https://github.com/numpy/numpy | numerics |
 | Matplotlib | Matplotlib licence (PSF-based, BSD-compatible) | https://github.com/matplotlib/matplotlib | plots |
 | PyYAML | MIT | https://github.com/yaml/pyyaml | mission / database files |
+| pint | BSD-3-Clause | https://github.com/hgrecco/pint | units at the input/output boundary (`acdt.core.quantities`, `acdt db`) |
+| jsonschema (dev) | MIT | https://github.com/python-jsonschema/jsonschema | validates `design.json` against `acdt.design/1` (optional; essential checks without it) |
 | pytest (dev) | MIT | https://github.com/pytest-dev/pytest | tests |
 
 ## Optional, imported (permissive / weak copyleft, installed by the user via extras)

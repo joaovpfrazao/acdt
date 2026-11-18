@@ -156,6 +156,7 @@ def parse_requirement(key: str, spec: Any) -> Requirement:
     if not isinstance(spec, dict):
         spec = {"target": spec}
     spec = dict(spec)
+    explicit_unit = spec.get("unit")
     unit = spec.pop("unit", units.default_unit(rt.dimension))
     weight = float(spec.pop("weight", 1.0))
     params: dict[str, float] = {}
@@ -163,8 +164,8 @@ def parse_requirement(key: str, spec: Any) -> Requirement:
         if p in spec:
             pv = spec.pop(p)
             dim = "length" if p == "altitude" else "speed"
-            if isinstance(pv, dict):
-                params[p] = units.to_si(pv["value"], pv.get("unit", units.default_unit(dim)), dim)
+            if isinstance(pv, (dict, str)):  # {value, unit} ou "3000 m" (acdt.core.quantities)
+                params[p] = _qty_si(pv, dim, f"{key}.{p}")[0]
             else:
                 params[p] = float(pv)
     if "value" in spec:
@@ -180,11 +181,23 @@ def parse_requirement(key: str, spec: Any) -> Requirement:
         if raw not in ("minimize", "maximize"):
             raise RequirementError(f"{key}: objective must be 'minimize' or 'maximize'")
         return Requirement(key, sense, raw, unit, raw, params, weight, trace)
+    if isinstance(raw, str):  # "150 kg", "10 h": unidade escrita no valor (acdt.core.quantities; docs/DADOS.md)
+        val, raw, unit = _qty_si(raw if explicit_unit is None else {"value": raw, "unit": explicit_unit},
+                                 rt.dimension, f"{key}.{sense}")
+        return Requirement(key, sense, val, unit, raw, params, weight, trace)
     try:
         val = units.to_si(raw, unit, rt.dimension)
     except units.UnitError as e:
         raise RequirementError(f"{key}: {e}") from e
     return Requirement(key, sense, val, unit, raw, params, weight, trace)
+
+
+def _qty_si(v: Any, dimension: str, where: str) -> tuple[float, float, str]:
+    from acdt.core.quantities import to_dimension_si
+    try:
+        return to_dimension_si(v, dimension, where)
+    except units.UnitError as e:
+        raise RequirementError(str(e)) from e
 
 
 @dataclass

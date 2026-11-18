@@ -167,6 +167,7 @@ class AircraftModel:
         skip = list(self.opts.get("skip_stages") or [])
         return {"domain": "aircraft", "mission": self.source, "fidelity": fid, "skip_stages": skip,
                 "workers": int(self.opts.get("workers") or 1),
+                "result_metrics": dict(self.opts.get("result_paths") or {}),  # nome → caminho (acdt db add-uq)
                 "text": f"pipeline aircraft L0/L1 (`{Path(self.source).name if self.source else '?'}`), fidelidade "
                         f"{fid}" + (f", sem {', '.join(skip)}" if skip else "") + "; um pipeline por amostra"}
 

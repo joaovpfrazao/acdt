@@ -24,6 +24,12 @@ def _cmd_size(a) -> int:
     except (InfeasibleError, RequirementError) as e:
         print(f"[acdt] requisitos inconsistentes: {e}", file=sys.stderr)
         return 2
+    except ValueError as e:  # unidades erradas na entrada (acdt.core.quantities.QuantityError)
+        from acdt.core.units import UnitError
+        if not isinstance(e, UnitError):
+            raise
+        print(f"[acdt] unidade inválida na entrada: {e}", file=sys.stderr)
+        return 2
     res, rep, spec = st["result"], st.get("report_path"), st["spec"]
     dp = res.design_point
     print(f"[acdt] {spec.name}: {'VIÁVEL' if res.feasible else 'INVIÁVEL'}")
@@ -49,7 +55,106 @@ def _cmd_size(a) -> int:
     v = getattr(res, "verified", None)
     print(f"  verificação da missão (Fase 2): {'OK' if v else ('FALHA' if v is False else 'n/a')}")
     print(f"  relatório: {rep}")
+    if (out / "design.json").is_file() and st.get("design") is not None:
+        print(f"  estado de projeto: {out / 'design.json'} (revisão {st['design'].get('revision')}; acdt db show)")
+    for i in st.issues:
+        if "design.json" in i.message:
+            print(f"  [{i.severity}] {i.message}")
     return 0 if res.feasible else 1
+
+
+def _cmd_db(a) -> int:
+    """Estado de projeto ``acdt.design/1`` (docs/DADOS.md): show / get / diff / export / build / validate."""
+    import json
+    from acdt.core import design_db as D
+
+    if a.action == "build":
+        if len(a.paths) != 2:
+            print("[acdt] db build precisa de <missão.yaml> <pasta de saída>", file=sys.stderr)
+            return 2
+        from acdt.domains.aircraft.design_db_run import build_from_output
+        db = build_from_output(a.paths[0], a.paths[1])
+        dst = Path(a.output) if a.output else Path(a.paths[1]) / D.DEFAULT_FILE
+        D.save(db, dst)
+        print(f"[acdt] estado de projeto: {dst} (revisão {db['revision']})")
+        print(D.summary(db))
+        return 0
+    if not a.paths:
+        print("[acdt] indique o design.json (ou a pasta de saída)", file=sys.stderr)
+        return 2
+    if a.action == "validate":
+        db = D.load(a.paths[0], check=False)
+        errs = D.validate(db)
+        for e in errs:
+            print(f"  {e}")
+        print(f"[acdt] {'válido' if not errs else f'{len(errs)} erros'} ({D.SCHEMA})")
+        return 0 if not errs else 1
+    try:
+        db = D.load(a.paths[0])
+    except (FileNotFoundError, D.DesignDBError) as e:
+        print(f"[acdt] {e}", file=sys.stderr)
+        return 2
+    if a.action == "show":
+        print(D.summary(db))
+        return 0
+    if a.action == "add-uq":
+        if len(a.paths) != 2:
+            print("[acdt] db add-uq <design.json> <uq.json|pasta do estudo>", file=sys.stderr)
+            return 2
+        from acdt.domains.aircraft.design_db_run import uq_into_db
+        mp = {}
+        for m in a.map or []:
+            k, _, v = m.partition("=")
+            if not k or not v:
+                print(f"[acdt] --map espera nome=caminho (recebido '{m}')", file=sys.stderr)
+                return 2
+            mp[k] = v
+        rep = uq_into_db(db, a.paths[1], mp)
+        dst = Path(a.paths[0])
+        D.save(db, dst / D.DEFAULT_FILE if dst.is_dir() else dst)
+        print(f"[acdt] incerteza ligada a {len(rep['ligadas'])} grandezas; sem grandeza no estado: "
+              f"{rep['sem_grandeza'] or '—'}; sem resumo válido: {rep['sem_resumo'] or '—'}")
+        return 0
+    if a.action == "get":
+        if len(a.paths) < 2:
+            print("[acdt] db get <design.json> <caminho|glob|nome> [--unit U]", file=sys.stderr)
+            return 2
+        hits = D.query(db, a.paths[1])
+        if not hits:
+            print(f"[acdt] nada corresponde a '{a.paths[1]}'", file=sys.stderr)
+            return 1
+        if a.json:
+            print(json.dumps(hits, indent=1, ensure_ascii=False))
+            return 0
+        from acdt.core.quantities import display_unit
+        for k, q in hits.items():
+            v, u = q.get("value"), q.get("unit")
+            if a.unit and isinstance(v, (int, float)) and not isinstance(v, bool):
+                v, u = D.get_value(db, k, a.unit), a.unit
+            un = "(unidade não declarada)" if u is None and isinstance(v, (int, float)) and not isinstance(v, bool) \
+                else display_unit(u)
+            unc = f"  ± {json.dumps(q['uncertainty'], ensure_ascii=False)}" if q.get("uncertainty") else ""
+            print(f"{k} = {D._fmt(v)} {un}  [{q.get('level') or '—'}; {q.get('method') or q.get('source') or ''}]{unc}")
+        return 0
+    if a.action == "diff":
+        if len(a.paths) != 2:
+            print("[acdt] db diff precisa de dois estados", file=sys.stderr)
+            return 2
+        r = D.diff(db, D.load(a.paths[1]), rtol=a.rtol, include=a.include)
+        print(json.dumps(r, indent=1, ensure_ascii=False) if a.json else D.explain_diff(r))
+        return 0 if r["identical"] else 1
+    if a.action == "export":
+        pat = a.paths[1] if len(a.paths) > 1 else None
+        fmt = a.format or (Path(a.output).suffix.lstrip(".") if a.output else "csv")
+        txt = D.to_csv(db, pat) if fmt == "csv" else D.to_markdown(db, pat) if fmt == "md" else \
+            json.dumps(D.rows(db, pat), indent=1, ensure_ascii=False)
+        if a.output:
+            Path(a.output).write_text(txt, encoding="utf-8")
+            print(f"[acdt] exportado: {a.output}")
+        else:
+            print(txt, end="")
+        return 0
+    return 2
 
 
 def _cmd_integration(a) -> int:
@@ -1957,6 +2062,19 @@ def main(argv=None) -> int:
     vvp.add_argument("--list", action="store_true", help="listar os casos registados")
     vvp.add_argument("--strict", action="store_true", help="código 1 também com nao_avaliado/desconhecido")
     vvp.set_defaults(fn=_cmd_vv)
+    dbp = sub.add_parser("db", help="estado de projeto único acdt.design/1 (unidades, nível, proveniência): show / "
+                         "get / diff / export / build / validate / add-uq (docs/DADOS.md)")
+    dbp.add_argument("action", choices=["show", "get", "diff", "export", "build", "validate", "add-uq"])
+    dbp.add_argument("paths", nargs="*", help="design.json ou pasta; get: + caminho/glob/nome; diff: A B; "
+                     "export: + filtro opcional; build: missão.yaml pasta")
+    dbp.add_argument("-o", "--output")
+    dbp.add_argument("--format", choices=["csv", "md", "json"])
+    dbp.add_argument("--unit", help="get: converter para esta unidade (pint)")
+    dbp.add_argument("--rtol", type=float, default=1e-6, help="diff: tolerância relativa")
+    dbp.add_argument("--include", help="diff: só caminhos que correspondem a este glob")
+    dbp.add_argument("--json", action="store_true")
+    dbp.add_argument("--map", action="append", help="add-uq: métrica=nome.da.grandeza (repetível)")
+    dbp.set_defaults(fn=_cmd_db)
     r = sub.add_parser("requirements", help="listar os tipos de requisito registados")
     r.add_argument("--domain", default="aircraft")
     r.set_defaults(fn=_cmd_requirements)

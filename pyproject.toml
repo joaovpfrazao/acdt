@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "Apache-2.0"}
 authors = [{name = "João Frazão"}]
 requires-python = ">=3.10"
-dependencies = ["numpy>=2.0", "matplotlib>=3.6", "pyyaml>=6.0"]
+dependencies = ["numpy>=2.0", "matplotlib>=3.6", "pyyaml>=6.0", "pint>=0.23"]
 keywords = ["aircraft design", "aerospace", "UAV", "sizing", "constraint diagram", "MDO"]
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
@@ -19,7 +19,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7", "pytest-xdist>=3", "pytest-cov>=5", "pytest-timeout>=2", "mypy>=1.10", "types-PyYAML"]
+dev = ["pytest>=7", "pytest-xdist>=3", "pytest-cov>=5", "pytest-timeout>=2", "mypy>=1.10", "types-PyYAML", "jsonschema>=4"]
 # Fases futuras (wrappers opcionais, ver docs/ARCHITECTURE.md)
 aero = ["aerosandbox>=4", "neuralfoil"]
 mdo = ["openmdao>=3.30", "openaerostruct>=2.7"]
@@ -47,7 +47,7 @@ acdt = "acdt.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"acdt.core" = ["data/*.yaml"]
+"acdt.core" = ["data/*.yaml", "data/*.json"]
 "acdt.ai" = ["prompts/*.md"]
 
 [tool.pytest.ini_options]
@@ -95,6 +95,9 @@ files = [
   "src/acdt/core/vv.py",
   "src/acdt/core/vv_cases.py",
   "src/acdt/domains/aircraft/vv_cases.py",
+  "src/acdt/core/quantities.py",
+  "src/acdt/core/design_db.py",
+  "src/acdt/domains/aircraft/design_db_run.py",
 ]
 strict = true
 follow_imports = "silent"

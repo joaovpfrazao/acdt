@@ -57,6 +57,17 @@ def _verification(st: DesignState):
         st.issues.append(Issue("warning", f"matriz de verificação não gerada: {type(ex).__name__}: {ex}"))
 
 
+def _design_db(st: DesignState):
+    """Estado de projeto único ``acdt.design/1`` (acdt.core.design_db; docs/DADOS.md): definição, resultados por
+    disciplina e nível, matriz. Com pasta de saída escreve design.json (revisão seguinte se já existir)."""
+    from acdt.core.requirements import Issue
+    try:
+        from .design_db_run import write_state
+        write_state(st)
+    except Exception as ex:  # noqa: BLE001 — o estado de projeto nunca parte o pipeline; fica registado
+        st.issues.append(Issue("warning", f"estado de projeto (design.json) não gerado: {type(ex).__name__}: {ex}"))
+
+
 DOMAIN = register_domain(Domain(
     name="aircraft",
     description="Fixed-wing aircraft and UAS",
@@ -70,7 +81,9 @@ DOMAIN = register_domain(Domain(
                   "ceilings (Raymer Ch. 17, Anderson)"),
             Stage("report", _report, description="markdown + plots + JSON"),
             Stage("verification", _verification, description="matriz de verificação dos requisitos rastreáveis "
-                  "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)")],
+                  "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)"),
+            Stage("design_db", _design_db, description="estado de projeto único acdt.design/1 com unidades, nível e "
+                  "proveniência (design.json; docs/DADOS.md)")],
     references=["Raymer 6th ed.", "Roskam I–VIII", "Gudmundsson 2014", "Anderson 1999", "Torenbeek 1982",
                 "USAF DATCOM", "Hepperle 2012", "Etkin & Reid 1996", "Nelson 1998", "Megson 2013", "Bruhn 1973",
                 "CS-23 / 14 CFR 23", "STANAG 4671", "Drela (XFOIL, AVL)"],

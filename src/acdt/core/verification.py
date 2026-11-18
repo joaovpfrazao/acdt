@@ -706,6 +706,23 @@ def from_dict(d: Mapping[str, Any], unit_to_si: Callable[[float, str], tuple[flo
     thr: Any = d.get("threshold")
     goal: Any = d.get("goal")
     unit = str(d.get("unit", ""))
+    if comp in ("min", "max", "target") and isinstance(thr, str):  # "300 m" (acdt.core.quantities; docs/DADOS.md)
+        from acdt.core.quantities import parse_quantity
+        try:
+            thr, u_txt = parse_quantity(thr)
+        except ValueError as ex:
+            raise VerificationError(f"{d.get('id', '?')}: limiar {ex}") from ex
+        if u_txt and unit and u_txt != unit:
+            raise VerificationError(f"{d.get('id', '?')}: unidade '{u_txt}' no limiar e 'unit: {unit}' diferentes")
+        unit = u_txt or unit
+    if isinstance(goal, str):
+        from acdt.core.quantities import parse_quantity
+        try:
+            goal, u_goal = parse_quantity(goal)
+        except ValueError as ex:
+            raise VerificationError(f"{d.get('id', '?')}: objetivo {ex}") from ex
+        if u_goal and u_goal != unit:  # o objetivo é convertido com a unidade do limiar: têm de coincidir
+            raise VerificationError(f"{d.get('id', '?')}: objetivo em '{u_goal}' e limiar em '{unit}'")
     si_unit = unit
     disp = ""
     if comp in ("min", "max", "target") and isinstance(thr, (int, float)) and not isinstance(thr, bool):

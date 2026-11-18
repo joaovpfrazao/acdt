@@ -147,6 +147,14 @@ class MissionSpec:
         # inside acdt size (MissionSpec / run_pipeline). No separate onboard_size call required for
         # mass/fuel/energy coupling. Missing BSFC/η/model → raise unassessed (never free energy).
         # Absent onboard → unchanged. Full CG/FOV/closure screens remain on `acdt onboard size`.
+        # Unidades escritas ("3.2 m", {value: 10, unit: ft}) → unidade que a chave declara (acdt.core.quantities;
+        # docs/DADOS.md). Números simples ficam iguais: os YAML sem unidades funcionam como antes.
+        if isinstance(d, dict):
+            from acdt.core.quantities import normalise_tree
+            d = dict(d)
+            for sec in ("assumptions", "systems", "onboard"):
+                if isinstance(d.get(sec), (dict, list)):
+                    d[sec] = normalise_tree(d[sec], sec)
         d_in = d
         if isinstance(d, dict) and (d.get("onboard") or (d.get("assumptions") or {}).get("onboard")):
             from .onboard_bridge import apply_onboard_to_size_dict
