@@ -1338,12 +1338,24 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
     vertical PRESSUPOSTO, Al 2024-T3, FS 1,5). Sadraey 9.5.3.2: δ = W T³/(48 EI) com EI conservador
     (caixão à espessura mínima); δ admissível do livro não citado → deflexão reportada, passa/falha
     unassessed.
+* **Ronda 2 (18 nov 2026, ramo `tailless-open-items-2`)**:
+  * **C_m0 dos corpos** (`assembly/body_moment.py`): Multhopp 1942 (NACA TM 1036; Nelson 1998 Sec. 2.3;
+    Tulapurkara NPTEL Eq. 2.56), C_m0,f = (k2−k1)/(36,5 S c̄) Σ w_f²(α_0L,f + i_f)Δx, com k2−k1 do esferoide de
+    Lamb/Munk (NACA TR-184). Sempre reportado (`approach_consistency['bodies_cm0']`, `body_cm0_alternative`).
+    Entra no trim principal só com `flying_wing.body_cm0: multhopp`; por omissão C_m0 = 0 PRESSUPOSTO.
+    No exemplo dá +0,0101, e o δe de cruzeiro passaria a +15,8…+9,6°, ainda equilibrável.
+  * **Rajada lateral 6-DOF** (`lateral_gust_6dof`): o critério estrito de `hq:lateral_gust` passa a ser
+    aplicado ao 6-DOF em cada caso, com a taxa exigida quando o limite é tocado. No exemplo, o `cheio` falha:
+    precisa de 100 °/s contra 84 °/s; os outros casos passam.
+  * Itens reverificados: fugóide nua ζ 0,042 e, com manutenção de atitude, Nível 1; JSBSim NRMS β 0,02–0,06;
+    taxa da elevon 99 ≤ 117 °/s; decrab com resíduo −0,3° e 23.485 0,60×/0,62×.
 * **Não faz**: rigidez/curso dos servos sem dados do fabricante, C_h medido da folha superior e a c_f/c = 0,40,
   ΔC_D medido para o perfil concreto; volume da carga (sem dimensões dos itens — o packaging fino avalia o
   combustível e deixa a carga como estação candidata); passo automático de torção; inclinação contra a deriva
   no toque; catapulta ou aterragem de ventre (só mencionadas). Aplicar a área de trem escalada ao polar
   é opt-in desde 16 nov 2026 (`gear.apply_scaled_drag`, secção 32g), não ligado no exemplo. A sensibilidade ao atrito não relança o 6-DOF. O C_m dos
-  corpos não é crédito de CLmax no laço W0 (C_m0 = 0 PRESSUPOSTO; no exemplo isso rebentava os 300 m).
+  corpos não é crédito de CLmax no laço W0 (no exemplo isso rebentava os 300 m); o C_m0 de Multhopp só é
+  reportado por omissão.
 * No gerador morfológico: dimensão extra `yaw_control` (não é semente); `split_aileron` liga a opção na
   montagem da base; regra física `yaw_control=rudder` × `tail=tailless` cortada.
 

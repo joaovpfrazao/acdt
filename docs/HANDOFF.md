@@ -1236,6 +1236,47 @@ Em aberto: contacto aft/hélice-bordo de fuga; fixação/inclinação das pernas
 só mencionados; área de trem escalada não aplicada ao polar; volume da carga (sem dimensões dos itens);
 curso/rigidez do DA 30 sem ficha; C_h da folha superior a 0,40c; ΔC_D medido do perfil.
 
+### Itens em aberto da asa sem deriva, ronda 2 (18 nov 2026, ramo `tailless-open-items-2`)
+
+Revisão dos sete itens da ronda 2 no main público (`a686d82`), com o exemplo a W0 149,7 kg:
+
+| item | estado | onde / números |
+|---|---|---|
+| limite de taxa na rajada lateral | linear fechado a 11–12 nov (δ0 = 2°); **6-DOF graduado agora** | `lateral_gust_6dof` (abaixo): o caso `cheio` falha pelo critério estrito |
+| fugóide Nível 2 (MIL-F-8785C) | fechado a 11 nov (`hq:phugoid_autopilot`) | célula nua ζ 0,042 (no limite do Nível 1, ζ ≥ 0,04); com manutenção de atitude ζ 0,96 → Nível 1 |
+| JSBSim vs 6-DOF | fechado a 11 nov; reverificado | NRMS β carga/combustível/cheio 0,022/0,021/0,024; vazio 0,055 com sensibilidade própria 0,037 (célula nua instável) |
+| packaging da carga/combustível no CG | combustível fechado a 11–12 nov; **carga em aberto (dados)** | 33,7 L cabem no corpo; volume da carga sem dimensões dos itens → `None` |
+| taxa exigida da elevon | fechado a 11 nov; reverificado | 99 °/s ≤ 117 °/s (1× Volz DA 30 na superfície) |
+| C_m dos corpos no trim | Torenbeek no trim principal desde 12 nov; **C_m0 de Multhopp agora** | +0,0101 (abaixo) |
+| decrab / missão 6-DOF com vento cruzado | fechado a 12 nov; reverificado | crab −9,0° a 30 m → resíduo −0,3°, deriva 0,35 m/s; 23.485 0,60×/0,62× → passa |
+
+* **C_m0 dos corpos** (`assembly/body_moment.py`): Multhopp 1942 (NACA TM 1036), na forma de Nelson 1998
+  Sec. 2.3 e de Tulapurkara (NPTEL, IIT Madras) Eq. 2.56: C_m0,f = (k2−k1)/(36,5 S c̄) Σ w_f² (α_0L,f + i_f) Δx,
+  com i_f negativo para cauda levantada. k2−k1 vem do esferoide prolato de Lamb (§373) / Munk 1924 (NACA TR-184).
+  Os testes reproduzem a tabela de Munk (l/d 2, 4, 6, 10) e o Exemplo 2.4 de Tulapurkara (C_m0,f −0,0357).
+  α_0L,f = −C_L0/C_Lα da asa AVL a δe = 0. PRESSUPOSTOS: sem o campo de upwash no termo de C_m0; o corpo central
+  parcialmente imerso é tratado como corpo inteiro; corpos rodados ficam unassessed. O valor é sempre
+  reportado (`approach_consistency['bodies_cm0']`, `body_cm0_alternative` por caso). Só entra no trim
+  principal com `flying_wing.body_cm0: multhopp`; por omissão C_m0 = 0 (PRESSUPOSTO), como antes. O laço W0
+  do CLmax continua sem termo dos corpos. No exemplo (opção desligada) dá C_m0 +0,0101, com α_0L,f +3,9°
+  (torção −10°), finura 8,8 e k2−k1 0,93. O δe de cruzeiro passaria de +11,4/+6,8/+9,9/+5,3° para
+  +15,8/+11,2/+14,2/+9,6° (vazio/carga/combustível/cheio), todos dentro de ±25°.
+* **Rajada lateral no 6-DOF** (`flightsim/tailless_sim.gust_verdict_6dof`, `lateral_gust_6dof` no resultado de
+  `acdt simulate … --fidelity 6dof`): aplica o mesmo critério estrito de `hq:lateral_gust` em cada caso de
+  massa: sem saturação, sem limite de taxa e β amortecido. Se o limite de taxa for tocado, volta a voar a
+  rajada sem limite e reporta a taxa exigida. Antes o contacto só ficava reportado; agora é uma falha.
+  No exemplo, vazio/carga/combustível passam (picos 43/73/53 °/s), mas o **cheio falha**: toca o limite em 0,54 %
+  do tempo e, sem limite, o pico é 100 °/s contra os 84 °/s do split na superfície (2× Volz DA 30 por folha,
+  ×1,20). O modelo linear passa (49 °/s), porque a diferença está na não linearidade do 6-DOF. O desenho não foi
+  alterado. As opções (servo mais rápido, mais pré-deflexão, ganhos) ficam para decisão.
+
+Testes: `tests/test_tailless_open_items_2.py` e o teste do exemplo (`bodies_cm0`, `lateral_gust_6dof`).
+
+Em aberto: volume da carga (precisa das dimensões dos itens); escolher o remédio da rajada 6-DOF no `cheio`
+(o servo a ≥ 100 °/s na superfície ou δ0 > 2° re-verificado no 6-DOF); validar o C_m0 de Multhopp de um corpo
+imerso contra ensaio/CFD (pesado, PC do João); curso/rigidez do DA 30; C_h da folha superior a 0,40c;
+ΔC_D medido.
+
 ### Longarina traseira vs charneira (12 nov 2026, ramo `tailless-wingbox-hinge`)
 
 A Fase 5/6 lê agora todas as superfícies de bordo de fuga de `options.flying_wing` (elevon, split aileron,

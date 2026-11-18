@@ -96,6 +96,19 @@ Os resultados ficam em `res.dynamics["tailless"]` (e no registo da montagem), co
 | 6-DOF (4 casos) | trim α 6,6–10,9°, δe +9,4…+0,3°; o SAS reduz o β final em todos (ex.: 'cheio' 2,3° nu → 0,09°) |
 | JSBSim vs 6-DOF (doublet 3 %, 8 s) | NRMS β carga/combustível/cheio 0,019–0,020; vazio 0,119 (célula nua instável, duplica em 11,6 s; a sensibilidade do próprio modelo dá 0,08). Causas corrigidas: δe no arrasto induzido, latitude do IC, guinada do AERORP e −D·sinβ |
 
+A tabela acima é de 10–11 nov 2026. Os valores do exemplo no main a 18 nov 2026 (W0 149,7 kg, trem a 19°)
+estão na tabela seguinte.
+
+| verificação (18 nov 2026) | resultado |
+|---|---|
+| rajada lateral, modelo linear (`hq:lateral_gust`) | **passa** com δ0 = 2°: split 9,9°, 49 °/s, sem limite de taxa |
+| rajada lateral, 6-DOF não linear (`lateral_gust_6dof`, mesmo critério estrito) | vazio/carga/combustível passam (pico 43/73/53 °/s); **cheio falha**: toca no limite de taxa em 0,54 % do tempo; sem limite pediria 100 °/s contra 84 °/s na superfície (×1,20). Reportado, nada alterado no desenho |
+| fugóide | célula nua ζ 0,042 (no limite do Nível 1, ζ ≥ 0,04, MIL-F-8785C 3.2.1.2); com manutenção de atitude ζ 0,96 → **Nível 1** |
+| taxa da elevon | exigida 99 °/s (bank hold na rajada) ≤ 117 °/s do Volz DA 30 na superfície → passa |
+| JSBSim vs 6-DOF (doublet 3 %, 8 s) | NRMS β carga/combustível/cheio 0,022/0,021/0,024; vazio 0,055 (sensibilidade própria 0,037) |
+| C_m0 dos corpos (Multhopp, sensibilidade) | +0,0101 (α_0L,f +3,9°, finura 8,8, k2−k1 0,93); δe de cruzeiro passaria de +11,4/+6,8/+9,9/+5,3° para +15,8/+11,2/+14,2/+9,6°, todos equilibráveis |
+| decrab na missão 6-DOF | crab −9,0° a 30 m → resíduo −0,3°, deriva 0,35 m/s; cargas 23.485 0,60×/0,62× → passa |
+
 ### Como se chegou aqui (estudo, 10 nov 2026)
 
 Antes da correção, só o caso 'vazio' equilibrava. Os casos com carga tinham margem estática 0,34–0,49 e
@@ -122,7 +135,9 @@ Alley 2007.
 
 * A carga e o combustível ficam no CG das massas fixas (`useful_load_at: empty_cg`). Verifica-se só o volume
   bruto à volta desse CG (`asm:useful_load_packaging`); o packaging fino (estrutura, sistemas) e o volume da
-  carga ficam **unassessed**. O C_m dos corpos entra só como sensibilidade (Torenbeek). A torção foi escolhida
+  carga ficam **unassessed**. O C_m dos corpos (Torenbeek) entra no equilíbrio principal desde 12 nov; o C_m0
+  dos corpos é 0 (PRESSUPOSTO) por omissão, e a estimativa de Multhopp é sempre reportada
+  (`flying_wing.body_cm0: multhopp` usa-a no equilíbrio principal; 18 nov 2026). A torção foi escolhida
   pelo estudo, não por um otimizador.
 * A pré-deflexão de 2° do split é agora opção de projeto e o seu arrasto (ΔC_D0 0,000202, McCormick Eq. 3.45)
   está no polar: W0 138,6 kg, e a rajada lateral passa.

@@ -54,10 +54,23 @@ def linear_trim(d0: dict, CL: float) -> tuple[float, float]:
 def body_cm_derivatives(d0: dict, k_body: float) -> dict:
     """Torenbeek fuselage shift of the NP as a moment about the CG: C_m += C_N k, k = −ΔX_np/c̄.
 
-    PRESSUPOSTO: C_m0 of the bodies is 0 (only the NP shift is known). Same term as the 6-DOF model.
+    C_m0 of the bodies: 0 by default (PRESSUPOSTO); the Multhopp estimate (:mod:`.body_moment`) is always
+    reported and enters the main trim with ``flying_wing.body_cm0: multhopp``. Same term as the 6-DOF model.
     """
     return {**d0, "Cm": d0["Cm"] + d0["CL"] * k_body, "Cma": d0["Cma"] + d0["CLa"] * k_body,
             "Cmde": d0["Cmde"] + d0["CLde"] * k_body}
+
+
+def _bodies_cm0_block(asm, d0: dict) -> dict:
+    """Multhopp C_m0 of the bodies (:mod:`.body_moment`) with α_0L,f = −C_L0/C_Lα of the AVL wing at δe = 0
+    (AVL α is measured from the geometry x axis = the bodies' reference line)."""
+    from .body_moment import bodies_cm0
+    if not d0.get("CLa"):
+        return {"status": "unassessed", "Cm0": None, "issue": "C_Lα do AVL em falta"}
+    try:
+        return bodies_cm0(asm, math.degrees(-d0["CL"] / d0["CLa"]))
+    except Exception as ex:  # pragma: no cover - geometry without bodies / wing
+        return {"status": "unassessed", "Cm0": None, "issue": str(ex)}
 
 
 def trimmed_clmax(d0: dict, de_max: float) -> dict:
@@ -130,6 +143,10 @@ def approach_consistency(asm, res, out, spec_fw: dict, el: dict, mach: float, W:
             rep["bodies_in_main_trim"] = False
     else:
         rep["bodies_in_main_trim"] = False
+    cm0_mode = str((spec_fw or {}).get("body_cm0", "zero")).lower()
+    if cm0_mode not in ("zero", "multhopp"):
+        raise ValueError("flying_wing.body_cm0: 'zero' (PRESSUPOSTO, omissão) ou 'multhopp'")
+    cm0_blk: dict | None = None
     for name, cs in cases.items():
         xcg, zcg = float(cs["cg"][0]), float(cs["cg"][2])
         m = float(cs["mass_kg"])
@@ -141,10 +158,17 @@ def approach_consistency(asm, res, out, spec_fw: dict, el: dict, mach: float, W:
         Wc = m * G0
         use_bodies = include_bodies and k_body is not None
         d_main = body_cm_derivatives(d0, k_body) if use_bodies else d0
+        if cm0_blk is None and include_bodies:
+            cm0_blk = _bodies_cm0_block(asm, d0)
+            rep["bodies_cm0"] = cm0_blk
+        cm0_b = (cm0_blk or {}).get("Cm0")
+        cm0_in_trim = bool(use_bodies and cm0_mode == "multhopp" and cm0_b is not None)
+        if cm0_in_trim:
+            d_main = {**d_main, "Cm": d_main["Cm"] + cm0_b}
         row = {"mass_kg": m, "x_cg": xcg,
                "static_margin": (d_main["CLa"] and -d_main["Cma"] / d_main["CLa"]),
                "CL0": d_main["CL"], "Cm0": d_main["Cm"], "CLde": d_main["CLde"], "Cmde": d_main["Cmde"],
-               "bodies_in_trim": use_bodies}
+               "bodies_in_trim": use_bodies, "bodies_cm0_in_trim": cm0_in_trim}
         a_c, de_c = linear_trim(d_main, CL_cruise * Wc / W)
         row["cruise"] = {"CL": CL_cruise * Wc / W, "alpha_deg": math.degrees(a_c), "elevon_deg": math.degrees(de_c),
                          "ok": abs(math.degrees(de_c)) <= el_max}
@@ -185,7 +209,29 @@ def approach_consistency(asm, res, out, spec_fw: dict, el: dict, mach: float, W:
                 av["approach_elevon_deg"] = math.degrees(linear_trim(d0, CL_approach * Wc / W)[1])
             row["with_bodies"] = wb
             row["avl_wing"] = av
+            if cm0_b is not None:
+                # sensitivity: the other choice of body C_m0 (Multhopp if the main trim uses 0, and vice-versa)
+                d_alt = {**d_main, "Cm": d_main["Cm"] + (-cm0_b if cm0_in_trim else cm0_b)}
+                alt = {"body_cm0": 0.0 if cm0_in_trim else cm0_b,
+                       "cruise_elevon_deg": math.degrees(linear_trim(d_alt, CL_cruise * Wc / W)[1]),
+                       "trimmed_CL_max_elevon_limit": trimmed_clmax(d_alt, math.radians(el_max))["CL"]}
+                if CL_approach is not None:
+                    alt["approach_elevon_deg"] = math.degrees(linear_trim(d_alt, CL_approach * Wc / W)[1])
+                    alt["approach_ok"] = abs(alt["approach_elevon_deg"]) <= el_max
+                alt["cruise_ok"] = abs(alt["cruise_elevon_deg"]) <= el_max
+                row["body_cm0_alternative"] = alt
         rep["cases"][name] = row
+    if cm0_blk is not None:
+        cm0_blk["mode"] = cm0_mode
+        cm0_blk["in_main_trim"] = bool(include_bodies and k_body is not None and cm0_mode == "multhopp"
+                                       and cm0_blk.get("Cm0") is not None)
+        if not cm0_blk["in_main_trim"]:
+            cm0_blk["note"] = ("C_m0 dos corpos de Multhopp reportado como sensibilidade ('body_cm0_alternative' por "
+                               "caso); o equilíbrio principal usa C_m0 = 0 (PRESSUPOSTO). flying_wing.body_cm0: "
+                               "multhopp usa-o no equilíbrio principal")
+        else:
+            cm0_blk["note"] = ("C_m0 dos corpos de Multhopp no equilíbrio principal; a sensibilidade com C_m0 = 0 "
+                               "fica em 'body_cm0_alternative'. O laço W0 do CLmax continua sem termo dos corpos")
     bad_cr = [k for k, v in rep["cases"].items() if v.get("cruise") and not v["cruise"]["ok"]]
     bad_ap = [k for k, v in rep["cases"].items() if v.get("approach") and not v["approach"]["ok"]]
     if bad_cr:
