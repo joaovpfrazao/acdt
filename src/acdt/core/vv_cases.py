@@ -771,3 +771,72 @@ def _cs_unit() -> Mapping[str, float | None]:
     return {"lot1_approx": learning_lot(102.73, 1, 2, s, "crawford", "approx"),
             "lot4_approx": learning_lot(102.73, 11, 15, s, "crawford", "approx"),
             "lot4_exact": learning_lot(102.73, 11, 15, s, "crawford", "exact")}
+
+
+# ------------------------------------------------------------------------------------------------ ciclo de vida
+NIST135 = ("NIST Handbook 135, Life-Cycle Costing Manual for the Federal Energy Management Program (Fuller & "
+           "Petersen, 1995 ed., fev. 1996)")
+_lc = builder("ciclo_vida")
+
+
+@_lc("LCC-NIST135-FACTORS", "Fatores de atualização SPV, UPV e UPV* (NIST HB 135, Tabela 3-1 e Eq. 3.6–3.9)",
+     "SPV(3 %, 15 anos) = 0,642; UPV(3 %, 15) = 11,94; UPV*(e = 2 %, d = 3 %, 15) = 13,89 (Tabela 3-1). Exemplos: "
+     "1000 $ no fim do ano 5 a 3 % → 862,61 $ (Eq. 3.6); 100 $/ano durante 5 anos a 3 % → 457,97 $ (Eq. 3.8); "
+     "100 $/ano com escalada de 2 % → 485,62 $ (Eq. 3.9).", "verificacao",
+     [Reference("SPV_3_15", 0.642, "-", NIST135 + ", Tabela 3-1", tol_abs=5e-4, tol_source="impresso com 3 casas"),
+      Reference("UPV_3_15", 11.94, "-", NIST135 + ", Tabela 3-1", tol_abs=5e-3, tol_source="impresso com 2 casas"),
+      Reference("UPVs_2_3_15", 13.89, "-", NIST135 + ", Tabela 3-1", tol_abs=5e-3, tol_source="impresso com 2 casas"),
+      Reference("PV_eq36", 862.61, "USD", NIST135 + ", Eq. 3.6", tol_abs=5e-3, tol_source="impresso ao cêntimo"),
+      Reference("PV_eq38", 457.97, "USD", NIST135 + ", Eq. 3.8", tol_abs=5e-3, tol_source="impresso ao cêntimo"),
+      Reference("PV_eq39", 485.62, "USD", NIST135 + ", Eq. 3.9", tol_abs=5e-3, tol_source="impresso ao cêntimo")],
+     tests=("tests/test_life_cycle.py::test_nist135_factors",))
+def _lc_factors() -> Mapping[str, float | None]:
+    from acdt.core.lcc.discount import spv, upv, upv_star
+
+    return {"SPV_3_15": spv(15, 0.03), "UPV_3_15": upv(15, 0.03), "UPVs_2_3_15": upv_star(15, 0.03, 0.02),
+            "PV_eq36": 1000 * spv(5, 0.03), "PV_eq38": 100 * upv(5, 0.03), "PV_eq39": 100 * upv_star(5, 0.03, 0.02)}
+
+
+@_lc("LCC-NIST135-RATES", "Taxas real e nominal (NIST HB 135, Eq. 3.11–3.14)",
+     "D = 7 %, I = 4 % → d = (1,07/1,04) − 1 = 0,02885 (Eq. 3.12); d = 3 %, I = 4 % → D = 1,04 × 1,03 − 1 = 0,0712 "
+     "(Eq. 3.14).", "verificacao",
+     [Reference("d_real", 0.02885, "-", NIST135 + ", Eq. 3.12", tol_abs=5e-6, tol_source="impresso com 5 casas"),
+      Reference("D_nominal", 0.0712, "-", NIST135 + ", Eq. 3.14", tol_abs=5e-5, tol_source="impresso com 4 casas")],
+     tests=("tests/test_life_cycle.py::test_nist135_rates",))
+def _lc_rates() -> Mapping[str, float | None]:
+    from acdt.core.lcc.discount import nominal_rate, real_rate
+
+    return {"d_real": real_rate(0.07, 0.04), "D_nominal": nominal_rate(0.03, 0.04)}
+
+
+@_lc("LCC-NIST135-EX51A", "LCC do sistema AVAC de base (NIST HB 135, Exemplo 5-1a, Tabela 5-2)",
+     "Investimento 103 000 $ na data base, ventilador 12 000 $ no ano 12, valor residual 3 500 $ no ano 20, "
+     "eletricidade 20 000 $/ano (fator FEMP UPV* 15,13, tabelado com as projeções do DOE — entra como fator "
+     "declarado), O&M 7 000 $/ano, d = 3 % real, 20 anos: LCC = 516 233 $ (Eq. 5.2). O livro usa fatores arredondados "
+     "(SPV12 0,701, SPV20 0,554, UPV20 14,88); aqui os fatores exatos.", "verificacao",
+     [Reference("LCC", 516233.0, "USD", NIST135 + ", Exemplo 5-1a (Tabela 5-2)", tol_rel=1e-4,
+                tol_source="fatores impressos com 3–4 algarismos significativos")],
+     tests=("tests/test_life_cycle.py::test_nist135_example_5_1a",))
+def _lc_ex51a() -> Mapping[str, float | None]:
+    from acdt.core.lcc.lcc import present_value
+
+    items = [{"amount": 103000.0, "year": 0}, {"amount": 12000.0, "year": 12}, {"amount": -3500.0, "year": 20},
+             {"amount": 20000.0, "factor": 15.13, "factor_source": "FEMP UPV* (NIST HB 135, Tabela 5-2)"},
+             {"amount": 7000.0, "annual": [1, 20]}]
+    return {"LCC": present_value(items, 0.03)}
+
+
+@_lc("LCA-CORSIA-FCF", "CO₂ da combustão de combustível de aviação (ICAO Anexo 16 Vol. IV, CORSIA)",
+     "CO₂ = massa de combustível × FCF, com FCF = 3,16 kg CO₂/kg (Jet-A/Jet-A1) e 3,10 kg CO₂/kg (AvGas/Jet-B): "
+     "1000 kg de Jet-A → 3160 kg CO₂; 1000 kg de AvGas → 3100 kg CO₂.", "verificacao",
+     [Reference("CO2_jet_a_1t", 3160.0, "kg", "ICAO Anexo 16 Vol. IV, Parte II Cap. 2, 2.2.3", tol_abs=1e-9,
+                tol_source="valor definido"),
+      Reference("CO2_avgas_1t", 3100.0, "kg", "ICAO Anexo 16 Vol. IV, Parte II Cap. 2, 2.2.3", tol_abs=1e-9,
+                tol_source="valor definido")],
+     tests=("tests/test_life_cycle.py::test_corsia_fcf",))
+def _lc_fcf() -> Mapping[str, float | None]:
+    from acdt.core.lcc.environment import analyse
+
+    a = analyse({"fuel_kg_per_fh": 1000.0, "fuel": "jet_a"})["per_flight_hour_kgCO2e"]["fuel_combustion_CO2"]["lo"]
+    b = analyse({"fuel_kg_per_fh": 1000.0, "fuel": "avgas"})["per_flight_hour_kgCO2e"]["fuel_combustion_CO2"]["lo"]
+    return {"CO2_jet_a_1t": a, "CO2_avgas_1t": b}

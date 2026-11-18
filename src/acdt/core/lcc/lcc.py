@@ -47,6 +47,24 @@ def rng(v: Any) -> tuple[float | None, float | None]:
     return x, x
 
 
+def present_value(items: list[Mapping[str, Any]], d: float) -> float:
+    """Valor presente de uma lista de fluxos (NIST HB 135 Eq. 5.1/5.2). Cada item: ``{amount, year}`` (montante
+    único no fim do ano; ano 0 = data base) ou ``{amount, annual: [t1, t2], escalation}`` (anual, A_t = A_0 (1+e)^t)
+    ou ``{amount, factor, factor_source}`` (fator de valor presente declarado, p. ex. FEMP UPV* tabelado)."""
+    tot = 0.0
+    for it in items:
+        a = float(it["amount"])
+        if "factor" in it:
+            tot += a * float(it["factor"])
+        elif "annual" in it:
+            t1, t2 = (int(x) for x in it["annual"])
+            e = float(it.get("escalation", 0.0))
+            tot += sum(a * (1.0 + e) ** t * spv(t, d) for t in range(t1, t2 + 1))
+        else:
+            tot += a * spv(float(it.get("year", 0)), d)
+    return tot
+
+
 def schedule(n_aircraft: int, rdte_years: int, rate: float, life: int) -> dict[str, Any]:
     if n_aircraft < 1 or rdte_years < 0 or rate <= 0 or life < 1:
         raise ValueError("frota ≥ 1, rdte_years ≥ 0, cadência > 0 e vida útil ≥ 1")
