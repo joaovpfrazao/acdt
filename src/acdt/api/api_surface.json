@@ -1,0 +1,32 @@
+{
+ "schema": "acdt.api_surface/1",
+ "api_version": "1.0.0",
+ "surface": {
+  "ACDTDeprecationWarning": "class(DeprecationWarning)",
+  "API_VERSION": "const:str",
+  "DEPRECATED": "value:dict",
+  "LEVELS": "value:dict",
+  "__version__": "const:str",
+  "analyse": "def(mission: 'PathLike | Mapping[str, Any]', output: 'PathLike | None' = None, *, level: 'str | None' = None, no_systems: 'bool' = False) -> 'dict[str, Any]'",
+  "calibrate": "def(study: 'PathLike', output: 'PathLike | None' = None) -> 'dict[str, Any]'",
+  "db_diff": "def(a: 'Mapping[str, Any]', b: 'Mapping[str, Any]', rtol: 'float' = 1e-06, atol: 'float' = 0.0) -> 'dict[str, Any]'",
+  "db_get": "def(db: 'Mapping[str, Any]', path: 'str', unit: 'str | None' = None) -> 'Any'",
+  "db_load": "def(path: 'PathLike', check: 'bool' = True) -> 'dict[str, Any]'",
+  "db_save": "def(db: 'dict[str, Any]', path: 'PathLike', bump: 'bool' = True) -> 'Path'",
+  "db_validate": "def(db: 'Mapping[str, Any]') -> 'list[str]'",
+  "deprecated": "def(since: 'str', *, removed_in: 'str', alternative: 'str | None' = None, name: 'str | None' = None) -> 'Callable[[F], F]'",
+  "errors": "def() -> 'dict[str, type[BaseException]]'",
+  "function_model": "def(fn: 'Callable[[Mapping[str, Any]], Mapping[str, float]]', params: 'Mapping[str, Any] | None' = None, requirements: 'Sequence[Mapping[str, Any]]' = (), name: 'str' = 'função analítica') -> 'Any'",
+  "load_mission": "def(mission: 'PathLike | Mapping[str, Any]', *, level: 'str | None' = None) -> 'Any'",
+  "load_test_data": "def(path: 'PathLike', meta: 'Mapping[str, Any] | PathLike | None' = None) -> 'Any'",
+  "mdo": "def(mission: 'PathLike', output: 'PathLike | None' = None, *, mdo_file: 'PathLike | None' = None, overrides: 'Mapping[str, Any] | None' = None, plots: 'bool' = True) -> 'dict[str, Any]'",
+  "mdo_study": "def(spec: 'Mapping[str, Any]', model: 'Any', output: 'PathLike | None' = None, *, plots: 'bool' = False) -> 'dict[str, Any]'",
+  "size": "def(mission: 'PathLike | Mapping[str, Any]', output: 'PathLike | None' = None, *, level: 'str | None' = None, no_systems: 'bool' = False) -> 'dict[str, Any]'",
+  "uq": "def(mission: 'PathLike', output: 'PathLike | None' = None, *, uq_file: 'PathLike | None' = None, overrides: 'Mapping[str, Any] | None' = None, plots: 'bool' = True) -> 'dict[str, Any]'",
+  "uq_study": "def(uncertainty: 'Mapping[str, Any]', model: 'Any', output: 'PathLike | None' = None, *, plots: 'bool' = False) -> 'dict[str, Any]'",
+  "verify": "def(mission: 'PathLike', output: 'PathLike') -> 'dict[str, Any]'",
+  "version_info": "def() -> 'dict[str, str]'",
+  "vv": "def(cases: 'Sequence[str] | None' = None, disciplines: 'Sequence[str] | None' = None, max_cost: 'str' = 'barato', output: 'PathLike | None' = None) -> 'dict[str, Any]'",
+  "vv_cases": "def() -> 'list[dict[str, Any]]'"
+ }
+}

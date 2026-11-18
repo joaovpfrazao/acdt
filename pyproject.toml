@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "acdt"
-version = "0.1.0"
+version = "0.2.0"
 description = "Engineering design framework (aircraft first): open requirements, classical sizing, constraint analysis, aerodynamics, systems and harness selection"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -52,6 +52,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "acdt.core" = ["data/*.yaml", "data/*.json"]
 "acdt.ai" = ["prompts/*.md"]
+"acdt.api" = ["api_surface.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -105,6 +106,9 @@ files = [
   "src/acdt/core/calibration/ingest.py",
   "src/acdt/core/calibration/fitting.py",
   "src/acdt/core/calibration/record.py",
+  "src/acdt/api/__init__.py",
+  "src/acdt/api/_deprecation.py",
+  "src/acdt/api/stability.py",
 ]
 strict = true
 follow_imports = "silent"
