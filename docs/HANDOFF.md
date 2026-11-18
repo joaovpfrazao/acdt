@@ -1772,6 +1772,33 @@ disciplina `gelo` no `design.json`, requisitos `ice_protection_power`, `max_ice_
   O resultado do exemplo de teste do PR #17 (W0 25,20 → 34,31 kg com ciclo 1) passa a ser mais baixo com a
   omissão; `power_schedule: missao` reproduz o majorante.
 
+### Fiabilidade e manutenção de frota L0 (18 nov 2026, ramo `disc-fiabilidade`, PR #19)
+
+Núcleo `acdt/core/reliability/` (taxas com proveniência, RBD série/paralelo/k-de-n/caminhos, manutibilidade e
+disponibilidades, sobressalentes Poisson, frota, estudo genérico), etapa `reliability` do pipeline
+(`domains/aircraft/reliability.py`, depois do gelo), disciplina `fiabilidade` no `design.json`, requisitos
+`mission_reliability`, `mtbcf`, `mtbf`, `operational_availability`, `maintenance_man_hours_per_fh` e `fleet_size`,
+avaliador `fiabilidade:`, `acdt.api.reliability`/`availability`/`spares_stock` (API 1.5.0) e cinco casos V&V do
+MIL-HDBK-338B (todos passam). Doc: [FIABILIDADE.md](FIABILIDADE.md); CAPABILITIES §32u.
+
+* **Reutilização**: taxas de `core/data/failure_rates.yaml` e de fornecedor (`core/safety/rates.py`, as mesmas do
+  ARP4761/SORA), `concept.reliability.k_of_n`, `concept.ops.availability`, `fleet_feedback.fleet` (Ha 2010) e o
+  custo operacional de `manufacturing.costing` (o custo de manutenção/FH entra nesse módulo, não num novo).
+* **Regra de completude**: taxa sem fonte → desconhecido (R = 0 no minorante, 1 no majorante; MTBF básica só com
+  majorante); entradas `kind: assumption` da base só com `accept_assumptions: true`; MTTR em falta → disponibilidades
+  desconhecidas; atrasos logísticos não declarados → A_o só com majorante; MMH ou custo de peças em falta → custo
+  operacional `partial`/`unassessed`, nunca zero.
+* **Ganchos**: `fleet_feedback.fleet` aceita `availability: {reliability: …}` (minorante de A_o; desconhecido →
+  erro); `attach_operating_cost` do morfológico aceita `operating_cost.reliability`.
+* **Exemplo (teste, `examples/uav_endurance_payload.yaml` sem alterar o projeto)**: com a FCC só da base (não
+  aceite) R_missão [0; 0,9994]; com `accept_assumptions: true` R_missão 0,9975–0,9992 (2,73 h), MTBCF 632–918 h,
+  MTBF básica 330–411 h, A_o 0,47–0,86 (atraso logístico 2–24 h), MMH/FH 0,042–0,043, frota 1–2 (2 surtidas/dia,
+  turno de 12 h).
+* **Achado**: o Exemplo 3 do §10.4.1.1 soma M_ct + M_pt em vez de ponderar pelas frequências; o código pondera e o
+  caso V&V dá M̄ como o texto.
+* **Seguimentos**: redundância em espera e reparação em missão; missões por fases e `duty` por segmento; Weibull e
+  vida limitada; causa comum (β) e ligação à FTA; METRIC multi-escalão; abortos na cobertura.
+
 ### Teste instável de reutilização de `run_id` (18 nov 2026, PR #12)
 
 Causa medida: falha transitória do AVL numa iteração intermédia do ciclo W0 → Schrenk só nessa iteração → ponto

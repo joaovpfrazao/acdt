@@ -145,6 +145,13 @@ files = [
   "src/acdt/core/icing/protection.py",
   "src/acdt/core/icing/penalty.py",
   "src/acdt/core/icing/study.py",
+  "src/acdt/core/reliability/__init__.py",
+  "src/acdt/core/reliability/rates.py",
+  "src/acdt/core/reliability/rbd.py",
+  "src/acdt/core/reliability/maintenance.py",
+  "src/acdt/core/reliability/spares.py",
+  "src/acdt/core/reliability/fleet.py",
+  "src/acdt/core/reliability/study.py",
 ]
 strict = true
 follow_imports = "silent"

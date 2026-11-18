@@ -90,6 +90,7 @@ class DesignResult:
     thermal_coupling: dict | None = None  # thermal.size_with_thermal (acoplamento iterar)
     icing: dict | None = None             # icing.analyse_icing (disciplina gelo, L0/L1)
     icing_coupling: dict | None = None    # icing.size_with_icing (acoplamento iterar)
+    reliability: dict | None = None       # reliability.analyse_reliability (disciplina fiabilidade, L0)
     structures_l1: object | None = None   # structures_l1.StructuresL1 (masses, deflections, elastic correction)
     launch_recovery: dict | None = None   # opt-in catapult / belly landing (launch_recovery.py)
     gear_drag: dict | None = None         # opt-in gear drag in the polar (aero/gear_drag.py)
@@ -206,6 +207,16 @@ def _chk_thermal(r, res):
 @register_handler("check", "flight_into_known_icing")
 def _chk_icing(r, res):
     return CheckResult(r.key, None, "avaliado na etapa de gelo (verificação: gelo:…)")
+
+
+@register_handler("check", "mission_reliability")
+@register_handler("check", "mtbcf")
+@register_handler("check", "mtbf")
+@register_handler("check", "operational_availability")
+@register_handler("check", "maintenance_man_hours_per_fh")
+@register_handler("check", "fleet_size")
+def _chk_reliability(r, res):
+    return CheckResult(r.key, None, "avaliado na etapa de fiabilidade (verificação: fiabilidade:…)")
 
 
 @register_handler("check", "noise")

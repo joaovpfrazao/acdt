@@ -1787,6 +1787,36 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   (Ap. O); ar sangrado e botas sem potência; encontros mistos não combinados; adaptadores VTOL/jato nativos em
   falta. Pormenor em [docs/GELO.md](docs/GELO.md).
 
+## 32u. Fiabilidade e manutenção de frota — L0 (18 nov 2026)
+
+* **O que faz**: etapa `reliability` do pipeline (depois do gelo) para qualquer aeronave do adaptador `aircraft`
+  (duração da missão a partir dos segmentos); `acdt.api.reliability` aceita uma especificação genérica
+  (`acdt.reliability/1`, qualquer sistema). Fiabilidade de missão e MTBCF a partir de um RBD (série, paralelo ativo,
+  k-de-n idêntico ou diferente, caminhos mínimos), MTBF básica, M_ct, MTBM, M̄, MMH/FH a partir de tarefas corretivas
+  e preventivas declaradas, disponibilidades intrínseca/atingida/operacional, sobressalentes por Poisson, frota para
+  cobertura contínua ou taxa de surtidas, custo de manutenção por FH no custo operacional existente.
+* **Métodos**: MIL-HDBK-338B (1998) Eq. 5.57, 5.58, 5.73, 5.75, 6.19–6.27, 6.30, §7.5.5 (k-de-n, Fig. 7.5-9),
+  §10.4.1 (Eq. 10.18, 10.21, 10.22, 10.24), definições de MTBCF e DMMH/MA (Secção 3); frota por cobertura com Ha
+  (2010) via `fleet_feedback.fleet`; custo de manutenção na estrutura DOC de `manufacturing.costing` (Raymer 2018
+  Cap. 18).
+* **Taxas**: só de fornecedor (com fonte e data), da base pública `failure_rates.yaml` (as mesmas do ARP4761/SORA)
+  ou declaradas com fonte; sem fonte → desconhecido; entradas `kind: assumption` só com `accept_assumptions: true`
+  (PRESSUPOSTO).
+* **Completude**: tudo em intervalo; taxa desconhecida → limites R = 0/1 (nunca λ = 0); MTTR, MMH, custo de peças ou
+  atrasos logísticos em falta → a grandeza correspondente fica só com um limite ou desconhecida; custo operacional
+  `partial`/`unassessed`; requisitos desconhecidos nunca passam.
+* **Integração**: secção `reliability` no `result.json`; disciplina `fiabilidade`/L0 no `design.json`; requisitos
+  `mission_reliability`, `mtbcf`, `mtbf`, `operational_availability`, `maintenance_man_hours_per_fh`, `fleet_size` e
+  avaliador `fiabilidade:<caminho>`; métricas de UQ e MDO pelos caminhos `reliability.*`; ganchos na frota
+  (`availability: {reliability: …}`) e no morfológico (`operating_cost.reliability`); API 1.5.0 (`reliability`,
+  `availability`, `spares_stock`).
+* **V&V**: `FIAB-338B-AVAIL-EX3`, `FIAB-338B-AAV-EX4`, `FIAB-338B-POISSON-5381`, `FIAB-338B-EQ630`,
+  `FIAB-338B-PARALLEL-MTBF` — todos passam.
+* **Validado**: `tests/test_reliability.py`.
+* **Limites**: taxas constantes, avarias independentes, redundância ativa sem reparação em missão; sem espera
+  fria/quente, fases, Weibull, causa comum nem METRIC; não altera o W0. Pormenor em
+  [docs/FIABILIDADE.md](docs/FIABILIDADE.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.
@@ -1897,3 +1927,4 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 16 | BAIXA | **Cadeia de abastecimento / BOM com preços em direto** | L2 do custo alimentado por preços atuais de distribuidores | pesquisa da IA com proveniência (já é a regra) + cache datada de cotações |
 | 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |
 | 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |
+| 19 | BAIXA (L0 feito 18 nov 2026, §32u) | **Fiabilidade e manutenção de frota** | fiabilidade de missão, disponibilidade, MMH/FH, sobressalentes, dimensão da frota e custo de manutenção | feito: MIL-HDBK-338B (RBD, k-de-n, Eq. 10.18–10.24, Poisson), Ha 2010; falta espera fria/quente, fases, Weibull, causa comum, METRIC |

@@ -24,6 +24,9 @@ de ``assumptions.constraints``).
   mesma regra da térmica (min: passa se lo ≥ limiar; max: passa se hi ≤ limiar; resto desconhecido). ``gelo:fiki``
   (requisito ``flight_into_known_icing``): «no» passa por declaração; «yes» falha se uma superfície crítica sem
   proteção acumula gelo e, senão, fica desconhecido (uma análise L0 não demonstra o 14 CFR 25.1419).
+* ``fiabilidade:<caminho>`` — grandeza da secção ``reliability`` (reliability.py; docs/FIABILIDADE.md), p. ex.
+  ``mission_reliability``, ``mtbcf_s``, ``mtbf_s``, ``operational_availability``, ``maintenance.mmh_per_fh``,
+  ``fleet_size``. Intervalos {lo, hi} com a mesma regra (min: passa se lo ≥ limiar; max: passa se hi ≤ limiar).
 * ``entrada:<requisito>`` — entradas do dimensionamento (velocidade/altitude de cruzeiro, payload, tripulação)
   lidas do que o dimensionamento usou: cumprido por construção, verificação por inspeção.
 """
@@ -145,6 +148,10 @@ def _list_evidence(ctx: VerificationContext) -> list[str]:
     ic = ctx.result.get("icing")
     if isinstance(ic, dict) and ic.get("evaluated"):
         out += ["gelo:max_thickness_m", "gelo:protection.power_W", "gelo:fiki"]
+    rl = ctx.result.get("reliability")
+    if isinstance(rl, dict) and rl.get("evaluated"):
+        out += ["fiabilidade:mission_reliability", "fiabilidade:mtbcf_s", "fiabilidade:operational_availability",
+                "fiabilidade:maintenance.mmh_per_fh"]
     return out
 
 
@@ -298,6 +305,59 @@ register_evaluator(Evaluator("gelo:", _eval_icing, "disciplina gelo L0/L1 (14 CF
                              "DOT/FAA/AR-00/30; Langmuir & Blodgett e Messinger via Anderson NASA/CR-2004-212875); "
                              "intervalos — desconhecido se atravessa o limiar", "analise", "N0",
                              "14 CFR 25 Ap. C; Anderson 2004; Langmuir & Blodgett 1946; Messinger 1953", ("aircraft",)))
+def _eval_reliability(req: TracedRequirement, ctx: VerificationContext, key: str) -> Evidence:
+    """``fiabilidade:<caminho>`` — intervalos {lo, hi} com a regra da térmica/gelo (desconhecido se atravessa)."""
+    from acdt.core.verification import json_path
+
+    rl = ctx.result.get("reliability")
+    if not isinstance(rl, dict):
+        return Evidence(ran=False, message="etapa de fiabilidade não correu")
+    if not rl.get("evaluated"):
+        return Evidence(ran=False, message=f"fiabilidade não avaliada: {rl.get('reason', '')}")
+    try:
+        v = json_path(rl, key)
+    except (KeyError, ValueError, IndexError, TypeError):
+        return Evidence(ran=False, message=f"reliability.{key} não existe", pointer=f"reliability.{key}")
+    rt = REGISTRY.get(req.quantity)
+    u = units.default_unit(rt.dimension) if rt is not None else req.unit
+
+    def num(x: Any) -> float | None:
+        return float(x) if isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(float(x)) \
+            else None
+
+    if isinstance(v, dict) and ("lo" in v or "hi" in v):
+        lo, hi = num(v.get("lo")), num(v.get("hi"))
+        thr = num(req.threshold)
+        rng = f"[{'?' if lo is None else f'{lo:.4g}'}, {'?' if hi is None else f'{hi:.4g}'}]"
+        if thr is not None and req.comparison == "min":
+            if lo is not None and lo >= thr:
+                return Evidence(lo, u, pointer=f"reliability.{key}.lo", fidelity="N0",
+                                message=f"intervalo {rng}: o minorante cumpre")
+            if hi is not None and hi < thr:
+                return Evidence(hi, u, pointer=f"reliability.{key}.hi", fidelity="N0",
+                                message=f"intervalo {rng}: nem o majorante cumpre")
+            return Evidence(None, message=f"reliability.{key} = {rng} atravessa o limiar ou tem extremo desconhecido "
+                            "(declare taxas/tempos em falta)", pointer=f"reliability.{key}", fidelity="N0")
+        if thr is not None and req.comparison == "max":
+            if hi is not None and hi <= thr:
+                return Evidence(hi, u, pointer=f"reliability.{key}.hi", fidelity="N0",
+                                message=f"intervalo {rng}: o majorante cumpre")
+            if lo is not None and lo > thr:
+                return Evidence(lo, u, pointer=f"reliability.{key}.lo", fidelity="N0",
+                                message=f"intervalo {rng}: nem o minorante cumpre")
+            return Evidence(None, message=f"reliability.{key} = {rng} atravessa o limiar ou tem extremo desconhecido "
+                            "(declare taxas/tempos em falta)", pointer=f"reliability.{key}", fidelity="N0")
+        return Evidence(None, message=f"reliability.{key} é um intervalo {rng}: só comparações min/max",
+                        pointer=f"reliability.{key}")
+    x = num(v)
+    if x is None:
+        return Evidence(None, message=f"reliability.{key} sem valor", pointer=f"reliability.{key}")
+    return Evidence(x, u, pointer=f"reliability.{key}", fidelity="N0")
+
+
+register_evaluator(Evaluator("fiabilidade:", _eval_reliability, "disciplina fiabilidade L0 (MIL-HDBK-338B: RBD, "
+                             "MTBCF, disponibilidades, DMMH, Poisson); intervalos — desconhecido se atravessa o limiar",
+                             "analise", "N0", "MIL-HDBK-338B (1998)", ("aircraft",)))
 register_evaluator(Evaluator("entrada:", _eval_input, "entrada do dimensionamento (por construção)",
                              "inspecao", "N0", domains=("aircraft",)))
 register_evidence_lister("aircraft", _list_evidence)
@@ -317,5 +377,13 @@ register_default_evaluator("aircraft", "cooling_drag_area", "termica:cooling.dra
 register_default_evaluator("aircraft", "ice_protection_power", "gelo:protection.power_W", "analise", "N0")
 register_default_evaluator("aircraft", "max_ice_thickness", "gelo:max_thickness_m", "analise", "N0")
 register_default_evaluator("aircraft", "flight_into_known_icing", "gelo:fiki", "analise", "N0")
+register_default_evaluator("aircraft", "mission_reliability", "fiabilidade:mission_reliability", "analise", "N0")
+register_default_evaluator("aircraft", "mtbcf", "fiabilidade:mtbcf_s", "analise", "N0")
+register_default_evaluator("aircraft", "mtbf", "fiabilidade:mtbf_s", "analise", "N0")
+register_default_evaluator("aircraft", "operational_availability", "fiabilidade:operational_availability", "analise",
+                           "N0")
+register_default_evaluator("aircraft", "maintenance_man_hours_per_fh", "fiabilidade:maintenance.mmh_per_fh",
+                           "analise", "N0")
+register_default_evaluator("aircraft", "fleet_size", "fiabilidade:fleet_size", "analise", "N0")
 for _k in ("regulatory_category", "unit_cost", "power_available", "thrust_available"):
     register_default_evaluator("aircraft", _k, f"check:{_k}", "analise", "N0")

@@ -49,6 +49,8 @@ SECTION_MAP: dict[str, tuple[str, str, str, str]] = {
                 "concentrada), MIL-HDBK-310, NACA RM A8I29", "CAPABILITIES §32s"),
     "icing": ("gelo", "L0", "gelo: 14 CFR 25 Ap. C (Jeck DOT/FAA/AR-00/30), Langmuir & Blodgett, Messinger via "
               "Anderson NASA/CR-2004-212875", "CAPABILITIES §32t"),
+    "reliability": ("fiabilidade", "L0", "fiabilidade e manutenção: MIL-HDBK-338B (RBD Eq. 6.19–6.27, k-de-n "
+                    "§7.5.5.1, M_ct Eq. 5.75, A_i/A_a/A_o Eq. 10.18–10.22, Poisson Eq. 5.58)", "CAPABILITIES §32u"),
     "systems": ("sistemas", "L0", "seleção de sistemas (hélice, motor, bateria, servos)", "CAPABILITIES §12"),
 }
 # metadados, listas de mensagens e históricos: ficam no result.json (referenciado pelo SHA-256)

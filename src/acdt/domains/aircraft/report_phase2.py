@@ -57,6 +57,8 @@ def phase2_dict(res) -> dict:
         d["thermal"] = res.thermal
     if getattr(res, "icing", None) is not None:
         d["icing"] = res.icing
+    if getattr(res, "reliability", None) is not None:
+        d["reliability"] = res.reliability
     d["verified_segment_mission"] = res.verified
     return _jsonable(d)
 

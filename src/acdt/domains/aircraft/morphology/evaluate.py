@@ -295,6 +295,29 @@ def attach_operating_cost(row: dict, operating: dict | None, *,
 
     d = dict(operating)
     d.pop("by_architecture", None)
+    rel_spec = d.pop("reliability", None)
+    if rel_spec:
+        # disciplina fiabilidade (acdt.core.reliability; docs/FIABILIDADE.md): MMH/FH e peças/FH preenchidos a partir
+        # das taxas de avaria e tarefas declaradas; desconhecidos ficam por avaliar (nunca zero)
+        from acdt.core.reliability.study import analyse as _rel
+        rel = _rel(rel_spec)
+        mmh = rel["maintenance"]["mmh_per_fh"]["hi"]
+        parts = rel["maintenance_cost"]["parts_per_fh"]["hi"]
+        notes0 = row.setdefault("notes", [])
+        if mmh is not None:
+            d["maintenance_mmh_per_fh"] = float(mmh)
+        if parts is not None:
+            d["maintenance_parts_per_fh"] = float(parts)
+        notes0.append(f"operating_cost manutenção ← fiabilidade (MMH/FH {mmh}, peças/FH {parts})")
+        if mmh is None or parts is None:
+            row["operating_cost"] = {
+                "status": "unassessed", "per_flight_hour": None,
+                "unassessed_terms": [t for t, v in (("maintenance_mmh_per_fh", mmh),
+                                                    ("maintenance_parts_per_fh", parts)) if v is None],
+                "method": "DOC (Raymer 2018 Ch. 18); manutenção da disciplina fiabilidade incompleta",
+                "note": "unassessed≠zero"}
+            notes0.append("operating_cost unassessed — manutenção da fiabilidade desconhecida (unknown≠zero)")
+            return
     unit_from = d.get("unit_price_from")
     override = None
     notes = row.setdefault("notes", [])

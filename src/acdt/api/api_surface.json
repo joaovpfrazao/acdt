@@ -1,6 +1,6 @@
 {
  "schema": "acdt.api_surface/1",
- "api_version": "1.4.0",
+ "api_version": "1.5.0",
  "surface": {
   "ACDTDeprecationWarning": "class(DeprecationWarning)",
   "API_VERSION": "const:str",
@@ -8,6 +8,7 @@
   "LEVELS": "value:dict",
   "__version__": "const:str",
   "analyse": "def(mission: 'PathLike | Mapping[str, Any]', output: 'PathLike | None' = None, *, level: 'str | None' = None, no_systems: 'bool' = False) -> 'dict[str, Any]'",
+  "availability": "def(*, mtbf_h: 'float | None' = None, mttr_h: 'float | None' = None, mtbm_h: 'float | None' = None, m_bar_h: 'float | None' = None, mdt_h: 'float | None' = None, ready_time_h: 'float' = 0.0) -> 'dict[str, float]'",
   "calibrate": "def(study: 'PathLike', output: 'PathLike | None' = None) -> 'dict[str, Any]'",
   "db_diff": "def(a: 'Mapping[str, Any]', b: 'Mapping[str, Any]', rtol: 'float' = 1e-06, atol: 'float' = 0.0) -> 'dict[str, Any]'",
   "db_get": "def(db: 'Mapping[str, Any]', path: 'str', unit: 'str | None' = None) -> 'Any'",
@@ -23,9 +24,11 @@
   "load_test_data": "def(path: 'PathLike', meta: 'Mapping[str, Any] | PathLike | None' = None) -> 'Any'",
   "mdo": "def(mission: 'PathLike', output: 'PathLike | None' = None, *, mdo_file: 'PathLike | None' = None, overrides: 'Mapping[str, Any] | None' = None, plots: 'bool' = True) -> 'dict[str, Any]'",
   "mdo_study": "def(spec: 'Mapping[str, Any]', model: 'Any', output: 'PathLike | None' = None, *, plots: 'bool' = False) -> 'dict[str, Any]'",
+  "reliability": "def(spec: 'Mapping[str, Any]') -> 'dict[str, Any]'",
   "report": "def(design: 'PathLike', level: 'str', output: 'PathLike | None' = None, *, uq: 'Sequence[PathLike]' = (), mdo: 'Sequence[PathLike]' = (), vv: 'Sequence[PathLike]' = (), calib: 'Sequence[PathLike]' = (), criteria: 'PathLike | Mapping[str, Any] | None' = None, discover: 'bool' = True, pdf: 'bool' = False) -> 'dict[str, Any]'",
   "rotor_noise": "def(*, blades: 'int', diameter_m: 'float', rpm: 'float', thrust_N: 'float', power_W: 'float', n_rotors: 'int' = 1, altitude_m: 'float' = 100.0, speed_m_s: 'float' = 0.0, rho: 'float' = 1.225, c_m_s: 'float' = 340.294, blade_area_m2: 'float | None' = None, projected_thickness_m: 'float | None' = None, harmonics: 'int' = 10, T_C: 'float' = 15.0, rh_pct: 'float' = 70.0, p_kpa: 'float' = 101.325, ground_dB: 'float' = 0.0, ambient_third_octave_dB: 'Mapping[float, float] | None' = None, detection_margin_dB: 'float' = 0.0) -> 'dict[str, Any]'",
   "size": "def(mission: 'PathLike | Mapping[str, Any]', output: 'PathLike | None' = None, *, level: 'str | None' = None, no_systems: 'bool' = False) -> 'dict[str, Any]'",
+  "spares_stock": "def(lambda_per_h: 'float', hours: 'float', confidence: 'float') -> 'dict[str, Any]'",
   "thermal": "def(spec: 'Mapping[str, Any]') -> 'dict[str, Any]'",
   "thermal_atmosphere": "def(profile: 'str', altitude_m: 'float', *, T_sl_C: 'float | None' = None) -> 'dict[str, Any]'",
   "uq": "def(mission: 'PathLike', output: 'PathLike | None' = None, *, uq_file: 'PathLike | None' = None, overrides: 'Mapping[str, Any] | None' = None, plots: 'bool' = True) -> 'dict[str, Any]'",

@@ -146,6 +146,13 @@ DEFAULT_ASSUMPTIONS: dict = {
               "envelopes": ["continuous", "intermittent"], "mvd_um": None, "conditions": None, "surfaces": None,
               "temperature": "envelope", "isa_dT_K": 0.0, "fiki": None, "max_altitude_m": None,
               "power_schedule": "exposicao"},
+    # Disciplina fiabilidade L0 (reliability.py; docs/FIABILIDADE.md). Sem components → não avaliada (desconhecida).
+    # components: [{id, supplier | rate_key | lambda_per_h | mtbf_h (+ source), n, duty, critical, mttr_h,
+    # mmh_per_action, replacement_cost, spares}], rbd, preventive, logistics, utilization, fleet, spares,
+    # operating_cost (bloco de manufacturing.costing; manutenção preenchida pela fiabilidade).
+    "reliability": {"enabled": True, "components": None, "rbd": None, "mission_duration_h": None,
+                    "accept_assumptions": False, "preventive": None, "logistics": None, "utilization": None,
+                    "fleet": None, "spares": None, "operating_cost": None, "labour_rate_per_h": None},
 }
 
 

@@ -59,6 +59,23 @@ _BUILTIN = [
                     reference="thermal.py: Incropera et al. 6th ed. correlations, MIL-HDBK-310 (docs/TERMICA.md)"),
     RequirementType("cooling_drag_area", "area", "Cooling drag area D/q at hot-day cruise (ram air + engine cooling)",
                     ("check",), ("max",), reference="thermal.py: momentum + Bernoulli, NACA RM A8I29 (docs/TERMICA.md)"),
+    RequirementType("mission_reliability", "dimensionless", "Probability of completing the design mission without a "
+                    "critical failure (mission RBD, constant rates)", ("check",), ("min",),
+                    reference="reliability.py: MIL-HDBK-338B Eq. 6.19–6.27, 5.57 (docs/FIABILIDADE.md)"),
+    RequirementType("mtbcf", "time", "Mean time between critical failures (mission RBD with redundancy)", ("check",),
+                    ("min",), reference="reliability.py: MIL-HDBK-338B Sec. 3, Eq. 5.73 (docs/FIABILIDADE.md)"),
+    RequirementType("mtbf", "time", "Basic (logistics) MTBF: every unit in series, maintenance demand", ("check",),
+                    ("min",), reference="reliability.py: MIL-HDBK-338B §6.4.2 (docs/FIABILIDADE.md)"),
+    RequirementType("operational_availability", "dimensionless", "Operational availability A_o = (MTBM + RT) / "
+                    "(MTBM + RT + MDT)", ("check",), ("min",),
+                    reference="reliability.py: MIL-HDBK-338B Eq. 10.22 (docs/FIABILIDADE.md)"),
+    RequirementType("maintenance_man_hours_per_fh", "dimensionless", "Direct maintenance man-hours per flight hour "
+                    "(corrective + preventive)", ("check",), ("max",),
+                    reference="reliability.py: MIL-HDBK-338B Sec. 3 DMMH/MA (docs/FIABILIDADE.md)"),
+    RequirementType("fleet_size", "dimensionless", "Number of aircraft needed to sustain the declared coverage or "
+                    "sortie rate given availability and mission reliability", ("check",), ("max",),
+                    reference="reliability.py: fleet_feedback (Ha 2010) / sortie balance, MIL-HDBK-338B Eq. 10.22 "
+                    "(docs/FIABILIDADE.md)"),
     RequirementType("ice_protection_power", "power", "Ice-protection power required (thermal anti-ice / "
                     "electro-thermal de-ice) must not exceed the power available for it", ("check",), ("max",),
                     reference="icing.py: Messinger (1953) heat balance via Anderson NASA/CR-2004-212875; 14 CFR 25 "
