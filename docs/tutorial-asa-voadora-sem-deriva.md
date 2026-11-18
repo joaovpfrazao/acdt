@@ -228,3 +228,4 @@ Alley 2007.
   A malha tem 192 facetas e uma baía em envergadura; não é uma convergência. Fuselagem, derivas,
   trem, hélice e a deflexão dos comandos ficam por avaliar. A onda completa não correu. Nenhum
   factor entra. Números em `h6_rcs_bounces2.json`.
+* **OpenVSP (18 nov 2026)**. O mesmo loft, com a torção de ponta −10° no bordo de ataque e t/c 0,15/0,12, foi exportado pelo OpenVSP 3.48.2 do contentor. O Windows não tem OpenVSP. O VSPAERO de superfície fina, no α do AVL, dá CL 0,494 contra 0,503 e CDi 0,0143 contra o CDff 0,0145. O momento é 0,042 contra 0,029, com o mesmo sinal. A malha e as cinco iterações de esteira não são as do AVL. Nenhum factor entra. Números em `h7_openvsp.json`.

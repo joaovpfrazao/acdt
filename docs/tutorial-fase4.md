@@ -27,6 +27,8 @@ export ACDT_HIFI_BIN=/caminho/para/env/bin
 export ACDT_VSP_PYTHON=/caminho/para/python-com-openvsp
 ```
 
+Neste PC, a 18 nov 2026, o Windows continua sem OpenVSP: não há executável e `ACDT_VSP_PYTHON` está vazio. A exportação usou o OpenVSP 3.48.2 que já está no contentor MDO Lab. O visor do VSPAERO não vem nessa imagem. Esse contentor não substitui um instalador no Windows, e não vê o disco do Windows montado: o caso entra por cópia para a pasta partilhada e as saídas voltam à mesma cópia. O processo acdt não importa `openvsp`. O gestor de análises escreve o caso e pára; o binário do solver corre noutro processo, porque o lançamento pelo gestor não regressa.
+
 ## 1. Correr
 
 ```bash
