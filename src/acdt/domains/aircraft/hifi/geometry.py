@@ -58,23 +58,80 @@ def vsp_spec(res, out_stem: str | Path, tess: int = 33) -> dict:
     }
 
 
-def build_vsp(res, out: str | Path, name: str = "aircraft") -> dict:
-    """Run the OpenVSP build (separate interpreter). Returns paths, CompGeom areas and the wetted-area
-    comparison against L0. Raises ToolNotAvailable without ``$ACDT_VSP_PYTHON``."""
+def flying_wing_vsp_spec(surf, name: str = "wing") -> dict:
+    """OpenVSP spec of one lofted trapezoidal wing. No fuselage and no tails.
+
+    Section twist is the loft twist, nose up positive, and the pivot is the leading edge
+    (``twist_location`` 0). OpenVSP's own default pivot is the quarter chord; leaving that
+    default would move the leading edge. Sweep is the leading-edge sweep of the straight
+    panel. Thickness is the declared t/c on each section. The airfoil code is symmetric:
+    the camber line of a NACA 4-digit name is not written, which is the same choice as
+    :func:`acdt.domains.aircraft.hifi.wing_bl.avl_text`.
+    """
+    root, tip = surf.sections[0], surf.sections[-1]
+    le0 = surf.to_global([root["le"]])[0]
+    le1 = surf.to_global([tip["le"]])[0]
+    dx = float(le1[0] - le0[0])
+    dy = float(le1[1] - le0[1])
+    dz = float(le1[2] - le0[2])
+    panel = math.hypot(dy, dz)
+    if panel <= 0.0 or dy <= 0.0:
+        raise ValueError("a asa não tem envergadura positiva")
+    return {
+        "out_stem": name,
+        "wing": {
+            "semispan": panel,
+            "c_root": float(root["chord"]),
+            "c_tip": float(tip["chord"]),
+            "sweep_deg": math.degrees(math.atan2(dx, panel)),
+            "sweep_location": 0.0,
+            "dihedral_deg": math.degrees(math.atan2(dz, dy)),
+            "x": float(le0[0]),
+            "z": float(le0[2]),
+            "incidence_deg": 0.0,
+            "airfoil": "0012",
+            "tc": [float(root["tc"]), float(tip["tc"])],
+            "twist_deg": [float(root["twist_deg"]), float(tip["twist_deg"])],
+            "twist_location": 0.0,
+            "tess_w": 41,
+            "tess_u": 16,
+        },
+    }
+
+
+def export_vsp(spec: dict, out: str | Path, name: str = "aircraft", timeout: float = 600) -> dict:
+    """Run ``vsp_build.py`` in the OpenVSP interpreter. The acdt process does not import ``openvsp``.
+
+    Raises ToolNotAvailable without ``$ACDT_VSP_PYTHON``. ``out_stem`` in the spec is replaced by
+    ``name`` because the build's working directory is ``out``."""
     py = tools.vsp_python()
     if py is None:
         raise ToolNotAvailable("OpenVSP Python API ($ACDT_VSP_PYTHON) não encontrado; ver docs/tutorial-fase4.md §0")
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    # The build runs with cwd = ``out``, so the stem is the file name. Stored paths are relative to the case.
-    stem = out / name
-    sp = vsp_spec(res, name)
-    (out / f"{name}_vsp_spec.json").write_text(json.dumps(sp, indent=1))
-    rc = tools.run([py, str(BUILD_SCRIPT), str(out / f"{name}_vsp_spec.json")], out, f"{name}_vsp.log",
-                   timeout=600)
-    if rc != 0 or not (out / f"{name}_compgeom.json").exists():
-        raise RuntimeError(f"OpenVSP falhou (ver {out / (name + '_vsp.log')})")
-    cg = json.loads((out / f"{name}_compgeom.json").read_text(encoding="utf-8"))
+    spec = dict(spec)
+    spec["out_stem"] = name
+    spec_path = out / f"{name}_vsp_spec.json"
+    spec_path.write_text(json.dumps(spec, indent=1), encoding="utf-8")
+    rc = tools.run([py, str(BUILD_SCRIPT), str(spec_path)], out, f"{name}_vsp.log", timeout=timeout)
+    cg_path = out / f"{name}_compgeom.json"
+    if rc != 0 or not cg_path.exists():
+        raise RuntimeError(f"OpenVSP falhou (ver {cg_path.with_name(name + '_vsp.log')})")
+    cg = json.loads(cg_path.read_text(encoding="utf-8"))
+    case = out.resolve().parent
+
+    def stored(suffix: str) -> str:
+        return tools.case_relative(out / f"{name}{suffix}", case)
+
+    return {"vsp3": stored(".vsp3"), "step": stored(".step"), "step_wing": stored("_wing.step"),
+            "stl": stored(".stl"), "spec": spec, "compgeom": cg, "vsp_version": cg.get("version")}
+
+
+def build_vsp(res, out: str | Path, name: str = "aircraft") -> dict:
+    """Run the OpenVSP build (separate interpreter). Returns paths, CompGeom areas and the wetted-area
+    comparison against L0. Raises ToolNotAvailable without ``$ACDT_VSP_PYTHON``."""
+    info = export_vsp(vsp_spec(res, name), out, name)
+    cg = info["compgeom"]
     l0 = res.config.wetted_areas()
     key = {"Fuselage": "fuselage", "Wing": "wing", "Htail": "htail", "Vtail": "vtail"}
     comp = []
@@ -85,14 +142,10 @@ def build_vsp(res, out: str | Path, name: str = "aircraft") -> dict:
                          "ratio": c["wet_area"] / l0[k] if l0[k] else math.nan})
     tot_v = sum(c["Swet_vsp_m2"] for c in comp)
     tot_0 = sum(c["Swet_L0_m2"] for c in comp)
-    case = out.resolve().parent
-
-    def _stored(suffix: str) -> str:
-        return tools.case_relative(Path(str(stem) + suffix), case)
-
-    return {"vsp3": _stored(".vsp3"), "step": _stored(".step"), "step_wing": _stored("_wing.step"),
-            "stl": _stored(".stl"), "spec": sp, "vsp_version": cg.get("version"), "wetted": comp,
+    return {"vsp3": info["vsp3"], "step": info["step"], "step_wing": info["step_wing"],
+            "stl": info["stl"], "spec": info["spec"], "vsp_version": cg.get("version"), "wetted": comp,
             "Swet_total_vsp": tot_v, "Swet_total_L0": tot_0, "Swet_ratio": tot_v / tot_0, "ref": VSP_REF,
+            "readback": cg.get("readback"),
             "note": "CompGeom exclui as interseções (asa–fuselagem, cauda–fuselagem); L0: Raymer Eq. 7.12 com "
                     "área exposta e Torenbeek App. F para a fuselagem"}
 
