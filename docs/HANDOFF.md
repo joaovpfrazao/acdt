@@ -1577,6 +1577,39 @@ O acdt passou a open-source (Apache-2.0) e o desenvolvimento continua no reposit
   passaram a usar as classes de Raymer e as saídas em `examples/output` foram regeneradas.
 * Do estudo Nansei só fica o benchmark (`examples/benchmarks/nansei_jcg/`).
 
+### Estado de projeto único com unidades (18 nov 2026, ramo `eng-dados`)
+
+Pormenor em [DADOS.md](DADOS.md) e CAPABILITIES §32n.
+
+* `acdt/core/quantities.py` (mypy estrito): unidades na fronteira com pint (dependência nova, BSD-3-Clause,
+  carregada só quando aparece uma unidade fora da tabela exata). Inclui `to_unit`, `to_dimension_si`, `convert`,
+  `unit_from_key` (tabela `SUFFIX_UNITS`) e `normalise_tree`. O erro é `QuantityError`, subclasse de
+  `UnitError`/`ValueError`.
+* Ligado em `MissionSpec.from_dict` (`assumptions`, `systems`, `onboard`), em `parse_requirement` (valores e
+  qualificadores em texto) e em `verification.from_dict` (limiar e objetivo em texto). O `acdt size` sai com código
+  2 numa unidade inválida.
+* `acdt/core/design_db.py` (mypy estrito), esquema `acdt.design/1`:
+  * `new`, `quantity`, `quantities_from_tree`, `set_results`, `set_uncertainty`, `attach_uq`,
+    `set_verification`;
+  * `save`/`load`, que validam com jsonschema quando está instalado (agora no extra `dev`) e, sem ele, com
+    verificações essenciais;
+  * `flatten`, `query`, `get_value`, `diff`/`explain_diff`, `to_csv`/`to_markdown`/`summary`.
+* `acdt/domains/aircraft/design_db_run.py`:
+  * `SECTION_MAP` (secção → disciplina, nível e método, com a secção de CAPABILITIES);
+  * a etapa `design_db` no fim do pipeline, que nunca o parte e, em caso de erro, deixa um aviso;
+  * `build_from_output` e `uq_into_db` (`UQ_METRIC_MAP`). O `uq.json` passa a guardar `model.result_metrics`.
+* `acdt verify` atualiza a secção `verification` do `design.json` da pasta.
+* Testes: `tests/test_design_db.py` cobre unidades, erros de dimensão, ida e volta, esquema, consulta, diff,
+  incerteza, export, compatibilidade dos exemplos e o pipeline com a CLI (marcado `slow`).
+
+Em aberto, por ordem:
+1. `acdt mdo`: o ótimo e o Pareto como blocos L2.
+2. `acdt vv`.
+3. Blocos L3 das ferramentas de alta fidelidade.
+4. Mapa de unidades para as chaves de resultado sem sufixo. No exemplo GA, 130 das 377 grandezas numéricas têm
+   unidade declarada.
+5. Unidades em texto nas specs de `mdo`/`uq`.
+
 ## Melhorias futuras em espera
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
