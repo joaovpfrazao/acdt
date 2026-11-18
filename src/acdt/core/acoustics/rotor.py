@@ -35,8 +35,12 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from scipy.special import jv
+
+if TYPE_CHECKING:
+    from .propagation import Component
 
 FT = 0.3048
 R_EFF = 0.8
@@ -99,3 +103,40 @@ def vortex_noise(T: float, Ab_m2: float, V07: float, rho: float, h_proj_m: float
 def projected_thickness(t_m: float, chord_m: float, alpha_rad: float) -> float:
     """h = b cos α + a sin α (Marte & Kurtz 1970, Apêndice C, passo 5)."""
     return t_m * math.cos(alpha_rad) + chord_m * math.sin(alpha_rad)
+
+
+def rotor_components(*, B: int, R: float, rpm: float, T: float, P: float, c: float, rho: float,
+                     n_rotors: int = 1, harmonics: int = 10, re_frac: float = R_EFF, blade_area_m2: float | None = None,
+                     h_proj_m: float | None = None, broadband: bool = True, label: str = "rotor"
+                     ) -> tuple[list["Component"], dict[str, object]]:
+    """Componentes de ruído de ``n_rotors`` rotores iguais e incoerentes (T e P de **um** rotor).
+
+    Tons: harmónicos m = 1…``harmonics`` de Gutin à frequência m·B·rpm/60. Banda larga: bandas de oitava de
+    Schlegel-King-Mull quando há área das pás e espessura projetada (sem elas, só o nível global é reportado e a
+    banda larga fica fora da soma — indicado em ``info['broadband_in_sum']``)."""
+    from .levels import lp_from_prms
+    from .propagation import Component
+
+    omega = rpm / 60.0 * 2.0 * math.pi
+    Q = P / omega if omega > 0 else 0.0
+    add = 10.0 * math.log10(max(n_rotors, 1))
+    comps: list[Component] = []
+    for m in range(1, harmonics + 1):
+        def lev(r: float, th: float, m: int = m) -> float:
+            return lp_from_prms(gutin_prms(m, B, omega, T, Q, r, th, c, R, re_frac)) + add
+        comps.append(Component(f"{label}: tom m={m}", m * B * rpm / 60.0, lev, "tonal", "tom"))
+    V07 = 0.7 * omega * R
+    tip_mach = omega * R / c
+    info: dict[str, object] = {"B": B, "R_m": R, "rpm": rpm, "T_N": T, "P_W": P, "Q_Nm": Q, "n_rotors": n_rotors,
+                               "tip_mach_rot": tip_mach, "bpf_Hz": B * rpm / 60.0, "harmonics": harmonics,
+                               "re_frac": re_frac, "broadband_in_sum": False, "vortex": None}
+    if broadband and blade_area_m2 and blade_area_m2 > 0 and V07 > 0:
+        vn = vortex_noise(T, blade_area_m2, V07, rho, h_proj_m)
+        info["vortex"] = {"SPL_300ft_dB": vn.spl_300ft_dB + add, "f_peak_Hz": vn.f_peak_Hz, "CL_mean": vn.CL,
+                          "V07_m_s": vn.V07_m_s, "Ab_m2": vn.Ab_m2}
+        for fc, L300 in vn.octave_bands():
+            def levb(r: float, th: float, L300: float = L300) -> float:
+                return L300 + add - 20.0 * math.log10(r / SKM_R_REF)
+            comps.append(Component(f"{label}: banda larga {fc:.0f} Hz", fc, levb, "banda_larga", "oitava"))
+        info["broadband_in_sum"] = vn.f_peak_Hz is not None
+    return comps, info

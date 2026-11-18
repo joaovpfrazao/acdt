@@ -45,8 +45,12 @@ _BUILTIN = [
     RequirementType("thrust_available", "force", "Installed (SL) static thrust limit, jet", ("check",), ("max",)),
     RequirementType("unit_cost", "currency", "Unit production cost (flyaway)", ("trade", "check"),
                     ("max", "objective"), reference="Gudmundsson (2014) Ch. 2, modified Eastlake model"),
-    RequirementType("noise", "sound", "Certification/flyover noise level", ("check",), ("max",), implemented=False,
-                    reference="Phase 4: ICAO Annex 16 Vol. I Ch. 10 procedure; propeller noise per Gutin/Hamilton Standard method"),
+    RequirementType("noise", "sound", "Flyover L_A,max at a ground observer below the loiter/cruise track", ("check",),
+                    ("max",), reference="Gutin 1936 + Schlegel-King-Mull 1966 (Marte & Kurtz 1970), ISO 9613-1, "
+                    "IEC 61672-1 A-weighting (noise.py; docs/RUIDO.md)"),
+    RequirementType("aural_detection_range", "length", "Ground distance within which the aircraft is audible "
+                    "(ISO 226 threshold; ambient noise optional)", ("check",), ("max",),
+                    reference="ISO 226:2003 T_f + noise.py propagation (docs/RUIDO.md)"),
     RequirementType("regulatory_category", "category", "Regulatory / certification basis", ("check", "systems"),
                     ("target",), choices=("easa_open", "easa_specific", "easa_certified", "stanag_4703",
                                           "stanag_4671", "cs_23", "cs_vla", "cs_lsa", "far_23")),

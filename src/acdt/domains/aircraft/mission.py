@@ -116,6 +116,14 @@ DEFAULT_ASSUMPTIONS: dict = {
     # {catapult: {accel_g: 10, rail_angle_deg: 10, stroke_max_m: 6, airframe_nx_limit_g: 12, payload_nx_limit_g: 15},
     #  belly_landing: {mu_slide: 0.5, n_limit: 4.0}}. Missing limits → the check is unassessed, never a pass.
     "launch_recovery": None,
+    # Disciplina ruído L0 (noise.py; docs/RUIDO.md). Precisa de propulsion.propeller (mapa BEMT). other_sources:
+    # {status: desprezaveis | incluidas, justification} declara as fontes não modeladas; sem isso o nível é um
+    # limite inferior. engine_noise: {octave_dB: {f: dB}, distance_m, source}. certification: {part36_G: {...}}.
+    "noise": {"enabled": True, "T_C": 15.0, "rh_pct": 70.0, "p_kpa": 101.325, "harmonics": 10,
+              "effective_radius_fraction": 0.8, "broadband": True, "blade_thickness_ratio": None,
+              "flyover_altitude_m": None, "flyover_speed_m_s": None, "sideline_m": 0.0, "ground_dB": 0.0,
+              "ambient_third_octave_dB": None, "detection_margin_dB": 0.0, "other_sources": None,
+              "engine_noise": None, "certification": None},
 }
 
 
