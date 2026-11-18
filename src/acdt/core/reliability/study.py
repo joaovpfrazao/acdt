@@ -213,15 +213,17 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
 
     # ---- frota
     fl = spec.get("fleet")
-    fleet_fh_day: float | None = None  # horas de voo da frota por dia (procura de sobressalentes)
+    # horas de voo da frota por dia {lo, hi} (procura de sobressalentes): surtidas/R × duração
+    fleet_fh: tuple[float | None, float | None] | None = None
     if fl:
         out["fleet"] = fleet_mod.size(fl, A_o, mission["reliability"])
         if out["fleet"]["mode"] == "sorties":
-            r_lo = mission["reliability"]["lo"]
+            base = float(fl["sorties_per_day"]) * float(fl["sortie_duration_h"])
             if fl.get("abort_reflight", True) is False:
-                fleet_fh_day = float(fl["sorties_per_day"]) * float(fl["sortie_duration_h"])
-            elif r_lo:
-                fleet_fh_day = float(fl["sorties_per_day"]) / r_lo * float(fl["sortie_duration_h"])
+                fleet_fh = (base, base)
+            else:
+                r_lo, r_hi = mission["reliability"]["lo"], mission["reliability"]["hi"]
+                fleet_fh = (None if not r_hi else base / r_hi, None if not r_lo else base / r_lo)
             if fh_day is None:
                 for b in ("hi", "lo"):
                     cs = out["fleet"]["cases"].get(b) or {}
@@ -244,17 +246,20 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
         days, conf = _num(s.get("resupply_days")), _num(s.get("confidence"))
         if days is None or conf is None:
             continue
-        ffh = fleet_fh_day if fleet_fh_day is not None else (
-            None if (fleet_n is None or fh_day is None) else float(fleet_n) * fh_day)
-        if ffh is None:
+        if fleet_fh is not None:
+            f_lo, f_hi = fleet_fh
+        elif fleet_n is not None and fh_day is not None:
+            f_lo = f_hi = float(fleet_n) * fh_day
+        else:
+            f_lo = f_hi = None
+        if f_lo is None and f_hi is None:
             sp_out[c] = {"stock": _iv(None, None), "note": "horas de voo da frota por dia desconhecidas (frota ou "
                          "utilização)"}
             cost_hi = None
             continue
-        k = ffh * days * mult[c]
         ul, uh = unit[c]
-        a_lo = None if ul is None else ul * k
-        a_hi = None if uh is None else uh * k
+        a_lo = None if (ul is None or f_lo is None) else ul * f_lo * days * mult[c]
+        a_hi = None if (uh is None or f_hi is None) else uh * f_hi * days * mult[c]
         st = _iv(None if a_lo is None else stock_for(a_lo, conf), None if a_hi is None else stock_for(a_hi, conf))
         uc = _num(cd.get("replacement_cost"))
         cst = _iv(None if (uc is None or st["lo"] is None) else uc * st["lo"],
@@ -262,7 +267,7 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
         cost_lo += cst["lo"] or 0.0
         cost_hi = None if (cost_hi is None or cst["hi"] is None) else cost_hi + cst["hi"]
         sp_out[c] = {"demand_mean": _iv(a_lo, a_hi), "stock": st, "cost": cst, "confidence": conf,
-                     "resupply_days": days, "fleet_fh_per_day": ffh}
+                     "resupply_days": days, "fleet_fh_per_day": _iv(f_lo, f_hi)}
     if sp_out:
         out["spares"] = {"by_component": sp_out, "total_cost": _iv(cost_lo, cost_hi),
                          "method": "Poisson P(X ≤ S) ≥ c (MIL-HDBK-338B Eq. 5.58, §5.3.8.1)"}
