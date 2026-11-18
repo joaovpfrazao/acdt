@@ -203,3 +203,10 @@ Alley 2007.
   Na grossa simétrica, a polar vai de −2° a 24°. O CLmax com os controlos alinhados é 1,059 a 20°
   e o CD0 viscoso, já sem o arrasto induzido do AVL, é 0,0198. Nenhum factor entra: uma malha, sem GCI,
   e o CLmax equilibrado do L1 (1,118) não é esta grandeza. Números em `h1_polar_grossa.json`.
+  Na mesma grossa, a elevon selada (charneira a 0,75c, η 0,20–0,45) correu a α = 9,52° em δ −10°,
+  +10° e −25°. A split fica por avaliar: a fenda não cabe na extrusão fechada. O RANS deu CL 0,319,
+  0,513 e 0,173, e Ch −0,000535, −0,001614 e +0,000438. O AVL com as estações da elevon e a torção
+  linear em graus dá CL 0,416 a δ = 0, ao lado do RANS limpo; o cartão de duas secções (0,503)
+  corresponde a um bordo de fuga recto. δ positivo sobe o CL nos dois. O momento de charneira a −10°
+  não tem o mesmo sinal que o HM do AVL por lado. Nenhum factor entra: uma malha, um α, sem GCI.
+  Os atuadores não mudam. Números em `h1_controlos_grossa.json`.
