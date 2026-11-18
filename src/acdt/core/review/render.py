@@ -90,7 +90,7 @@ def blocks(r: Mapping[str, Any], figure_dir: str = "figuras") -> list[Block]:
         cnt = ", ".join(f"{k} {n}" for k, n in rq["counts"].items())
         B.append(("p", f"Fonte: {rq['fonte']}. Estados: {cnt}. Fração avaliada: {num(rq['fracao_avaliada'])}. "
                        "nao_avaliado e desconhecido nunca contam como passa."))
-        B.append(("table", ["ID", "Grandeza", "Limiar", "Valor", "Unidade", "Margem", "Estado", "Método",
+        B.append(("table", ["ID", "Grandeza", "Limiar", "Valor", "Unidade", "Margem (rel.)", "Estado", "Método",
                             "Fid. exig./aval.", "Evidência"],
                   [[x["id"] + (" (dispensa)" if x.get("dispensa") else ""), x.get("quantity") or "—",
                     x.get("display") or num(x.get("threshold")), num(x.get("value")),

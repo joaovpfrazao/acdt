@@ -1,0 +1,424 @@
+{
+ "acceptance": {
+  "allow_synthetic": true,
+  "band": {
+   "e": [
+    0.5,
+    0.95
+   ]
+  },
+  "max_chi2_red": 2.0,
+  "max_rel_sd": 0.05,
+  "min_points": 10,
+  "require_instrument_uncertainty": true
+ },
+ "correlation": [
+  [
+   0.9999999999999999,
+   0.6841189423498655
+  ],
+  [
+   0.6841189423498655,
+   1.0
+  ]
+ ],
+ "covariance": [
+  [
+   2.5268939785033755e-08,
+   5.804767552156722e-07
+  ],
+  [
+   5.804767552156722e-07,
+   2.8491769029102296e-05
+  ]
+ ],
+ "criteria": [
+  {
+   "applies_to": "*",
+   "criterion": "allow_synthetic",
+   "detail": "dados SINTÉTICOS aceites por declaração explícita (só demonstração; nunca um projeto real)",
+   "status": "passa"
+  },
+  {
+   "applies_to": "*",
+   "criterion": "min_points",
+   "detail": "n = 22 (mín. 10)",
+   "status": "passa"
+  },
+  {
+   "applies_to": "*",
+   "criterion": "require_instrument_uncertainty",
+   "detail": "σ: instrumento",
+   "status": "passa"
+  },
+  {
+   "applies_to": "*",
+   "criterion": "max_chi2_red",
+   "detail": "χ²/ν = 1.23 (máx. 2.0)",
+   "status": "passa"
+  },
+  {
+   "applies_to": "CD0",
+   "criterion": "max_rel_sd",
+   "detail": "σ/|θ| = 0.00635 (máx. 0.05)",
+   "status": "passa"
+  },
+  {
+   "applies_to": "e",
+   "criterion": "max_rel_sd",
+   "detail": "σ/|θ| = 0.00685 (máx. 0.05)",
+   "status": "passa"
+  },
+  {
+   "applies_to": "e",
+   "criterion": "band",
+   "detail": "0.77891 em [0.5, 0.95]",
+   "status": "passa"
+  }
+ ],
+ "data": {
+  "channels": {
+   "CD": {
+    "max": 0.08661,
+    "min": 0.024765,
+    "n": 22,
+    "n_missing": 0,
+    "uncertainty": {
+     "how": "incerteza-padrão declarada",
+     "kind": "desvio_padrao",
+     "sd": 0.0004,
+     "source": "σ do ruído sintético"
+    },
+    "unit": "1"
+   },
+   "CL": {
+    "max": 1.0903,
+    "min": 0.03713,
+    "n": 22,
+    "n_missing": 0,
+    "uncertainty": {
+     "how": "incerteza-padrão declarada",
+     "kind": "desvio_padrao",
+     "sd": 0.005,
+     "source": "σ do ruído sintético"
+    },
+    "unit": "1"
+   },
+   "Re": {
+    "max": 300000.0,
+    "min": 300000.0,
+    "n": 22,
+    "n_missing": 0,
+    "uncertainty": null,
+    "unit": "1"
+   }
+  },
+  "file": {
+   "kind": "bytes",
+   "path": "polar_tunel_sintetico.csv",
+   "sha256": "c3c7803765d584686f7a430c62d310fbaed6b7918d9268f945aa36f4eda4ab6a",
+   "sha256_bytes": "c3c7803765d584686f7a430c62d310fbaed6b7918d9268f945aa36f4eda4ab6a",
+   "size_bytes": 625
+  },
+  "format": "csv",
+  "meta": {
+   "conditions": {
+    "Re": "3.0e5",
+    "V_m_s": 25.0
+   },
+   "date": null,
+   "instrument": "balança de 6 componentes (fictícia)",
+   "kind": "tunel",
+   "source": "gerar_sintetico.py: CD0 = 0,0250, e = 0,78, AR = 8, ruído normal σ_CD = 0,0004 e σ_CL = 0,005, semente 20261118",
+   "synthetic": true
+  },
+  "n_rows": 22,
+  "name": "polar_tunel_sintetico",
+  "schema": "acdt.testdata/1",
+  "synthetic": true
+ },
+ "decision": "aplicar",
+ "discipline": "aero",
+ "discrepancy": null,
+ "fidelity": "ensaio",
+ "fit": {
+  "at_bound": [],
+  "birge_factor": 1.2268021200351886,
+  "chi2": 24.53604240070377,
+  "chi2_red": 1.2268021200351886,
+  "dof": 20,
+  "identifiable": true,
+  "n": 22,
+  "n_dropped": 0,
+  "output_unit": "1",
+  "rmse": 0.0005279794295279396
+ },
+ "level": "L1",
+ "method": {
+  "constants": {
+   "AR": 8.0
+  },
+  "expr": "CD0 + CL**2 / (pi * AR * e)",
+  "name": "wls",
+  "notes": [
+   "variância efetiva com a incerteza das entradas (Orear 1982)",
+   "covariância × χ²/ν = 1.23 (razão de Birge): o instrumento não explica a dispersão"
+  ],
+  "output": "CD",
+  "reference": "Bard, Nonlinear Parameter Estimation, Academic Press 1974, Cap. 7; Seber & Wild, Nonlinear Regression, Wiley 1989; Orear, Am. J. Phys. 50 (1982) 912 (variância efetiva); Birge, Phys. Rev. 40 (1932) 207",
+  "sigma_source": "instrumento",
+  "units": {}
+ },
+ "name": "polar_tunel_sintetico",
+ "parameters": {
+  "CD0": {
+   "bounds": [
+    0.0,
+    0.2
+   ],
+   "ci95": [
+    0.024712981951479945,
+    0.02537616008765648
+   ],
+   "decision": "aplicar",
+   "factor": null,
+   "group": null,
+   "initial": 0.03,
+   "nominal": null,
+   "prior": null,
+   "reasons": [],
+   "sd": 0.00015896207027160208,
+   "shift_sigma": null,
+   "target": null,
+   "unit": "1",
+   "value": 0.025044571019568213,
+   "what": "CD0 da polar parabólica (reportado; não há caminho a substituir)"
+  },
+  "e": {
+   "bounds": [
+    0.3,
+    1.0
+   ],
+   "ci95": [
+    0.7677769805092657,
+    0.7900457590915085
+   ],
+   "decision": "aplicar",
+   "factor": null,
+   "group": null,
+   "initial": 0.8,
+   "nominal": 0.8,
+   "prior": null,
+   "reasons": [],
+   "sd": 0.005337768169291572,
+   "shift_sigma": -3.950832919446896,
+   "target": "assumptions.aero.oswald",
+   "unit": "1",
+   "value": 0.7789113698003871,
+   "what": "fator de Oswald da polar parabólica"
+  }
+ },
+ "residuals": [
+  {
+   "CL": 0.03713,
+   "eta": 0.02511499523144617,
+   "residual": -0.00034999523144617004,
+   "residual_norm": -0.8740060714603557,
+   "sigma": 0.00040044942807018654,
+   "y": 0.024765
+  },
+  {
+   "CL": 0.09749,
+   "eta": 0.02553007437726456,
+   "residual": -0.0007140743772645584,
+   "residual_norm": -1.771509142619601,
+   "sigma": 0.0004030881693382786,
+   "y": 0.024816
+  },
+  {
+   "CL": 0.15031,
+   "eta": 0.026198682727100076,
+   "residual": 0.0003743172728999239,
+   "residual_norm": 0.9190149529898923,
+   "sigma": 0.0004073027013131099,
+   "y": 0.026573
+  },
+  {
+   "CL": 0.203,
+   "eta": 0.02714962953590323,
+   "residual": 0.00012037046409676955,
+   "residual_norm": 0.2912966935640526,
+   "sigma": 0.0004132228987017374,
+   "y": 0.02727
+  },
+  {
+   "CL": 0.24917,
+   "eta": 0.02821606288206115,
+   "residual": 0.00031593711793884843,
+   "residual_norm": 0.7526563831776371,
+   "sigma": 0.00041976275628593585,
+   "y": 0.028532
+  },
+  {
+   "CL": 0.30047,
+   "eta": 0.029656412073201747,
+   "residual": -0.00010641207320174692,
+   "residual_norm": -0.24837262765193738,
+   "sigma": 0.00042843720021704606,
+   "y": 0.02955
+  },
+  {
+   "CL": 0.34935,
+   "eta": 0.0312789556446096,
+   "residual": -0.0005879556446095995,
+   "residual_norm": -1.3423547180325062,
+   "sigma": 0.00043800318702002107,
+   "y": 0.030691
+  },
+  {
+   "CL": 0.39611,
+   "eta": 0.03305957440394404,
+   "residual": 0.0012904255960559594,
+   "residual_norm": 2.8787033991491575,
+   "sigma": 0.0004482662564116065,
+   "y": 0.03435
+  },
+  {
+   "CL": 0.45461,
+   "eta": 0.03560180303821001,
+   "residual": -7.780303821001283e-05,
+   "residual_norm": -0.16821385032680491,
+   "sigma": 0.0004625245665494103,
+   "y": 0.035524
+  },
+  {
+   "CL": 0.48931,
+   "eta": 0.03727496028942799,
+   "residual": -0.0004129602894279924,
+   "residual_norm": -0.8755215206039758,
+   "sigma": 0.0004716734879836112,
+   "y": 0.036862
+  },
+  {
+   "CL": 0.54766,
+   "eta": 0.040365818975808564,
+   "residual": 0.00025618102419143474,
+   "residual_norm": 0.5248280688510509,
+   "sigma": 0.00048812371021287796,
+   "y": 0.040622
+  },
+  {
+   "CL": 0.59656,
+   "eta": 0.04322400499626346,
+   "residual": 0.0005979950037365428,
+   "residual_norm": 1.1891951328566266,
+   "sigma": 0.0005028569216391496,
+   "y": 0.043822
+  },
+  {
+   "CL": 0.64996,
+   "eta": 0.04662426874280316,
+   "residual": -0.0001632687428031604,
+   "residual_norm": -0.3140744940495719,
+   "sigma": 0.0005198408208766896,
+   "y": 0.046461
+  },
+  {
+   "CL": 0.69447,
+   "eta": 0.04968107480647581,
+   "residual": 0.00012692519352418968,
+   "residual_norm": 0.23739916466870414,
+   "sigma": 0.0005346488632397533,
+   "y": 0.049808
+  },
+  {
+   "CL": 0.74497,
+   "eta": 0.053394349194426025,
+   "residual": -0.00029934919442602126,
+   "residual_norm": -0.5421980798311422,
+   "sigma": 0.0005521030146754635,
+   "y": 0.053095
+  },
+  {
+   "CL": 0.80406,
+   "eta": 0.058070041414847964,
+   "residual": -0.0002340414148479658,
+   "residual_norm": -0.4082172157738968,
+   "sigma": 0.0005733256849647336,
+   "y": 0.057836
+  },
+  {
+   "CL": 0.84174,
+   "eta": 0.0612378581523815,
+   "residual": 0.0002591418476185006,
+   "residual_norm": 0.4412663535831986,
+   "sigma": 0.0005872685409032454,
+   "y": 0.061497
+  },
+  {
+   "CL": 0.89512,
+   "eta": 0.06597389944125787,
+   "residual": 0.0005251005587421365,
+   "residual_norm": 0.8643385045073823,
+   "sigma": 0.0006075172585784666,
+   "y": 0.066499
+  },
+  {
+   "CL": 0.95275,
+   "eta": 0.07141381466161809,
+   "residual": -0.001070814661618083,
+   "residual_norm": -1.6997793393163299,
+   "sigma": 0.0006299727481384593,
+   "y": 0.070343
+  },
+  {
+   "CL": 1.00454,
+   "eta": 0.07659194747343642,
+   "residual": -0.0003739474734364284,
+   "residual_norm": -0.5747484669442319,
+   "sigma": 0.0006506280485176356,
+   "y": 0.076218
+  },
+  {
+   "CL": 1.05703,
+   "eta": 0.08211967662811101,
+   "residual": -0.0003166766281110095,
+   "residual_norm": -0.47126070039941975,
+   "sigma": 0.0006719775865940198,
+   "y": 0.081803
+  },
+  {
+   "CL": 1.0903,
+   "eta": 0.08576909529782258,
+   "residual": 0.0008409047021774307,
+   "residual_norm": 1.2263298728952283,
+   "sigma": 0.0006857084058403864,
+   "y": 0.08661
+  }
+ ],
+ "schema": "acdt.calib/1",
+ "study": {
+  "kind": "yaml-canonical",
+  "path": "examples/calibration/polar_tunel_sintetico.yaml",
+  "sha256": "6dbfb07eaed39a218e7f2a074747d8103d560904e88b77791456dfa920518754",
+  "sha256_bytes": "e23a6e4bab0624f73ba0902c61b6b1c859ccb096cfe48380c8c66ba42cff9058",
+  "size_bytes": 1002
+ },
+ "synthetic": true,
+ "validity": {
+  "conditions": {
+   "Re": "3.0e5",
+   "V_m_s": 25.0
+  },
+  "ranges": {
+   "CL": [
+    0.03713,
+    1.0903
+   ]
+  },
+  "rule": "aplica-se só com todas as entradas dadas e dentro de [mín, máx] dos dados usados",
+  "units": {
+   "CL": "1"
+  }
+ }
+}

@@ -113,6 +113,14 @@ files = [
   "src/acdt/api/__init__.py",
   "src/acdt/api/_deprecation.py",
   "src/acdt/api/stability.py",
+  "src/acdt/core/review/__init__.py",
+  "src/acdt/core/review/criteria.py",
+  "src/acdt/core/review/bundle.py",
+  "src/acdt/core/review/profile.py",
+  "src/acdt/core/review/evaluate.py",
+  "src/acdt/core/review/build.py",
+  "src/acdt/core/review/render.py",
+  "src/acdt/domains/aircraft/review_profile.py",
 ]
 strict = true
 follow_imports = "silent"

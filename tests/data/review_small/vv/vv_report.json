@@ -1,0 +1,171 @@
+{
+ "cases": [
+  {
+   "cost": "barato",
+   "discipline": "atmosfera",
+   "evaluator": "acdt.core.vv_cases._isa_sl",
+   "id": "ATM-ISA-SL",
+   "kind": "verificacao",
+   "message": "",
+   "notes": "",
+   "problem": "Atmosfera padrão a H = 0: temperatura, pressão, massa volúmica, velocidade do som e viscosidade dinâmica (Sutherland) definidas pela norma.",
+   "references": [
+    {
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "kind": "valor",
+     "quantity": "T",
+     "tol_abs": 1e-06,
+     "tol_rel": 0.0,
+     "tol_source": "valor definidor (exato)",
+     "unit": "K",
+     "value": 288.15
+    },
+    {
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "kind": "valor",
+     "quantity": "p",
+     "tol_abs": 0.001,
+     "tol_rel": 0.0,
+     "tol_source": "valor definidor (exato)",
+     "unit": "Pa",
+     "value": 101325.0
+    },
+    {
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "kind": "valor",
+     "quantity": "rho",
+     "tol_abs": 0.0,
+     "tol_rel": 0.0001,
+     "tol_source": "valor tabelado com 4 algarismos",
+     "unit": "kg/m³",
+     "value": 1.225
+    },
+    {
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "kind": "valor",
+     "quantity": "a",
+     "tol_abs": 0.0,
+     "tol_rel": 1e-05,
+     "tol_source": "valor tabelado com 6 algarismos",
+     "unit": "m/s",
+     "value": 340.294
+    },
+    {
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "kind": "valor",
+     "quantity": "mu",
+     "tol_abs": 0.0,
+     "tol_rel": 0.0001,
+     "tol_source": "valor tabelado com 5 algarismos",
+     "unit": "Pa·s",
+     "value": 1.7894e-05
+    }
+   ],
+   "requires": [],
+   "results": [
+    {
+     "allowed": 1e-06,
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "computed": 288.15,
+     "delta": 0.0,
+     "delta_rel": 0.0,
+     "kind": "valor",
+     "quantity": "T",
+     "status": "passa",
+     "tol_abs": 1e-06,
+     "tol_rel": 0.0,
+     "tol_source": "valor definidor (exato)",
+     "unit": "K",
+     "value": 288.15
+    },
+    {
+     "allowed": 0.001,
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "computed": 101325.0,
+     "delta": 0.0,
+     "delta_rel": 0.0,
+     "kind": "valor",
+     "quantity": "p",
+     "status": "passa",
+     "tol_abs": 0.001,
+     "tol_rel": 0.0,
+     "tol_source": "valor definidor (exato)",
+     "unit": "Pa",
+     "value": 101325.0
+    },
+    {
+     "allowed": 0.00012250000000000002,
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "computed": 1.225000018124288,
+     "delta": 1.8124287848308995e-08,
+     "delta_rel": 1.479533701902775e-08,
+     "kind": "valor",
+     "quantity": "rho",
+     "status": "passa",
+     "tol_abs": 0.0,
+     "tol_rel": 0.0001,
+     "tol_source": "valor tabelado com 4 algarismos",
+     "unit": "kg/m³",
+     "value": 1.225
+    },
+    {
+     "allowed": 0.00340294,
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "computed": 340.293988026089,
+     "delta": -1.1973911000495718e-05,
+     "delta_rel": -3.51869589252109e-08,
+     "kind": "valor",
+     "quantity": "a",
+     "status": "passa",
+     "tol_abs": 0.0,
+     "tol_rel": 1e-05,
+     "tol_source": "valor tabelado com 6 algarismos",
+     "unit": "m/s",
+     "value": 340.294
+    },
+    {
+     "allowed": 1.7893999999999998e-09,
+     "citation": "ISO 2533:1975 Standard Atmosphere (= ICAO Doc 7488/3, 1993); NOAA/NASA/USAF, U.S. Standard Atmosphere 1976, NOAA-S/T 76-1562, Tab. I (altitude geopotencial)",
+     "computed": 1.789380278077583e-05,
+     "delta": -1.9721922416704321e-10,
+     "delta_rel": -1.1021528119316152e-05,
+     "kind": "valor",
+     "quantity": "mu",
+     "status": "passa",
+     "tol_abs": 0.0,
+     "tol_rel": 0.0001,
+     "tol_source": "valor tabelado com 5 algarismos",
+     "unit": "Pa·s",
+     "value": 1.7894e-05
+    }
+   ],
+   "seconds": 0.0,
+   "status": "passa",
+   "tests": [
+    "tests/test_atmosphere_units.py::test_isa_sea_level"
+   ],
+   "title": "ISA ao nível do mar"
+  }
+ ],
+ "counts": {
+  "desconhecido": 0,
+  "falha": 0,
+  "nao_avaliado": 0,
+  "passa": 1
+ },
+ "filters": {
+  "disciplines": [],
+  "ids": [
+   "ATM-ISA-SL"
+  ]
+ },
+ "max_cost": "barato",
+ "nota": "nao_avaliado ≠ passa; desconhecido = o avaliador correu sem valor (ou com erro)",
+ "provenance": {
+  "nota": "normalizado para o teste",
+  "schema": "acdt.provenance/1"
+ },
+ "registry_fingerprint": "31a4799249f0dd82c0b4d23aca174f2f5c11f7414679305e28a4445c9de5d546",
+ "registry_version": "2026.11.17",
+ "schema": "acdt.vv/1"
+}

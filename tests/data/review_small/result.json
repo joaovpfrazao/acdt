@@ -1,0 +1,16 @@
+{
+ "feasible": true,
+ "issues": [
+  {
+   "message": "aviso de teste (modelo analítico)",
+   "severity": "warning"
+  }
+ ],
+ "sizing": {
+  "m_kg": 10.0,
+  "y": 1.0
+ },
+ "struct": {
+  "sigma_max_Pa": 120000000.0
+ }
+}

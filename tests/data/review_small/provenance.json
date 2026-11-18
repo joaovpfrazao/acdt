@@ -1,0 +1,37 @@
+{
+ "acdt": {
+  "git": {
+   "branch": "fixture",
+   "commit": "6104522e85fce2d81b48f6fc94f1661d8f55d810",
+   "dirty": false,
+   "dirty_diff_sha256": null
+  },
+  "version": "fixture"
+ },
+ "created": {
+  "europe_lisbon": "2026-11-18T00:00:00+00:00",
+  "utc": "2026-11-18T00:00:00+00:00"
+ },
+ "entry_point": {
+  "argv": [],
+  "command": "tests/data/review_small/gerar.py",
+  "cwd": "."
+ },
+ "inputs": [],
+ "notes": [
+  "registo NORMALIZADO para o teste (sem versões de pacotes nem plataforma)"
+ ],
+ "outputs": [
+  {
+   "path": "result.json",
+   "sha256": "4dbd371f54d78039380a214b3d1621e50c422d2ff514121e41c9472fa7d09255",
+   "written_this_run": true
+  }
+ ],
+ "packages": {},
+ "platform": {},
+ "python": {},
+ "schema": "acdt.provenance/1",
+ "seeds": {},
+ "tools": {}
+}

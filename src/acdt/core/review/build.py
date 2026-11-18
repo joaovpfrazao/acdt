@@ -261,6 +261,10 @@ def _calib(c: Ctx) -> dict[str, Any]:
     return {"present": bool(recs), "records": recs}
 
 
+def _sm(status: Any, msg: Any) -> str:
+    return f"{status}: {msg}" if msg else str(status)
+
+
 def _strings(o: Any, path: str = "") -> Iterable[tuple[str, str]]:
     if isinstance(o, Mapping):
         for k, v in o.items():
@@ -281,11 +285,11 @@ def _open_items(c: Ctx, crit: list[dict[str, Any]], fid: dict[str, Any], trace: 
         items.append({"categoria": cat, "id": ident, "descricao": desc, "fonte": src, "severidade": sev})
 
     sev_of = {"falha": "alta", "desconhecido": "media", "nao_avaliado": "media", "no_limite": "media"}
-    for r in c.rows or []:
-        s = str(r.get("status"))
+    for row_ in c.rows or []:
+        s = str(row_.get("status"))
         if s in sev_of:
-            w = c.waivers.get(str(r.get("id")))
-            add("requisito", str(r.get("id")), f"{s}: {r.get('message') or ''}".strip() +
+            w = c.waivers.get(str(row_.get("id")))
+            add("requisito", str(row_.get("id")), (f"{s}: {row_['message']}" if row_.get("message") else s) +
                 (f" (com dispensa: {w})" if w else ""), "matriz de verificação", "baixa" if w else sev_of[s])
     res = b.result or {}
     unreq = set(map(str, c.coverage.get("avaliadores_sem_requisito") or []))
@@ -295,7 +299,7 @@ def _open_items(c: Ctx, crit: list[dict[str, Any]], fid: dict[str, Any], trace: 
         key = str(ch.get("key"))
         if f"check:{key}" in unreq and ch.get("ok") is not True:
             st = "falha" if ch.get("ok") is False else "desconhecido"
-            add("verificacao_sem_requisito", key, f"{st}: {ch.get('message') or ''}", "result.json#checks",
+            add("verificacao_sem_requisito", key, _sm(st, ch.get("message")), "result.json#checks",
                 "alta" if st == "falha" else "media")
     for iss in res.get("issues") or []:
         if isinstance(iss, Mapping) and iss.get("severity") in ("warning", "error"):
@@ -306,48 +310,48 @@ def _open_items(c: Ctx, crit: list[dict[str, Any]], fid: dict[str, Any], trace: 
                                    ("design.json#results",
                                     {d: {lv: blk.get("notes") for lv, blk in lvs.items()}
                                      for d, lvs in (b.design.get("results") or {}).items()})]
-    srcs += [(f"{b.rel(r.path)}#pressupostos", r.data.get("pressupostos")) for r in b.uq + b.mdo]
-    srcs += [(f"{b.rel(r.path)}#method.notes", (r.data.get("method") or {}).get("notes")) for r in b.calib]
+    srcs += [(f"{b.rel(rec.path)}#pressupostos", rec.data.get("pressupostos")) for rec in b.uq + b.mdo]
+    srcs += [(f"{b.rel(rec.path)}#method.notes", (rec.data.get("method") or {}).get("notes")) for rec in b.calib]
     for src, tree in srcs:
         for p, s in _strings(tree):
             if _PRESS.search(s) and s not in seen_p:
                 seen_p.add(s)
-                add("pressuposto", p or "—", s, src, "baixa")
-    for r in b.uq:
-        for i in r.data.get("inputs") or []:
+                add("pressuposto", ("item" + p) if p.startswith("[") else (p or "—"), s, src, "baixa")
+    for rec in b.uq:
+        for i in rec.data.get("inputs") or []:
             if i.get("pressuposto"):
                 add("pressuposto", str(i.get("path")), f"entrada incerta sem fonte: {i.get('describe')}",
-                    b.rel(r.path), "baixa")
+                    b.rel(rec.path), "baixa")
     for src, tree in (("design.json", b.design), ("result.json", res)):
         for p, s in _strings(tree):
             if _OUTVAL.search(s):
                 add("calibracao", p, s, src, "alta")
-    for r in b.calib:
-        d = r.data
+    for rec in b.calib:
+        d = rec.data
         if d.get("synthetic"):
-            add("calibracao", str(d.get("name")), "dados SINTÉTICOS: não são evidência de ensaio", b.rel(r.path),
+            add("calibracao", str(d.get("name")), "dados SINTÉTICOS: não são evidência de ensaio", b.rel(rec.path),
                 "media")
         for n, p in sorted((d.get("parameters") or {}).items()):
             if p.get("decision") != "aplicar":
                 add("calibracao", f"{d.get('name')}:{n}", "nao_aplicar: " + ("; ".join(p.get("reasons") or [])
                                                                              or "sem critérios cumpridos"),
-                    b.rel(r.path), "media")
-    for r in b.vv:
-        for k in r.data.get("cases") or []:
+                    b.rel(rec.path), "media")
+    for rec in b.vv:
+        for k in rec.data.get("cases") or []:
             if k.get("status") != "passa":
-                add("vv", str(k.get("id")), f"{k.get('status')}: {k.get('message') or ''}".strip(), b.rel(r.path),
+                add("vv", str(k.get("id")), _sm(k.get("status"), k.get("message")), b.rel(rec.path),
                     "alta" if k.get("status") == "falha" else "media")
-    for r in b.uq:
-        for rid, p in sorted(((r.data.get("propagation") or {}).get("requirements") or {}).items()):
+    for rec in b.uq:
+        for rid, p in sorted(((rec.data.get("propagation") or {}).get("requirements") or {}).items()):
             st = p.get("estado_probabilistico")
             if st != "prob_passa":
-                add("incerteza", str(rid), f"{st}: {p.get('nota') or ''}".strip(), b.rel(r.path),
+                add("incerteza", str(rid), _sm(st, p.get("nota")), b.rel(rec.path),
                     "alta" if st == "prob_falha" else "media")
-    for r in b.mdo:
-        for w in r.data.get("warnings") or []:
-            add("mdo", "aviso", str(w), b.rel(r.path), "baixa")
-        if r.data.get("chosen") is None:
-            add("mdo", "sem_escolha", "nenhum projeto viável escolhido", b.rel(r.path), "alta")
+    for rec in b.mdo:
+        for w in rec.data.get("warnings") or []:
+            add("mdo", "aviso", str(w), b.rel(rec.path), "baixa")
+        if rec.data.get("chosen") is None:
+            add("mdo", "sem_escolha", "nenhum projeto viável escolhido", b.rel(rec.path), "alta")
     for row in fid["rows"]:
         if row["status"] in ("abaixo", "ausente"):
             add("fidelidade", row["discipline"], f"{row['status']}: nível máximo {row['max_level'] or '—'}, "
