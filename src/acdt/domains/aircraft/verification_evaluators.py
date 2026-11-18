@@ -10,6 +10,10 @@ de ``assumptions.constraints``).
 * ``perf:<requisito>`` — valor de ``performance.requirements`` (missão por segmentos, Raymer Cap. 17, Anderson),
   convertido para SI. Resolução 0,1 % (a mesma de ``performance_analysis.add``).
 * ``sizing:stall_speed`` — V_s em configuração de aterragem a partir de W/S e C_Lmax,aterragem.
+* ``ruido:<grandeza>`` — grandeza escalar da secção ``noise`` (noise.py; docs/RUIDO.md), p. ex.
+  ``overhead_LAmax_dBA``, ``detection_ground_range_m``, ``SEL_dBA``, ``part36_G.LAmax_dBA``. Com fontes de ruído
+  incompletas o valor é um **limite inferior**: num requisito ``max`` um valor acima do limiar falha, um valor abaixo
+  fica desconhecido (nunca passa).
 * ``entrada:<requisito>`` — entradas do dimensionamento (velocidade/altitude de cruzeiro, payload, tripulação)
   lidas do que o dimensionamento usou: cumprido por construção, verificação por inspeção.
 """
@@ -122,6 +126,9 @@ def _list_evidence(ctx: VerificationContext) -> list[str]:
     perf = ctx.result.get("performance")
     if isinstance(perf, dict):
         out += [f"perf:{c['requisito']}" for c in perf.get("requirements") or [] if isinstance(c, dict)]
+    nz = ctx.result.get("noise")
+    if isinstance(nz, dict) and nz.get("evaluated"):
+        out += ["ruido:overhead_LAmax_dBA", "ruido:detection_ground_range_m"]
     return out
 
 
@@ -131,6 +138,32 @@ register_evaluator(Evaluator("perf:", _eval_perf, "missão por segmentos / compr
                              "analise", "N1", "Raymer 2018 Cap. 17; Anderson 1999", ("aircraft",)))
 register_evaluator(Evaluator("sizing:stall_speed", _eval_stall, "V_s de aterragem a partir de W/S e C_Lmax",
                              "analise", "N0", "Raymer 2018 Eq. 5.6", ("aircraft",)))
+def _eval_noise(req: TracedRequirement, ctx: VerificationContext, key: str) -> Evidence:
+    from acdt.core.verification import json_path
+
+    nz = ctx.result.get("noise")
+    if not isinstance(nz, dict):
+        return Evidence(ran=False, message="etapa de ruído não correu")
+    if not nz.get("evaluated"):
+        return Evidence(ran=False, message=f"ruído não avaliado: {nz.get('reason', '')}")
+    try:
+        v = json_path(nz, key)
+    except (KeyError, ValueError):
+        return Evidence(ran=False, message=f"noise.{key} não existe", pointer=f"noise.{key}")
+    if not isinstance(v, (int, float)) or isinstance(v, bool) or not math.isfinite(float(v)):
+        return Evidence(None, message=f"noise.{key} sem valor", pointer=f"noise.{key}")
+    x = float(v)
+    if not nz.get("sources_complete") and req.comparison == "max" and req.threshold is not None \
+            and x <= float(req.threshold):
+        return Evidence(None, message=f"noise.{key} = {x:.4g} é limite inferior (fontes incompletas: "
+                        f"{nz.get('sources_note', '')}); não pode passar", pointer=f"noise.{key}", fidelity="N0")
+    return Evidence(x, req.unit, pointer=f"noise.{key}", fidelity="N0",
+                    message="" if nz.get("sources_complete") else "limite inferior (fontes incompletas)")
+
+
+register_evaluator(Evaluator("ruido:", _eval_noise, "disciplina ruído L0 (Gutin, Schlegel-King-Mull, ISO 9613-1, "
+                             "IEC 61672-1, ISO 226); limite inferior com fontes incompletas", "analise", "N0",
+                             "Marte & Kurtz 1970; ISO 9613-1; IEC 61672-1; ISO 226", ("aircraft",)))
 register_evaluator(Evaluator("entrada:", _eval_input, "entrada do dimensionamento (por construção)",
                              "inspecao", "N0", domains=("aircraft",)))
 register_evidence_lister("aircraft", _list_evidence)
@@ -142,5 +175,7 @@ register_default_evaluator("aircraft", "mtow", "resultado:weights.W0_kg", "anali
 register_default_evaluator("aircraft", "wing_span", "resultado:geometry.wing.span_m", "analise", "N0")
 for _k in _INPUT_PATHS:
     register_default_evaluator("aircraft", _k, f"entrada:{_k}", "inspecao", "N0")
-for _k in ("regulatory_category", "unit_cost", "power_available", "thrust_available", "noise"):
+register_default_evaluator("aircraft", "noise", "ruido:overhead_LAmax_dBA", "analise", "N0")
+register_default_evaluator("aircraft", "aural_detection_range", "ruido:detection_ground_range_m", "analise", "N0")
+for _k in ("regulatory_category", "unit_cost", "power_available", "thrust_available"):
     register_default_evaluator("aircraft", _k, f"check:{_k}", "analise", "N0")

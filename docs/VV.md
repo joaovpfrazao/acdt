@@ -57,6 +57,10 @@ Corrida de 17 nov 2026 no box Linux (`acdt vv --cost medio`): **22 passa, 0 falh
 | EM-PO-01…09 | em | verificação | barato | Knott, Shaeffer & Tuley 1993 Tab. 6.1; Balanis 2012 §11.3 (placa, esfera, cilindro, diedro) | 0,01–1 dB (bandas de `core/em/validate.py`) |
 | AERO-LL-ELLIPTIC | aerodinâmica | verificação | barato | Anderson 2011 §5.3.1 (Prandtl, asa elíptica: e = 1) | ±0,1 % / ±0,2 % |
 | REG-23337-N | cargas | verificação | barato | 14 CFR 23.337(a) (até à Amdt. 23-63) / CS-23.337(a) | exato |
+| NOISE-SKM-EXAMPLE | ruido | verificação | barato | Marte & Kurtz, JPL TR 32-1462 (1970) Ap. C: 78,7 dB a 300 ft, 68,2 dB a 1000 ft, 556 Hz | 0,1 dB; 0,3 % (arredondamentos do exemplo) |
+| NOISE-AWEIGHT | ruido | verificação | barato | IEC 61672-1:2013 Tabela 3 (ponderação A, 31,5 Hz – 16 kHz) | 0,05 dB |
+| NOISE-ISO9613-ALPHA | ruido | verificação | barato | α da ISO 9613-1 (4 atmosferas × 7 oitavas), tabela reproduzida pela ETH Zürich | meia unidade do último algarismo + 0,01 dB/km |
+| NOISE-P36G-LIMITS | ruido | verificação | barato | 14 CFR 36 Ap. G, G36.301(b)/(c) | exato |
 | SIZ-C172S | dimensionamento | **validação** | médio | Cessna 172S Information Manual (1998): MTOW 1157 kg, vazio 754 kg, 134 kW, 16,2 m², 71,4 kg/m² | ±15 % massas, ±25 % resto (método conceptual) |
 
 Achado ao montar a biblioteca: o primeiro valor de referência escrito para o SP-8007 (0,5806) estava errado; a

@@ -1701,6 +1701,23 @@ Em aberto, por ordem:
 3. Registo de decisões (`acdt decisions`) como evidência dos estudos de compromisso; `acdt certify` nos critérios
    de segurança; ficha RID/RFA.
 
+### Ruído acústico L0 (18 nov 2026, ramo `disc-ruido`)
+
+Primeiro item das «disciplinas em falta». Núcleo `acdt/core/acoustics/` (Gutin, Schlegel-King-Mull, ISO 9613-1,
+IEC 61672-1, ISO 226, 14 CFR 36 Ap. G), etapa `noise` do pipeline (`domains/aircraft/noise.py`), disciplina `ruido`
+no `design.json`, requisitos `noise` e `aural_detection_range`, avaliador `ruido:`, `acdt.api.rotor_noise` (API
+1.2.0) e quatro casos V&V (todos passam). Doc: [RUIDO.md](RUIDO.md); CAPABILITIES §32r.
+
+* **Regra de completude**: só tons de carga e banda larga de vórtices. Sem `noise.other_sources` declarado, o nível
+  é um limite inferior: falha se já excede, desconhecido se cumpre (nunca passa). Idem para a Parte 36.
+* **Exemplo (teste, `examples/cessna172_check.yaml`, sem alterar o projeto)**: sobrevoo a 2438 m e 62,8 m/s,
+  2700 rpm: L_A,max 46,2 dB(A), L_AE 60,4 dB(A), alcance de deteção em silêncio 27,5 km no solo (tom fundamental
+  de 90 Hz; limite superior sem refração nem atenuação do solo). M_tip helicoidal 0,85 > 0,8: aviso de validade
+  (espessura não modelada). Parte 36 Ap. G (com `certification.part36_G`): MTOW 1138 kg → limite 80,7 dB(A)
+  (G36.301(c)); altura de referência 204 m; L_A,max 70,8 dB(A) — limite inferior, por isso «desconhecido».
+* **Seguimentos**: validação contra medições publicadas; espessura (Deming) e voo (Garrick & Watkins); ruído de
+  motor; Fidell et al. (1974) depois de consultar o original; ICAO Anexo 16 Cap. 10; ligação ao `acdt vtol`.
+
 ### Teste instável de reutilização de `run_id` (18 nov 2026, PR #12)
 
 Causa medida: falha transitória do AVL numa iteração intermédia do ciclo W0 → Schrenk só nessa iteração → ponto

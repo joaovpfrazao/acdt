@@ -85,6 +85,7 @@ class DesignResult:
     propeller_calibration: dict | None = None  # propeller.calibrated_etas history (fixed-pitch map)
     weight_balance: object | None = None  # weight_balance.WeightBalanceResult (operational loading)
     landing_gear: object | None = None    # landing_gear.LandingGearResult
+    noise: dict | None = None             # noise.analyse_noise (disciplina ruído, L0)
     structures_l1: object | None = None   # structures_l1.StructuresL1 (masses, deflections, elastic correction)
     launch_recovery: dict | None = None   # opt-in catapult / belly landing (launch_recovery.py)
     gear_drag: dict | None = None         # opt-in gear drag in the polar (aero/gear_drag.py)
@@ -191,7 +192,7 @@ def _chk_cat(r, res):
 
 @register_handler("check", "noise")
 def _chk_noise(r, res):
-    return CheckResult(r.key, None, f"not evaluated — foreseen: {r.type.reference}")
+    return CheckResult(r.key, None, "avaliado na etapa de ruído (verificação: ruido:overhead_LAmax_dBA)")
 
 
 # ---- pipeline ---------------------------------------------------------------

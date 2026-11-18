@@ -40,6 +40,13 @@ def _aeroelastic(st: DesignState):
     aeroelastic_stage(st["result"])
 
 
+def _noise(st: DesignState):
+    """Disciplina ruído L0 (noise.py; docs/RUIDO.md): Gutin + Schlegel-King-Mull, ISO 9613-1, ponderação A,
+    sobrevoo, deteção auditiva (ISO 226) e, opcional, 14 CFR 36 Ap. G."""
+    from .noise import noise_stage
+    noise_stage(st["result"])
+
+
 def _report(st: DesignState):
     out = st["options"].get("output")
     if out:
@@ -80,6 +87,8 @@ DOMAIN = register_domain(Domain(
                   "flutter, AEER-45 (Wright & Cooper, Bisplinghoff) + OpenAeroStruct static coupling"),
             Stage("performance", _performance, description="segment mission, payload-range, field lengths, "
                   "ceilings (Raymer Ch. 17, Anderson)"),
+            Stage("noise", _noise, description="ruído de hélice L0 (Gutin, Schlegel-King-Mull), ISO 9613-1, "
+                  "ponderação A IEC 61672-1, deteção auditiva ISO 226, 14 CFR 36 Ap. G opcional"),
             Stage("report", _report, description="markdown + plots + JSON"),
             Stage("verification", _verification, description="matriz de verificação dos requisitos rastreáveis "
                   "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)"),

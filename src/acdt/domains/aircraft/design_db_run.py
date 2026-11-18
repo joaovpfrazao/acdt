@@ -43,6 +43,8 @@ SECTION_MAP: dict[str, tuple[str, str, str, str]] = {
     "performance": ("desempenho", "L0", "missão por segmentos (Raymer Cap. 17, Anderson)", "CAPABILITIES §2"),
     "verified_segment_mission": ("desempenho", "L0", "missão por segmentos (Raymer Cap. 17)", "CAPABILITIES §2"),
     "cost": ("custo", "L0", "DAPCA IV / Eastlake (Raymer Cap. 18)", "CAPABILITIES §14"),
+    "noise": ("ruido", "L0", "ruído de hélice: Gutin 1936 + Schlegel-King-Mull 1966, ISO 9613-1, IEC 61672-1, "
+              "ISO 226", "CAPABILITIES §32r"),
     "systems": ("sistemas", "L0", "seleção de sistemas (hélice, motor, bateria, servos)", "CAPABILITIES §12"),
 }
 # metadados, listas de mensagens e históricos: ficam no result.json (referenciado pelo SHA-256)

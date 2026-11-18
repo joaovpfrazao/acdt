@@ -51,6 +51,8 @@ def phase2_dict(res) -> dict:
         d["landing_gear"] = res.landing_gear.summary()
     if res.performance is not None:
         d["performance"] = res.performance.summary()
+    if getattr(res, "noise", None) is not None:
+        d["noise"] = res.noise
     d["verified_segment_mission"] = res.verified
     return _jsonable(d)
 
