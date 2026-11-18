@@ -222,3 +222,9 @@ Alley 2007.
   devolve os mesmos 537 pontos (desvio 9,8×10⁻¹³ m) quando não há variável de projecto. Não houve
   solução ADflow nem TACS de cruzeiro, por isso não há comparação com o CL da grossa nem com a
   flecha do CalculiX. Nenhum factor entra. Números em `h3_mphys.json`.
+* **RCS (18 nov 2026)**. O mesmo loft, com a torção de ponta −10° e o bordo de fuga acima do bordo
+  de ataque, foi avaliado em óptica física a 10 GHz. Com uma reflexão a média no sector frontal é
+  −10,03 dBsm. Com duas, passa a −7,49 dBsm em VV e −9,73 dBsm em HH. O máximo fica perto de 8 dBsm.
+  A malha tem 192 facetas e uma baía em envergadura; não é uma convergência. Fuselagem, derivas,
+  trem, hélice e a deflexão dos comandos ficam por avaliar. A onda completa não correu. Nenhum
+  factor entra. Números em `h6_rcs_bounces2.json`.
