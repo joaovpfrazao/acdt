@@ -11,5 +11,6 @@
 *.vtu
 *.vtk
 *.csv
+!h5_c172_rans_asa_fuselagem.csv
 *.log
 *.msh

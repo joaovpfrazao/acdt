@@ -331,6 +331,38 @@ def run_wing_euler(res, step, work, alphas=(0.0, 4.0), iters: int = 1500, nproc:
     return out
 
 
+def rans_volume_estimate(swet_full_m2: float, mac_m: float, first_cell_m: float, *,
+                         n_alpha: int = 3, iters: int = 8000, n_cores: int = 8) -> dict:
+    """Cell, RAM and time estimate used by :func:`full_aircraft_rans_case`.
+
+    ``swet_full_m2`` is the sum of both sides. The half model uses half of that area.
+    Surface spacing is mac/100. The prism count grows at 1.2 until about 0.01 chords.
+    RAM is 1.8 kB/cell. Time is 4 µs/cell/iteration/core, 8000 iterations and three
+    angles on 8 cores, unless the caller overrides those three counts. This is the
+    formula already in this module. It is not a measured mesh.
+    """
+    swet_half = float(swet_full_m2) / 2.0
+    h_s = float(mac_m) / 100.0
+    n_surf = swet_half / h_s**2 * 2.0
+    n_layers = int(math.ceil(math.log(1 + 0.05 * float(mac_m) * 0.2 / float(first_cell_m)) / math.log(1.2)))
+    cells = n_surf * n_layers + 6.0 * n_surf
+    return {
+        "swet_full_m2": float(swet_full_m2),
+        "swet_half_m2": swet_half,
+        "surface_spacing_m": h_s,
+        "n_surface_tri": int(n_surf),
+        "prism_layers": n_layers,
+        "cells_estimate": int(cells),
+        "ram_GB": cells * 1.8e-6,
+        "wall_h": cells * iters * n_alpha * 4e-6 / 3600.0 / n_cores,
+        "iters": iters,
+        "n_alpha": n_alpha,
+        "n_cores": n_cores,
+        "rate_s_per_cell_iter_per_core": 4e-6,
+        "kB_per_cell": 1.8,
+    }
+
+
 def full_aircraft_rans_case(res, step, work, yplus: float = 1.0, nproc_target: int = 64) -> dict:
     """Write the full-aircraft RANS-SA case (half model) for a stronger machine; estimates cells/RAM/time."""
     from .cfd import first_cell
@@ -342,14 +374,11 @@ def full_aircraft_rans_case(res, step, work, yplus: float = 1.0, nproc_target: i
     at = isa(res.cruise_altitude)
     Re = at.rho * res.cruise_speed * w.mac / at.mu
     h1 = first_cell(Re, w.mac, yplus)
-    Swet = sum(res.config.wetted_areas().values()) / 2
-    h_s = w.mac / 100                                   # surface spacing (≈ 100 per chord)
-    n_surf = Swet / h_s**2 * 2                          # triangles on the half-model wetted surface
-    n_layers = int(math.ceil(math.log(1 + 0.05 * w.mac * 0.2 / h1) / math.log(1.2)))  # to ~0.01 c at 1.2
-    cells_bl = n_surf * n_layers
-    cells = cells_bl + 6 * n_surf                       # + tets outside the prism layer
-    mem = cells * 1.8e-6                                # GB, SU2 RANS-SA ≈ 1.5–2 kB/cell
-    hours = cells * 8000 * 3 * 4e-6 / 3600 / 8          # 8000 it × 3 α, ~4 µs/cell/it per core on 8 cores
+    est_n = rans_volume_estimate(sum(res.config.wetted_areas().values()), w.mac, h1)
+    h_s = est_n["surface_spacing_m"]
+    n_layers = est_n["prism_layers"]
+    mem = est_n["ram_GB"]
+    hours = est_n["wall_h"]
     geo = f"""// acdt Phase 4 — full aircraft half model, RANS-SA (Gmsh {''}4.x). First cell {h1:.2e} m (y+ {yplus:g}).
 SetFactory("OpenCASCADE");
 Geometry.OCCTargetUnit = "M";
@@ -373,9 +402,10 @@ Mesh.Algorithm3D = 10;
              .replace("FREESTREAM_PRESSURE= 101325.0\nFREESTREAM_TEMPERATURE= 288.15",
                       f"REYNOLDS_NUMBER= {Re:.4e}\nREYNOLDS_LENGTH= {w.mac:.5f}\nFREESTREAM_TEMPERATURE= {at.T:.2f}")
     (work / "aircraft_rans.cfg").write_text(cfg)
-    est = {"Re_mac": Re, "first_cell_m": h1, "surface_spacing_m": h_s, "n_surface_tri": int(n_surf),
-           "prism_layers": n_layers, "cells_estimate": int(cells), "ram_GB": mem,
-           "wall_h_8cores_3alpha": hours, "wall_h_64cores_3alpha": hours * 8 / nproc_target,
+    est = {"Re_mac": Re, "first_cell_m": h1, "surface_spacing_m": h_s,
+           "n_surface_tri": est_n["n_surface_tri"],
+           "prism_layers": n_layers, "cells_estimate": est_n["cells_estimate"], "ram_GB": mem,
+           "wall_h_8cores_3alpha": hours, "wall_h_64cores_3alpha": hours * est_n["n_cores"] / nproc_target,
            "commands": [f"cd {tools.case_relative(work, work.resolve().parent)}",
                         "gmsh aircraft_rans.geo -3 -format su2 -o aircraft_half.su2",
                         f"mpirun -n <N> SU2_CFD aircraft_rans.cfg   # AOA in the cfg; repeat for α = 0, 2, 4 (+ stall sweep)"]}

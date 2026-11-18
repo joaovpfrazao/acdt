@@ -61,7 +61,10 @@ A 18 nov 2026 a quarta malha 2-D da secção do C172 (refine = 2, α = 2°, 1079
 O CD ficou com deriva 0,42 % nas últimas 10 % das iterações, por isso o GCI fino de 3,0 % não é aceite.
 Os α 0° e 4° não foram corridos. O RANS só da asa e da fuselagem estima 1,2×10⁷ células e 22 GB e não
 cabe nesta máquina; o caso do avião completo, e o avião com trem e hélice, continuam por correr.
-Números em `examples/output/cessna172_check_hifi_win/h5_c172_gci.json`. O `gci/gci.json` de três malhas
+Números em `examples/output/cessna172_check_hifi_win/h5_c172_gci.json`. Uma medição nova, com 16,32 GB
+livres e limite 11,42 GB, mantém 21,731 GB e 40,24 h. O solver não arrancou e não se escreveu malha.
+O plano de restart fica em `h5_c172_rans_asa_fuselagem.json`, sem bloco de iterações. A comparação com
+a polar L1 e com o POH fica `nao_avaliado`. O `gci/gci.json` de três malhas
 não foi reescrito.
 
 ## 3. Ler o relatório
@@ -106,7 +109,7 @@ filtro e não como penalidade suave.
 
 ## 6. Limitações
 
-* GCI e Euler 3-D só correm se pedidos e se couberem na máquina; o RANS do avião completo fica preparado. O RANS só da asa e da fuselagem do C172 foi estimado a 18 nov 2026 (22 GB) e não correu.
+* GCI e Euler 3-D só correm se pedidos e se couberem na máquina; o RANS do avião completo fica preparado. O RANS só da asa e da fuselagem do C172 foi estimado a 18 nov 2026 (22 GB) e não correu. A medição seguinte, no mesmo dia, recusou outra vez: 21,731 GB contra um limite de 11,42 GB.
 * O deck Nastran SOL 145 é relido com pyNastran, mas não é corrido (sem MSC/NX Nastran).
 * C_h das superfícies de comando e V_H ≈ 1,1 V_C são pressupostos.
 * Roskam Classe II fora da base estatística (UAV de 25 kg) é só indicativo; as Eqs. 5.12–5.13
