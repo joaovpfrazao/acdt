@@ -182,7 +182,7 @@ def test_penalty_ranges():
 def test_api_icing():
     from acdt import api
 
-    assert api.API_VERSION == "1.4.0"
+    assert tuple(int(x) for x in api.API_VERSION.split(".")) >= (1, 4, 0)  # icing desde 1.4.0
     e = api.icing_envelope("intermittent", -20, 25, horizontal_extent_nmi=4.0, altitude_m=4000)
     assert e["lwc_g_m3"] == pytest.approx(1.041, abs=6e-4) and e["envelope_status"] == "dentro"
     assert api.icing(_spec())["schema"] == "acdt.icing/1"
