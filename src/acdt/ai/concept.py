@@ -421,6 +421,27 @@ def _req(res: dict, key: str):
     return None
 
 
+def _reuse_size_run(src: dict, level: str | None, v: dict) -> dict | None:
+    """``run_id`` de uma corrida ``size`` concluída, sem ``level``/``assumptions`` novos → reutiliza o result.json
+    dessa corrida tal como está (não volta a dimensionar). Voltar a dimensionar repetia o ciclo W0, cujo ponto fixo
+    só está convergido a ``mda.tol_lowfi`` — a "reutilização" não seria idêntica ao resultado de origem.
+    Devolve ``None`` quando é preciso dimensionar de novo (overrides, outra ferramenta, corrida falhada)."""
+    from acdt.ai import registry
+    if set(src) != {"run_id"} or level is not None or v.get("assumptions"):
+        return None
+    try:
+        run = registry.load(src["run_id"])
+    except KeyError:
+        return None
+    rec = run.record
+    inp = rec.get("inputs") or {}
+    rj = (rec.get("files") or {}).get("result.json")
+    if (rec.get("tool") != "size" or rec.get("status") != "done" or not rj or not Path(rj).is_file()
+            or bool(inp.get("no_systems", False)) != bool(v.get("no_systems", True))):
+        return None
+    return {"run_id": run.id, "status": "done", "result_json": rj, "level": inp.get("level")}
+
+
 def _size_variant(v: dict) -> dict:
     from acdt.ai import toolkit as T
     from acdt.core.certification.basis import select_basis
@@ -433,8 +454,13 @@ def _size_variant(v: dict) -> dict:
     # Explicit level=L0|L1 forces handbook/lowfi. Previous default L0 silently disagreed with acdt size
     # on YAML files that declare fidelity: lowfi (Nansei / illegal_fishing discrepancy).
     level = v.get("level")  # may be None
-    r = T.size(**src, level=level, no_systems=v.get("no_systems", True),
-               assumptions=v.get("assumptions"))
+    r = _reuse_size_run(src, level, v)
+    reused = r is not None
+    if r is None:
+        r = T.size(**src, level=level, no_systems=v.get("no_systems", True),
+                   assumptions=v.get("assumptions"))
+    else:
+        level = r.get("level")  # nível com que essa corrida foi feita (None = fidelidade do YAML)
     if r.get("status") != "done":
         return {"id": vid, "quantity": q, "status": r.get("status"), "error": r.get("error"), "run_id": r.get("run_id")}
     res = json.loads(Path(r["result_json"]).read_text(encoding="utf-8"))
@@ -470,6 +496,7 @@ def _size_variant(v: dict) -> dict:
                           "level=L0|L1 overrides fidelity"),
                "fleet_W0_meaning": "quantity × aircraft W0 from this size run (not a second mass model)",
                "opt_in_feed": "pass run_id from a prior acdt size / toolkit.size to reuse that result",
+               "reused_size_run": reused,
            }}
     if ac.get("fuel_kg_per_fh_approx") is not None:
         out["assumed"].append("fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound")
