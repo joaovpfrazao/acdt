@@ -125,6 +125,24 @@ Política:
 Casos já nesta forma: `tests/test_section_thickness.py::test_avl_cl_cm_at_frozen_references` (PR #64),
 `tests/test_tailless_split_aileron.py` (bandas do `side_load_band`, PR #65).
 
+### Teste instável de reutilização de `run_id` (18 nov 2026)
+
+`tests/test_size_fleet_mtow_align.py::test_run_id_feed_reuses_size_result` falhou uma vez na suite paralela
+(W0 da frota 136,34500 kg contra 136,34385 kg por avião, 1,7e-5 relativo) e passava sozinho. Causa medida: uma
+**falha transitória do AVL** (tempo-limite de 60 s com a máquina sobrecarregada) numa iteração intermédia do ciclo
+W0 fazia `_strip_cl_model` cair em silêncio para Schrenk só nessa iteração; o ponto fixo convergido (só a
+`mda.tol_lowfi` = 2e-4) parava noutro sítio. Simulando a falha na 5.ª corrida AVL obtém-se exatamente
+136,3450049584588 kg, o valor da falha. Não era cache partilhada entre workers (12 processos em paralelo dão W0
+idêntico até ao último dígito) nem ordem dos testes. Correções:
+
+1. o par de corridas AVL do modelo de faixas repete uma vez com tempo-limite de 180 s antes de cair para Schrenk
+   (`lowfi.AVL_TIMEOUTS_S`);
+2. se a fonte da carga em envergadura mudar entre iterações, o resultado leva um aviso (antes ficava só a fonte da
+   última iteração);
+3. `size_fleet` com `run_id` de uma corrida `size` concluída, sem `level`/`assumptions` novos, reutiliza o
+   `result.json` dessa corrida em vez de voltar a dimensionar (era o que o contrato dizia);
+4. o ficheiro de teste usa um `ACDT_RUNS_DIR` por teste.
+
 ## 5. Correr localmente
 
 ```bash
