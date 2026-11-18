@@ -162,7 +162,7 @@ def build_record(study: Mapping[str, Any], spec: F.ModelSpec, ds: Dataset, res: 
         vals = vals[res.mask] if res.mask is not None else vals
         vals = vals[np.isfinite(vals)]
         if vals.size:
-            validity[k] = [float(vals.min()), float(vals.max())]
+            validity[k] = [float(np.min(vals)), float(np.max(vals))]
             vunits[k] = u
     if (study.get("validity") or {}).get("only_channels"):
         keep = set(str(c) for c in study["validity"]["channels"])
@@ -420,7 +420,7 @@ def load_study(path: str | Path) -> tuple[dict[str, Any], Path]:
 
     p = Path(path)
     d = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
-    return dict(d.get("calibration", d)), p.resolve().parent
+    return dict(d.get("calibration") or d), p.resolve().parent
 
 
 def dataset_for(study: Mapping[str, Any], base: Path) -> Dataset:

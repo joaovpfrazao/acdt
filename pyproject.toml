@@ -39,6 +39,9 @@ cert = ["openpyxl>=3.1"]
 sim = ["scipy>=1.10", "jsbsim>=1.3"]
 # Estrutura em STEP. CadQuery importa OpenCASCADE (LGPL) — só dentro de cad_build.py, noutro processo.
 cad = ["cadquery>=2.8,<2.9"]
+# Dados de ensaio (acdt calib): Parquet (pandas + pyarrow, BSD/Apache-2.0) e PX4 ULog (pyulog, BSD-3-Clause).
+# ArduPilot .bin (pymavlink, LGPL-3.0) não é importado: converter fora do processo para CSV.
+dados = ["pandas>=2", "pyarrow>=14", "pyulog>=1.0"]
 
 [project.scripts]
 acdt = "acdt.cli:main"
@@ -98,6 +101,10 @@ files = [
   "src/acdt/core/quantities.py",
   "src/acdt/core/design_db.py",
   "src/acdt/domains/aircraft/design_db_run.py",
+  "src/acdt/core/calibration/__init__.py",
+  "src/acdt/core/calibration/ingest.py",
+  "src/acdt/core/calibration/fitting.py",
+  "src/acdt/core/calibration/record.py",
 ]
 strict = true
 follow_imports = "silent"

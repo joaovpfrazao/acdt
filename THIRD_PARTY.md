@@ -33,6 +33,8 @@ or the official project pages) in **October 2026**. Re-check them before any red
 | Intel oneMKL (PyPI `mkl`, pulled in by pypardiso) | Intel — https://pypi.org/project/mkl/ | Intel Simplified Software Licence (proprietary, free redistribution) | active (tested 2026.2.0) | PARDISO back-end of pypardiso; never required, never shipped by acdt |
 | kinparse | D. Vandenbout — https://github.com/devbisme/kinparse | MIT | low activity (tested 1.2.4) | `[hifi]`, tests only: parses the exported KiCad netlist back (round-trip check) |
 | Loads Kernel | DLR Institute of Aeroelasticity — https://github.com/DLR-AE/LoadsKernel | BSD-3-Clause | active (last push 2026-10) | not used: Phase 4 uses PanelAero (same group) directly for the DLM |
+| pandas + PyArrow | pandas-dev / Apache Arrow — https://github.com/pandas-dev/pandas, https://github.com/apache/arrow | BSD-3-Clause / Apache-2.0 | active (tested pyarrow 26.0.1) | `[dados]`: Parquet test data in `acdt calib ingest` (`core/calibration/ingest.py`) |
+| pyulog | PX4 — https://github.com/PX4/pyulog | BSD-3-Clause | active (tested 1.3.0) | `[dados]`: PX4 ULog flight logs in `acdt calib ingest`. ArduPilot `.bin` is **not** read in-process: its reference parser pymavlink is LGPL-3.0; convert out-of-process (`mavlogdump.py --format csv`) and ingest the CSV |
 | MCP Python SDK (`mcp`) | Model Context Protocol project — https://github.com/modelcontextprotocol/python-sdk | MIT | active (tested 2.3.0; v1 `FastMCP` API also supported) | `[ai]`: `acdt mcp` server (`acdt/ai/mcp_server.py`), stdio and streamable HTTP. Pulls in pydantic (MIT), anyio (MIT), starlette (BSD-3-Clause), uvicorn (BSD-3-Clause), sse-starlette (BSD-3-Clause) |
 
 ### Phase 5 shell FEM: why in-house

@@ -13,8 +13,8 @@ Formatos:
   (``V_m_s``, ``alpha_deg``); linhas começadas por ``#`` são comentários; células vazias → ``NaN`` (em falta);
 * **Parquet** (pandas + pyarrow, Apache-2.0, opcional): unidades pelo nome da coluna ou pelos metadados;
 * **PX4 ULog** (pyulog, BSD-3-Clause, opcional, no processo): canais ``tópico.campo``; o campo ``timestamp`` do
-  PX4 é em microssegundos (documentação uORB do PX4) e os restantes ficam com unidade não declarada salvo
-  declaração nos metadados. **ArduPilot .bin** não é lido aqui: o leitor de referência (pymavlink) é LGPL-3.0;
+  PX4 é em microssegundos (documentação uORB do PX4); os restantes pelo sufixo do nome (``_m_s``) ou ficam com
+  unidade não declarada, salvo declaração nos metadados. **ArduPilot .bin** não é lido aqui: o leitor de referência (pymavlink) é LGPL-3.0;
   converte-se fora do processo (``mavlogdump.py --format csv``) e ingere-se o CSV.
 
 Metadados: ficheiro ``<dados>.meta.yaml`` ao lado dos dados ou mapa passado a :func:`load`. Campos:
@@ -73,19 +73,19 @@ class Channel:
 
     def to(self, unit: str) -> Array:
         """Valores convertidos para ``unit`` (conversões afins, p. ex. °C → K, incluídas)."""
-        return _affine(self.unit, unit, self.name)(self.values)
+        return np.asarray(_affine(self.unit, unit, self.name)(self.values), dtype=float)
 
     def sd_to(self, unit: str) -> Array | None:
         s = self.sd()
         if s is None:
             return None
         f = _affine(self.unit, unit, self.name)
-        return np.abs(f(s) - f(np.zeros_like(s)))  # só a escala (o desvio da origem cancela)
+        return np.asarray(np.abs(f(s) - f(np.zeros_like(s))), dtype=float)  # só a escala (o desvio da origem cancela)
 
     def summary(self) -> dict[str, Any]:
         v = self.values[np.isfinite(self.values)]
         return {"unit": self.unit, "n": int(v.size), "n_missing": int(self.values.size - v.size),
-                "min": float(v.min()) if v.size else None, "max": float(v.max()) if v.size else None,
+                "min": float(np.min(v)) if v.size else None, "max": float(np.max(v)) if v.size else None,
                 "uncertainty": self.uncertainty}
 
 
@@ -265,11 +265,15 @@ def read_parquet(path: Path) -> dict[str, tuple[Array, str | None]]:
 
 def read_ulog(path: Path, topics: Iterable[str] | None = None) -> dict[str, tuple[Array, str | None]]:
     """PX4 ULog → canais ``tópico.campo`` (instância > 0: ``tópico_i.campo``). Tópicos diferentes têm bases de
-    tempo diferentes: cada canal só tem sentido com o ``timestamp`` do mesmo tópico (não se reamostra)."""
+    tempo diferentes: cada canal só tem sentido com o ``timestamp`` do mesmo tópico (não se reamostra). Unidade
+    pelo sufixo do nome do campo (``true_airspeed_m_s`` → m/s; a convenção uORB coincide com a do acdt); campos
+    sem sufixo reconhecido ficam com unidade não declarada."""
     try:
         from pyulog import ULog  # BSD-3-Clause
     except ImportError as e:
         raise IngestError("PX4 ULog precisa de pyulog (BSD-3-Clause; pip install 'acdt[dados]')") from e
+    from acdt.core.quantities import unit_from_key
+
     ul = ULog(str(path), list(topics) if topics else None)
     out: dict[str, tuple[Array, str | None]] = {}
     for d in ul.data_list:
@@ -279,7 +283,7 @@ def read_ulog(path: Path, topics: Iterable[str] | None = None) -> dict[str, tupl
                 v = np.asarray(arr, dtype=float)
             except (TypeError, ValueError):
                 continue
-            out[f"{base}.{fld}"] = (v, "us" if fld == "timestamp" else None)
+            out[f"{base}.{fld}"] = (v, "us" if fld == "timestamp" else unit_from_key(fld))
     return out
 
 
