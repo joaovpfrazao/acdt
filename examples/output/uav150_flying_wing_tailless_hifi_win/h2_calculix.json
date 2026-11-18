@@ -1,0 +1,229 @@
+{
+  "design": "uav150_flying_wing_tailless",
+  "date": "2026-11-18",
+  "solver": "CalculiX 2.23",
+  "linear_solver": "SPOOLES",
+  "host": {
+    "cpu": "i5-12400F",
+    "ram_livre_arranque_GB": 19.16,
+    "guarda_70_GB": 13.41,
+    "disco_livre_GB": 208.3,
+    "nos": 3558,
+    "mem_GB": 0.78033,
+    "tempo_estimado_min": 0.32022,
+    "fits_ram": true,
+    "budget": "cabe nesta máquina"
+  },
+  "sized": {
+    "converged": true,
+    "method": "buckling",
+    "material": "CFRP (UD caps / ±45 fabric — ASSUMPTION)",
+    "tc_root": 0.15,
+    "tc_tip": 0.12,
+    "box_mass_kg": 6.428730251878573,
+    "masses_kg": {
+      "caps": 0.3547161207331391,
+      "box_skins": 2.2118041792342895,
+      "core": 0.7884952360416357,
+      "webs": 0.2633544809297932,
+      "web_uprights": 0.0,
+      "LE_TE_skins": 1.4008093135150501,
+      "ribs": 0.12380487104895067,
+      "ideal": 5.142984201502858,
+      "nonoptimum": 1.2857460503757145,
+      "total": 6.428730251878573
+    },
+    "buckling_reserve": {},
+    "skin_RF": null,
+    "rib_RF": null,
+    "note": "Este é o caixão que o CalculiX malhou. buckling_reserve veio vazio. Os RF 1,00 e 1,36 da Fase 6 não foram copiados."
+  },
+  "wingbox_baseline_hold_section": {
+    "box_mass_kg": 5.884877387364975,
+    "optimized": false,
+    "reversal_surface": "elevon",
+    "buckling_reserve": null,
+    "x": {
+      "xf": 0.2,
+      "xr": 0.57,
+      "tc_root": 0.15,
+      "tc_tip": 0.12,
+      "camber": 0.04,
+      "twist_tip_deg": -10.0,
+      "rib_pitch_m": 0.4616769812461205,
+      "k_skin": 1.0
+    },
+    "V_div_m_s": 583.67528344044,
+    "V_rev": null,
+    "V_rev_note": "não cruza",
+    "V_F": null,
+    "V_F_note": "não cruza até 4 V_D",
+    "V_req_m_s": 58.1496063486542,
+    "elevon": {
+      "cf_c": 0.25,
+      "eta_inner": 0.2,
+      "eta_outer": 0.45,
+      "V_R": null,
+      "V_R_note": "não cruza",
+      "effectiveness_at_1_2_VD": 1.0157307273782934,
+      "method": "Wright & Cooper 2015 Ch. 9; Bisplinghoff, Ashley & Halfman 1955 Ch. 8; Glauert 1926 flap derivatives (sealed plain flap)"
+    },
+    "split_aileron": {
+      "cf_c": 0.4,
+      "eta_inner": 0.45,
+      "eta_outer": 0.98,
+      "V_R": null,
+      "V_R_note": "não cruza",
+      "effectiveness_at_1_2_VD": 1.009587494950843,
+      "yaw_effectiveness": "unassessed",
+      "pressuposto": "PRESSUPOSTO: o V_R e a eficácia são só o acoplamento de rolamento, com derivadas de flap liso. O split não é flap liso."
+    }
+  },
+  "phase6_published": {
+    "date": "2026-11-12",
+    "tc_root": 0.13,
+    "tc_tip": 0.1,
+    "box_mass_kg": 5.47,
+    "skin_RF": 1.0,
+    "rib_RF_inner": 1.0,
+    "rib_RF_tip": 1.36,
+    "elevon_effectiveness_at_1_2_VD": 1.088,
+    "same_quantity": false,
+    "note": "Estudo com hold_section e t/c 0,13/0,10. Em 14 nov o desenho passou a 0,15/0,12 e esse estudo de massas não foi repetido. Não é o caixão desta corrida nem a base de 5,885 kg."
+  },
+  "strip_sizing": {
+    "note": "aeroelastic_analysis com static_aerostructural false. Não é o elevon desenhado: usa a fracção de aileron por omissão.",
+    "V_D_m_s": 48.458005290545174,
+    "V_required_m_s": 58.1496063486542,
+    "V_div_m_s": 549.8833773198015,
+    "divergence_margin": 8.456355972950243,
+    "V_R": null,
+    "V_R_note": "não cruza",
+    "V_F": null,
+    "V_F_note": "não cruza até 4 V_D"
+  },
+  "fem": {
+    "wall_s": 7.639166355133057,
+    "tip_w_fem_m": 0.057858099999999996,
+    "tip_w_beam_m": 0.03301497826852123,
+    "tip_twist_fem_deg": -0.4829969677409608,
+    "tip_twist_beam_deg": 0.4302339749673124,
+    "twist_signs": "opostos",
+    "buckling_factors_ultimate": [0.8542045, 1.05899, 1.54348, 1.643272],
+    "frequencies_Hz": [20.96068, 60.08808, 70.78118, 89.90476, 139.531, 174.6651, 187.0741, 202.1486, 206.4402, 248.6286],
+    "mode_types": ["bending", "in-plane", "bending", "torsion", "bending", "torsion", "in-plane", "bending", "local", "torsion"],
+    "loads": {
+      "cm0_phase3": -0.09845922973432031,
+      "V0_fem_N": 3961.337509457435,
+      "V0_phase3_N": 3962.1271949926186,
+      "M0_fem_Nm": 3403.1434113050786,
+      "M0_phase3_Nm": 3405.2639939267647,
+      "T0_fem_Nm": 342.0680820135906,
+      "T0_phase3_Nm": 342.13147376685953
+    }
+  },
+  "flutter_dlm": {
+    "grid": "plana, sem flap",
+    "sweep": "estendido até 6 V_D porque não houve cruzamento de g = 0,03 até 2,5 V_D",
+    "V_F_g0_m_s": 279.7139161804796,
+    "V_F_g003_m_s": 284.5870142213441,
+    "V_required_m_s": 58.1496063486542,
+    "margin_g003": 3.894048852455051,
+    "ok": true,
+    "basis": "1.2 V_D, g ≤ 0.03 (AC 23.629-1B prática; verificar)",
+    "modes_used": ["bending", "bending", "torsion", "bending", "torsion", "bending", "torsion"],
+    "freqs_Hz": [20.96068, 70.78118, 89.90476, 139.531, 174.6651, 202.1486, 248.6286],
+    "strip_V_F": null,
+    "strip_V_F_note": "não cruza até 4 V_D"
+  },
+  "dlm_reversal": {
+    "status": "nao_avaliado",
+    "reason": "A malha DLM é a asa plana sem flap. Não há inversão de comando por DLM. O V_R das faixas não tapa essa lacuna."
+  },
+  "nlgeom": {
+    "status": "falhou",
+    "rc": 201,
+    "wall_s": 33.48128843307495,
+    "tip_w_fem_m": null,
+    "tip_twist_fem_deg": null,
+    "error": "too many cutbacks",
+    "increment_cut_to": 4.882813e-05,
+    "card": "*STEP, NLGEOM / *STATIC, SOLVER=SPOOLES",
+    "increment": {"initial": 0.2, "period": 1.0, "automatic": true},
+    "pressuposto": "PRESSUPOSTO: o incremento inicial é 0,2 do tempo de passo 1, com incremento automático. Não é um caminho de Riks.",
+    "tube_check": "Um tubo com 20 N na ponta converge com o mesmo cartão. A falha é a do caixão à carga última, não a do cartão.",
+    "linear_tip_kept_m": 0.057858099999999996
+  },
+  "riks": {
+    "status": "nao_avaliado",
+    "reason": "CalculiX 2.23 lista não-linearidade geométrica e encurvadura linear. Não lista Riks nem comprimento de arco. Não se escreveu esse cartão."
+  },
+  "calibration": {
+    "band": [0.2, 5.0],
+    "applied_to_example": false,
+    "note": "Só k_EI e k_GJ podem redimensionar a viga, e só se o yaml listar structures em assumptions.calibration.apply. Este exemplo não lista. Os outros factores ficam no relatório.",
+    "factors": {
+      "k_EI": {
+        "value": 0.5706198141404788,
+        "hifi": 0.057858099999999996,
+        "lowfi": 0.03301497826852123,
+        "valid": true,
+        "applied": false,
+        "what": "effective bending stiffness ratio = tip deflection beam(Phase 3 EI) / FEM"
+      },
+      "k_GJ": {
+        "value": -0.8907591635193328,
+        "hifi": -0.4829969677409608,
+        "lowfi": 0.4302339749673124,
+        "valid": false,
+        "invalid_reason": "non-positive ratio",
+        "applied": false,
+        "what": "effective torsional stiffness ratio = tip twist beam(Phase 3 Bredt GJ, torque about the mid-box) / FEM"
+      },
+      "k_sigma_cap": {
+        "value": 0.22922360462962965,
+        "hifi": -114.61180231481482,
+        "lowfi": 500.0,
+        "valid": true,
+        "applied": false,
+        "what": "spar-cap abs(σ) at ultimate / allowable (Phase 3 sizing target ≤ 1). Reportado. Não está em STRUCTURES_APPLIED."
+      },
+      "lambda_buckling": {
+        "value": 0.8542045,
+        "hifi": 0.8542045,
+        "lowfi": 1.0,
+        "valid": true,
+        "applied": false,
+        "what": "linear buckling eigenvalue at ultimate load (Phase 3 sized to 1.0). A razão cabe na banda. O primeiro valor próprio é inferior a 1. Não é o RF da pele da Fase 6 e não é aplicado."
+      },
+      "k_f_bending": {
+        "value": 0.7502638361875278,
+        "hifi": 20.96068,
+        "lowfi": 27.93774534903865,
+        "valid": true,
+        "applied": false,
+        "what": "1st bending frequency FEM / strip"
+      },
+      "k_f_torsion": {
+        "value": 0.9490422657386872,
+        "hifi": 89.90476,
+        "lowfi": 94.73209281150677,
+        "valid": true,
+        "applied": false,
+        "what": "1st torsion frequency FEM / strip"
+      },
+      "k_flutter": {
+        "value": null,
+        "hifi_m_s": 284.5870142213441,
+        "lowfi": null,
+        "valid": false,
+        "invalid_reason": "strip flutter speed is not finite; ratio not formed",
+        "applied": false,
+        "raw_run_value": 0.0,
+        "raw_run_note": "Nesta corrida o filtro dividiu a velocidade do DLM por uma velocidade de faixas não finita e gravou 0, com valid false e a razão não positiva. Esse 0 não é uma medição. O código deixa de formar a razão."
+      }
+    }
+  },
+  "decision": "nao_aplicar",
+  "decision_reason": "k_EI = 0,571 está dentro de [0,2, 5] e o filtro marca-o válido. O yaml não lista structures em assumptions.calibration.apply, por isso não entra no exemplo. k_GJ = -0,891 tem o sinal oposto e fica inválido; o sinal da torção não foi invertido. k_flutter não é uma razão finita: o DLM cruza a 284,6 m/s (g = 0,03) e as faixas não cruzam até 4 V_D. O 0 escrito na corrida é a divisão por infinito, não um factor. O primeiro valor próprio de encurvadura linear é 0,854, abaixo de 1, e não é o RF 1,00 da pele do estudo de 12 nov. O NLGEOM à carga última acabou com o código 201, sem flecha. Riks e a inversão de comando por DLM ficam nao_avaliado. O exemplo não muda."
+}

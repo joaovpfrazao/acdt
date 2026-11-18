@@ -210,3 +210,11 @@ Alley 2007.
   corresponde a um bordo de fuga recto. δ positivo sobe o CL nos dois. O momento de charneira a −10°
   não tem o mesmo sinal que o HM do AVL por lado. Nenhum factor entra: uma malha, um α, sem GCI.
   Os atuadores não mudam. Números em `h1_controlos_grossa.json`.
+* **CalculiX (18 nov 2026)**. O caixão do dimensionamento actual, t/c 0,15/0,12, pesa 6,429 kg.
+  A flecha de ponta do FEM é 0,05786 m e a da viga 0,03301 m (k_EI = 0,571, dentro da banda e por
+  aplicar: o exemplo não liga o grupo). A torção muda de sinal (−0,483° no FEM, +0,430° na viga) e
+  k_GJ fica inválido. O primeiro factor de encurvadura linear à carga última é 0,854. Os 5,47 kg e o
+  RF 1,00 da pele são o estudo de 12 nov, com outro t/c, e não entram nesta comparação. O DLM cruza
+  a 285 m/s; o modelo de faixas não cruza. Não há factor de flutter. A inversão por DLM fica por
+  avaliar, porque a grelha não tem flap. O NLGEOM do caixão não convergiu e o Riks não foi escrito.
+  Nenhum factor entra no exemplo. Números em `h2_calculix.json`.

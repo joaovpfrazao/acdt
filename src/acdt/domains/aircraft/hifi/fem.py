@@ -487,6 +487,15 @@ def write_deck(mesh: BoxMesh, path: Path, step: str, loads: dict | None = None, 
     elif step == "frequency":
         L.append(f"*STEP\n*FREQUENCY\n{n_modes}\n")
         L.append("*NODE PRINT, NSET=L_F_MID\nU\n*NODE PRINT, NSET=L_R_MID\nU\n*NODE FILE\nU\n*END STEP\n")
+    elif step == "nlgeom":
+        # Geometric nonlinearity is *STEP, NLGEOM plus *STATIC (CalculiX User's Manual).
+        # Version 2.23 lists that procedure and linear *BUCKLE. It does not list a Riks
+        # or arc-length procedure, so this deck does not write one.
+        L.append("*STEP, NLGEOM\n*STATIC, SOLVER=SPOOLES\n0.2, 1.\n*CLOAD\n"
+                 + "".join(f"{n + 1}, 3, {F:.6e}\n" for n, F in loads.items()))
+        L.append("*NODE PRINT, NSET=L_F_UP\nU\n*NODE PRINT, NSET=L_R_UP\nU\n*END STEP\n")
+    else:
+        raise ValueError(f"unknown CalculiX step {step!r}")
     path.write_text("".join(L))
     return path
 
@@ -700,6 +709,75 @@ def run_box_fem(res, work: str | Path, ds: float | None = None, force: bool = Fa
             "lambda_ult = lambda_solver/scale")
     (work / "fem_results.json").write_text(json.dumps(out, indent=1, default=float))
     return out
+
+
+def run_nlgeom(res, work: str | Path, ds: float | None = None, timeout: float = 7200) -> dict:
+    """Same box and the same ultimate loads, with geometric nonlinearity.
+
+    The card is ``*STEP, NLGEOM`` and ``*STATIC, SOLVER=SPOOLES`` with an initial increment
+    of 0.2 over a step time of 1 (automatic). CalculiX stays a separate process.
+    Riks is not a procedure of CalculiX 2.23: the capability overview lists geometric
+    nonlinearity and linear buckling, and it does not list arc-length. That comparison
+    is ``nao_avaliado``. A missing pressure or a failed solve is not a zero deflection.
+    """
+    ccx = tools.find_exe("ccx")
+    if ccx is None:
+        raise ToolNotAvailable("CalculiX 'ccx' not found ($ACDT_HIFI_BIN or PATH)")
+    work = Path(work)
+    work.mkdir(parents=True, exist_ok=True)
+    mesh = build_box_mesh(res, ds)
+    loads, linfo = nodal_loads(res, mesh)
+    write_deck(mesh, work / "box_nlgeom.inp", "nlgeom", loads)
+    env = {"OMP_NUM_THREADS": str(min(8, tools.cores()))}
+    t0 = time.time()
+    rc = tools.run([ccx, "box_nlgeom"], work, "box_nlgeom.log", env=env, timeout=timeout)
+    tip = _tip_deflection(mesh, work / "box_nlgeom.dat")
+    out = {
+        "rc": rc,
+        "wall_s": time.time() - t0,
+        "loads": linfo,
+        "tip_w_fem_m": tip[0] if tip else None,
+        "tip_twist_fem_deg": tip[1] if tip else None,
+        "increment": {"initial": 0.2, "period": 1.0, "automatic": True},
+        "card": "*STEP, NLGEOM / *STATIC, SOLVER=SPOOLES",
+        "riks": {
+            "status": "nao_avaliado",
+            "reason": (
+                "CalculiX 2.23 lista não-linearidade geométrica e encurvadura linear. "
+                "Não lista Riks nem comprimento de arco. Não se escreveu esse cartão."
+            ),
+        },
+        "pressuposto": (
+            "PRESSUPOSTO: o incremento inicial é 0,2 do tempo de passo 1, com incremento automático. "
+            "Não é um caminho de Riks."
+        ),
+    }
+    if rc != 0 or tip is None:
+        out["status"] = "falhou" if rc != 0 else "sem_deslocamento"
+        out["tip_w_fem_m"] = None
+        out["tip_twist_fem_deg"] = None
+    else:
+        out["status"] = "ok"
+    (work / "nlgeom.json").write_text(json.dumps(out, indent=1, default=float))
+    return out
+
+
+def _tip_deflection(mesh: BoxMesh, dat: Path):
+    if not dat.exists():
+        return None
+    blocks = parse_dat_blocks(dat)
+    U = {}
+    for head, rows in blocks:
+        if head.startswith("displacements"):
+            for row in rows:
+                U[int(row[0]) - 1] = row[1:4]
+    jt = len(mesh.y) - 1
+    fu, ru = mesh.spar_lines["f_up"][jt], mesh.spar_lines["r_up"][jt]
+    if fu not in U or ru not in U:
+        return None
+    wt = 0.5 * (U[fu][2] + U[ru][2])
+    th = math.degrees(math.atan2(U[fu][2] - U[ru][2], mesh.x_r[jt] - mesh.x_f[jt]))
+    return float(wt), float(th)
 
 
 def _post(res, mesh: BoxMesh, work: Path, loads: dict) -> dict:
