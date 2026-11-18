@@ -24,6 +24,7 @@ ficam marcados como **PRESSUPOSTO**; desconhecido nunca é zero e "não avaliado
 | gelo: envelopes 14 CFR 25 Ap. C, captação, rime/glaze, espessura, potência de proteção | [Gelo](GELO.md) |
 | fiabilidade de missão, MTBF/MTBCF, disponibilidades, MMH/FH, sobressalentes, frota (MIL-HDBK-338B) | [Fiabilidade](FIABILIDADE.md) |
 | custo de série: CER em função de N, RDT&E vs produção, aprendizagem Wright/Crawford, ponto de equilíbrio | [Custo de série](CUSTO_SERIE.md) |
+| ciclo de vida: LCC em valor presente (NIST HB 135), custo por FH, CO₂e de combustível, rede e baterias | [Ciclo de vida](CICLO_VIDA.md) |
 | CI, mypy, tolerâncias | [Qualidade](QUALIDADE.md) |
 
 O que o acdt faz, área a área, está em

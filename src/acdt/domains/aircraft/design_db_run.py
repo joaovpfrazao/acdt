@@ -54,6 +54,10 @@ SECTION_MAP: dict[str, tuple[str, str, str, str]] = {
     "series_cost": ("custo_serie", "L0", "custo de série: Eastlake modificado (Gudmundsson 2014 Cap. 2) / DAPCA IV "
                     "(Raymer 2018 Cap. 18) em função de N, aprendizagem Wright 1936 / Crawford 1944 (FAA Pricing "
                     "Handbook 1998 Cap. 18)", "CAPABILITIES §32v"),
+    "life_cycle": ("ciclo_vida", "L0", "ciclo de vida: LCC RDT&E + produção + O&S + abate (OSD CAPE 2020 §2.1) em "
+                   "valor presente (NIST Handbook 135 Eq. 5.1), CO₂ da combustão (ICAO Anexo 16 Vol. IV) e do ciclo "
+                   "de vida do combustível (CORSIA), rede declarada, baterias (IVL C 444, opcional)",
+                   "CAPABILITIES §32w"),
     "systems": ("sistemas", "L0", "seleção de sistemas (hélice, motor, bateria, servos)", "CAPABILITIES §12"),
 }
 # metadados, listas de mensagens e históricos: ficam no result.json (referenciado pelo SHA-256)

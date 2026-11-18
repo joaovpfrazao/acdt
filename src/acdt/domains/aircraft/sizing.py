@@ -92,6 +92,7 @@ class DesignResult:
     icing_coupling: dict | None = None    # icing.size_with_icing (acoplamento iterar)
     reliability: dict | None = None       # reliability.analyse_reliability (disciplina fiabilidade, L0)
     series_cost: dict | None = None       # series_cost.analyse_series_cost (disciplina custo_serie, L0)
+    life_cycle: dict | None = None        # life_cycle.analyse_life_cycle (disciplina ciclo_vida, L0)
     structures_l1: object | None = None   # structures_l1.StructuresL1 (masses, deflections, elastic correction)
     launch_recovery: dict | None = None   # opt-in catapult / belly landing (launch_recovery.py)
     gear_drag: dict | None = None         # opt-in gear drag in the polar (aero/gear_drag.py)
@@ -225,6 +226,14 @@ def _chk_reliability(r, res):
 @register_handler("check", "break_even_quantity")
 def _chk_series_cost(r, res):
     return CheckResult(r.key, None, "avaliado na etapa de custo de série (verificação: custo_serie:…)")
+
+
+@register_handler("check", "life_cycle_cost")
+@register_handler("check", "life_cycle_cost_per_fh")
+@register_handler("check", "co2e_per_flight_hour")
+@register_handler("check", "life_cycle_co2e")
+def _chk_life_cycle(r, res):
+    return CheckResult(r.key, None, "avaliado na etapa de ciclo de vida (verificação: ciclo_vida:…)")
 
 
 @register_handler("check", "noise")

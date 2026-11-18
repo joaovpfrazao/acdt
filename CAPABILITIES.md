@@ -1841,6 +1841,30 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   automaticamente do plano de fabrico e não há curvas com degraus. Pormenor em
   [docs/CUSTO_SERIE.md](docs/CUSTO_SERIE.md).
 
+## 32w. Custo do ciclo de vida e CO₂e — L0 (18 nov 2026)
+
+* **O que faz**: etapa `life_cycle` do pipeline (depois de `series_cost`; só corre se pedida) e
+  `acdt.api.life_cycle_cost` / `life_cycle_emissions` / `present_value`. LCC = RDT&E + produção + O&S + abate −
+  residual, com calendário (RDT&E, entregas, vida útil), em dólares constantes e em valor presente à taxa real
+  declarada; custo por hora de voo e por missão; CO₂ de combustão, CO₂e do poço à esteira, eletricidade da rede e
+  fabrico de baterias, por FH, por missão, por aeronave e da frota.
+* **Métodos**: OSD CAPE O&S Cost-Estimating Guide (2020) §2.1 (categorias); NIST Handbook 135 (1995) Eq. 5.1,
+  Tabela 3-1, Eq. 3.6–3.13 (SPV, UPV, UPV*, taxas real/nominal); ICAO Anexo 16 Vol. IV Parte II Cap. 2 (FCF 3,16/3,10);
+  CORSIA LC 89/95 gCO₂e/MJ; IVL C 444 (2019) 61–106 kg CO₂e/kWh para baterias NMC.
+* **PRESSUPOSTOS**: calendário uniforme; residual 0 por omissão; frota = quantidade de série; combustível/FH e
+  energia/FH a partir do dimensionamento (majorantes); PCI mínimo da norma; fator IVL (veículos) aplicado à
+  aeronave. A intensidade da rede não tem valor por omissão: é sempre declarada.
+* **Completude**: custo desconhecido → majorante desconhecido (nunca zero); sem taxa → VP desconhecido; sem
+  rendimento de carga → só minorante da eletricidade; sem fator de bateria → fabrico desconhecido.
+* **Integração**: secção `life_cycle`; disciplina `ciclo_vida`/L0 no `design.json`; requisitos `life_cycle_cost`,
+  `life_cycle_cost_per_fh`, `co2e_per_flight_hour`, `life_cycle_co2e`; avaliador `ciclo_vida:`; métricas UQ/MDO
+  pelos caminhos `life_cycle.*`; reutiliza `series_cost`, `reliability.operating_cost` e
+  `manufacturing.costing.operating_cost` (depreciação retirada); API 1.7.0.
+* **V&V**: `LCC-NIST135-FACTORS`, `LCC-NIST135-RATES`, `LCC-NIST135-EX51A`, `LCA-CORSIA-FCF` — todos passam.
+* **Validado**: `tests/test_life_cycle.py`.
+* **Limites**: sem fabrico da estrutura/motores, fim de vida nem efeitos não-CO₂. Pormenor em
+  [docs/CICLO_VIDA.md](docs/CICLO_VIDA.md).
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.
@@ -1947,7 +1971,7 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 12 | BAIXA (L0 feito 18 nov 2026, §32r) | **Ruído** | ruído de hélice para certificação e aceitação (UAV urbano) | feito: Gutin, Schlegel-King-Mull, ISO 9613-1, IEC 61672-1, ISO 226, Parte 36 Ap. G; falta Hanson, espessura, motor, ICAO Anexo 16 |
 | 13 | BAIXA (L0/L1 feito 18 nov 2026, §32t) | **Gelo** | penalização aerodinâmica e necessidade de proteção | feito: 14 CFR 25 Ap. C (Jeck), Langmuir & Blodgett, Messinger (Anderson), potência de proteção, penalização em intervalo (Broeren); falta Ap. O (SLD), gelo de retorno, formas de gelo (LEWICE só como referência externa) |
 | 14 | BAIXA (L0/L1 feito 18 nov 2026, §32s) | **Gestão térmica** de aviónica e baterias | temperatura de células e eletrónica; dimensionamento de arrefecimento | feito: parâmetros concentrados (Incropera), MIL-HDBK-310, entradas NACA; falta modelo térmico de Bernardi (baterias), permutadores líquidos |
-| 15 | BAIXA | **Custo do ciclo de vida, carbono e LCA** | custo total de posse e pegada (fabrico, operação, fim de vida) | LCC (Roskam VIII, a verificar); ISO 14040/44; fatores de emissão de bases públicas |
+| 15 | ~~BAIXA~~ L0 feito (§32w) | **Custo do ciclo de vida, carbono e LCA** | custo total de posse e pegada (fabrico, operação, fim de vida) | feito: OSD CAPE 2020, NIST HB 135, ICAO Anexo 16 Vol. IV/CORSIA, IVL C 444; falta: fabrico da estrutura, fim de vida, ISO 14040/44 completa |
 | 16 | BAIXA | **Cadeia de abastecimento / BOM com preços em direto** | L2 do custo alimentado por preços atuais de distribuidores | pesquisa da IA com proveniência (já é a regra) + cache datada de cotações |
 | 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |
 | 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |

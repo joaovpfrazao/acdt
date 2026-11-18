@@ -78,6 +78,10 @@ Corrida de 17 nov 2026 no box Linux (`acdt vv --cost medio`): **22 passa, 0 falh
 | CS-FAA18-SLOPE | custo_serie | verificação | barato | FAA Pricing Handbook (1998) Cap. 18 Eq. 18-4: S = 0,9 → b = −0,15200; 2 unidades 190 (unitária) vs 180 (média acumulada) | 5×10⁻⁵; exato |
 | CS-FAA18-CUMAV-LOT | custo_serie | verificação | barato | idem Caso 18-2: média acumulada 103,45 X^−0,04, lote 11–15 = 449 h (Eq. 18-7) | 1 h |
 | CS-FAA18-UNIT-APPROX | custo_serie | verificação | barato | idem Caso 18-2: unitária 102,73 X^−0,15, lote 1–2 ≈ 196 h (Eq. 18-9), lote 11–15 ≈ 350 h (Eq. 18-10 e soma exata) | 0,5 h |
+| LCC-NIST135-FACTORS | ciclo_vida | verificação | barato | NIST Handbook 135 (1995) Tabela 3-1 e Eq. 3.6–3.9: SPV(3 %, 15) 0,642; UPV 11,94; UPV*(2 %, 3 %, 15) 13,89; 862,61 $; 457,97 $; 485,62 $ | meio da última casa impressa |
+| LCC-NIST135-RATES | ciclo_vida | verificação | barato | idem Eq. 3.12/3.14: d = 0,02885 (D 7 %, I 4 %); D = 0,0712 (d 3 %, I 4 %) | 5×10⁻⁶; 5×10⁻⁵ |
+| LCC-NIST135-EX51A | ciclo_vida | verificação | barato | idem Exemplo 5-1a: LCC 516 233 $ | 10⁻⁴ rel. (fatores impressos arredondados) |
+| LCA-CORSIA-FCF | ciclo_vida | verificação | barato | ICAO Anexo 16 Vol. IV Parte II Cap. 2: 1 t Jet-A → 3160 kg CO₂; 1 t AvGas → 3100 kg | exato |
 | FIAB-338B-PARALLEL-MTBF | fiabilidade | verificação | barato | idem §7.5.5 e Fig. 7.5-9: +50 % de MTBF com o 1.º redundante, ΔM₃ = 0,33 (MTTF por integração do RBD, Eq. 5.73) | 10⁻⁶ rel.; 5×10⁻³ |
 | SIZ-C172S | dimensionamento | **validação** | médio | Cessna 172S Information Manual (1998): MTOW 1157 kg, vazio 754 kg, 134 kW, 16,2 m², 71,4 kg/m² | ±15 % massas, ±25 % resto (método conceptual) |
 

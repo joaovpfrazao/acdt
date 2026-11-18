@@ -25,7 +25,7 @@ from acdt import __version__
 from ._deprecation import DEPRECATED, ACDTDeprecationWarning, deprecated
 
 #: Versão semântica da API pública (independente da versão do pacote, :data:`acdt.__version__`).
-API_VERSION = "1.6.0"
+API_VERSION = "1.7.0"
 
 #: Níveis de fidelidade aceites por :func:`size`/:func:`analyse` (``None`` = o que a missão declara).
 LEVELS: dict[str, str] = {"L0": "handbook", "L1": "lowfi"}
@@ -52,6 +52,8 @@ __all__ = [
     "reliability", "availability", "spares_stock",
     # custo de produção em série (L0): CER em função de N, curvas de aprendizagem, ponto de equilíbrio
     "series_cost", "learning_curve",
+    # custo do ciclo de vida e pegada ambiental L0
+    "life_cycle_cost", "life_cycle_emissions", "present_value",
     # erros
     "errors",
 ]
@@ -660,3 +662,30 @@ def learning_curve(T1: float, slope: float, first: int = 1, last: int = 1, *, th
     return {"b": learning_b(slope), "lot_total": tot, "lot_average": tot / (last - first + 1), "unit_last": unit,
             "lot_midpoint": lot_midpoint(first, last, slope),
             "source": "Wright (1936); Crawford (1944); FAA Pricing Handbook (1998) Cap. 18"}
+
+
+def life_cycle_cost(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Custo do ciclo de vida de um programa (desde 1.7.0; docs/CICLO_VIDA.md): RDT&E + produção + O&S + abate −
+    residual (OSD CAPE 2020 §2.1) com calendário (RDT&E, entregas, vida útil), em dólares constantes e em valor
+    presente à taxa real declarada (NIST Handbook 135 Eq. 5.1); custo por hora de voo e por missão. Entradas em
+    valor ou ``{lo, hi}``; custo desconhecido → majorante ``None``."""
+    from acdt.core.lcc.lcc import analyse
+
+    return analyse(spec)
+
+
+def life_cycle_emissions(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """CO₂/CO₂e L0 (desde 1.7.0): combustão (ICAO Anexo 16 Vol. IV: 3,16/3,10 kg CO₂/kg), ciclo de vida do
+    combustível (CORSIA LC 89/95 gCO₂e/MJ), eletricidade (intensidade da rede declarada) e fabrico de baterias
+    (``ivl_c444_2019`` ou intervalo com fonte); o que faltar fica desconhecido."""
+    from acdt.core.lcc.environment import analyse
+
+    return analyse(spec)
+
+
+def present_value(items: Sequence[Mapping[str, Any]], discount_rate: float) -> float:
+    """Valor presente de fluxos (desde 1.7.0; NIST Handbook 135 Eq. 5.1): ``{amount, year}``, ``{amount, annual:
+    [t1, t2], escalation}`` ou ``{amount, factor}``."""
+    from acdt.core.lcc.lcc import present_value as pv
+
+    return pv(list(items), float(discount_rate))

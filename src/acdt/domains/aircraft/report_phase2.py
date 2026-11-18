@@ -61,6 +61,8 @@ def phase2_dict(res) -> dict:
         d["reliability"] = res.reliability
     if getattr(res, "series_cost", None) is not None:
         d["series_cost"] = res.series_cost
+    if getattr(res, "life_cycle", None) is not None:
+        d["life_cycle"] = res.life_cycle
     d["verified_segment_mission"] = res.verified
     return _jsonable(d)
 
