@@ -271,7 +271,7 @@ Nada disto entra em `main` por esta sessão. O histórico público começa em `d
 5. #5 `h6-rcs-bounces2` sobre `h5-c172-gci`. Duas reflexões, VV −7,49 dBsm. Onda completa por correr. `nao_aplicar`.
 6. #6 `h7-openvsp` sobre `h6-rcs-bounces2`. VSPAERO fino, CL 0,49394 contra AVL 0,50293. `nao_aplicar`.
 7. #7 `h8-pycycle` sobre `h7-openvsp`. TSFC 0,79852 contra 0,400 da correlação L0. `nao_aplicar`.
-8. `h8-cadeia-publica` sobre `h8-pycycle`. Actualiza esta lista para os PRs públicos. Não muda números nem decisões.
+8. #8 `h8-cadeia-publica` sobre `h8-pycycle`. Actualiza esta lista para os PRs públicos. Não muda números nem decisões.
 
 O que fica para o João: o instalador OpenVSP no Windows; o visor do VSPAERO no contentor; uma instalação de pyCycle que resolva o turbojato sem o ajuste local de `ThermoAdd`; a onda completa do RCS, só como proposta; o RANS de asa e fuselagem do C172, que não coube; o painel grosso do VSPAERO, que morre na esteira; um deck L1 de motor, que não existe. Nenhum factor foi aplicado e o yaml dos exemplos não mudou. Os ficheiros pesados que já estavam fora do git continuam fora.
 
