@@ -1,0 +1,106 @@
+{
+  "design": "uav150_flying_wing_tailless",
+  "date": "2026-11-18",
+  "frequency_Hz": 10000000000,
+  "method": "PO, Gordon 1975; Knott, Shaeffer e Tuley 1993, cap. 5; segunda reflexão Ling, Chou e Lee, IEEE TAP 37(2) 1989",
+  "occlusion": true,
+  "n_sub_max": 12,
+  "sector": {
+    "az_deg": [
+      -30,
+      30
+    ],
+    "daz_deg": 0.5,
+    "el_deg": [
+      -5,
+      0,
+      5
+    ],
+    "pol": [
+      "VV",
+      "HH"
+    ]
+  },
+  "geometry": {
+    "loft": "scaled_wing",
+    "twist_tip_deg": -10.0,
+    "tc_root": 0.15,
+    "tc_tip": 0.12,
+    "mean_line": false,
+    "tip_te_above_le_m": 0.07207238641794836,
+    "tip_nose_up_deg": -9.993845710466825,
+    "n_sections": 2,
+    "fine": 1,
+    "n_facets": 192,
+    "both_sides": true,
+    "scale_k": 1.153614783048992,
+    "S_m2": 3.186,
+    "note": "Uma baía em envergadura de cada lado. Não é uma convergência de malha do RCS."
+  },
+  "host": {
+    "ram_available_GB": 19.58,
+    "ram_estimate_GB": 0.05,
+    "disk_free_GB": 198.2,
+    "probe_estimate_min": 1.62
+  },
+  "wall_s": {
+    "bounces_1": 1.1676979064941406,
+    "bounces_2": 136.41345310211182
+  },
+  "nose_az0_el0_VV_dbsm": {
+    "bounces_1": -41.12574689417581,
+    "bounces_2": -18.54560686584488
+  },
+  "bounces_1": {
+    "VV": {
+      "mean_m2": 0.0992908401156832,
+      "mean_dbsm": -10.03090814653696,
+      "median_dbsm": -34.94936207785981,
+      "max_dbsm": 8.237835644183084,
+      "n": 363
+    },
+    "HH": {
+      "mean_m2": 0.09929084011568319,
+      "mean_dbsm": -10.030908146536962,
+      "median_dbsm": -34.94936207785981,
+      "max_dbsm": 8.237835644183084,
+      "n": 363
+    }
+  },
+  "bounces_2": {
+    "VV": {
+      "mean_m2": 0.17819907165663296,
+      "mean_dbsm": -7.490945627876502,
+      "median_dbsm": -14.646513910428446,
+      "max_dbsm": 8.058724972815517,
+      "n": 363
+    },
+    "HH": {
+      "mean_m2": 0.10650111580809021,
+      "mean_dbsm": -9.726458421148404,
+      "median_dbsm": -25.155123528726154,
+      "max_dbsm": 8.367214073248313,
+      "n": 363
+    }
+  },
+  "delta_mean_dbsm": {
+    "VV": 2.5399625186604586,
+    "HH": 0.3044497253885581
+  },
+  "unassessed": [
+    "fuselage",
+    "tip_fins",
+    "landing_gear",
+    "propeller",
+    "control_deflection",
+    "edge_diffraction"
+  ],
+  "full_wave": {
+    "status": "proposta",
+    "ran": false,
+    "candidates": "MoM/MLFMM ou FDTD",
+    "reason": "O processo acdt não tem um solver de onda completa. O PO não o substitui."
+  },
+  "decision": "nao_aplicar",
+  "decision_reason": "As duas contagens de reflexão são o mesmo PO, na mesma malha, com a torção corrigida. Não há RCS medido. A malha tem uma baía em envergadura. A onda completa não correu. O exemplo não muda."
+}
