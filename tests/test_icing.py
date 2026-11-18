@@ -221,6 +221,23 @@ def test_icing_stage_in_pipeline_requirements_and_coupling():
     ic2 = st2["result"].icing
     loop = ic2["coupling_loop"]
     assert loop["converged"] and loop["history"][0]["power_W"] > 0 and loop["history"][0]["mass_kg"] == 0.3
+    assert 0.0 < loop["history"][0]["duty"] <= 1.0  # ciclo = fração da missão em gelo (ou 1, conservador)
     assert st2["result"].sizing.W0 > W0
     rows2 = {r["id"]: r for r in st2["verification"]["rows"]}
     assert rows2["IC-03"]["status"] in ("passa", "falha")
+
+
+def test_exposure_duty_fraction_and_conservative_fallback():
+    """Ciclo da carga de proteção: fração da missão em segmentos dentro do envelope (majorante da exposição); sem
+    durações, ou com power_schedule: missao, toda a missão (majorante conservador)."""
+    from acdt.domains.aircraft.icing import exposure_duty
+
+    out = {"conditions": {"subida": {"duration_s": 600.0}, "cruzeiro": {"duration_s": 3000.0},
+                          "descida": {"duration_s": 400.0}},
+           "exposure_s": {"lo": 300.0, "hi": 1000.0}}
+    f, note = exposure_duty(out)
+    assert f == pytest.approx(1000.0 / 4000.0) and "envelope" in note
+    assert exposure_duty(out, "missao")[0] == 1.0
+    out["conditions"]["descida"]["duration_s"] = None
+    assert exposure_duty(out)[0] == 1.0
+    assert exposure_duty({"conditions": {}, "exposure_s": {"hi": 0.0}})[0] == 1.0
