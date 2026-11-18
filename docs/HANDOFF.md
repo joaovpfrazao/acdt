@@ -279,11 +279,11 @@ O que fica para o João, no `main` antes destes PR: o instalador OpenVSP no Wind
 
 ### Estado das cinco tarefas (18 nov 2026)
 
-Nenhum PR abaixo foi integrado. Este ramo não contém o código dos outros quatro.
+O PR #23 está no `main` (`5c58b68`). Os outros quatro continuam abertos. Este ramo não contém o código dos outros quatro e não os integra.
 
-1. PR #23, `win-openvsp-esteira`, aberto. O OpenVSP 3.56 no Windows correu o painel grosso com a esteira nos defaults lidos de volta. O AVL não fica validado nem calibrado. `nao_aplicar`. Não está bloqueado; fica por rever.
+1. PR #23, `win-openvsp-esteira`, integrado. O OpenVSP 3.56 no Windows correu o painel grosso com a esteira nos defaults lidos de volta. O AVL não fica validado nem calibrado. `nao_aplicar`. Não está bloqueado.
 2. PR #24, `pycycle-sem-ajuste`, aberto. OpenMDAO 3.41.0 e NumPy 1.26.4 resolvem o turbojato publicado sem o ajuste de `ThermoAdd`. O gráfico final falhou depois da impressão. O L0 fica `nao_aplicar` (outra classe de motor). O L1 fica `nao_avaliado`: o deck não existe e os campos em falta estão no JSON desse PR. Não está bloqueado por solver; o deck é que continua ausente.
-3. PR #25, `c172-rans-asa-fuselagem`, aberto e bloqueado. 21,731 GB e 40,24 h, com 16,32 GB livres e limite 11,42 GB, e 2415 min contra 45 min. O solver não arrancou. A malha não foi engrossada. O L1 fica `nao_avaliado`. `nao_aplicar`.
+3. PR #25, `c172-rans-asa-fuselagem`, aberto e bloqueado. A fórmula já registada dá 21,731 GB e 40,24 h, com 2415 min contra 45 min. Na primeira medição havia 16,32 GB livres e o limite era 11,42 GB. Nova leitura de `Win32_OperatingSystem`: 16,34 GB livres de 31,86 GB, limite 11,44 GB. A fórmula não foi refeita. O solver não arrancou. A malha não foi engrossada. O L1 fica `nao_avaliado`. `nao_aplicar`.
 4. PR #26, `termico-gelo-proposta`, aberto. Só proposta: sem sólido da baía, sem malha de acreção e sem corrida. O L0 e o L1 ficam `nao_avaliado`. `nao_aplicar`.
 5. PR #27, `rcs-onda-completa-proposta`, aberto. Só proposta. O openEMS (GPL-3.0, processo separado) não arrancou. Sem caixa de cálculo, as células ficam em falta. O PO não é onda completa. `nao_avaliado`. `nao_aplicar`.
 

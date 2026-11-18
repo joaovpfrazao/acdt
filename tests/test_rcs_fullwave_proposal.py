@@ -35,7 +35,12 @@ def test_full_wave_is_missing_and_po_is_not_a_pass():
     assert measured["lower_level"] is None
     tasks = task_status()
     assert [item["pr"] for item in tasks] == [23, 24, 25, 26, 27]
-    assert all(item["merged"] is False for item in tasks)
+    assert tasks[0]["merged"] is True
+    assert tasks[0]["state"] == "integrado"
+    assert tasks[0]["blocked"] is None
+    assert all(item["merged"] is False for item in tasks[1:])
+    assert all(item["state"] == "aberto" for item in tasks[1:])
+    assert tasks[2]["blocked"]
     assert tasks[4]["blocked"]
 
 
@@ -73,6 +78,7 @@ def test_written_record_stays_relative_and_matches_the_proposal():
     assert data["cost"]["ram_GB"] is None
     assert data["comparison"]["overall"] == body["comparison"]["overall"]
     assert data["comparison"]["model_L1"] == "nao_avaliado"
+    assert data["tarefas"] == task_status()
     assert data["lower_level"]["source"].startswith("examples/")
     assert (
         data["lower_level"]["vv_mean_dbsm_two_bounces"]

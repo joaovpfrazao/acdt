@@ -133,14 +133,14 @@ def proposal(root: Path | None = None) -> dict:
 
 
 def task_status() -> list[dict]:
-    """Open pull requests of this effort. None of them is merged."""
+    """State of the five efforts. PR #23 is on main; the other four stay open."""
     return [
         {
             "task": 1,
             "pr": 23,
             "branch": "win-openvsp-esteira",
-            "state": "aberto",
-            "merged": False,
+            "state": "integrado",
+            "merged": True,
             "verdict": "nao_aplicar",
             "model": "L1 AVL nao_avaliado como validação: nao_aplicar, sem calibração",
             "blocked": None,
@@ -164,8 +164,9 @@ def task_status() -> list[dict]:
             "verdict": "nao_aplicar",
             "model": "L1 nao_avaliado",
             "blocked": (
-                "21,731 GB e 40,24 h. Na medição havia 16,32 GB livres, limite 11,42 GB, "
-                "e 2415 min contra 45 min. Não se engrossou a malha."
+                "21,731 GB e 40,24 h. Na primeira medição havia 16,32 GB livres, limite 11,42 GB, "
+                "e 2415 min contra 45 min. Nova leitura: 16,34 GB livres de 31,86 GB, limite 11,44 GB. "
+                "O solver não arrancou. Não se engrossou a malha."
             ),
         },
         {
