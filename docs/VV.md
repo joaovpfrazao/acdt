@@ -75,6 +75,9 @@ Corrida de 17 nov 2026 no box Linux (`acdt vv --cost medio`): **22 passa, 0 falh
 | FIAB-338B-AAV-EX4 | fiabilidade | verificação | barato | idem §10.4.1.2 Ex. 4: A_AV(1 h) = 0,9972 (Eq. 10.24) | 5×10⁻⁵ |
 | FIAB-338B-POISSON-5381 | fiabilidade | verificação | barato | idem §5.3.8.1 (projetor, Eq. 5.58): R(500 h) com 2 reservas 0,986; stock para 98 % = 2 | 5×10⁻⁴; inteiro exato |
 | FIAB-338B-EQ630 | fiabilidade | verificação | barato | idem §6.4.4.2.1.3, Eq. 6.30 (estrutura não série-paralelo): P_S = 0,13572 | 5×10⁻⁶ |
+| CS-FAA18-SLOPE | custo_serie | verificação | barato | FAA Pricing Handbook (1998) Cap. 18 Eq. 18-4: S = 0,9 → b = −0,15200; 2 unidades 190 (unitária) vs 180 (média acumulada) | 5×10⁻⁵; exato |
+| CS-FAA18-CUMAV-LOT | custo_serie | verificação | barato | idem Caso 18-2: média acumulada 103,45 X^−0,04, lote 11–15 = 449 h (Eq. 18-7) | 1 h |
+| CS-FAA18-UNIT-APPROX | custo_serie | verificação | barato | idem Caso 18-2: unitária 102,73 X^−0,15, lote 1–2 ≈ 196 h (Eq. 18-9), lote 11–15 ≈ 350 h (Eq. 18-10 e soma exata) | 0,5 h |
 | FIAB-338B-PARALLEL-MTBF | fiabilidade | verificação | barato | idem §7.5.5 e Fig. 7.5-9: +50 % de MTBF com o 1.º redundante, ΔM₃ = 0,33 (MTTF por integração do RBD, Eq. 5.73) | 10⁻⁶ rel.; 5×10⁻³ |
 | SIZ-C172S | dimensionamento | **validação** | médio | Cessna 172S Information Manual (1998): MTOW 1157 kg, vazio 754 kg, 134 kW, 16,2 m², 71,4 kg/m² | ±15 % massas, ±25 % resto (método conceptual) |
 

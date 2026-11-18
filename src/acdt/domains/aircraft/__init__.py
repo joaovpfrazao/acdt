@@ -94,6 +94,13 @@ def _reliability(st: DesignState):
     reliability_stage(st["result"])
 
 
+def _series_cost(st: DesignState):
+    """Disciplina custo_serie L0 (series_cost.py; docs/CUSTO_SERIE.md): CER Eastlake/DAPCA IV varrida em N,
+    RDT&E vs produção, amortização de ferramentas, curvas de aprendizagem, ponto de equilíbrio."""
+    from .series_cost import series_cost_stage
+    series_cost_stage(st["result"])
+
+
 def _report(st: DesignState):
     out = st["options"].get("output")
     if out:
@@ -142,6 +149,8 @@ DOMAIN = register_domain(Domain(
                   "Blodgett, Messinger (fração de congelação), espessura, potência de proteção"),
             Stage("reliability", _reliability, description="fiabilidade L0: RBD (série/paralelo/k-de-n), MTBF/MTBCF, "
                   "disponibilidades, MMH/FH, sobressalentes Poisson, frota (MIL-HDBK-338B)"),
+            Stage("series_cost", _series_cost, description="custo de série L0: CER Eastlake/DAPCA IV em função de N, "
+                  "RDT&E vs produção, ferramentas, aprendizagem Wright/Crawford, ponto de equilíbrio"),
             Stage("report", _report, description="markdown + plots + JSON"),
             Stage("verification", _verification, description="matriz de verificação dos requisitos rastreáveis "
                   "(passa/falha/no_limite/nao_avaliado/desconhecido; docs/REQUISITOS.md)"),

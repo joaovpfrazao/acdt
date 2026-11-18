@@ -23,6 +23,7 @@ ficam marcados como **PRESSUPOSTO**; desconhecido nunca é zero e "não avaliado
 | gestão térmica: compartimentos, dias quente/frio MIL-HDBK-310, arrefecimento e arrasto | [Térmica](TERMICA.md) |
 | gelo: envelopes 14 CFR 25 Ap. C, captação, rime/glaze, espessura, potência de proteção | [Gelo](GELO.md) |
 | fiabilidade de missão, MTBF/MTBCF, disponibilidades, MMH/FH, sobressalentes, frota (MIL-HDBK-338B) | [Fiabilidade](FIABILIDADE.md) |
+| custo de série: CER em função de N, RDT&E vs produção, aprendizagem Wright/Crawford, ponto de equilíbrio | [Custo de série](CUSTO_SERIE.md) |
 | CI, mypy, tolerâncias | [Qualidade](QUALIDADE.md) |
 
 O que o acdt faz, área a área, está em

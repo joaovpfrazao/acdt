@@ -4,7 +4,7 @@ O acdt tem duas portas de entrada estáveis: a **API Python `acdt.api`** e a **l
 resto (`acdt.core`, `acdt.domains`, `acdt.ai`, os internos de `acdt.cli`) é interno e pode mudar entre versões do
 pacote sem aviso. Referência gerada: [API Python](referencia/api.md) · [CLI](referencia/cli.md).
 
-## 1. Superfície pública (`acdt.api`, API 1.5.0)
+## 1. Superfície pública (`acdt.api`, API 1.6.0)
 
 | grupo | funções |
 |---|---|
@@ -21,6 +21,7 @@ pacote sem aviso. Referência gerada: [API Python](referencia/api.md) · [CLI](r
 | térmica | `thermal(spec)` — compartimentos, margens e arrefecimento a partir de uma especificação genérica `acdt.thermal/1`; `thermal_atmosphere(perfil, altitude_m, T_sl_C=)` — dias quente/frio MIL-HDBK-310 (desde 1.3.0; [TERMICA.md](TERMICA.md)) |
 | gelo | `icing(spec)` — envelopes do 14 CFR 25 Ap. C, captação, fração de congelação, espessura, potência de proteção e penalização a partir de uma especificação genérica `acdt.icing/1`; `icing_envelope(tipo, T_C, mvd_um, horizontal_extent_nmi=, altitude_m=)` — LWC de projeto e estado face ao envelope (desde 1.4.0; [GELO.md](GELO.md)) |
 | fiabilidade | `reliability(spec)` — fiabilidade de missão, MTBF/MTBCF, M_ct, MMH/FH, disponibilidades A_i/A_a/A_o, sobressalentes, frota e custo de manutenção a partir de uma especificação genérica `acdt.reliability/1`; `availability(*, mtbf_h=, mttr_h=, mtbm_h=, m_bar_h=, mdt_h=, ready_time_h=)` — Eq. 10.18/10.21/10.22 do MIL-HDBK-338B; `spares_stock(lambda_per_h, hours, confidence)` — stock Poisson (desde 1.5.0; [FIABILIDADE.md](FIABILIDADE.md)) |
+| custo de série | `series_cost(spec)` — CER Eastlake/DAPCA IV varrida em N (RDT&E, ferramentas, recorrente, *flyaway*, custo médio, amortizações, lotes), rota de aprendizagem com T1 e ponto de equilíbrio vs preço; `learning_curve(T1, slope, first, last, theory=, method=)` — lote, média, unidade e ponto médio (Crawford/Wright, FAA Eq. 18-9/18-10) (desde 1.6.0; [CUSTO_SERIE.md](CUSTO_SERIE.md)) |
 | descontinuação | `deprecated(since, removed_in=, alternative=)`, `ACDTDeprecationWarning`, `DEPRECATED` |
 
 Contratos comuns:

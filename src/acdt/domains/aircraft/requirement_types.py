@@ -45,6 +45,18 @@ _BUILTIN = [
     RequirementType("thrust_available", "force", "Installed (SL) static thrust limit, jet", ("check",), ("max",)),
     RequirementType("unit_cost", "currency", "Unit production cost (flyaway)", ("trade", "check"),
                     ("max", "objective"), reference="Gudmundsson (2014) Ch. 2, modified Eastlake model"),
+    RequirementType("unit_cost_at_quantity", "currency", "Average unit cost (programme cost / N, RDT&E and tooling "
+                    "amortised) at production quantity N (qualifier quantity; default series_cost.quantity)",
+                    ("check",), ("max",), params=("quantity",),
+                    reference="series_cost.py: Gudmundsson (2014) Ch. 2 Eastlake / Raymer (2018) Ch. 18 DAPCA IV "
+                    "(docs/CUSTO_SERIE.md)"),
+    RequirementType("flyaway_cost", "currency", "Unit flyaway (recurring production) cost at quantity N (qualifier "
+                    "quantity)", ("check",), ("max",), params=("quantity",),
+                    reference="series_cost.py: recurring CER elements / N + per-aircraft items (docs/CUSTO_SERIE.md)"),
+    RequirementType("break_even_quantity", "dimensionless", "Smallest production quantity at which revenue "
+                    "(series_cost.price × N) covers the programme cost", ("check",), ("max",),
+                    reference="series_cost.py: break-even definition, fixed/variable split of Gudmundsson (2014) "
+                    "Ch. 2 (docs/CUSTO_SERIE.md)"),
     RequirementType("noise", "sound", "Flyover L_A,max at a ground observer below the loiter/cruise track", ("check",),
                     ("max",), reference="Gutin 1936 + Schlegel-King-Mull 1966 (Marte & Kurtz 1970), ISO 9613-1, "
                     "IEC 61672-1 A-weighting (noise.py; docs/RUIDO.md)"),

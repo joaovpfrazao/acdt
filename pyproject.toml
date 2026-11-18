@@ -152,6 +152,8 @@ files = [
   "src/acdt/core/reliability/spares.py",
   "src/acdt/core/reliability/fleet.py",
   "src/acdt/core/reliability/study.py",
+  "src/acdt/domains/aircraft/manufacturing/series.py",
+  "src/acdt/domains/aircraft/series_cost.py",
 ]
 strict = true
 follow_imports = "silent"
