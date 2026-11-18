@@ -163,7 +163,7 @@ def parse_requirement(key: str, spec: Any) -> Requirement:
     for p in rt.params:
         if p in spec:
             pv = spec.pop(p)
-            dim = "length" if p == "altitude" else "speed"
+            dim = {"altitude": "length", "quantity": "dimensionless"}.get(p, "speed")
             if isinstance(pv, (dict, str)):  # {value, unit} ou "3000 m" (acdt.core.quantities)
                 params[p] = _qty_si(pv, dim, f"{key}.{p}")[0]
             else:

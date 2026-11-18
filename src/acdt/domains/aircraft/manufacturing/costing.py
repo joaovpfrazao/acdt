@@ -3,7 +3,8 @@
 * :func:`dapca4` — DAPCA IV (RAND), Raymer (2018) Ch. 18, constant 2012 USD with CPI escalation input.
 * :func:`eastlake` — modified Eastlake GA model (Gudmundsson 2014 Ch. 2), see :mod:`acdt.domains.aircraft.cost`.
 * :func:`learning_unit`, :func:`learning_cum_avg`, :func:`learning_total` — Crawford (unit) and Wright
-  (cumulative-average) learning curves (NASA JSC learning-curve calculator conventions).
+  (cumulative-average) learning curves (NASA JSC learning-curve calculator conventions); :func:`learning_lot`,
+  :func:`wright_unit`, :func:`lot_midpoint` — lotes (FAA Pricing Handbook 1998, Cap. 18, Eq. 18-7/18-9/18-10).
 * :func:`operating_cost` / :func:`operational_cost_from_dict` — DOC per flight hour (Raymer 2018 Ch. 18
   element structure); rates are dated inputs; missing activated terms → status unassessed/partial
   (never a silent zero). ``unit_price`` may come from Eastlake / DAPCA IV CERs (Gudmundsson 2014 Ch. 2).
@@ -52,6 +53,48 @@ def learning_cum_avg(T1: float, N: float, slope: float = 0.85, theory: str = "cr
 def learning_factor(N: float, slope: float = 0.85, theory: str = "crawford") -> float:
     """Average-to-first-unit ratio over N units (1.0 for N = 1)."""
     return learning_cum_avg(1.0, max(N, 1), slope, theory)
+
+
+def learning_b(slope: float) -> float:
+    """Expoente b = log2(declive) (FAA Pricing Handbook 1998, Cap. 18, Eq. 18-4)."""
+    return _b(slope)
+
+
+def wright_unit(T1: float, n: int, slope: float = 0.85) -> float:
+    """Custo da unidade n implícito na curva de média acumulada de Wright (1936): T_n = T1 [n^(1+b) − (n−1)^(1+b)]
+    (diferença dos totais acumulados, FAA Pricing Handbook 1998, Eq. 18-7)."""
+    b = _b(slope)
+    return T1 * (n ** (1 + b) - (n - 1) ** (1 + b))
+
+
+def learning_lot(T1: float, first: int, last: int, slope: float = 0.85, theory: str = "crawford",
+                 method: str = "exact") -> float:
+    """Total do lote de unidades ``first``..``last`` (inclusive).
+
+    * ``wright``: T1 [L^(1+b) − (F−1)^(1+b)] (total acumulado até L menos o até F−1; FAA Pricing Handbook 1998,
+      Cap. 18, Eq. 18-7 e Caso 18-2);
+    * ``crawford``, ``method='exact'``: Σ_{k=F..L} T1 k^b; ``method='approx'``: aproximação contínua
+      T1/(1+b) [(L+½)^(1+b) − (F−½)^(1+b)] (FAA Eq. 18-9/18-10; Conway & Schultz 1959)."""
+    if first < 1 or last < first:
+        raise ValueError(f"lote inválido {first}..{last}")
+    b = _b(slope)
+    if theory == "wright":
+        return T1 * (last ** (1 + b) - (first - 1) ** (1 + b))
+    if theory != "crawford":
+        raise ValueError("theory deve ser 'crawford' ou 'wright'")
+    if method == "approx":
+        return T1 / (1 + b) * ((last + 0.5) ** (1 + b) - (first - 0.5) ** (1 + b))
+    if method != "exact":
+        raise ValueError("method deve ser 'exact' ou 'approx'")
+    return learning_total(T1, last - first + 1, slope, first=first)
+
+
+def lot_midpoint(first: int, last: int, slope: float = 0.85) -> float:
+    """Ponto médio algébrico do lote (teoria unitária): a unidade x cujo custo T1 x^b iguala o custo médio do lote
+    (definição da FAA Pricing Handbook 1998, Cap. 18 / ICEAA CEBoK Módulo 7); calculado a partir da soma exata."""
+    b = _b(slope)
+    avg = learning_lot(1.0, first, last, slope, "crawford") / (last - first + 1)
+    return float((first + last) / 2) if b == 0 else float(avg ** (1 / b))
 
 
 # ------------------------------------------------------------------------------------------------ DAPCA IV

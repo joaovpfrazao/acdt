@@ -27,6 +27,9 @@ de ``assumptions.constraints``).
 * ``fiabilidade:<caminho>`` — grandeza da secção ``reliability`` (reliability.py; docs/FIABILIDADE.md), p. ex.
   ``mission_reliability``, ``mtbcf_s``, ``mtbf_s``, ``operational_availability``, ``maintenance.mmh_per_fh``,
   ``fleet_size``. Intervalos {lo, hi} com a mesma regra (min: passa se lo ≥ limiar; max: passa se hi ≤ limiar).
+* ``custo_serie:<caminho>`` — grandeza da secção ``series_cost`` (series_cost.py; docs/CUSTO_SERIE.md), p. ex.
+  ``unit_cost_at_quantity_USD``, ``flyaway_cost_USD``, ``break_even_quantity``, ``at_quantity.rdte_amortisation_USD``. Escalares ou
+  intervalos {lo, hi} com a regra da térmica; ponto de equilíbrio não atingido / sem preço → desconhecido.
 * ``entrada:<requisito>`` — entradas do dimensionamento (velocidade/altitude de cruzeiro, payload, tripulação)
   lidas do que o dimensionamento usou: cumprido por construção, verificação por inspeção.
 """
@@ -152,6 +155,9 @@ def _list_evidence(ctx: VerificationContext) -> list[str]:
     if isinstance(rl, dict) and rl.get("evaluated"):
         out += ["fiabilidade:mission_reliability", "fiabilidade:mtbcf_s", "fiabilidade:operational_availability",
                 "fiabilidade:maintenance.mmh_per_fh"]
+    sc = ctx.result.get("series_cost")
+    if isinstance(sc, dict) and sc.get("evaluated"):
+        out += ["custo_serie:unit_cost_at_quantity_USD", "custo_serie:flyaway_cost_USD", "custo_serie:break_even_quantity"]
     return out
 
 
@@ -355,6 +361,66 @@ def _eval_reliability(req: TracedRequirement, ctx: VerificationContext, key: str
     return Evidence(x, u, pointer=f"reliability.{key}", fidelity="N0")
 
 
+def eval_section_interval(section: str, label: str, req: TracedRequirement, ctx: VerificationContext,
+                          key: str) -> Evidence:
+    """Avaliador genérico de uma secção de disciplina com valores escalares ou intervalos {lo, hi} (regra da
+    térmica/gelo/fiabilidade: min passa se lo ≥ limiar; max passa se hi ≤ limiar; o resto fica desconhecido)."""
+    from acdt.core.verification import json_path
+
+    sec = ctx.result.get(section)
+    if not isinstance(sec, dict):
+        return Evidence(ran=False, message=f"etapa de {label} não correu")
+    if not sec.get("evaluated"):
+        return Evidence(ran=False, message=f"{label} não avaliado: {sec.get('reason', '')}")
+    try:
+        v = json_path(sec, key)
+    except (KeyError, ValueError, IndexError, TypeError):
+        return Evidence(ran=False, message=f"{section}.{key} não existe", pointer=f"{section}.{key}")
+    rt = REGISTRY.get(req.quantity)
+    u = units.default_unit(rt.dimension) if rt is not None else req.unit
+
+    def num(x: Any) -> float | None:
+        return float(x) if isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(float(x)) \
+            else None
+
+    ptr = f"{section}.{key}"
+    if isinstance(v, dict) and ("lo" in v or "hi" in v):
+        lo, hi = num(v.get("lo")), num(v.get("hi"))
+        thr = num(req.threshold)
+        rng = f"[{'?' if lo is None else f'{lo:.4g}'}, {'?' if hi is None else f'{hi:.4g}'}]"
+        if thr is not None and req.comparison == "min":
+            if lo is not None and lo >= thr:
+                return Evidence(lo, u, pointer=f"{ptr}.lo", fidelity="N0", message=f"intervalo {rng}: o minorante "
+                                "cumpre")
+            if hi is not None and hi < thr:
+                return Evidence(hi, u, pointer=f"{ptr}.hi", fidelity="N0", message=f"intervalo {rng}: nem o "
+                                "majorante cumpre")
+        elif thr is not None and req.comparison == "max":
+            if hi is not None and hi <= thr:
+                return Evidence(hi, u, pointer=f"{ptr}.hi", fidelity="N0", message=f"intervalo {rng}: o majorante "
+                                "cumpre")
+            if lo is not None and lo > thr:
+                return Evidence(lo, u, pointer=f"{ptr}.lo", fidelity="N0", message=f"intervalo {rng}: nem o "
+                                "minorante cumpre")
+        else:
+            return Evidence(None, message=f"{ptr} é um intervalo {rng}: só comparações min/max", pointer=ptr)
+        return Evidence(None, message=f"{ptr} = {rng} atravessa o limiar ou tem extremo desconhecido (declare as "
+                        "entradas em falta)", pointer=ptr, fidelity="N0")
+    x = num(v)
+    if x is None:
+        return Evidence(None, message=f"{ptr} sem valor (desconhecido)", pointer=ptr)
+    return Evidence(x, u, pointer=ptr, fidelity="N0")
+
+
+def _eval_series_cost(req: TracedRequirement, ctx: VerificationContext, key: str) -> Evidence:
+    return eval_section_interval("series_cost", "custo de série", req, ctx, key)
+
+
+register_evaluator(Evaluator("custo_serie:", _eval_series_cost, "disciplina custo de série L0 (Eastlake "
+                             "modificado / DAPCA IV em função de N, aprendizagem Wright/Crawford, ponto de "
+                             "equilíbrio); desconhecido se faltar preço/NRE ou o equilíbrio não for atingido",
+                             "analise", "N0", "Gudmundsson (2014) Cap. 2; Raymer (2018) Cap. 18; FAA Pricing "
+                             "Handbook (1998) Cap. 18", ("aircraft",)))
 register_evaluator(Evaluator("fiabilidade:", _eval_reliability, "disciplina fiabilidade L0 (MIL-HDBK-338B: RBD, "
                              "MTBCF, disponibilidades, DMMH, Poisson); intervalos — desconhecido se atravessa o limiar",
                              "analise", "N0", "MIL-HDBK-338B (1998)", ("aircraft",)))
@@ -385,5 +451,8 @@ register_default_evaluator("aircraft", "operational_availability", "fiabilidade:
 register_default_evaluator("aircraft", "maintenance_man_hours_per_fh", "fiabilidade:maintenance.mmh_per_fh",
                            "analise", "N0")
 register_default_evaluator("aircraft", "fleet_size", "fiabilidade:fleet_size", "analise", "N0")
+register_default_evaluator("aircraft", "unit_cost_at_quantity", "custo_serie:unit_cost_at_quantity_USD", "analise", "N0")
+register_default_evaluator("aircraft", "flyaway_cost", "custo_serie:flyaway_cost_USD", "analise", "N0")
+register_default_evaluator("aircraft", "break_even_quantity", "custo_serie:break_even_quantity", "analise", "N0")
 for _k in ("regulatory_category", "unit_cost", "power_available", "thrust_available"):
     register_default_evaluator("aircraft", _k, f"check:{_k}", "analise", "N0")

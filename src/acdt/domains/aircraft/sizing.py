@@ -91,6 +91,7 @@ class DesignResult:
     icing: dict | None = None             # icing.analyse_icing (disciplina gelo, L0/L1)
     icing_coupling: dict | None = None    # icing.size_with_icing (acoplamento iterar)
     reliability: dict | None = None       # reliability.analyse_reliability (disciplina fiabilidade, L0)
+    series_cost: dict | None = None       # series_cost.analyse_series_cost (disciplina custo_serie, L0)
     structures_l1: object | None = None   # structures_l1.StructuresL1 (masses, deflections, elastic correction)
     launch_recovery: dict | None = None   # opt-in catapult / belly landing (launch_recovery.py)
     gear_drag: dict | None = None         # opt-in gear drag in the polar (aero/gear_drag.py)
@@ -217,6 +218,13 @@ def _chk_icing(r, res):
 @register_handler("check", "fleet_size")
 def _chk_reliability(r, res):
     return CheckResult(r.key, None, "avaliado na etapa de fiabilidade (verificação: fiabilidade:…)")
+
+
+@register_handler("check", "unit_cost_at_quantity")
+@register_handler("check", "flyaway_cost")
+@register_handler("check", "break_even_quantity")
+def _chk_series_cost(r, res):
+    return CheckResult(r.key, None, "avaliado na etapa de custo de série (verificação: custo_serie:…)")
 
 
 @register_handler("check", "noise")
@@ -368,6 +376,12 @@ def flap_system_items(o: dict, flap_area_m2: float | None, label: str) -> list:
 
 def unit_cost_estimate(spec: MissionSpec, We: float, P_sl: float | None, Vc: float):
     """Modified Eastlake unit cost (Gudmundsson 2014 Ch. 2) from empty mass and installed power."""
+    return eastlake_unit_cost(eastlake_inputs(spec, We, P_sl, Vc))
+
+
+def eastlake_inputs(spec: MissionSpec, We: float, P_sl: float | None, Vc: float) -> EastlakeInputs:
+    """Entradas do Eastlake modificado a partir do projeto (as de :func:`unit_cost_estimate`; reutilizadas pela
+    disciplina custo_serie para varrer a quantidade N)."""
     A, reqs = spec.assumptions, spec.requirements
     kind = spec.propulsion_kind
     ca = A.get("cost", {})
@@ -391,7 +405,7 @@ def unit_cost_estimate(spec: MissionSpec, We: float, P_sl: float | None, Vc: flo
                         V_H_kt=vmax / 0.514444, engine_cost=eng,
                         **{k: v for k, v in ca.items() if k in EastlakeInputs.__dataclass_fields__
                            and k not in ("W_airframe_kg", "V_H_kt", "engine_cost")})
-    return eastlake_unit_cost(ei)
+    return ei
 
 
 def _attach_onboard_bridge(res: DesignResult, spec: MissionSpec) -> None:
