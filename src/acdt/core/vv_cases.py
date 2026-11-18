@@ -718,3 +718,56 @@ def _fb_parallel() -> Mapping[str, float | None]:
     m3 = mttf({"type": "parallel", "blocks": ["a", "b", "c"]}, {"a": lam, "b": lam, "c": lam}, 0.0)
     return {"ratio_n2": None if m2 is None else m2 / m1,
             "delta_n3": None if (m2 is None or m3 is None) else (m3 - m2) / m1}
+
+
+# ------------------------------------------------------------------------------------------------ custo de série
+FAA18 = ("FAA Pricing Handbook (1998), Cap. 18 «The Learning Curve» (fast.faa.gov/pricing/98-30c18.htm; cópia "
+         "web.archive.org 2007-11-27)")
+_cs = builder("custo_serie")
+
+
+@_cs("CS-FAA18-SLOPE", "Expoente da curva e totais de 2 unidades (FAA Pricing Handbook Cap. 18, Eq. 18-4)",
+     "Unidade 1 custa 100 e a 2 custa 90: declive 90 %, b = log(0,9)/log(2) = −0,15200. Com T1 = 100 e 90 %, o total "
+     "de 2 unidades é 190 pela curva unitária (Crawford) e 2 × 90 = 180 pela de média acumulada (Wright).",
+     "verificacao",
+     [Reference("b", -0.152, "-", FAA18 + ", §18.3 (b = −0,15200)", tol_abs=5e-5, tol_source="impresso com 5 casas"),
+      Reference("total2_unit", 190.0, "-", FAA18 + ", §18.3", tol_abs=1e-9, tol_source="exato"),
+      Reference("total2_cumavg", 180.0, "-", FAA18 + ", §18.3", tol_abs=1e-9, tol_source="exato")],
+     tests=("tests/test_series_cost.py::test_faa18_slope_and_two_units",))
+def _cs_slope() -> Mapping[str, float | None]:
+    from acdt.domains.aircraft.manufacturing.costing import learning_b, learning_lot
+
+    return {"b": learning_b(0.9), "total2_unit": learning_lot(100.0, 1, 2, 0.9, "crawford"),
+            "total2_cumavg": learning_lot(100.0, 1, 2, 0.9, "wright")}
+
+
+@_cs("CS-FAA18-CUMAV-LOT", "Custo de um lote pela média acumulada (FAA Pricing Handbook, Caso 18-2, Eq. 18-7)",
+     "Curva ajustada Y = 103,45 X^−0,04 (média acumulada): o lote 4 (unidades 11 a 15) custa Y_T(15) − Y_T(10) = "
+     "1392 − 943 = 449 h. O livro arredonda os totais intermédios; tolerância de 1 h.", "verificacao",
+     [Reference("lot4_hours", 449.0, "h", FAA18 + ", Caso 18-2 (média acumulada)", tol_abs=1.0,
+                tol_source="totais intermédios impressos arredondados à unidade")],
+     tests=("tests/test_series_cost.py::test_faa18_case_18_2",))
+def _cs_cumav() -> Mapping[str, float | None]:
+    from acdt.domains.aircraft.manufacturing.costing import learning_lot
+
+    return {"lot4_hours": learning_lot(103.45, 11, 15, 2 ** -0.04, "wright")}
+
+
+@_cs("CS-FAA18-UNIT-APPROX", "Aproximação contínua do custo de lote pela curva unitária (FAA Eq. 18-9 e 18-10)",
+     "Curva unitária Y = 102,73 X^−0,15: lote 1 (unidades 1–2) ≈ 196 h (Eq. 18-9; o real foi 200) e lote 4 (unidades "
+     "11–15) ≈ 350 h (Eq. 18-10), com T1/(1+b)[(L+½)^(1+b) − (F−½)^(1+b)]. A soma exata dá 195,3 e 350,0.",
+     "verificacao",
+     [Reference("lot1_approx", 196.0, "h", FAA18 + ", Caso 18-2 (Eq. 18-9)", tol_abs=0.5,
+                tol_source="impresso à unidade"),
+      Reference("lot4_approx", 350.0, "h", FAA18 + ", Caso 18-2 (Eq. 18-10)", tol_abs=0.5,
+                tol_source="impresso à unidade"),
+      Reference("lot4_exact", 350.0, "h", FAA18 + ", Caso 18-2 (a aproximação é «very good»)", tol_abs=0.5,
+                tol_source="impresso à unidade")],
+     tests=("tests/test_series_cost.py::test_faa18_case_18_2",))
+def _cs_unit() -> Mapping[str, float | None]:
+    from acdt.domains.aircraft.manufacturing.costing import learning_lot
+
+    s = 2 ** -0.15
+    return {"lot1_approx": learning_lot(102.73, 1, 2, s, "crawford", "approx"),
+            "lot4_approx": learning_lot(102.73, 11, 15, s, "crawford", "approx"),
+            "lot4_exact": learning_lot(102.73, 11, 15, s, "crawford", "exact")}

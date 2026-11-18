@@ -137,7 +137,7 @@ def learning_total_cost_fn(T1: float, slope: float, theory: str, nre: float,
                 s += T1 * k ** b
                 cache[k] = s
             rec = cache[n]
-        return nre + rec + per_aircraft_items * n
+        return float(nre + rec + per_aircraft_items * n)
     return f
 
 

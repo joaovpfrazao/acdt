@@ -25,7 +25,7 @@ from acdt import __version__
 from ._deprecation import DEPRECATED, ACDTDeprecationWarning, deprecated
 
 #: Versão semântica da API pública (independente da versão do pacote, :data:`acdt.__version__`).
-API_VERSION = "1.5.0"
+API_VERSION = "1.6.0"
 
 #: Níveis de fidelidade aceites por :func:`size`/:func:`analyse` (``None`` = o que a missão declara).
 LEVELS: dict[str, str] = {"L0": "handbook", "L1": "lowfi"}
@@ -50,6 +50,8 @@ __all__ = [
     "icing", "icing_envelope",
     # fiabilidade e manutenção de frota (L0), genérica para qualquer tipo de aeronave
     "reliability", "availability", "spares_stock",
+    # custo de produção em série (L0): CER em função de N, curvas de aprendizagem, ponto de equilíbrio
+    "series_cost", "learning_curve",
     # erros
     "errors",
 ]
@@ -633,3 +635,28 @@ def spares_stock(lambda_per_h: float, hours: float, confidence: float) -> dict[s
     S = stock_for(a, confidence)
     return {"demand_mean": a, "stock": S, "protection": poisson_cdf(S, a),
             "source": "MIL-HDBK-338B Eq. 5.58 (§5.3.8.1)"}
+
+
+def series_cost(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Custo de produção em série (desde 1.6.0; docs/CUSTO_SERIE.md): CER Eastlake modificado (Gudmundsson 2014
+    Cap. 2) ou DAPCA IV (Raymer 2018 Cap. 18) varrida em N com RDT&E / ferramentas / recorrente, custo unitário de
+    saída de fábrica e médio, amortizações, ou rota de baixo para cima com curva de aprendizagem (``method:
+    learning``); ponto de equilíbrio vs preço (``None`` se não for atingido). Valores em USD (chaves ``*_USD``)."""
+    from acdt.domains.aircraft.manufacturing.series import analyse
+
+    return analyse(spec)
+
+
+def learning_curve(T1: float, slope: float, first: int = 1, last: int = 1, *, theory: str = "crawford",
+                   method: str = "exact") -> dict[str, Any]:
+    """Curva de aprendizagem (desde 1.6.0): total e média do lote ``first..last``, custo da unidade ``last`` e
+    ponto médio do lote. ``theory``: ``crawford`` (unitária, Crawford 1944) ou ``wright`` (média acumulada, Wright
+    1936); ``method``: ``exact`` (soma) ou ``approx`` (FAA Pricing Handbook 1998 Eq. 18-9/18-10)."""
+    from acdt.domains.aircraft.manufacturing.costing import (learning_b, learning_lot, learning_unit, lot_midpoint,
+                                                             wright_unit)
+
+    tot = learning_lot(T1, first, last, slope, theory, method)
+    unit = learning_unit(T1, last, slope) if theory == "crawford" else wright_unit(T1, last, slope)
+    return {"b": learning_b(slope), "lot_total": tot, "lot_average": tot / (last - first + 1), "unit_last": unit,
+            "lot_midpoint": lot_midpoint(first, last, slope),
+            "source": "Wright (1936); Crawford (1944); FAA Pricing Handbook (1998) Cap. 18"}
