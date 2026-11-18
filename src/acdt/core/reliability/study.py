@@ -216,6 +216,11 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
     # horas de voo da frota por dia {lo, hi} (procura de sobressalentes): surtidas/R × duração
     fleet_fh: tuple[float | None, float | None] | None = None
     if fl:
+        fl = dict(fl)
+        if fl.get("sortie_duration_h") is None and t_m is not None:
+            fl["sortie_duration_h"] = t_m  # surtida = missão analisada (omissão)
+        if (fl.get("mode") == "sorties" or "sorties_per_day" in fl) and fl.get("sortie_duration_h") is None:
+            raise ValueError("fleet: sortie_duration_h (ou mission_duration_h) necessário no modo sorties")
         out["fleet"] = fleet_mod.size(fl, A_o, mission["reliability"])
         if out["fleet"]["mode"] == "sorties":
             base = float(fl["sorties_per_day"]) * float(fl["sortie_duration_h"])

@@ -253,3 +253,14 @@ def test_reliability_stage_in_pipeline_requirements_and_db():
     for k in ("RL-01", "RL-02", "RL-03", "RL-04", "RL-05"):
         assert rows[k]["status"] == "passa", (k, rows[k])
     assert "L0" in st2["design"]["results"]["fiabilidade"]
+
+
+def test_sortie_duration_defaults_to_mission_duration():
+    from acdt.core.reliability.study import analyse
+
+    s = _spec(fleet={"mode": "sorties", "sorties_per_day": 2, "turnaround_h": 1.0, "operating_hours_per_day": 12})
+    r = analyse(s)
+    assert r["fleet"]["cases"]["lo"]["fleet"] is not None
+    s.pop("mission_duration_h")
+    with pytest.raises(ValueError):
+        analyse(s)

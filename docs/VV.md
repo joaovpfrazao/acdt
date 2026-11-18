@@ -71,7 +71,15 @@ Corrida de 17 nov 2026 no box Linux (`acdt vv --cost medio`): **22 passa, 0 falh
 | ICING-AND-B2 | gelo | verificação | barato | idem Ap. B.2 (20 µm): K 4,09, K₀ 1,381, β₀ 0,629, A_c 1,265, n₀ 0,598 | idem |
 | ICING-APPC-JECK | gelo | verificação | barato | 14 CFR 25 Ap. C via Jeck, DOT/FAA/AR-00/30 (2002) Tabelas 1–2 (cinco nós) e Parte I(c) (0,35 g/m³) | 0,0005 g/m³; descolagem exata |
 | ICING-NACA0012-RLE | gelo | verificação | barato | Abbott & von Doenhoff via Anderson: r_le = 1,58 % c | 10⁻⁴ (ver nota) |
+| FIAB-338B-AVAIL-EX3 | fiabilidade | verificação | barato | MIL-HDBK-338B (1998) §10.4.1.1 Ex. 3 (radar): A_i 0,995 (Eq. 10.18), A_a 0,99 (Eq. 10.21), A_o 0,985 (Eq. 10.22) | meia unidade do último algarismo impresso |
+| FIAB-338B-AAV-EX4 | fiabilidade | verificação | barato | idem §10.4.1.2 Ex. 4: A_AV(1 h) = 0,9972 (Eq. 10.24) | 5×10⁻⁵ |
+| FIAB-338B-POISSON-5381 | fiabilidade | verificação | barato | idem §5.3.8.1 (projetor, Eq. 5.58): R(500 h) com 2 reservas 0,986; stock para 98 % = 2 | 5×10⁻⁴; inteiro exato |
+| FIAB-338B-EQ630 | fiabilidade | verificação | barato | idem §6.4.4.2.1.3, Eq. 6.30 (estrutura não série-paralelo): P_S = 0,13572 | 5×10⁻⁶ |
+| FIAB-338B-PARALLEL-MTBF | fiabilidade | verificação | barato | idem §7.5.5 e Fig. 7.5-9: +50 % de MTBF com o 1.º redundante, ΔM₃ = 0,33 (MTTF por integração do RBD, Eq. 5.73) | 10⁻⁶ rel.; 5×10⁻³ |
 | SIZ-C172S | dimensionamento | **validação** | médio | Cessna 172S Information Manual (1998): MTOW 1157 kg, vazio 754 kg, 134 kW, 16,2 m², 71,4 kg/m² | ±15 % massas, ±25 % resto (método conceptual) |
+
+Nota sobre `FIAB-338B-AVAIL-EX3`: o manual soma M̄ = M_ct + M_pt (0,5 + 0,25 h) em vez de ponderar pelas
+frequências (definição do §10.4.1.1 e Eq. 5.75, como o código faz); o caso dá M̄ diretamente, como o texto.
 
 Nota sobre `ICING-NACA0012-RLE`: a fórmula r_le = 1,1019 t² c dá 1,587 % e a referência imprime 1,58 %; com a
 meia unidade do último algarismo (5×10⁻⁵) o caso falhou na primeira corrida. A tolerância foi alargada a 10⁻⁴
