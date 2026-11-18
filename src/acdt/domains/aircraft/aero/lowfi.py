@@ -105,13 +105,33 @@ class _RePolar:
         return self._mix(self.lo.cd_at_cl(cl), self.hi.cd_at_cl(cl))
 
 
+# Tempo-limite das corridas AVL do modelo de faixas: 1.ª tentativa e repetição (s). Uma falha transitória (p.ex.
+# tempo-limite com a máquina sobrecarregada) não deve trocar silenciosamente AVL por Schrenk numa iteração do ciclo
+# W0: isso desloca o ponto fixo convergido (até ~tol_lowfi) e torna o resultado dependente da carga da máquina.
+AVL_TIMEOUTS_S = (60.0, 180.0)
+
+
+def _avl_pair(config, mach: float):
+    """As duas corridas AVL (alpha 2° e 6°), repetidas uma vez com tempo-limite maior se a 1.ª tentativa falhar."""
+    last: Exception | None = None
+    for tmo in AVL_TIMEOUTS_S:
+        try:
+            return (run_avl_case(config, alpha_deg=2.0, mach=mach, timeout=tmo),
+                    run_avl_case(config, alpha_deg=6.0, mach=mach, timeout=tmo))
+        except ToolNotAvailable:
+            raise
+        except Exception as ex:  # noqa: BLE001 - qualquer falha da corrida externa conta como tentativa falhada
+            last = ex
+    assert last is not None
+    raise last
+
+
 def _strip_cl_model(config, mach: float, fus_d: float):
     """Return (y, area, cl_fun(CL), e_inv, CLa_avl, source) for the exposed wing strips."""
     w = config.wing
     if avl_available():
         try:
-            r1 = run_avl_case(config, alpha_deg=2.0, mach=mach)
-            r2 = run_avl_case(config, alpha_deg=6.0, mach=mach)
+            r1, r2 = _avl_pair(config, mach)
             y = np.array([s["y"] for s in r1.strips])
             A = np.array([s["area"] for s in r1.strips])
             c1 = np.array([s["cl"] for s in r1.strips])
@@ -123,7 +143,7 @@ def _strip_cl_model(config, mach: float, fus_d: float):
             return (y[m], A[m], lambda CL: c1[m] + slope[m] * (CL - r1.CL), e_inv,
                     dCL / math.radians(4.0), "AVL 3.40 (VLM), 2 ângulos")
         except Exception as ex:  # pragma: no cover - AVL failure
-            src_note = f"AVL falhou ({ex}); Schrenk usado"
+            src_note = f"AVL falhou após {len(AVL_TIMEOUTS_S)} tentativas ({ex}); Schrenk usado"
     else:
         src_note = "AVL não instalado; Schrenk (NACA TM 948) usado"
     from ..structures import spanwise_lift_schrenk

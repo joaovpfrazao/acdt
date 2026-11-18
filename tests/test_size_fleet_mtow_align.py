@@ -14,6 +14,12 @@ UAV = "uav_gasoline_150kg"
 VARIANT_L = EX / "concept" / "illegal_fishing" / "variant_L.yaml"
 
 
+@pytest.fixture(autouse=True)
+def _runs(tmp_path, monkeypatch):
+    """Registo de corridas por teste (não partilhado entre workers do xdist nem com ./runs)."""
+    monkeypatch.setenv("ACDT_RUNS_DIR", str(tmp_path / "runs"))
+
+
 @pytest.mark.slow
 def test_fleet_of_one_matches_size_when_level_omitted():
     """Default size_fleet (no level) must match toolkit.size(level=None) = acdt size YAML policy."""
@@ -58,7 +64,20 @@ def test_run_id_feed_reuses_size_result():
     s = T.size(example=UAV, level=None, no_systems=True)
     f = C.size_fleet(variants=[{"id": "fed", "run_id": s["run_id"], "quantity": 2}])
     assert f["variants"][0]["status"] == "done"
+    # reutiliza o result.json da corrida (não volta a dimensionar): igualdade exata, sem depender do ponto fixo
+    # do ciclo W0 (convergido só a mda.tol_lowfi) nem de falhas transitórias do AVL noutra corrida
+    assert f["variants"][0]["mtow_alignment"]["reused_size_run"] is True
+    assert f["variants"][0]["run_id"] == s["run_id"]
     assert f["fleet"]["W0_kg"] == pytest.approx(2 * s["summary"]["weights"]["W0_kg"], rel=1e-12)
+
+
+def test_run_id_with_override_resizes():
+    """run_id + level/assumptions novos → nova corrida size (não é reutilização)."""
+    s = T.size(example=UAV, level="L0", no_systems=True)
+    f = C.size_fleet(variants=[{"id": "fed", "run_id": s["run_id"], "quantity": 1, "level": "L0"}])
+    v = f["variants"][0]
+    assert v["status"] == "done" and v["mtow_alignment"]["reused_size_run"] is False
+    assert v["run_id"] != s["run_id"]
 
 
 @pytest.mark.slow

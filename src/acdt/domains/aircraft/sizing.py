@@ -661,6 +661,7 @@ def _run_mda(spec: MissionSpec, strict: bool = False, systems=None) -> DesignRes
         _fac = {}
     k_EI, k_GJ = float(_fac.get("k_EI", 1.0)), float(_fac.get("k_GJ", 1.0))
     history = []
+    lowfi_span_sources: list[str] = []  # fonte da carga em envergadura em cada iteração low-fi
     config = buildup = None
     converged = False
     W0_prev, CD0_prev = None, None
@@ -775,6 +776,7 @@ def _run_mda(spec: MissionSpec, strict: bool = False, systems=None) -> DesignRes
                                 (aero_a["Q"] or {}).get("wing", 1.0), aero_a["lp_fraction"], hl.CLmax_clean, Vs_, e,
                                 prefer=aero_a.get("airfoil_solver", "xfoil"), calibration=cal_factors)
                 polar = DragPolar(lf.CD0, lf.K)
+                lowfi_span_sources.append(lf.span_source or "")
                 hl = high_lift_summary(lf.clmax_airfoil, sweep, flap)
                 hl = _hl_ovr(hl)
             except (ToolNotAvailable, RuntimeError, ImportError) as ex:
@@ -933,6 +935,12 @@ def _run_mda(spec: MissionSpec, strict: bool = False, systems=None) -> DesignRes
     CLa = lift_curve_slope(AR, Vc / isa(h_cruise).a, config.wing.sweep_at(config.wing.xc_max_t),
                            S_exp_over_S_ref=config.wing.exposed_area(fus.max_diameter) / config.wing.S,
                            fuselage_diameter=fus.max_diameter, span=config.wing.span)
+    if len(set(lowfi_span_sources)) > 1:
+        # p.ex. AVL falhou (tempo-limite) numa iteração intermédia e foi usado Schrenk só nessa: o ponto fixo
+        # convergido difere (até ~tol_lowfi) do que se obteria sem a falha — não pode ficar silencioso
+        mixed = sorted({s for s in lowfi_span_sources if not s.startswith("AVL 3")})
+        issues.append(Issue("warning", "Carga em envergadura low-fi mudou de fonte entre iterações do ciclo W0 ("
+                            + "; ".join(mixed) + "): resultado dependente dessa falha, repetir a corrida"))
     res = DesignResult(spec, sz, dp, cons, polar, config, hl, CLa, buildup, legs, Vc, h_cruise, it, converged,
                        issues, history=history, weights=bd, weight_initial_source=ew_initial.source(), lowfi=lf)
     if asm_loop is not None and asm_drag is not None:
