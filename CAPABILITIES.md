@@ -31,7 +31,8 @@ N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nív
 * **Fidelidade**: —
 * **CLI / MCP**: `acdt requirements` / `requirements_schema`, `validate_requirements`.
 * **Pedir à IA**: "Valida estes requisitos: UAV de 150 kg, 10 h de autonomia, 20 kg de carga, pista de 300 m."
-* **Limites**: o tipo `noise` é aceite mas não é avaliado (aparece como "not evaluated").
+* **Limites**: o tipo `noise` (L_A,max na vertical) e `aural_detection_range` são avaliados pela etapa de ruído
+  (§32r); sem mapa de hélice ou em jatos ficam "não avaliado".
 
 ## 2. Conceptual / dimensionamento
 
@@ -1636,7 +1637,7 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 
 * **O que faz**: dá ao acdt uma porta de entrada estável para scripts, notebooks e outras ferramentas, com
   versionamento semântico verificado por teste, documentação gerada do código e uma CLI com convenções comuns.
-* **API Python `acdt.api`** (API 1.1.0 desde §32q; pacote 0.2.0):
+* **API Python `acdt.api`** (API 1.2.0 desde §32r — `rotor_noise`; 1.1.0 desde §32q; pacote 0.2.0):
   * `load_mission`, `size`, `analyse`, `verify`, `uq`, `uq_study`, `mdo`, `mdo_study`, `function_model`,
     `vv_cases`, `vv`, `calibrate`, `load_test_data`, `db_load`/`db_save`/`db_get`/`db_diff`/`db_validate`,
     `version_info`, `errors`;
@@ -1701,6 +1702,33 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   * ficha RID/RFA.
 
   Pormenor em [docs/RELATORIOS.md](docs/RELATORIOS.md).
+
+## 32r. Ruído acústico de hélices e rotores — L0 (18 nov 2026)
+
+* **O que faz**: etapa `noise` do pipeline (depois do desempenho) para aviões a hélice com mapa BEMT
+  (`assumptions.propulsion.propeller`): ponto de funcionamento de sobrevoo (empuxo = arrasto a W0 na perna de
+  espera ou cruzeiro) e de subida a V_y. Calcula L_p e L_A na vertical, **L_A,max** e **L_AE** de uma passagem,
+  espectro por componente e **alcance de deteção auditiva** (silêncio e, opcional, ruído ambiente em 1/3 de
+  oitava). Opcional: verificação de **14 CFR 36 Ap. G** (limite G36.301 e altura de referência G36.111, microfone
+  sobre placa). `acdt.api.rotor_noise` avalia rotores dados explicitamente (multirrotor, VTOL, hélice sem mapa).
+* **Métodos**: tons de carga de Gutin (1936; Garrick & Watkins 1954; Marte & Kurtz 1970 Eq. 1), banda larga de
+  vórtices de Schlegel, King & Mull (1966; Marte & Kurtz 1970 Eq. 3, Fig. 10a), absorção ISO 9613-1, ponderação A
+  IEC 61672-1 (Eq. E.6), limiar de audição ISO 226:2003 (T_f), Doppler (Marte & Kurtz Ap. C).
+* **Fidelidade**: L0. Gutin estático; fontes de espessura, motor, célula e interação não modeladas, por isso
+  **nível e alcance são limites inferiores**: um requisito máximo excedido falha, um cumprido fica desconhecido até
+  o utilizador declarar `noise.other_sources` com justificação (ou juntar `noise.engine_noise` medido). Avisos de
+  validade para M_tip < 0,5 e M_tip helicoidal > 0,8.
+* **Integração**: secção `noise` no `result.json`; disciplina `ruido`/L0 no `design.json`; requisitos `noise` e
+  `aural_detection_range` e avaliador `ruido:<grandeza>` na matriz; verificação `noise:part36_G`; métricas de UQ e
+  MDO por `result_metrics` (p. ex. `noise.overhead_LAmax_dBA`) ou `req:<ID>`.
+* **V&V**: `NOISE-SKM-EXAMPLE` (exemplo de Marte & Kurtz 1970), `NOISE-AWEIGHT` (IEC 61672-1 Tab. 3),
+  `NOISE-ISO9613-ALPHA` (tabela de α ISO 9613-1), `NOISE-P36G-LIMITS` (G36.301) — todos passam. Sem caso de
+  validação contra medições ainda.
+* **Validado**: `tests/test_noise.py` (forma SI de Gutin contra a forma inglesa, V&V, deteção, semântica de
+  limite inferior, pipeline C172 com Parte 36, API).
+* **Limites**: jatos não avaliados; Hamilton Standard/SAE AIR1407, Hanson, Fidell (deteção de sinais) e ICAO
+  Anexo 16 Cap. 10 não implementados (fontes não verificadas); sem refração, atenuação do solo ou barreiras.
+  Pormenor em [docs/RUIDO.md](docs/RUIDO.md).
 
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
@@ -1780,7 +1808,7 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 
 ### Prioridade MÉDIA
 
-9. **Configurações VTOL, híbrido e eVTOL.** — L0 feito (6 nov 2026, §29, `acdt vtol`); fecho de massa opt-in feito (9 nov 2026); despacho híbrido L0 por regras + fases comuns no estudo de frota 1.2 feitos (9 nov 2026); BEMT axial/pairar opt-in feito (10 nov 2026); falta massa híbrida fechada, BEMT em voo avançado, ruído, ECMS/DP.
+9. **Configurações VTOL, híbrido e eVTOL.** — L0 feito (6 nov 2026, §29, `acdt vtol`); fecho de massa opt-in feito (9 nov 2026); despacho híbrido L0 por regras + fases comuns no estudo de frota 1.2 feitos (9 nov 2026); BEMT axial/pairar opt-in feito (10 nov 2026); falta massa híbrida fechada, BEMT em voo avançado, ruído no `acdt vtol` (a `acdt.api.rotor_noise` já aceita rotores dados, §32r), ECMS/DP.
 
 ### Prioridade BAIXA (útil, mais tarde)
 
@@ -1805,7 +1833,7 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 9 | BAIXA | **UQ e projeto robusto** | bandas nos resultados (W0, custo, margens) em vez de pontos; projeto pouco sensível | Monte Carlo / LHS; caos polinomial (Chaospy, MIT); OpenMDAO + UQ |
 | 10 | BAIXA | **Modelos substitutos / ML** para MDO rápido | MDO com L1/L3 a custo L0; exploração de espaço de projeto | krigagem (SMT, BSD); redes neuronais; multifidelidade (co-krigagem) |
 | 11 | BAIXA | **Ingestão de dados de ensaio em voo** | calibrar polares, desempenho e estabilidade com dados reais (como a Fase 4 faz com CFD) | identificação de sistemas (output-error, Klein & Morelli); logs PX4/ArduPilot |
-| 12 | BAIXA | **Ruído** | ruído de hélice para certificação e aceitação (UAV urbano) | Hanson (ruído harmónico de hélice); referências de métodos FAA AEDT; ICAO Anexo 16 |
+| 12 | BAIXA (L0 feito 18 nov 2026, §32r) | **Ruído** | ruído de hélice para certificação e aceitação (UAV urbano) | feito: Gutin, Schlegel-King-Mull, ISO 9613-1, IEC 61672-1, ISO 226, Parte 36 Ap. G; falta Hanson, espessura, motor, ICAO Anexo 16 |
 | 13 | BAIXA | **Gelo** | penalização aerodinâmica e necessidade de proteção | NASA LEWICE (referência); CS-25 Anexo C (envelopes) |
 | 14 | BAIXA | **Gestão térmica** de aviónica e baterias | temperatura de células e eletrónica; dimensionamento de arrefecimento | balanços térmicos de parâmetros concentrados; modelo térmico de Bernardi (baterias) |
 | 15 | BAIXA | **Custo do ciclo de vida, carbono e LCA** | custo total de posse e pegada (fabrico, operação, fim de vida) | LCC (Roskam VIII, a verificar); ISO 14040/44; fatores de emissão de bases públicas |
