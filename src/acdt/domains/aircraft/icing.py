@@ -199,7 +199,16 @@ def size_with_icing(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]:
         sp.assumptions["weights"]["fixed_mass_kg"] = base_mass + new["mass_kg"]
         if spec.propulsion_kind == "electric":
             sp.assumptions["propulsion"]["systems_power_W"] = base_P + new["power_W"]
-    return res, sysr, {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ gelo"}
+            # com power budget em malha fechada (systems_integration.run_with_systems) systems_power_W é substituído
+            # pela média do balanço; a proteção entra também como carga do balanço, com ciclo 1 (toda a missão —
+            # PRESSUPOSTO conservador: a exposição real é só a fração em gelo)
+            if new["power_W"]:
+                ss = copy.deepcopy(dict(getattr(spec, "systems", None) or {}))
+                ss["loads"] = list(ss.get("loads") or []) + [
+                    {"name": "proteção contra o gelo (acdt.icing)", "power_w": new["power_W"], "duty": 1.0}]
+                sp.systems = ss
+    return res, sysr, {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ gelo",
+                       "electrical_load": "propulsion.systems_power_W + systems.loads (ciclo 1, conservador)"}
 
 
 def icing_stage(res: Any) -> None:
