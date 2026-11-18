@@ -86,6 +86,8 @@ class DesignResult:
     weight_balance: object | None = None  # weight_balance.WeightBalanceResult (operational loading)
     landing_gear: object | None = None    # landing_gear.LandingGearResult
     noise: dict | None = None             # noise.analyse_noise (disciplina ruído, L0)
+    thermal: dict | None = None           # thermal.analyse_thermal (disciplina térmica, L0/L1)
+    thermal_coupling: dict | None = None  # thermal.size_with_thermal (acoplamento iterar)
     structures_l1: object | None = None   # structures_l1.StructuresL1 (masses, deflections, elastic correction)
     launch_recovery: dict | None = None   # opt-in catapult / belly landing (launch_recovery.py)
     gear_drag: dict | None = None         # opt-in gear drag in the polar (aero/gear_drag.py)
@@ -188,6 +190,13 @@ def _chk_cat(r, res):
         ok &= W0 >= lim["mtow_min"]
         msgs.append(f"W0 >= {lim['mtow_min']:g} kg")
     return CheckResult(r.key, ok if msgs else None, f"{r.value}: " + ("; ".join(msgs) or "no numeric limit"))
+
+
+@register_handler("check", "thermal_margin")
+@register_handler("check", "cold_thermal_margin")
+@register_handler("check", "cooling_drag_area")
+def _chk_thermal(r, res):
+    return CheckResult(r.key, None, "avaliado na etapa térmica (verificação: termica:…)")
 
 
 @register_handler("check", "noise")

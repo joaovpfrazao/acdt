@@ -53,6 +53,8 @@ def phase2_dict(res) -> dict:
         d["performance"] = res.performance.summary()
     if getattr(res, "noise", None) is not None:
         d["noise"] = res.noise
+    if getattr(res, "thermal", None) is not None:
+        d["thermal"] = res.thermal
     d["verified_segment_mission"] = res.verified
     return _jsonable(d)
 

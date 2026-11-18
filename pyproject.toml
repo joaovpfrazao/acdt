@@ -130,6 +130,13 @@ files = [
   "src/acdt/core/acoustics/propagation.py",
   "src/acdt/core/acoustics/certification.py",
   "src/acdt/core/acoustics/study.py",
+  "src/acdt/core/thermal/__init__.py",
+  "src/acdt/core/thermal/air.py",
+  "src/acdt/core/thermal/convection.py",
+  "src/acdt/core/thermal/network.py",
+  "src/acdt/core/thermal/cooling.py",
+  "src/acdt/core/thermal/sources.py",
+  "src/acdt/core/thermal/study.py",
 ]
 strict = true
 follow_imports = "silent"

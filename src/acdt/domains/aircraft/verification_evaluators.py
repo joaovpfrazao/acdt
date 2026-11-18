@@ -14,6 +14,11 @@ de ``assumptions.constraints``).
   ``overhead_LAmax_dBA``, ``detection_ground_range_m``, ``SEL_dBA``, ``part36_G.LAmax_dBA``. Com fontes de ruído
   incompletas o valor é um **limite inferior**: num requisito ``max`` um valor acima do limiar falha, um valor abaixo
   fica desconhecido (nunca passa).
+* ``termica:<caminho>`` — grandeza da secção ``thermal`` (thermal.py; docs/TERMICA.md), p. ex. ``hot_margin_C``,
+  ``cold_margin_C``, ``cooling.drag_area_m2``, ``components.<id>.by_condition.<cond>.hot_margin_C``. As grandezas
+  térmicas são **intervalos** {lo, hi}: num requisito ``min`` passa só se ``lo`` ≥ limiar, falha se ``hi`` < limiar;
+  num ``max`` passa só se ``hi`` ≤ limiar, falha se ``lo`` > limiar; o resto (ou majorante desconhecido) fica
+  desconhecido — nunca passa por omissão.
 * ``entrada:<requisito>`` — entradas do dimensionamento (velocidade/altitude de cruzeiro, payload, tripulação)
   lidas do que o dimensionamento usou: cumprido por construção, verificação por inspeção.
 """
@@ -129,6 +134,9 @@ def _list_evidence(ctx: VerificationContext) -> list[str]:
     nz = ctx.result.get("noise")
     if isinstance(nz, dict) and nz.get("evaluated"):
         out += ["ruido:overhead_LAmax_dBA", "ruido:detection_ground_range_m"]
+    th = ctx.result.get("thermal")
+    if isinstance(th, dict) and th.get("evaluated"):
+        out += ["termica:hot_margin_C", "termica:cold_margin_C", "termica:cooling.drag_area_m2"]
     return out
 
 
@@ -164,6 +172,58 @@ def _eval_noise(req: TracedRequirement, ctx: VerificationContext, key: str) -> E
 register_evaluator(Evaluator("ruido:", _eval_noise, "disciplina ruído L0 (Gutin, Schlegel-King-Mull, ISO 9613-1, "
                              "IEC 61672-1, ISO 226); limite inferior com fontes incompletas", "analise", "N0",
                              "Marte & Kurtz 1970; ISO 9613-1; IEC 61672-1; ISO 226", ("aircraft",)))
+def _eval_thermal(req: TracedRequirement, ctx: VerificationContext, key: str) -> Evidence:
+    from acdt.core.verification import json_path
+
+    th = ctx.result.get("thermal")
+    if not isinstance(th, dict):
+        return Evidence(ran=False, message="etapa térmica não correu")
+    if not th.get("evaluated"):
+        return Evidence(ran=False, message=f"térmica não avaliada: {th.get('reason', '')}")
+    try:
+        v = json_path(th, key)
+    except (KeyError, ValueError, IndexError, TypeError):
+        return Evidence(ran=False, message=f"thermal.{key} não existe", pointer=f"thermal.{key}")
+    rt = REGISTRY.get(req.quantity)
+    u = units.default_unit(rt.dimension) if rt is not None else req.unit
+
+    def num(x: Any) -> float | None:
+        return float(x) if isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(float(x)) \
+            else None
+
+    if isinstance(v, dict) and ("lo" in v or "hi" in v):
+        lo, hi = num(v.get("lo")), num(v.get("hi"))
+        thr = num(req.threshold)
+        rng = f"[{'?' if lo is None else f'{lo:.4g}'}, {'?' if hi is None else f'{hi:.4g}'}]"
+        if thr is not None and req.comparison == "min":
+            if lo is not None and lo >= thr:
+                return Evidence(lo, u, pointer=f"thermal.{key}.lo", fidelity="N0", message=f"intervalo {rng}: "
+                                "o minorante cumpre")
+            if hi is not None and hi < thr:
+                return Evidence(hi, u, pointer=f"thermal.{key}.hi", fidelity="N0", message=f"intervalo {rng}: "
+                                "nem o majorante cumpre")
+            return Evidence(None, message=f"thermal.{key} = {rng} atravessa o limiar ou tem extremo desconhecido "
+                            "(declare as entradas em falta)", pointer=f"thermal.{key}", fidelity="N0")
+        if thr is not None and req.comparison == "max":
+            if hi is not None and hi <= thr:
+                return Evidence(hi, u, pointer=f"thermal.{key}.hi", fidelity="N0", message=f"intervalo {rng}: "
+                                "o majorante cumpre")
+            if lo is not None and lo > thr:
+                return Evidence(lo, u, pointer=f"thermal.{key}.lo", fidelity="N0", message=f"intervalo {rng}: "
+                                "nem o minorante cumpre")
+            return Evidence(None, message=f"thermal.{key} = {rng} atravessa o limiar ou tem extremo desconhecido "
+                            "(declare as entradas em falta)", pointer=f"thermal.{key}", fidelity="N0")
+        return Evidence(None, message=f"thermal.{key} é um intervalo {rng}: só comparações min/max",
+                        pointer=f"thermal.{key}")
+    x = num(v)
+    if x is None:
+        return Evidence(None, message=f"thermal.{key} sem valor", pointer=f"thermal.{key}")
+    return Evidence(x, u, pointer=f"thermal.{key}", fidelity="N0")
+
+
+register_evaluator(Evaluator("termica:", _eval_thermal, "disciplina térmica L0/L1 (Incropera et al. 6.ª ed., "
+                             "MIL-HDBK-310, NACA RM A8I29); intervalos — desconhecido se atravessa o limiar",
+                             "analise", "N0", "Incropera et al. 2007; MIL-HDBK-310; NACA RM A8I29", ("aircraft",)))
 register_evaluator(Evaluator("entrada:", _eval_input, "entrada do dimensionamento (por construção)",
                              "inspecao", "N0", domains=("aircraft",)))
 register_evidence_lister("aircraft", _list_evidence)
@@ -177,5 +237,8 @@ for _k in _INPUT_PATHS:
     register_default_evaluator("aircraft", _k, f"entrada:{_k}", "inspecao", "N0")
 register_default_evaluator("aircraft", "noise", "ruido:overhead_LAmax_dBA", "analise", "N0")
 register_default_evaluator("aircraft", "aural_detection_range", "ruido:detection_ground_range_m", "analise", "N0")
+register_default_evaluator("aircraft", "thermal_margin", "termica:hot_margin_C", "analise", "N0")
+register_default_evaluator("aircraft", "cold_thermal_margin", "termica:cold_margin_C", "analise", "N0")
+register_default_evaluator("aircraft", "cooling_drag_area", "termica:cooling.drag_area_m2", "analise", "N0")
 for _k in ("regulatory_category", "unit_cost", "power_available", "thrust_available"):
     register_default_evaluator("aircraft", _k, f"check:{_k}", "analise", "N0")

@@ -25,7 +25,7 @@ from acdt import __version__
 from ._deprecation import DEPRECATED, ACDTDeprecationWarning, deprecated
 
 #: Versão semântica da API pública (independente da versão do pacote, :data:`acdt.__version__`).
-API_VERSION = "1.2.0"
+API_VERSION = "1.3.0"
 
 #: Níveis de fidelidade aceites por :func:`size`/:func:`analyse` (``None`` = o que a missão declara).
 LEVELS: dict[str, str] = {"L0": "handbook", "L1": "lowfi"}
@@ -44,6 +44,8 @@ __all__ = [
     "report",
     # ruído de rotores/hélices (L0)
     "rotor_noise",
+    # gestão térmica (L0/L1), genérica para qualquer tipo de aeronave
+    "thermal", "thermal_atmosphere",
     # erros
     "errors",
 ]
@@ -539,3 +541,24 @@ def rotor_noise(*, blades: int, diameter_m: float, rpm: float, thrust_N: float, 
                projected_thickness_m=projected_thickness_m, harmonics=harmonics, T_C=T_C, rh_pct=rh_pct, p_kpa=p_kpa,
                ground_dB=ground_dB, ambient_third_octave_dB=ambient_third_octave_dB,
                detection_margin_dB=detection_margin_dB)
+
+
+def thermal(spec: Mapping[str, Any]) -> dict[str, Any]:
+    """Análise térmica genérica (desde 1.3.0; docs/TERMICA.md): compartimentos, fontes de calor como intervalos,
+    condições (atmosferas ISA / MIL-HDBK-310 quente/fria), regime permanente e transitório de capacidade
+    concentrada (Incropera et al. 6.ª ed.), ar dinâmico (entrada NACA, NACA RM A8I29) e ventilador, com arrasto,
+    massa e potência de arrefecimento. Serve qualquer aeronave (asa fixa, VTOL, jato, híbrido): o chamador dá as
+    fontes (W ou [mín, máx]; ``None`` = desconhecido) por condição."""
+    from acdt.core.thermal.study import analyse
+
+    return analyse(spec)
+
+
+def thermal_atmosphere(profile: str, altitude_m: float, *, T_sl_C: float | None = None) -> dict[str, Any]:
+    """Ar ambiente de projeto (desde 1.3.0): ``isa``, ``mil310_hot_1pct``, ``mil310_cold_1pct``,
+    ``mil310_cold_20pct`` ou ``custom``. Devolve T [°C], p [Pa], ρ [kg/m³] e a fonte."""
+    from acdt.core.thermal.air import ambient
+
+    a = ambient(profile, altitude_m, T_sl_C=T_sl_C)
+    return {"profile": a.profile, "altitude_m": a.altitude_m, "T_C": a.T_C, "p_Pa": a.p_Pa, "rho_kg_m3": a.rho,
+            "source": a.source}

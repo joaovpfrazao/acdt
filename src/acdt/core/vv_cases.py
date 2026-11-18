@@ -430,3 +430,121 @@ def _nz_p36() -> Mapping[str, float | None]:
     return {"b_500kg": part36_g_limit(500, False), "b_1200kg": part36_g_limit(1200, False),
             "b_5000kg": part36_g_limit(5000, False), "c_570kg": part36_g_limit(570, True),
             "c_1140kg": part36_g_limit(1140, True), "c_3000kg": part36_g_limit(3000, True)}
+
+
+# ------------------------------------------------------------------------------------------------ térmica
+INC6 = ("Incropera, DeWitt, Bergman & Lavine, Fundamentals of Heat and Mass Transfer, 6.ª ed. (Wiley, 2007); "
+        "enunciado, propriedades do ar (Tabela A.4) e resposta impressa do exemplo, transcritos pelo FOSSEE Textbook "
+        "Companion (IIT Bombay, tbc-python.fossee.in, «Fundamentals of Heat and Mass Transfer», notebooks dos "
+        "Caps. 5, 7, 8 e 9)")
+_th = builder("termica")
+
+
+@_th("THERMAL-INC-EX5.1", "Capacidade concentrada: junção de termopar (Incropera Ex. 5.1)",
+     "Esfera com h = 400 W/(m²·K), k = 20 W/(m·K), c = 400 J/(kg·K), ρ = 8500 kg/m³: diâmetro para τ = 1 s "
+     "(τ = ρcD/(6h), Eq. 5.7) e tempo de 25 °C a 199 °C num gás a 200 °C (Eq. 5.5); verificação Bi < 0,1.",
+     "verificacao",
+     [Reference("D_mm", 0.706, "mm", INC6 + ", Ex. 5.1", tol_abs=5e-4, tol_source="resposta impressa a 3 algarismos"),
+      Reference("t_s", 5.2, "s", INC6 + ", Ex. 5.1", tol_abs=0.05, tol_source="resposta impressa a 0,1 s (exato 5,16)"),
+      Reference("Bi", 0.1, "-", INC6 + ", Eq. 5.10 (critério)", kind="max", tol_source="critério de validade")],
+     tests=("tests/test_thermal.py::test_incropera_ex51_lumped",))
+def _th_ex51() -> Mapping[str, float | None]:
+    from acdt.core.thermal.convection import biot, lumped_time_to
+
+    h, k, c, rho = 400.0, 20.0, 400.0, 8500.0
+    D = 6.0 * h * 1.0 / (rho * c)
+    tau = rho * c * D / (6.0 * h)
+    return {"D_mm": D * 1e3, "t_s": lumped_time_to(199.0, 25.0, 200.0, tau), "Bi": biot(h, D / 6.0, k)}
+
+
+@_th("THERMAL-INC-EX7.1", "Placa plana laminar: arrefecimento por ar a baixa pressão (Incropera Ex. 7.1)",
+     "Ar a 300 °C e 6 kPa, 10 m/s, sobre placa de 0,5 m a 27 °C; propriedades a T_f = 437 K (ν = 30,84×10⁻⁶ m²/s a "
+     "1 atm, escalada por p, k = 36,4×10⁻³ W/(m·K), Pr = 0,687); Eq. 7.30.", "verificacao",
+     [Reference("q_W_per_m", 570.0, "W/m", INC6 + ", Ex. 7.1", tol_rel=0.005,
+                tol_source="resposta impressa a 3 algarismos (570 W/m)")],
+     tests=("tests/test_thermal.py::test_incropera_ex71_flat_plate",))
+def _th_ex71() -> Mapping[str, float | None]:
+    from acdt.core.thermal.air import AirProps
+    from acdt.core.thermal.convection import flat_plate_forced
+
+    nu = 30.84e-6 * 101325.0 / 6000.0
+    k, Pr = 36.4e-3, 0.687
+    # AirProps com ν, k e Pr do exemplo: ρ = 1 (escala), μ = ν, c_p = Pr·k/μ
+    pr = AirProps(437.0, 1.0, nu, k, Pr * k / nu)
+    c = flat_plate_forced(10.0, 0.5, 300.0, 573.0, 6000.0, props=pr)
+    return {"q_W_per_m": c.h * 0.5 * (573.0 - 300.0)}
+
+
+@_th("THERMAL-INC-EX9.2", "Convecção natural, placa vertical: guarda-fogo de vidro (Incropera Ex. 9.2)",
+     "Placa vertical 0,71 m × 1,02 m a 232 °C em ar a 23 °C; propriedades a 400 K (k = 33,8×10⁻³, ν = 26,4×10⁻⁶, "
+     "α = 38,3×10⁻⁶, Pr = 0,69, β = 1/T_f); Churchill & Chu, Eq. 9.26.", "verificacao",
+     [Reference("q_W", 1060.0, "W", INC6 + ", Ex. 9.2", tol_rel=0.005, tol_source="resposta impressa a 3 algarismos")],
+     tests=("tests/test_thermal.py::test_incropera_ex92_natural",))
+def _th_ex92() -> Mapping[str, float | None]:
+    from acdt.core.thermal.air import AirProps
+    from acdt.core.thermal.convection import vertical_plate_natural
+
+    k, nu, al, Pr = 33.8e-3, 26.4e-6, 38.3e-6, 0.69
+    # ρ·c_p = k/α; μ = ν·ρ; com ρ = 1 → c_p = k/α; Pr do exemplo
+    pr = AirProps(400.0, 1.0, nu, k, k / al)
+    c = vertical_plate_natural(0.71, 505.0, 296.0, 101325.0, props=pr)
+    # Pr da AirProps = ν/α = 0,689 (o exemplo usa 0,69 arredondado)
+    return {"q_W": c.h * 0.71 * 1.02 * (505.0 - 296.0)}
+
+
+@_th("THERMAL-INC-EX8.6", "Escoamento interno turbulento: conduta de ar quente (Incropera Ex. 8.6)",
+     "Ar a 0,05 kg/s numa conduta de 0,15 m (k = 0,030, μ = 208,2×10⁻⁷, Pr = 0,70 a 350 K) arrefecido para "
+     "exterior a 0 °C com h_o = 6 W/(m²·K); Dittus–Boelter (Eq. 8.60, n = 0,3); fluxo e temperatura da parede à "
+     "saída (77 °C).", "verificacao",
+     [Reference("q_flux_W_m2", 304.0, "W/m²", INC6 + ", Ex. 8.6", tol_rel=0.005, tol_source="resposta a 3 algarismos"),
+      Reference("Ts_L_C", 50.7, "°C", INC6 + ", Ex. 8.6", tol_abs=0.15, tol_source="resposta impressa a 0,1 °C")],
+     tests=("tests/test_thermal.py::test_incropera_ex86_duct",))
+def _th_ex86() -> Mapping[str, float | None]:
+    from acdt.core.thermal.air import AirProps
+    from acdt.core.thermal.convection import duct_internal
+
+    m, D, k, mu, Pr = 0.05, 0.15, 0.030, 208.2e-7, 0.70
+    h = duct_internal(m, D, math.pi * D * D / 4.0, 363.0, 101325.0, heating=False,
+                      props=AirProps(350.0, 1.0, mu, k, Pr * k / mu)).h
+    q = (77.0 - 0.0) / (1.0 / h + 1.0 / 6.0)
+    return {"q_flux_W_m2": q, "Ts_L_C": 77.0 - q / h}
+
+
+_MIL = ("MIL-HDBK-310 (DoD, 23 jun 1997), §5.3.1.1.2 e §5.3.1.2.2 (temperaturas de 1 % por altitude geométrica, com "
+        "massa volúmica associada) e Tabela I (radiação solar máxima 1120 W/m²)")
+
+
+@_th("THERMAL-MIL310", "Atmosferas de projeto quente e fria (MIL-HDBK-310)",
+     "Valores transcritos nos nós da tabela e radiação solar de projeto do dia quente.", "verificacao",
+     [Reference("hot_T_0km_C", 49.0, "°C", _MIL, tol_abs=1e-9, tol_source="valor tabelado"),
+      Reference("hot_rho_0km", 1.081, "kg/m³", _MIL, tol_rel=1e-9, tol_source="valor tabelado"),
+      Reference("hot_T_10km_C", -13.0, "°C", _MIL, tol_abs=1e-9, tol_source="valor tabelado"),
+      Reference("cold_T_0km_C", -61.0, "°C", _MIL, tol_abs=1e-9, tol_source="valor tabelado"),
+      Reference("cold_rho_6km", 0.675, "kg/m³", _MIL, tol_rel=1e-9, tol_source="valor tabelado"),
+      Reference("solar_W_m2", 1120.0, "W/m²", _MIL, tol_abs=1e-9, tol_source="valor tabelado")],
+     tests=("tests/test_thermal.py::test_mil310_tables",))
+def _th_mil() -> Mapping[str, float | None]:
+    from acdt.core.thermal.air import SOLAR_HOT_DAY_W_M2, ambient
+
+    return {"hot_T_0km_C": ambient("mil310_hot_1pct", 0).T_C, "hot_rho_0km": ambient("mil310_hot_1pct", 0).rho,
+            "hot_T_10km_C": ambient("mil310_hot_1pct", 10000).T_C,
+            "cold_T_0km_C": ambient("mil310_cold_1pct", 0).T_C, "cold_rho_6km": ambient("mil310_cold_1pct", 6000).rho,
+            "solar_W_m2": SOLAR_HOT_DAY_W_M2}
+
+
+_INC_A4 = INC6 + ", Tabela A.4 (ar a 300 K: μ = 184,6×10⁻⁷ N·s/m², k = 26,3×10⁻³ W/(m·K), Pr = 0,707)"
+
+
+@_th("THERMAL-AIR-PROPS", "Propriedades do ar (USSA 1976) contra a Tabela A.4 de Incropera",
+     "μ (Sutherland, USSA 1976 Eq. 51), k (USSA 1976 Eq. 53) e Pr = μc_p/k a 300 K e 1 atm, com c_p de gás "
+     "caloricamente perfeito.", "validacao",
+     [Reference("mu_300K", 184.6e-7, "Pa·s", _INC_A4, tol_rel=0.005, tol_source="correlação vs tabela: 0,5 %"),
+      Reference("k_300K", 26.3e-3, "W/(m·K)", _INC_A4, tol_rel=0.01, tol_source="correlação vs tabela: 1 %"),
+      Reference("Pr_300K", 0.707, "-", _INC_A4, tol_rel=0.01, tol_source="c_p constante 1004,7 vs 1007 da tabela "
+                "(−0,2 %) + k: 1 %")],
+     tests=("tests/test_thermal.py::test_air_props_vs_table_a4",))
+def _th_air() -> Mapping[str, float | None]:
+    from acdt.core.thermal.air import air_props
+
+    a = air_props(300.0, 101325.0)
+    return {"mu_300K": a.mu, "k_300K": a.k, "Pr_300K": a.Pr}
