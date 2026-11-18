@@ -219,13 +219,13 @@ def lateral_test(fm: FlightModel, tl: dict, V: float, h: float, T: float = 12.0,
     Lda = qS * a.b * t0[IDX["Clda"]] / fm.mass.Ixx
     kp, kd, _ = TX.bank_hold_gains(Lp, Lda, da_max)
 
-    def run(with_sas: bool):
+    def run(with_sas: bool, rate=act_rate):
         sim = SixDOF(fm, wind=wind)
         x = tr["x"].copy()
         c0 = tr["controls"]
         act = None
         if with_sas and sas.get("status") == "ok" and sa.get("C1"):
-            act = TX.SplitActuator(sa["C1"], sa["delta_max_deg"], act_rate, dyn.get("lag_s", 0.0),
+            act = TX.SplitActuator(sa["C1"], sa["delta_max_deg"], rate, dyn.get("lag_s", 0.0),
                                    dyn.get("delay_s", TX.TIME_DELAY_LIMITS_S[0]), dt,
                                    bias_deg=float((tl.get("lateral_gust") or {}).get("bias_deg") or 0.0))
         t = 0.0
@@ -262,8 +262,44 @@ def lateral_test(fm: FlightModel, tl: dict, V: float, h: float, T: float = 12.0,
     out["bank_hold"] = {"kp_phi": kp, "kd_phi": kd, "source": "Beard & McLain 2012 Sec. 6.3.1"}
     b_end, s_end = out["bare"]["final_beta_amp_deg"], out["sas"]["final_beta_amp_deg"]
     out["sas_damps_better"] = (s_end is not None and b_end is not None and s_end < b_end)
+    out["gust_verdict"] = gust_verdict_6dof(out["sas"], act_rate, lambda: run(True, rate=None))
     out["status"] = "assessed"
     return out
+
+
+GUST_6DOF_CRITERION = ("o mesmo critério estrito de hq:lateral_gust (14 CFR 23.443/23.333(c) pré-Amdt 64, rajada "
+                       "1−cos): sem saturação, sem limite de taxa e β amortecido (≤ 10 % do pico no último quarto); "
+                       "não se encontrou norma citável que admita saturação de taxa breve")
+
+
+def gust_verdict_6dof(r_sas: dict, rate_avail_deg_s, run_unlimited) -> dict:
+    """Strict verdict of the 6-DOF lateral gust with the SAS (same criterion as ``hq:lateral_gust``). When the
+    servo rate limit is touched, the gust is re-flown with an unlimited rate and its peak surface rate is the
+    rate the strict criterion requires (``rate_required_deg_s``) — reported, nothing is changed in the design."""
+    a = r_sas.get("actuator")
+    if not a:
+        return {"status": "unassessed", "ok": None, "issue": "sem SAS/atuador no ensaio 6-DOF",
+                "criterion": GUST_6DOF_CRITERION}
+    pk = (r_sas.get("peak") or {}).get("beta_deg") or 0.0
+    fin = r_sas.get("final_beta_amp_deg")
+    settled = fin is not None and fin <= 0.1 * max(pk, 1e-6)
+    v = {"status": "assessed", "criterion": GUST_6DOF_CRITERION, "settled": bool(settled),
+         "saturated": bool(a.get("saturated")), "rate_limited": bool(a.get("rate_limited")),
+         "rate_limited_fraction": a.get("rate_limited_fraction"), "peak_rate_deg_s": a.get("peak_rate_deg_s"),
+         "rate_available_deg_s": rate_avail_deg_s}
+    v["ok"] = bool(settled and not v["saturated"] and not v["rate_limited"])
+    if v["rate_limited"]:
+        ru = (run_unlimited() or {}).get("actuator") or {}
+        v["rate_required_deg_s"] = ru.get("peak_rate_deg_s")
+        v["unlimited_rate_saturated"] = ru.get("saturated")
+        if rate_avail_deg_s and v["rate_required_deg_s"]:
+            v["rate_factor_required"] = v["rate_required_deg_s"] / float(rate_avail_deg_s)
+        v["issue"] = (f"limite de taxa tocado em {100 * (v['rate_limited_fraction'] or 0):.2f} % do tempo; sem limite o "
+                      f"pico seria {v['rate_required_deg_s'] or float('nan'):.0f} °/s contra "
+                      f"{rate_avail_deg_s or float('nan'):.0f} °/s disponíveis na superfície — falha pelo critério estrito")
+    elif not v["ok"]:
+        v["issue"] = "saturação ou β não amortecido no último quarto"
+    return v
 
 
 def bare_modes(fm: FlightModel, V: float, h: float) -> dict:
@@ -408,6 +444,15 @@ def tailless_simulation_study(res, out_dir, *, jsbsim_check: bool = False, log=p
         out["notes"].append(f"casos sem equilíbrio de cruzeiro com a elevon (6-DOF não corrido): {untrimmed}")
     out["lateral_test"] = out["lateral_tests"][case]
     out["case"] = case
+    gv = {cn: (lt.get("gust_verdict") or {}) for cn, lt in out["lateral_tests"].items()}
+    oks = [v.get("ok") for v in gv.values()]
+    out["lateral_gust_6dof"] = {
+        "criterion": GUST_6DOF_CRITERION,
+        "ok": False if any(o is False for o in oks) else (True if oks and all(o is True for o in oks) else None),
+        "failing_cases": sorted(cn for cn, v in gv.items() if v.get("ok") is False),
+        "rate_required_deg_s": max((v["rate_required_deg_s"] for v in gv.values()
+                                    if v.get("rate_required_deg_s") is not None), default=None),
+        "cases": gv}
     ms = None
     if mission:
         from .mission import load_mission
