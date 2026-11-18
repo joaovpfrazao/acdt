@@ -70,7 +70,7 @@ _SUFFIX_KEYS = sorted(SUFFIX_UNITS, key=len, reverse=True)
 _OPAQUE = {"dB_acdt": "dB", "dBsm_acdt": "dBsm", "USD_acdt": "USD", "kUSD_acdt": "kUSD"}
 
 _NUM = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
-_QTY_RE = re.compile(rf"^\s*({_NUM})\s*([^\d\s].*?)?\s*$")
+_QTY_RE = re.compile(rf"^\s*({_NUM})\s*([A-Za-z°%µΩ(].*?)?\s*$")  # unidade começa por letra: "2026-11-06" não
 
 
 @lru_cache(maxsize=1)
@@ -215,8 +215,8 @@ def normalise_tree(obj: Any, where: str = "") -> Any:
     """Converte, numa árvore YAML (assumptions, systems…), os valores com unidade escrita para a unidade que a
     chave declara. Devolve uma cópia; números simples e textos que não são grandezas ficam iguais.
 
-    Erros (com o caminho): dimensão errada; grandeza com unidade numa chave sem unidade declarada (não se adivinha
-    em que unidade o núcleo a espera).
+    Erros (com o caminho): dimensão errada ou unidade desconhecida numa chave que declara unidade. Numa chave sem
+    sufixo de unidade o texto fica como está (é texto: datas, notas, referências); não se adivinha a unidade.
     """
     if isinstance(obj, dict):
         return {k: _norm_value(k, v, f"{where}.{k}" if where else str(k)) for k, v in obj.items()}
@@ -235,10 +235,7 @@ def _norm_value(key: Any, v: Any, where: str) -> Any:
         if target is not None:
             return [_norm_value(key, x, f"{where}[{i}]") for i, x in enumerate(v)]
         return normalise_tree(v, where)
-    if looks_like_quantity(v):
-        if target is None:
-            raise QuantityError(f"{where}: '{v}' tem unidade, mas a chave '{key}' não declara a unidade interna "
-                                f"(sufixo como _m, _kg, _deg); escreva o número na unidade que o modelo usa")
+    if target is not None and looks_like_quantity(v):
         if target in _OPAQUE:
             mag, u = parse_quantity(v)
             if u not in (_OPAQUE[target], target):

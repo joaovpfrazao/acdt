@@ -63,8 +63,9 @@ def test_normalise_tree_converts_by_key_and_keeps_numbers():
     assert out["geometry"]["c_ht"] == 0.55 and out["airfoil"] == "NACA 4415"
     assert out["weight_balance"]["arm_in"] == pytest.approx(1 / 0.0254)
     assert src["geometry"]["fuselage_length_m"] == "10 ft"           # não altera a entrada
-    with pytest.raises(Q.QuantityError, match="não declara a unidade interna"):
-        Q.normalise_tree({"AR": "16 m"}, "assumptions.aero")
+    assert Q.normalise_tree({"AR": "16 m"}) == {"AR": "16 m"}   # chave sem unidade declarada: texto, não se adivinha
+    free = {"retrieved": "2026-11-06", "notes": "2 tempos", "ref": "3 pins", "id": "123"}   # texto livre: igual
+    assert Q.normalise_tree(free) == free
     with pytest.raises(Q.QuantityError, match=r"\[time\]"):
         Q.normalise_tree({"geometry": {"fuselage_length_m": "3 s"}})
 

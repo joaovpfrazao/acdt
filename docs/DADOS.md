@@ -130,8 +130,9 @@ verification:
   `_kg`, `_deg`, `_m_s`, `_kW_per_kg`, `_in`, …; tabela `SUFFIX_UNITS` em `acdt/core/quantities.py`).
 * **Erros claros**, com o caminho e as duas dimensões. Exemplos:
   `assumptions.geometry.fuselage_length_m: '8.0 kg' tem dimensão [mass], mas é esperado [length] (unidade
-  interna 'm')`. Uma grandeza com unidade numa chave sem sufixo de unidade (`AR: 16 m`) é recusada, porque não se
-  adivinha em que unidade o modelo a espera. O `acdt size` sai com código 2 e mostra a mensagem.
+  interna 'm')`. O `acdt size` sai com código 2 e mostra a mensagem.
+* Numa chave sem sufixo de unidade (`AR: 16 m`, `retrieved: 2026-11-06`, notas), o texto fica como está, porque
+  não se adivinha em que unidade o modelo o espera.
 * `{value, unit}` só se lê como grandeza numa chave com sufixo de unidade. Nas outras chaves, um mapa continua a
   ser um mapa.
 * Temperaturas (`15 degC`) convertem-se pela regra afim do pint.
