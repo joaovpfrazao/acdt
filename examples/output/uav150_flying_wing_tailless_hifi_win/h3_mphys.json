@@ -1,0 +1,77 @@
+{
+  "design": "uav150_flying_wing_tailless",
+  "date": "2026-11-18",
+  "image": "mdolab/public:u22-gcc-ompi-stable",
+  "image_updated": "2026-11-17",
+  "image_bytes": 3853076191,
+  "runner": "udocker 1.3.17, execmode P1",
+  "docker_desktop": false,
+  "container": "acdt-mphys",
+  "host": {
+    "wsl_mem_total_MB": 15922,
+    "wsl_mem_available_MB": 15400,
+    "wsl_disk_free": "933G",
+    "fits": true,
+    "note": "O embutir do loft é uma caixa de 6 por 8 por 4 e 537 pontos. A estimativa fica muito abaixo de 70 % da memória livre."
+  },
+  "versions": {
+    "adflow": "2.13.1",
+    "tacs": "3.10.1",
+    "pygeo": "1.17.1",
+    "pyhyp": "2.6.3",
+    "idwarp": "2.6.4",
+    "mphys": "2.0.0",
+    "openmdao": "3.37.0"
+  },
+  "imports": {
+    "adflow": true,
+    "tacs": true,
+    "pygeo": true,
+    "pyhyp": true,
+    "idwarp": true,
+    "mphys": true
+  },
+  "loft": {
+    "surface": "surface.xyz",
+    "ffd": "ffd.xyz",
+    "script": "pygeo_ffd.py",
+    "n_chord": 17,
+    "n_span": 9,
+    "n_tip": 9,
+    "n_points": 537,
+    "ffd_shape": [6, 8, 4],
+    "margin": 0.05,
+    "pressuposto": "PRESSUPOSTO: o FFD é a caixa alinhada aos eixos do loft, aumentada 5 % em cada lado e no mínimo 1 mm. Não é uma caixa ajustada à curvatura. Não há variável de projecto."
+  },
+  "pygeo": {
+    "status": "ok",
+    "rc": 0,
+    "n_points": 537,
+    "max_point_move_m": 9.761080836450517e-13,
+    "embedded": true,
+    "ranks": 1,
+    "note": "Sem variável de projecto, o ponto embutido coincide com o loft a 1e-12 m. O processo acdt não importa o pyGeo."
+  },
+  "cruise_aerostructural": {
+    "status": "nao_avaliado",
+    "adflow": "nao_avaliado",
+    "tacs": "nao_avaliado",
+    "reason": "O FFD não é uma malha de volume e não há deck ADflow nem TACS deste loft. Não se formou CL, CD, CMy nem flecha.",
+    "etapa3_su2_coarse": {
+      "alpha_deg": 9.52057,
+      "CL": 0.4170208795,
+      "CD": 0.03110908415,
+      "CMy": 0.03191435401,
+      "same_quantity": false,
+      "note": "RANS-SA SU2 da grossa, controlos alinhados. Não é um resultado ADflow."
+    },
+    "etapa6_calculix": {
+      "tip_w_fem_m": 0.057858099999999996,
+      "k_EI": 0.5706198141404788,
+      "same_quantity": false,
+      "note": "Flecha linear CalculiX à carga última. Não é um deslocamento TACS de cruzeiro."
+    }
+  },
+  "decision": "nao_aplicar",
+  "decision_reason": "O pyGeo embute os 537 pontos do loft e, sem variável de projecto, move-os 9,8e-13 m. Não há solução ADflow nem TACS de cruzeiro, por isso não há razão contra o CL 0,417 da grossa nem contra a flecha 0,0579 m do CalculiX. Essas grandezas não são a mesma. O exemplo não muda."
+}

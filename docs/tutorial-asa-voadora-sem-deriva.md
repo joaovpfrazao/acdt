@@ -218,3 +218,7 @@ Alley 2007.
   a 285 m/s; o modelo de faixas não cruza. Não há factor de flutter. A inversão por DLM fica por
   avaliar, porque a grelha não tem flap. O NLGEOM do caixão não convergiu e o Riks não foi escrito.
   Nenhum factor entra no exemplo. Números em `h2_calculix.json`.
+* **pyGeo (18 nov 2026)**. O loft entra numa caixa FFD e o pyGeo, dentro do contentor MDO Lab,
+  devolve os mesmos 537 pontos (desvio 9,8×10⁻¹³ m) quando não há variável de projecto. Não houve
+  solução ADflow nem TACS de cruzeiro, por isso não há comparação com o CL da grossa nem com a
+  flecha do CalculiX. Nenhum factor entra. Números em `h3_mphys.json`.
