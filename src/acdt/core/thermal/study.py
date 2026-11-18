@@ -117,6 +117,7 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
     cold_m: list[tuple[float | None, float | None]] = []
     drag_lo = drag_hi = 0.0
     drag_known = True
+    drag_unsized = False
     mass_total: float | None = 0.0
     fan_P: dict[str, float | None] = {}
     notes: list[str] = []
@@ -183,6 +184,13 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
         if ram is not None:
             bres["cooling"]["inlet_area_m2"] = A_in
             bres["cooling"]["mass_flow_ratio"] = mfr
+            if not A_in:
+                # conduto declarado mas sem área (não dimensionável): arrasto e massa desconhecidos, nunca zero
+                drag_unsized = True
+                mass_total = None
+                bres["cooling"]["status"] = "nao_dimensionado"
+                notes.append(f"compartimento '{bid}': conduto de ar dinâmico sem área (não dimensionado): "
+                             "arrasto e massa de arrefecimento desconhecidos")
 
         fan_conds = set((fan or {}).get("conditions") or [n for n, (c, _k) in conds.items() if c.V_m_s <= 0.5])
         for cn, (cond, case) in conds.items():
@@ -339,13 +347,17 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
     if rc in conds:
         cnd = conds[rc][0]
         q_ref = 0.5 * cnd.ambient.rho * cnd.V_m_s ** 2
-    cooling = {"drag_N": _iv(drag_lo, drag_hi if drag_known else drag_hi), "drag_known": drag_known,
-               "drag_area_m2": None if not q_ref else _iv(drag_lo / q_ref, drag_hi / q_ref),
-               "delta_CD0": None if not (q_ref and S) else _iv(drag_lo / (q_ref * S), drag_hi / (q_ref * S)),
+    dhi_out: float | None = None if drag_unsized else drag_hi
+    if drag_unsized:
+        drag_known = False
+    cooling = {"drag_N": _iv(drag_lo, dhi_out), "drag_known": drag_known,
+               "drag_area_m2": None if not q_ref else _iv(drag_lo / q_ref, None if dhi_out is None else dhi_out / q_ref),
+               "delta_CD0": None if not (q_ref and S) else _iv(drag_lo / (q_ref * S),
+                                                               None if dhi_out is None else dhi_out / (q_ref * S)),
                "mass_kg": mass_total, "fan_power_W": fan_P,
                "fan_power_max_W": (None if any(v is None for v in fan_P.values())
                                    else max((float(v) for v in fan_P.values() if v is not None), default=0.0))}
-    if not drag_known:
+    if not drag_known and not drag_unsized:
         notes.append("arrasto de arrefecimento é um intervalo [0, ṁV] (perdas de pressão não declaradas)")
     if not complete:
         notes.append("há fontes de calor sem majorante: temperaturas máximas desconhecidas onde indicado")

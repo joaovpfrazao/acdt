@@ -198,6 +198,9 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     srcs: dict[str, Any] = {"avionica": {"heat_W": electrical_load("avionica", P_hot, float(o["radiated_fraction"]),
                                                                     f"carga elétrica de bordo: {hot_src}"),
                                          "method": hot_src}}
+    if P_hot <= 0.0:
+        notes.append("carga elétrica de bordo declarada = 0 W (systems_power_W/onboard_power_W e power_budget): "
+                     "aviónica sem calor — confirme que não é uma omissão do modelo")
     el = o.get("electric") or {}
     eng = o.get("engine") or {}
     chain_ids: list[str] = []
