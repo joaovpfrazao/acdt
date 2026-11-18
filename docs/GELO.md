@@ -131,10 +131,21 @@ o LWC de projeto e o estado face ao envelope.
 
 ### 5.3 Acoplamento (`coupling: iterar`)
 
-Dentro da etapa de dimensionamento: soma o majorante da potência elétrica de proteção a
+Dentro da etapa de dimensionamento: soma o majorante da potência elétrica de proteção P × ciclo a
 `propulsion.systems_power_W` e, porque o power budget em malha fechada substitui esse valor pela média do
-balanço, também como carga `systems.loads` com ciclo 1 (toda a missão — PRESSUPOSTO conservador) (só aeronaves
-elétricas), e a massa declarada dos sistemas a `weights.fixed_mass_kg`;
+balanço, também como carga `systems.loads` (potência P, ciclo, pico P) (só aeronaves elétricas), e a massa
+declarada dos sistemas a `weights.fixed_mass_kg`.
+
+O ciclo vem de `icing.power_schedule`:
+
+* `exposicao` (omissão): ciclo = Σ duração dos segmentos com algum caso dentro do envelope do Ap. C
+  (`exposure_s.hi`, majorante da exposição) / Σ duração de todos os segmentos analisados. A energia passa a ser a da
+  fração da missão em gelo; a potência de pico (bateria, cablagem) continua a ser P;
+* `missao`: ciclo 1 (toda a missão, majorante conservador). É também o que se usa quando alguma duração de
+  segmento é desconhecida (por exemplo, condições do ponto de projeto sem tabela de missão).
+
+O ciclo e a sua justificação ficam em cada linha de `icing.coupling_loop.history` (`duty`, `duty_note`).
+
 repete até a variação ficar abaixo de `tol` (histórico em `icing.coupling_loop`). Desconhecidos não são acoplados
 e ficam em `not_coupled`. Compõe-se com o acoplamento térmico (o ciclo do gelo envolve o térmico).
 
@@ -162,7 +173,7 @@ intervalos, FIKI, API, pipeline com requisitos e acoplamento iterado).
 * β local fora da estagnação, limites de impacto e gelo de retorno; geometria a evoluir com a acreção.
 * Penalização por tipo de gelo (corno, crista, rugosidade) com mais perfis; ΔC_D0 com referência limpa.
 * Ar sangrado (caudal/temperatura) e potência de botas; mapa de calibração IRT.
-* Carga de proteção no balanço só durante a fração de exposição (hoje ciclo 1).
-* O acoplamento térmico (`thermal.py`) só escreve `systems_power_W`, que o power budget em malha fechada
-  substitui: a potência do ventilador pode perder-se nesses projetos — rever como aqui.
+* Feito (ramo `fix-acoplamento-termico`): carga de proteção só na fração de exposição (`power_schedule`) e o
+  acoplamento térmico passa também a escrever a carga em `systems.loads`. Falta: perfil de potência por segmento
+  no balanço (hoje ciclo médio + pico).
 * Combinação de encontros contínuo + intermitente; temperatura do dia (MIL-HDBK-310 frio) em vez do varrimento.
