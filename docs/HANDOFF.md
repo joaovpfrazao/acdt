@@ -88,7 +88,7 @@ A passagem anterior do mesmo dia (trem, k_cd_profile, caminhos relativos, CD de 
   Sec. 10.3). Os servos continuam a ser reescolhidos no fecho, e o motor a pistão não entra neste catálogo.
 * **CAD**: a montagem STEP é a estrutura interna. A espessura do revestimento é a do `WingBoxLayout`,
   não a da encurvadura, e é aplicada na vertical (PRESSUPOSTO). A casca exterior só entra com `--oml`.
-  O OpenVSP continua em falta neste PC.
+  O OpenVSP 3.56.0 está instalado neste PC (18 nov 2026, §4b).
 * **SIMP das nervuras**: demo 2-D da alma (layout) e, **opt-in**, massa da alma no orçamento de massa
   (`wingbox/rib_simp_mass.py`, `acdt rib-simp`, `assumptions.structures.rib_simp_mass`). Continua 2-D
   linear, um caso de carga, volume fixo; o resto nariz/cauda não é SIMP; sem extrapolação da raiz;
@@ -261,7 +261,9 @@ Meia asa do exemplo `uav150_flying_wing_tailless`, controlos alinhados, um α de
 
 **pyCycle sem ajuste (18 nov 2026).** OpenMDAO 3.41.0 e NumPy 1.26.4, com a 4.4.0 publicada e sem editar `ThermoAdd`, imprimem TSFC 0,79852 / 0,78364 / 0,82951. A correlação L0 dá 0,40000045 / 0,40000045 / 0,48150375. A razão de decisão fica ausente: as classes de motor diferem e a razão impressa não calibra. O L0 não fica validado nem calibrado. O L1 fica `nao_avaliado`: não há grelha deste turbojato. Os campos em falta estão no JSON. O gráfico final não correu e o código de saída foi 1, depois dos três pontos. `nao_aplicar`. Números em `h8_pycycle_sem_ajuste.json`. O `h8_pycycle.json` não foi reescrito.
 
-**OpenVSP / VSPAERO (18 nov 2026).** O Windows continua sem OpenVSP. O 3.48.2 do contentor exporta a asa e o C172 e não substitui esse instalador. O VSPAERO fino, no α do AVL, dá CL 0,49394 contra 0,50293, CDi 0,014302 contra CDff 0,014536 e CMytot 0,04164 contra Cmtot 0,02886. O painel grosso morreu na esteira e não entra na comparação. Cinco iterações não são convergência. `nao_aplicar`. A banda do H1 não entra. O VSPAERO do C172 não correu. Números em `h7_openvsp.json`.
+**OpenVSP / VSPAERO (18 nov 2026).** Nesse registo o Windows ainda não tinha OpenVSP. O 3.48.2 do contentor exporta a asa e o C172 e não substitui o instalador. O VSPAERO fino, no α do AVL, dá CL 0,49394 contra 0,50293, CDi 0,014302 contra CDff 0,014536 e CMytot 0,04164 contra Cmtot 0,02886. O painel grosso morreu na esteira e não entra na comparação. Cinco iterações não são convergência. `nao_aplicar`. A banda do H1 não entra. O VSPAERO do C172 não correu. Números em `h7_openvsp.json`.
+
+**Painel grosso no Windows (18 nov 2026, ramo `win-openvsp-esteira`).** O OpenVSP 3.56.0 está neste PC: o zip `OpenVSP-3.56.0-win64-Python3.13` descarregou e `import openvsp` imprime essa versão. O processo acdt não importa `openvsp`. O gestor escreve o caso com `StopBeforeRun` e o `vspaero.exe` corre noutro processo, 4 threads, 2,19 s. Asa voadora, tess 41×16, sem fuselagem nem caudas. Conjunto grosso: GeomSet 0 (`SET_ALL`) e ThinGeomSet −1 (`SET_NONE`). A esteira escrita e lida de volta é o default desta versão: WakeNumIter 5, NumWakeNodes 8, WakeRelax 1, FixedWakeFlag 0, ImplicitWake 0. O CHANGELOG 3.45.0 (2025-07-18) descreve a esteira implícita; ImplicitWake fica 0. A linha do 3.46.0, «Fix TE wake detection for VSPAERO», não é tomada como causa. O `ComputeCompGeom` deixa dois `MeshGeom`. Com eles dentro do `SET_ALL` a história saiu não finita, por isso são apagados antes do solver. Iteração 5: CL 0,52862, CDi 0,024897, CDtot 0,039919, CMytot 0,035399, CLiw 0,54191, CDiw 0,019933, residual L2 −0,695 (na iteração 4 era +0,256). Rho 0,002377 e Vinf 100 são os do cabeçalho. StallModel 0, portanto o ReCref escrito não torna a solução viscosa. O AVL desta corrida, cartão de duas secções, dá α 9,52057°, CL 0,50293, CDff 0,014536, Cmtot 0,02886 e CDtot 0,01611. Razões CL 1,051 e Cm 1,227, o mesmo sinal. A razão informativa CDi/CDff é 1,713 e fica fora de [0,7, 1,5]. CDiw/CDff é 1,371. O CDtot do VSPAERO inclui o CDo. Cinco iterações não são convergência. Decisão `nao_aplicar`, `valid` false, `applied` false. O modelo L1 (AVL) não fica validado e não é calibrado. O yaml não muda. RAM livre 17,01 GB, limite da guarda 11,91 GB; o teto de 0,8 GB vem do registo fino e não é uma medição desta malha. Números em `h7_vspaero_painel.json` e `h7_vspaero_painel.csv`. O 3.48.2 continua em `h7_openvsp.json`.
 
 ### Cadeia H1–H8 do Build (18 nov 2026), integrada
 
@@ -275,7 +277,7 @@ O histórico público começa em `dcca304`, que já inclui o GCI v2, a linha mé
 6. #6 `h7-openvsp`: VSPAERO fino, CL 0,49394 contra AVL 0,50293.
 7. #7 `h8-pycycle`: TSFC 0,79852 contra 0,400 da correlação L0 (classe de motor diferente).
 
-O que fica para o João: o instalador OpenVSP no Windows; o visor do VSPAERO no contentor; a onda completa do RCS, só como proposta; o RANS de asa e fuselagem do C172, que não coube; o painel grosso do VSPAERO, que morre na esteira. A instalação publicada de pyCycle 4.4.0 com OpenMDAO 3.41.0 e NumPy 1.26.4 resolve o turbojato sem o ajuste local de `ThermoAdd`. O deck L1 continua ausente: faltam os campos de `table` e de `corrected_table` listados em `h8_pycycle_sem_ajuste.json`, e o mapa não guarda OPR, T4, eficiências, FAR, caudais nem totais de estação. A comparação L1 fica `nao_avaliado`. O PR #23, noutro ramo, trata o OpenVSP do Windows e não entra neste. Nenhum factor foi aplicado e o yaml dos exemplos não mudou. Os ficheiros pesados que já estavam fora do git continuam fora.
+O que fica para o João: o visor do VSPAERO no contentor 3.48.2; a onda completa do RCS, só como proposta; o RANS de asa e fuselagem do C172, que não coube; um deck L1 de motor, que não existe. A instalação publicada de pyCycle 4.4.0 com OpenMDAO 3.41.0 e NumPy 1.26.4 resolve o turbojato sem o ajuste local de `ThermoAdd`. O deck L1 continua ausente: faltam os campos de `table` e de `corrected_table` listados em `h8_pycycle_sem_ajuste.json`, e o mapa não guarda OPR, T4, eficiências, FAR, caudais nem totais de estação. A comparação L1 fica `nao_avaliado`. O OpenVSP 3.56.0 no Windows e o painel grosso, com a esteira no default documentado, estão feitos e ficam `nao_aplicar`, sem factor. Nenhum factor foi aplicado e o yaml dos exemplos não mudou. Os ficheiros pesados que já estavam fora do git continuam fora.
 
 ### G1. Cadeia ADflow + TACS (MPhys) — preparação, sem corridas no box
 
@@ -842,8 +844,13 @@ airborne de comprimento zero). VMCG de ensaio continua fora de âmbito. Exemplo
   OpenMP em `su2\win64-omp\bin`. `ACDT_HIFI_BIN` (utilizador) junta essas três pastas, separadas por `;`.
   O build MPI do SU2 ficou em `su2\win64-mpi` e não entra no `ACDT_HIFI_BIN`: o executável importa
   `msmpi.dll`. O `winget` não instalou o Microsoft MPI (o instalador é só de máquina e esta sessão não
-  elevou). O OpenVSP 3.55.0 para Python 3.13 não foi descarregado: `openvsp.org` fecha o handshake TLS
-  neste PC. A 18 nov 2026 o contentor MDO Lab tem o OpenVSP 3.48.2; isso não substitui o instalador em falta no Windows. JSBSim 1.3.3 importa no venv. A validação SU2 e CalculiX deste PC está no §4
+  elevou). O OpenVSP 3.55.0 para Python 3.13 não foi descarregado a 28 out 2026: `openvsp.org` fechava o handshake TLS
+  neste PC. A 18 nov 2026 o zip `OpenVSP-3.56.0-win64-Python3.13.zip` descarregou de
+  `https://openvsp.org/download.php?file=zips/current/windows/OpenVSP-3.56.0-win64-Python3.13.zip`
+  para `C:\acdt-tools\openvsp`. O pacote `openvsp` 3.56.0 está no venv `C:\acdt-tools\openvsp\py313`.
+  `import openvsp` imprime `OpenVSP 3.56.0`. O contentor MDO Lab mantém o 3.48.2 e não substitui esta instalação.
+  `ACDT_VSP_PYTHON` aponta para o `python.exe` desse venv. O processo acdt não importa `openvsp`.
+  JSBSim 1.3.3 importa no venv. A validação SU2 e CalculiX deste PC está no §4
   (pastas `*_hifi_win`, 28 out 2026).
 * **Trabalho em paralelo (vários Grok Builds / agentes no mesmo PC)**:
   * Cada tarefa grande num ramo próprio a partir de `main`.
