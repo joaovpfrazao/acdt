@@ -1475,6 +1475,10 @@ def _print_tailless_sim(r) -> int:
                 print(f"  [{cn}] rajada lateral, {'célula nua' if k == 'bare' else 'com SAS'}: β pico {p['beta_deg']:.1f}°, "
                       f"φ pico {p['phi_deg']:.1f}°, split {p['split_deg']:.1f}°, elevon {p['elevon_deg']:.1f}°, "
                       f"|β| final {lt[k]['final_beta_amp_deg']:.3g}°")
+        gv = lt.get("gust_verdict") or {}
+        if gv.get("status") == "assessed":
+            print(f"  [{cn}] rajada lateral 6-DOF (critério estrito): {'passa' if gv['ok'] else 'falha'}"
+                  + (f" — {gv['issue']}" if gv.get("issue") else ""))
     for cn, jc in (r.get("jsbsim_cases") or {}).items():
         nr = jc.get("nrms") or {}
         print(f"  [{cn}] JSBSim vs 6-DOF: NRMS β {nr.get('beta', float('nan')):.3f}, p {nr.get('p', float('nan')):.3f}, "

@@ -261,6 +261,12 @@ def test_tailless_example_closes_bare_fails_sas_passes():
     # bodies' Cm (Torenbeek) is in the main trim; AVL-wing-only remains as a sensitivity
     assert ap.get("bodies_in_main_trim") is True
     assert all("with_bodies" in c and "avl_wing" in c for c in ap["cases"].values())
+    # 18 nov 2026: body C_m0 by Multhopp (Nelson 1998 Sec. 2.3; Tulapurkara Eq. 2.56) always reported; the main
+    # trim keeps C_m0 = 0 (PRESSUPOSTO) unless flying_wing.body_cm0: multhopp. Linux: +0,0101 (α0L,f +3,9°).
+    bc = ap["bodies_cm0"]
+    assert bc["status"] == "assessed" and bc["in_main_trim"] is False and 0.0 < bc["Cm0"] < 0.03
+    assert all(c["body_cm0_alternative"]["cruise_ok"] and c["body_cm0_alternative"]["approach_ok"]
+               for c in ap["cases"].values())
     fp = t["fine_packaging"]
     assert fp["status"] == "assessed" and fp.get("fuel", {}).get("fits") is True
     assert "cheio" in (fp.get("cases") or {})
@@ -325,6 +331,14 @@ def test_tailless_example_closes_bare_fails_sas_passes():
         assert O["g_vento_cruzado_menor"]["closes"] is False and O["f_catapulta"]["closes"] is None
         assert O["b_tracao"]["thrust_factor_required"] > 1.0 and "check_6dof" in O["b_tracao"]
         assert "sweep" in O["e_atitude"]
+    # 18 nov 2026: strict 6-DOF gust verdict per case (same criterion as hq:lateral_gust). Linux: 'cheio' touches
+    # the split rate limit (0,5 % of the time) → False, ~100 °/s required vs 84 °/s; only the structure is asserted
+    g6 = r["lateral_gust_6dof"]
+    assert set(g6["cases"]) == set(r["lateral_tests"]) and g6["ok"] is not None
+    for v in g6["cases"].values():
+        assert v["status"] == "assessed" and v["ok"] is not None
+        if v["rate_limited"]:
+            assert v["ok"] is False and v["rate_required_deg_s"] >= v["rate_available_deg_s"] * 0.999
     assert r["name"] == "tailless_lateral_test" and r["case"] == "cheio"
     assert set(r["lateral_tests"]) == {"vazio", "carga", "combustível", "cheio"}
     for lt in r["lateral_tests"].values():
