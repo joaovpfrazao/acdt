@@ -496,7 +496,10 @@ def report(design: PathLike, level: str, output: PathLike | None = None, *, uq: 
         design: ``design.json`` ou a pasta que o contém.
         level: ``"SRR"``, ``"PDR"`` ou ``"CDR"``.
         output: pasta onde escrever ``relatorio_<nível>.json/.md/.html`` (``None`` = só devolve o ``dict``).
-        uq, mdo, vv, calib: registos extra (ficheiro ou pasta), além dos encontrados na pasta do projeto.
+        uq: estudos de incerteza extra (``uq.json`` ou pasta), além dos encontrados na pasta do projeto.
+        mdo: estudos MDO extra (``mdo.json`` ou pasta).
+        vv: relatórios de V&V extra (``vv_report.json`` ou pasta).
+        calib: registos de calibração extra (``calibration_record.json`` ou pasta).
         criteria: ficheiro YAML ou ``dict`` com ``waivers``/``tailoring`` (com justificação),
             ``required_level``, ``primary_disciplines``, ``headline``.
         discover: procurar registos na pasta do ``design.json`` (até 3 níveis).
