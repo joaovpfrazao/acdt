@@ -49,4 +49,4 @@ Nenhum destes PR foi integrado no `main`.
    não foi engrossada. O L1 fica `nao_avaliado`.
 4. PR #26, `termico-gelo-proposta`, aberto. Só proposta, sem sólido e sem corrida. O L0 e o L1
    ficam `nao_avaliado`.
-5. Este ramo. Só proposta. O openEMS não arrancou. O PO fica `nao_avaliado` face à onda completa.
+5. PR #27, este ramo, aberto. Só proposta. O openEMS não arrancou. O PO fica `nao_avaliado` face à onda completa.

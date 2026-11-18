@@ -34,7 +34,7 @@ def test_full_wave_is_missing_and_po_is_not_a_pass():
     assert measured["hifi"] is None
     assert measured["lower_level"] is None
     tasks = task_status()
-    assert [item["pr"] for item in tasks] == [23, 24, 25, 26, None]
+    assert [item["pr"] for item in tasks] == [23, 24, 25, 26, 27]
     assert all(item["merged"] is False for item in tasks)
     assert tasks[4]["blocked"]
 

@@ -130,9 +130,9 @@
   },
   {
    "task": 5,
-   "pr": null,
+   "pr": 27,
    "branch": "rcs-onda-completa-proposta",
-   "state": "este_ramo",
+   "state": "aberto",
    "merged": false,
    "verdict": "nao_aplicar",
    "model": "L1 PO nao_avaliado face à onda completa",

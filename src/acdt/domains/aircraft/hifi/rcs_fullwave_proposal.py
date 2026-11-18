@@ -133,7 +133,7 @@ def proposal(root: Path | None = None) -> dict:
 
 
 def task_status() -> list[dict]:
-    """Open pull requests of this effort. This branch's own PR number is still unknown."""
+    """Open pull requests of this effort. None of them is merged."""
     return [
         {
             "task": 1,
@@ -180,9 +180,9 @@ def task_status() -> list[dict]:
         },
         {
             "task": 5,
-            "pr": None,
+            "pr": 27,
             "branch": "rcs-onda-completa-proposta",
-            "state": "este_ramo",
+            "state": "aberto",
             "merged": False,
             "verdict": "nao_aplicar",
             "model": "L1 PO nao_avaliado face à onda completa",
