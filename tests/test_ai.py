@@ -278,7 +278,7 @@ def test_capabilities_doc_matches_code():
     txt = catalogue.doc("CAPABILITIES")
     assert "Roadmap" in txt and "Sugestões de capacidades" in txt
     cli = (catalogue.REPO / "src/acdt/cli.py").read_text(encoding="utf-8")
-    for cmd in set(re.findall(r"`acdt ([a-z0-9-]+)", txt)):
+    for cmd in set(re.findall(r"`acdt ([a-z0-9][a-z0-9-]*)", txt)):
         assert f'add_parser("{cmd}"' in cli, cmd
     ai_dir = catalogue.REPO / "src/acdt/ai"
     srv = "".join(p.read_text(encoding="utf-8") for p in [ai_dir / "mcp_server.py", *sorted(ai_dir.glob("*_mcp.py"))])

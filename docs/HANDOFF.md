@@ -1645,6 +1645,39 @@ Em aberto, por ordem:
 4. Dados de ensaio reais (túnel, voo ou estático) com relatório e incerteza. Sem eles, nenhum fator de ensaio é
    aplicado a um projeto.
 
+### API pública, documentação, CLI e notebooks (18 nov 2026, ramo `eng-api`)
+
+Pormenor em [API.md](API.md) e CAPABILITIES §32p.
+
+* `acdt/api/` (mypy estrito):
+  * `__init__.py`: superfície pública (`__all__`), `API_VERSION = "1.0.0"`, funções finas sobre `run_pipeline`,
+    `verification_run`, `uq_run`/`sensitivity.study`, `mdo_system`/`sysmdo.run`, `vv`, `calibration`,
+    `design_db` (importações tardias: `import acdt.api` é leve);
+  * `_deprecation.py`: `deprecated`, `ACDTDeprecationWarning`, registo `DEPRECATED`;
+  * `stability.py` + `api_surface.json`: `surface`, `check` (regras SemVer), `python -m acdt.api.stability
+    [--write]`.
+* `acdt/cli.py`: `build_parser()` separado de `main()`; `EXIT_CODES`; `--json`/`--debug` acrescentados a todos os
+  subcomandos que não os tinham (`db` e `provenance` mantêm o `--json` próprio); `_emit(...)` preenche o `result`
+  do envelope em `size`, `verify`, `uq`, `mdo`, `vv`, `calib fit`; exceções não tratadas → código 4.
+* Versão do pacote 0.2.0 (`pyproject.toml` e `acdt.__version__`, verificado por teste).
+* Documentação: `mkdocs.yml`, `docs/index.md`, `docs/API.md`, `docs/referencia/{api,cli}.md`, hook
+  `docs/hooks/cli_ref.py`; extras `[docs]` e `[notebooks]`; `site/` no `.gitignore`.
+* CI: jobs `docs` e `notebooks` em `ci.yml`; `docs-pages.yml` só publica com `workflow_dispatch` ou com a
+  variável `PAGES_ENABLED = "true"` (e o Pages ativado em Settings → Pages → GitHub Actions).
+* Testes: `tests/test_api.py` (10), `tests/test_cli_contract.py` (7), `tests/test_notebooks.py` (4).
+
+Em aberto, por ordem:
+1. Alargar `acdt.api` (sistemas, fabrico/custo, certificação, simulação) — cada acréscimo sobe a MENOR e regenera
+   `api_surface.json`.
+2. `result` estruturado no `--json` dos restantes comandos.
+3. Ativar o GitHub Pages (decisão do João) e, quando houver API 2.x, documentação por versão.
+
+### Teste instável de reutilização de `run_id` (18 nov 2026, PR #12)
+
+Causa medida: falha transitória do AVL numa iteração intermédia do ciclo W0 → Schrenk só nessa iteração → ponto
+fixo diferente (≤ `tol_lowfi`). Corrigido com repetição do AVL (180 s), aviso de mudança de fonte entre iterações e
+reutilização do `result.json` em `size_fleet(run_id=…)`. Pormenor em [QUALIDADE.md](QUALIDADE.md) §4.
+
 ## Melhorias futuras em espera
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).

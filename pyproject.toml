@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "acdt"
-version = "0.1.0"
+version = "0.2.0"
 description = "Engineering design framework (aircraft first): open requirements, classical sizing, constraint analysis, aerodynamics, systems and harness selection"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -42,6 +42,10 @@ cad = ["cadquery>=2.8,<2.9"]
 # Dados de ensaio (acdt calib): Parquet (pandas + pyarrow, BSD/Apache-2.0) e PX4 ULog (pyulog, BSD-3-Clause).
 # ArduPilot .bin (pymavlink, LGPL-3.0) não é importado: converter fora do processo para CSV.
 dados = ["pandas>=2", "pyarrow>=14", "pyulog>=1.0"]
+# Documentação gerada (docs/API.md §5): MkDocs (BSD-2), mkdocs-material (MIT), mkdocstrings-python (ISC).
+docs = ["mkdocs>=1.6", "mkdocs-material>=9.5", "mkdocstrings[python]>=0.26"]
+# Notebooks de examples/notebooks executados no CI: nbmake (Apache-2.0), nbclient/nbformat/ipykernel (BSD-3).
+notebooks = ["nbmake>=1.5", "nbclient>=0.10", "nbformat>=5.9", "ipykernel>=6"]
 
 [project.scripts]
 acdt = "acdt.cli:main"
@@ -52,6 +56,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "acdt.core" = ["data/*.yaml", "data/*.json"]
 "acdt.ai" = ["prompts/*.md"]
+"acdt.api" = ["api_surface.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -105,6 +110,9 @@ files = [
   "src/acdt/core/calibration/ingest.py",
   "src/acdt/core/calibration/fitting.py",
   "src/acdt/core/calibration/record.py",
+  "src/acdt/api/__init__.py",
+  "src/acdt/api/_deprecation.py",
+  "src/acdt/api/stability.py",
 ]
 strict = true
 follow_imports = "silent"
