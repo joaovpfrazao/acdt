@@ -1,0 +1,32 @@
+{
+ "design": "UAV gasolina 150 kg (endurance)",
+ "kind": "cost",
+ "factors": {
+  "k_cost_L0_eastlake": {
+   "group": "cost_L0",
+   "value": 0.7480424262296697,
+   "hifi": 184814.62688375954,
+   "lowfi": 247064.36480518064,
+   "hifi_level": "L1",
+   "independent": false,
+   "what": "unit cost L1 bottom-up / eastlake CER (same design, N, USD year)",
+   "note": "L1 labour anchored to Eastlake: NOT independent \u2014 do not apply"
+  },
+  "k_cost_L0_dapca4": {
+   "group": "cost_L0",
+   "value": 0.39868635158561566,
+   "hifi": 184814.62688375954,
+   "lowfi": 463558.95091149525,
+   "hifi_level": "L1",
+   "independent": false,
+   "what": "unit cost L1 bottom-up / dapca4 CER (same design, N, USD year)",
+   "note": "L1 labour anchored to Eastlake: NOT independent \u2014 do not apply"
+  }
+ },
+ "sources": {
+  "year": 2025,
+  "N": 50,
+  "l1_labour_calibration": 0.12160500527999227
+ },
+ "note": "ratios higher/lower fidelity of the same design; applied only if the group is listed in manufacturing.cost_calibration.apply (cost_L0, cost_L1)"
+}

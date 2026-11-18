@@ -1,0 +1,8 @@
+{
+  "label": "BEMT de rotor pedido sem polar / passo / empuxo → unassessed",
+  "rotor": {
+    "diameter_m": 0.4,
+    "blades": 2,
+    "rpm": 7000
+  }
+}

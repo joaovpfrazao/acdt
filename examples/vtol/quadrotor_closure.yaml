@@ -1,0 +1,23 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Fecho de massa VTOL opt-in (closure): MTOW resolvido a partir de componentes.
+# Coeficientes das correlações (NDARC AFDD00 rotor, NASA15 motor) estão citados no código;
+# TODOS os números abaixo são PRESSUPOSTOS ilustrativos, não dados publicados nem de fornecedor.
+architecture: multirotor
+name: quadrotor-fecho-massa
+mission: {t_hover_s: 120, cruise_distance_m: 5000, cruise_speed_m_s: 15}
+closure:
+  source: "PRESSUPOSTO: exemplo ilustrativo"
+  mass_bounds_kg: [3, 200]
+  fixed_items:
+    - {id: payload, role: payload, mass_kg: 2.0, source: "PRESSUPOSTO: carga útil ilustrativa"}
+  components:
+    rotors: {method: AFDD00, n_blades: 2, flap_frequency_per_rev: 1.1,
+             source: "PRESSUPOSTO: frequência de batimento ilustrativa; regressão NDARC extrapolada para rotor pequeno"}
+    motors: {method: NASA15, torque_class: other,
+             source: "PRESSUPOSTO: classe de binário/peso ilustrativa (verificada contra o resultado)"}
+    controllers: {method: fraction_of_motor, fraction: 0.30,
+                  source: "PRESSUPOSTO dentro da gama 10–70 % citada por NDARC Cap. 22-1; substituir por dados do ESC"}
+    rotor_support: {method: fraction_of_mtow, fraction: 0.05, source: "PRESSUPOSTO: braços/suportes, forma NDARC W_supt = f_supt W_MTO"}
+    airframe: {method: fraction_of_mtow, fraction: 0.25, source: "PRESSUPOSTO: fuselagem/trem/estrutura ilustrativa"}
+    other:
+      - {id: avionics, mass_kg: 0.5, source: "PRESSUPOSTO: aviónica/cablagem ilustrativa"}

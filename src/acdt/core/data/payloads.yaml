@@ -1,0 +1,28 @@
+# EXAMPLE DATA — not product recommendations. Replace with datasheet values + source + date.
+# Fields: id, kind (eo_ir|radar|ais|esm|other), mass_kg, power_w_avg, power_w_peak, volume_l,
+#         fov_cross_deg, fov_along_deg, notes, source, retrieved
+payloads:
+  - {id: eo_ir_light, kind: eo_ir, mass_kg: 0.85, power_w_avg: 18, power_w_peak: 35, volume_l: 0.8,
+     fov_cross_deg: 60, fov_along_deg: 40, notes: "EXEMPLO gimbal leve", source: "EXAMPLE", retrieved: "2026-11-06"}
+  - {id: eo_ir_mid, kind: eo_ir, mass_kg: 2.4, power_w_avg: 45, power_w_peak: 80, volume_l: 2.5,
+     fov_cross_deg: 40, fov_along_deg: 30, notes: "EXEMPLO gimbal médio", source: "EXAMPLE", retrieved: "2026-11-06"}
+  - {id: radar_x_small, kind: radar, mass_kg: 3.5, power_w_avg: 120, power_w_peak: 400, volume_l: 4.0,
+     fov_cross_deg: 90, fov_along_deg: 20, notes: "EXEMPLO radar X banda leve", source: "EXAMPLE", retrieved: "2026-11-06"}
+  - {id: radar_x_mid, kind: radar, mass_kg: 8.0, power_w_avg: 250, power_w_peak: 800, volume_l: 9.0,
+     fov_cross_deg: 120, fov_along_deg: 25, notes: "EXEMPLO radar X banda médio", source: "EXAMPLE", retrieved: "2026-11-06"}
+  - {id: ais_rx, kind: ais, mass_kg: 0.15, power_w_avg: 2, power_w_peak: 3, volume_l: 0.1,
+     fov_cross_deg: 360, fov_along_deg: 90, notes: "EXEMPLO receptor AIS", source: "EXAMPLE", retrieved: "2026-11-06"}
+  - {id: esm_light, kind: esm, mass_kg: 1.2, power_w_avg: 25, power_w_peak: 40, volume_l: 1.5,
+     fov_cross_deg: 360, fov_along_deg: 40, notes: "EXEMPLO ESM leve", source: "EXAMPLE", retrieved: "2026-11-06"}
+
+generators:
+  - {id: alt_28v_1kw, kind: alternator, mass_kg: 2.8, power_w_cont: 1000, power_w_peak: 1200,
+     voltage_v: 28, notes: "EXEMPLO alternador", source: "EXAMPLE", retrieved: "2026-11-06"}
+  - {id: pma_28v_400w, kind: pma, mass_kg: 1.1, power_w_cont: 400, power_w_peak: 500,
+     voltage_v: 28, notes: "EXEMPLO PMA", source: "EXAMPLE", retrieved: "2026-11-06"}
+
+batteries_avionics:
+  - {id: liion_6s_5ah, kind: li_ion, mass_kg: 0.75, energy_wh: 110, voltage_nom_v: 22.2,
+     continuous_w: 200, notes: "EXEMPLO pack aviónica", source: "EXAMPLE", retrieved: "2026-11-06"}
+  - {id: lifepo_4s_10ah, kind: lifepo4, mass_kg: 1.4, energy_wh: 128, voltage_nom_v: 12.8,
+     continuous_w: 300, notes: "EXEMPLO LiFePO4", source: "EXAMPLE", retrieved: "2026-11-06"}

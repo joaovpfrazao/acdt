@@ -1,0 +1,19 @@
+{
+  "what": "Manter twin-boom + asa alta como configuração viva N1",
+  "why": "Pareto morph_evaluate: L/D e envelope de CG dentro da banda ±15%; flying_wing falhou dutch-roll com winglets atuais",
+  "fidelity": "N1",
+  "level_gate": "N1",
+  "rejected": [
+    {"id": "flying_wing", "reason": "hq:dutch_roll e período curto fora dos limites com winglets desenhados"},
+    {"id": "conventional_low", "reason": "dominada em L/D e RCS médio dentro da banda N1"}
+  ],
+  "conditions": [
+    {"metric": "radar_mass_kg", "op": ">", "value": 25},
+    {"metric": "CL_alpha", "op": "<", "relative_to": "baseline_CL_alpha", "pct": -10}
+  ],
+  "evidence": [
+    {"tool": "morph_prune", "summary": "twin-boom viva; flying_wing rejeitada"},
+    {"tool": "assembly_hq", "summary": "dutch_roll fail on flying_wing"}
+  ],
+  "tags": ["configuration", "N1"]
+}

@@ -1,0 +1,37 @@
+{
+  "label": "EXAMPLE/PRESSUPOSTO — SIMP-informed rib mass in the Phase 6 structural budget. Illustrative geometry and loads only; not a real FEM, topology-campaign, or vendor result.",
+  "rho_kg_m3": 2780.0,
+  "rho_source": "MIL-HDBK-5J Table 3.2.3.0(b) — typical/S-basis (as Phase 3 MATERIALS, Al 2024-T3)",
+  "t_source": "EXAMPLE/PRESSUPOSTO: thickness taken as if from sizing6.size_ribs (Niu 1988 §5.4 crushing/shear/buckling/min gauge); not a measured or vendor thickness",
+  "vol": 0.4,
+  "penal": 3.0,
+  "nelx": 32,
+  "iters": 30,
+  "stations": "all",
+  "nonoptimum_factor": 1.25,
+  "masses": {
+    "caps": 8.0,
+    "box_skins": 0.0,
+    "core": 0.0,
+    "webs": 0.0,
+    "web_uprights": 0.0,
+    "LE_TE_skins": 0.0,
+    "ribs": 0.60528384,
+    "ideal": 10.60528384,
+    "nonoptimum": 2.65132096,
+    "total": 13.2566048
+  },
+  "ribs": {
+    "y": [0.0, 1.0],
+    "w_m": [0.40, 0.32],
+    "h_m": [0.15, 0.12],
+    "t_m": [0.001, 0.0008],
+    "t_mm": [1.0, 0.8],
+    "dV_N": [500.0, 350.0],
+    "p_crush_N_m": [3000.0, 2200.0],
+    "D_h": [0.0, 0.0],
+    "mass_factor": [1.0, 1.0],
+    "box_part_kg": [0.1668, 0.0854016],
+    "rest_kg": [0.03336, 0.01708032]
+  }
+}

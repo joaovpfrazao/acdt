@@ -1,0 +1,25 @@
+{
+  "label": "Complete Eastlake CER → DOC (Raymer 2018 Ch. 18) — EXAMPLE rates, not vendor quotes",
+  "flight_hours_per_year": 200,
+  "fuel_kg_per_h": 30.0,
+  "fuel_price_per_kg": 2.0,
+  "maintenance_mmh_per_fh": 0.5,
+  "maintenance_rate_per_h": 100.0,
+  "engine_overhaul_cost": 40000.0,
+  "engine_tbo_h": 2000.0,
+  "depreciation_years": 20.0,
+  "residual_fraction": 0.0,
+  "profile": "full",
+  "eastlake": {
+    "W_airframe_kg": 500.0,
+    "V_H_kt": 130.0,
+    "N": 500
+  },
+  "sources": {
+    "fuel_price_per_kg": "EXAMPLE Jet-A 2 USD/kg illustrative (replace with dated quote)",
+    "maintenance_rate_per_h": "EXAMPLE shop wage 100 USD/h illustrative",
+    "engine_overhaul_cost": "EXAMPLE overhaul reserve illustrative",
+    "eastlake": "Gudmundsson 2014 Ch. 2 modified Eastlake CER → unit_price"
+  },
+  "reference": "DOC elements Raymer 2018 Ch. 18; acquisition CER Gudmundsson 2014 Ch. 2; HANDOFF MÉDIA §5 L2 BOM still blocked"
+}

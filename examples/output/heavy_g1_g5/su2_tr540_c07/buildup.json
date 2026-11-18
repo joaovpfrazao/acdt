@@ -1,0 +1,46 @@
+{
+ "Re_chord": 3100000.0,
+ "Mach_buildup": 0.15,
+ "V_m_s": 51.04409999999999,
+ "rho": 8.556966959263741,
+ "mu": 1.7894e-05,
+ "a_m_s": 340.294,
+ "chord_m": 0.127,
+ "Sref_m2": 0.096774,
+ "S_full_wing_m2": 0.096774,
+ "CD0_nominal": 0.015430933549716107,
+ "CD0_pessimistic": 0.017244103320097938,
+ "lp_fraction": 0.05,
+ "lp_fraction_pessimistic": 0.1,
+ "components": [
+  {
+   "component": "wing",
+   "kind": "wing",
+   "Swet_m2": 0.19992602643227328,
+   "Cf": 0.0039450591579295235,
+   "FF": 1.2006747543959313,
+   "Q": 1.0,
+   "f_friction_m2": 0.0009469961940702806,
+   "upsweep_m2": 0.0,
+   "base_m2": 0.0,
+   "f_m2": 0.0009469961940702806,
+   "f_pess_m2": 0.0009943460037737948,
+   "CD0": 0.009785646910020054
+  },
+  {
+   "component": "fuselage",
+   "kind": "body",
+   "Swet_m2": 0.10991391065188522,
+   "Cf": 0.003292997628979155,
+   "FF": 1.312920971973747,
+   "Q": 1.0,
+   "f_friction_m2": 0.000475206818634697,
+   "upsweep_m2": 0.0,
+   "base_m2": 0.0,
+   "f_m2": 0.000475206818634697,
+   "f_pess_m2": 0.0005227275004981667,
+   "CD0": 0.004910480280185763
+  }
+ ],
+ "note": "Denominator of a calibration factor is f_m2 (friction*Q + upsweep + base), before the L&P markup. The total CD0 band includes L&P. Laminar fraction and roughness are the cd0_buildup defaults (surface 0.10, body 0.0, smooth_paint). RANS-SA is fully turbulent."
+}

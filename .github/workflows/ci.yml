@@ -1,0 +1,187 @@
+# CI do acdt (docs/QUALIDADE.md): testes em Linux e Windows com cobertura, e mypy gradual.
+# AVL (GPL) é só um executável externo: em Linux é compilado da fonte oficial 3.40b (como a cópia local de
+# desenvolvimento: plotlib + eispack + solver matrix.f, sem LAPACK); em Windows usa-se o binário oficial WIN64.
+# XFOIL não é instalado: os testes marcados requires_xfoil saltam e a contagem vai para o resumo do job.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  AVL_SRC_URL: https://web.mit.edu/drela/Public/web/avl/avl3.40b.tgz
+  AVL_WIN_URL: https://web.mit.edu/drela/Public/web/avl/avl3.40_execs/WIN64/avl.exe
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  MPLBACKEND: Agg
+  # Modo UTF-8 do Python: obrigatório no Windows (docs/DEV-SETUP-WINDOWS.md; os relatórios usam →, ≤, Δ).
+  PYTHONUTF8: "1"
+
+jobs:
+  tests:
+    name: testes (${{ matrix.os }}, py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    # Linux: suite completa (~35 min em 2 vCPU). Windows: só `not slow` — a suite completa demora > 2 h no runner
+    # Windows de 2 vCPU (arranque de processos e do AVL ~2,5x mais lento; não é um bloqueio). Ver QUALIDADE.md §1.
+    timeout-minutes: ${{ matrix.job_timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.13"
+            markers: ""
+            job_timeout: 75
+          - os: windows-latest
+            python: "3.13"
+            markers: "not slow"
+            job_timeout: 60
+    env:
+      # Ferramentas instaladas neste job: se faltarem, os testes marcados falham em vez de saltar.
+      ACDT_REQUIRE_TOOLS: avl,jsbsim
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Instalar acdt + extras de teste
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,aero,mdo,structures,hifi,wingbox,ai,cert,sim]"
+
+      - name: Cache do AVL (Linux)
+        if: runner.os == 'Linux'
+        id: avl-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/avl-bin
+          key: avl-3.40b-matrixf-v1-${{ runner.os }}
+
+      - name: Compilar AVL 3.40b da fonte (Linux)
+        if: runner.os == 'Linux' && steps.avl-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q gfortran libx11-dev
+          mkdir -p ~/avl-build && cd ~/avl-build
+          curl -fsSL "$AVL_SRC_URL" -o avl.tgz
+          tar xzf avl.tgz
+          cd Avl/plotlib
+          rm -f *.a *.o
+          make gfortran
+          cp -f libPlt_gSP.a libPlt.a
+          cd ../eispack
+          gfortran -c -O2 -fomit-frame-pointer eispack.f
+          ar r libeispack.a eispack.o && ranlib libeispack.a
+          cd ../bin
+          make -f Makefile.gfortran avl MATRIX=matrix.o MLIBS= INSTALLCMD=true ACHK=-fallow-argument-mismatch
+          mkdir -p ~/avl-bin && cp avl ~/avl-bin/avl
+
+      - name: AVL no PATH (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y -q libgfortran5 libx11-6 || true
+          echo "$HOME/avl-bin" >> "$GITHUB_PATH"
+
+      - name: Instalar AVL 3.40 binário oficial (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $d = Join-Path $env:RUNNER_TEMP "avl-bin"
+          New-Item -ItemType Directory -Force -Path $d | Out-Null
+          Invoke-WebRequest -Uri $env:AVL_WIN_URL -OutFile (Join-Path $d "avl.exe")
+          Add-Content -Path $env:GITHUB_PATH -Value $d
+
+      - name: Ferramentas externas encontradas
+        shell: bash
+        run: |
+          python - <<'PY'
+          import shutil, importlib.util
+          for t in ("avl", "xfoil"):
+              print(f"{t}: {shutil.which(t)}")
+          print("jsbsim:", importlib.util.find_spec("jsbsim") is not None)
+          PY
+
+      - name: pytest -n auto (com cobertura)
+        shell: bash
+        run: |
+          # pytest-timeout: método thread (o único que funciona no Windows; no Linux também apanha bloqueios em
+          # subprocessos à espera de stdin) — o teste pendurado falha com a pilha de todas as threads.
+          python -m pytest -n auto -v -rfEs -m "${{ matrix.markers }}" --timeout=900 --timeout-method=thread \
+            --durations=25 --cov=acdt --cov-report=xml --cov-report=term:skip-covered --junitxml=junit.xml
+
+      - name: Resumo da cobertura
+        if: always()
+        shell: bash
+        run: |
+          if [ -f .coverage ] || ls .coverage.* >/dev/null 2>&1; then
+            { echo "### Cobertura (${{ matrix.os }})"; echo; python -m coverage report --format=markdown | tail -n 3; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cobertura-${{ matrix.os }}-py${{ matrix.python }}
+          path: |
+            coverage.xml
+            junit.xml
+          if-no-files-found: ignore
+
+  vv:
+    name: V&V (casos baratos)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Instalar
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,mdo,structures]"
+      - name: acdt vv --cost barato
+        run: acdt vv --cost barato -o vv_report
+      - name: Resumo V&V
+        if: always()
+        run: |
+          if [ -f vv_report/vv_report.md ]; then
+            sed -n '1,/^## Casos/p' vv_report/vv_report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vv-report
+          path: vv_report/
+          if-no-files-found: ignore
+
+  mypy:
+    name: mypy (subconjunto estrito)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Instalar
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: mypy
+        run: python -m mypy

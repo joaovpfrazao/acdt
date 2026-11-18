@@ -1,0 +1,20 @@
+{
+  "dimensions": {
+    "wing": ["high", "flying_wing", "tandem"],
+    "fuselage": ["pod", "twin_boom", "blended"],
+    "tail": ["conventional", "inverted_V", "tailless", "V"],
+    "propulsion_layout": ["pusher", "tractor", "on_booms"],
+    "propulsion_kind": ["electric"],
+    "launch_recovery": ["catapult", "runway"],
+    "landing_gear": ["none", "tricycle"],
+    "energy": ["battery"],
+    "avionics_link": ["LOS", "SATCOM"],
+    "payload": ["EO_IR", "radar"]
+  },
+  "notes": [
+    "Exemplo N1 para UAV ISR ~25 kg. A IA deve acrescentar pelo menos uma opção fora do habitual.",
+    "Gerar: acdt morph generate --matrix examples/morphology/n1_uav_isr_matrix.json -o output/morph_gen.json",
+    "Avaliar (L0, sem juiz de missão): acdt morph evaluate --architectures output/morph_gen.json --mission examples/uav_endurance_payload.yaml --limit 6 -o output/morph_eval.json",
+    "Podar: acdt morph prune --rows output/morph_eval.json -o output/morph_alive.json"
+  ]
+}

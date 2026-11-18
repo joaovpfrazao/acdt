@@ -1,0 +1,15 @@
+{
+  "metric": "W0_kg",
+  "variables": [
+    {
+      "path": "assumptions.aero.AR",
+      "rel_span": 0.1
+    },
+    {
+      "path": "assumptions.propulsion.battery_Wh_kg",
+      "rel_span": 0.1
+    }
+  ],
+  "n": 8,
+  "note": "PRESSUPOSTO small Saltelli N for smoke \u2014 raise N for decision-quality indices"
+}

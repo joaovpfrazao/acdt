@@ -1,0 +1,18 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO: illustrative A320-class study, NOT a particular certified variant.
+# Public source details and retrieval dates: a320_ref.json.
+mtow_kg: 77000
+wing_area_m2: 122.6
+aspect_ratio: 9.48
+mach: 0.79
+altitude_m: 11277.6
+range_m: 5639000
+thrust_sl_N: 120000  # per engine, uninstalled SLS [N]
+n_engines: 2
+wave:
+  thickness_ratio: 0.12  # PRESSUPOSTO representative strip
+  sweep_deg: 25.0       # PRESSUPOSTO
+  technology_factor: 0.95  # PRESSUPOSTO supercritical
+loads:
+  vc_eas_m_s: 160  # PRESSUPOSTO, separate maneuver condition; NOT cruise TAS
+# Other defaults (CD0, e, L/D, cruise mass fraction, crew, reserve): PRESSUPOSTO.

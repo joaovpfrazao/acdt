@@ -1,0 +1,399 @@
+{
+ "rows": [
+  {
+   "option": "none",
+   "converged": true,
+   "feasible": false,
+   "W0": 37.67938557189217,
+   "We": 13.782311238786718,
+   "Wf_or_battery": 19.89707433246116,
+   "S": 1.4609183512092818,
+   "P_sl_kW": 7.206039703575346,
+   "W/S": 252.92895130842453,
+   "LD_max": 21.171700906296707,
+   "CL_LDmax": 0.8333245203713682,
+   "CLmax_landing": 1.4288710114447356,
+   "unit_cost": 30373.05358279514,
+   "active": [
+    "Vmax 70 m/s @ 600 m",
+    "Perda 17.0 m/s"
+   ],
+   "unit_cost_note": "Eastlake (GA) fora da gama de calibra\u00e7\u00e3o para UAV \u2014 usar s\u00f3 como delta relativo",
+   "failed": [
+    "wing_span",
+    "mtow"
+   ],
+   "flap_system_kg": 0,
+   "V_max": 69.97589165875414,
+   "V_loiter": 22.0,
+   "P_loiter_W": 385.2425005435347,
+   "endurance_h": 4.182351650481368,
+   "range_km": 329.96678272179696
+  },
+  {
+   "option": "plain",
+   "converged": true,
+   "feasible": false,
+   "W0": 36.80031703223833,
+   "We": 11.939379008922815,
+   "Wf_or_battery": 20.86093802281157,
+   "S": 1.1127627091213819,
+   "P_sl_kW": 6.291030237835015,
+   "W/S": 324.3169689871714,
+   "LD_max": 20.058880265912787,
+   "CL_LDmax": 0.9006521889998087,
+   "CLmax_landing": 1.8321748402134443,
+   "unit_cost": 28814.262669263204,
+   "active": [
+    "Vmax 70 m/s @ 600 m",
+    "Perda 17.0 m/s"
+   ],
+   "unit_cost_note": "Eastlake (GA) fora da gama de calibra\u00e7\u00e3o para UAV \u2014 usar s\u00f3 como delta relativo",
+   "failed": [
+    "mtow"
+   ],
+   "flap_system_kg": 0,
+   "V_max": 69.82840276569166,
+   "V_loiter": 22.0,
+   "P_loiter_W": 408.49361037600397,
+   "endurance_h": 4.163795665943372,
+   "range_km": 329.6324413949914
+  },
+  {
+   "option": "camber",
+   "converged": true,
+   "feasible": true,
+   "W0": 31.618743295272022,
+   "We": 10.574086616717544,
+   "Wf_or_battery": 17.044656677931194,
+   "S": 0.9131951714733185,
+   "P_sl_kW": 5.380375310109259,
+   "W/S": 339.5483885841363,
+   "LD_max": 20.93249707185269,
+   "CL_LDmax": 1.0932860198688603,
+   "CLmax_landing": 1.9182159226426092,
+   "unit_cost": 28118.314410589366,
+   "active": [
+    "Vmax 70 m/s @ 600 m",
+    "Perda 17.0 m/s"
+   ],
+   "unit_cost_note": "Eastlake (GA) fora da gama de calibra\u00e7\u00e3o para UAV \u2014 usar s\u00f3 como delta relativo",
+   "failed": [],
+   "flap_system_kg": 0.138564,
+   "V_max": 69.73652857967932,
+   "V_loiter": 22.0,
+   "P_loiter_W": 329.1209670524356,
+   "endurance_h": 4.180645137605815,
+   "range_km": 330.19444230359125,
+   "camber": {
+    "kind": "camber",
+    "flapped_area_ratio": 0.610862216642468,
+    "flap_area_m2": 0.12376000000000001,
+    "dCLmax": 0.15443207698938227,
+    "delta_max_deg": 15.0,
+    "dCD_min": -0.002336640860746188,
+    "CL_at_dCD_min": 0.0,
+    "dcm0_per_deg": -0.004886666666666666,
+    "schedule": [
+     {
+      "CL": 0.0,
+      "delta_deg": -10.0,
+      "dCD": -0.002336640860746188
+     },
+     {
+      "CL": 0.11528953509553543,
+      "delta_deg": -7.5,
+      "dCD": -0.0016457402354036407
+     },
+     {
+      "CL": 0.23057907019107085,
+      "delta_deg": -5.0,
+      "dCD": -0.0007795452944332745
+     },
+     {
+      "CL": 0.3458686052866063,
+      "delta_deg": -2.5,
+      "dCD": -0.00031923598769373915
+     },
+     {
+      "CL": 0.4611581403821417,
+      "delta_deg": -2.5,
+      "dCD": -0.00021955180932079017
+     },
+     {
+      "CL": 0.5764476754776772,
+      "delta_deg": -2.5,
+      "dCD": -4.62703236381519e-05
+     },
+     {
+      "CL": 0.6917372105732126,
+      "delta_deg": 10.0,
+      "dCD": -4.469987989480866e-05
+     },
+     {
+      "CL": 0.807026745668748,
+      "delta_deg": 0.0,
+      "dCD": 0.0
+     },
+     {
+      "CL": 0.9223162807642834,
+      "delta_deg": 2.5,
+      "dCD": -0.00016761329299970398
+     },
+     {
+      "CL": 1.037605815859819,
+      "delta_deg": 2.5,
+      "dCD": -0.0002079997129316008
+     },
+     {
+      "CL": 1.1528953509553543,
+      "delta_deg": 5.0,
+      "dCD": -0.0003574328383700358
+     },
+     {
+      "CL": 1.2681848860508897,
+      "delta_deg": 5.0,
+      "dCD": -0.00046503684603647395
+     }
+    ],
+    "section_source": "XFOIL 6.99",
+    "notes": [
+     "camber flap camber: c_f/c 0.20, \u03b7 0.00\u20130.65, S_flapped/S 0.61; polars XFOIL 6.99 at Re 4e+05 (cruise) and 3.5e+05 (stall); span loading AVL 3.40 (VLM), 2 \u00e2ngulos",
+     "\u0394cm0 -0.0049/\u00b0 de flap (sec\u00e7\u00e3o) \u2014 arrasto de compensa\u00e7\u00e3o n\u00e3o inclu\u00eddo (limita\u00e7\u00e3o)"
+    ]
+   }
+  },
+  {
+   "option": "flaperon",
+   "converged": true,
+   "feasible": true,
+   "W0": 31.648132669282855,
+   "We": 10.007581480359056,
+   "Wf_or_battery": 17.640551188318923,
+   "S": 0.8247887122393139,
+   "P_sl_kW": 5.1765772469255875,
+   "W/S": 376.292928886702,
+   "LD_max": 20.370766047031864,
+   "CL_LDmax": 1.0976476294600228,
+   "CLmax_landing": 2.1258033061701997,
+   "unit_cost": 27476.09540472107,
+   "active": [
+    "Vmax 70 m/s @ 600 m",
+    "Perda 17.0 m/s"
+   ],
+   "unit_cost_note": "Eastlake (GA) fora da gama de calibra\u00e7\u00e3o para UAV \u2014 usar s\u00f3 como delta relativo",
+   "failed": [],
+   "flap_system_kg": 0.014132000000000004,
+   "V_max": 69.63115235809673,
+   "V_loiter": 22.0,
+   "P_loiter_W": 342.41478430203335,
+   "endurance_h": 4.172916618764443,
+   "range_km": 330.22738918995236,
+   "camber": {
+    "kind": "flaperon",
+    "flapped_area_ratio": 0.8671122646360575,
+    "flap_area_m2": 0.14132000000000003,
+    "dCLmax": 0.21617108757376924,
+    "delta_max_deg": 15.0,
+    "dCD_min": -0.003474627878919119,
+    "CL_at_dCD_min": 0.0,
+    "dcm0_per_deg": -0.004566666666666666,
+    "schedule": [
+     {
+      "CL": 0.0,
+      "delta_deg": -10.0,
+      "dCD": -0.003474627878919119
+     },
+     {
+      "CL": 0.11505975634264212,
+      "delta_deg": -7.5,
+      "dCD": -0.0019526469185922799
+     },
+     {
+      "CL": 0.23011951268528424,
+      "delta_deg": -5.0,
+      "dCD": -0.0011062707495799358
+     },
+     {
+      "CL": 0.3451792690279264,
+      "delta_deg": -2.5,
+      "dCD": -0.0004549939469623682
+     },
+     {
+      "CL": 0.4602390253705685,
+      "delta_deg": -2.5,
+      "dCD": -0.0002770649909751661
+     },
+     {
+      "CL": 0.5752987817132106,
+      "delta_deg": -2.5,
+      "dCD": -6.814530648867327e-05
+     },
+     {
+      "CL": 0.6903585380558528,
+      "delta_deg": 0.0,
+      "dCD": 0.0
+     },
+     {
+      "CL": 0.8054182943984949,
+      "delta_deg": 2.5,
+      "dCD": -6.579056272795236e-06
+     },
+     {
+      "CL": 0.920478050741137,
+      "delta_deg": 2.5,
+      "dCD": -0.00020929815622519282
+     },
+     {
+      "CL": 1.035537807083779,
+      "delta_deg": 5.0,
+      "dCD": -0.00031007695735676315
+     },
+     {
+      "CL": 1.1505975634264212,
+      "delta_deg": 5.0,
+      "dCD": -0.0005031532887755906
+     },
+     {
+      "CL": 1.2656573197690633,
+      "delta_deg": 5.0,
+      "dCD": -0.0006576535152008445
+     }
+    ],
+    "section_source": "XFOIL 6.99",
+    "notes": [
+     "camber flap flaperon: c_f/c 0.20, \u03b7 0.00\u20130.95, S_flapped/S 0.87; polars XFOIL 6.99 at Re 3.5e+05 (cruise) and 3.2e+05 (stall); span loading AVL 3.40 (VLM), 2 \u00e2ngulos",
+     "\u0394cm0 -0.0046/\u00b0 de flap (sec\u00e7\u00e3o) \u2014 arrasto de compensa\u00e7\u00e3o n\u00e3o inclu\u00eddo (limita\u00e7\u00e3o)"
+    ]
+   }
+  },
+  {
+   "option": "plain_same_area",
+   "converged": true,
+   "feasible": true,
+   "W0": 32.106828031438425,
+   "We": 10.65707441051169,
+   "Wf_or_battery": 17.44975361991128,
+   "S": 0.9270388540993731,
+   "P_sl_kW": 5.775849824828772,
+   "W/S": 339.64102337479204,
+   "LD_max": 20.826373071638766,
+   "CL_LDmax": 1.0333954752085996,
+   "CLmax_landing": 1.9187353203800126,
+   "unit_cost": 27693.43420894359,
+   "active": [
+    "Vmax 70 m/s @ 600 m",
+    "Perda 17.0 m/s"
+   ],
+   "unit_cost_note": "Eastlake (GA) fora da gama de calibra\u00e7\u00e3o para UAV \u2014 usar s\u00f3 como delta relativo",
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 69.73643256056369,
+   "V_loiter": 22.0,
+   "P_loiter_W": 336.9321410477225,
+   "endurance_h": 4.177583444136409,
+   "range_km": 330.2679130104786
+  },
+  {
+   "option": "droop_flaperon",
+   "converged": true,
+   "feasible": true,
+   "W0": 32.293760864302165,
+   "We": 10.24437657049868,
+   "Wf_or_battery": 18.049384292591736,
+   "S": 0.841435216742121,
+   "P_sl_kW": 5.558961067889782,
+   "W/S": 376.3731344714652,
+   "LD_max": 20.40294498287595,
+   "CL_LDmax": 1.0714376274055493,
+   "CLmax_landing": 2.126249951477664,
+   "unit_cost": 27325.531911856044,
+   "active": [
+    "Vmax 70 m/s @ 600 m",
+    "Perda 17.0 m/s"
+   ],
+   "unit_cost_note": "Eastlake (GA) fora da gama de calibra\u00e7\u00e3o para UAV \u2014 usar s\u00f3 como delta relativo",
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 69.62992311422825,
+   "V_loiter": 22.0,
+   "P_loiter_W": 350.37352745642943,
+   "endurance_h": 4.167824443658728,
+   "range_km": 329.9425194040602
+  }
+ ],
+ "selected": "camber",
+ "objective": "W0",
+ "objective_key": "W0",
+ "justified": true,
+ "min_gain": 0.01,
+ "deltas": {
+  "camber": {
+   "W0": -0.02938937401083308,
+   "We": 0.5665051363584883,
+   "Wf_or_battery": -0.5958945103877298,
+   "S": 0.08840645923400459,
+   "P_sl_kW": 0.20379806318367155,
+   "LD_max": 0.5617310248208263,
+   "unit_cost": 642.2190058682972,
+   "V_max": 0.10537622158258841,
+   "endurance_h": 0.007728518841371823,
+   "range_km": -0.03294688636111687,
+   "flap_system_kg": 0.12443199999999999,
+   "P_loiter_W": -13.293817249597737,
+   "vs": "flaperon"
+  },
+  "flaperon": {
+   "W0": 0.02938937401083308,
+   "We": -0.5665051363584883,
+   "Wf_or_battery": 0.5958945103877298,
+   "S": -0.08840645923400459,
+   "P_sl_kW": -0.20379806318367155,
+   "LD_max": -0.5617310248208263,
+   "unit_cost": -642.2190058682972,
+   "V_max": -0.10537622158258841,
+   "endurance_h": -0.007728518841371823,
+   "range_km": 0.03294688636111687,
+   "flap_system_kg": -0.12443199999999999,
+   "P_loiter_W": 13.293817249597737,
+   "vs": "camber"
+  },
+  "plain_same_area": {
+   "W0": 0.48808473616640313,
+   "We": 0.08298779379414611,
+   "Wf_or_battery": 0.40509694198008717,
+   "S": 0.01384368262605462,
+   "P_sl_kW": 0.39547451471951334,
+   "LD_max": -0.10612400021392432,
+   "unit_cost": -424.88020164577756,
+   "V_max": -9.6019115630952e-05,
+   "endurance_h": -0.0030616934694061015,
+   "range_km": 0.07347070688734902,
+   "P_loiter_W": 7.811173995286879,
+   "vs": "camber"
+  },
+  "droop_flaperon": {
+   "W0": 0.6750175690301425,
+   "We": -0.3297100462188638,
+   "Wf_or_battery": 1.004727614660542,
+   "S": -0.07175995473119756,
+   "P_sl_kW": 0.17858575778052277,
+   "LD_max": -0.5295520889767396,
+   "unit_cost": -792.7824987333224,
+   "V_max": -0.10660546545106797,
+   "endurance_h": -0.012820693947086959,
+   "range_km": -0.25192289953105274,
+   "P_loiter_W": 21.25256040399381,
+   "vs": "camber"
+  }
+ },
+ "notes": [
+  "plain_same_area: flap simples (Raymer plain) com a mesma \u00e1rea que camber (S_flapped/S 0.61) \u2014 isola o ganho do escalonamento de camber do ganho de \u00e1rea de flap",
+  "droop_flaperon: flap simples (Raymer plain) com a mesma \u00e1rea que flaperon (S_flapped/S 0.87) \u2014 isola o ganho do escalonamento de camber do ganho de \u00e1rea de flap; flaperon desca\u00eddo s\u00f3 na aterragem, sem camber em cruzeiro"
+ ],
+ "files": {
+  "camber_camber": "examples/output/flap_options/uav_loiter_dash/camber_camber.png",
+  "camber_flaperon": "examples/output/flap_options/uav_loiter_dash/camber_flaperon.png",
+  "design_point_shift": "examples/output/flap_options/uav_loiter_dash/design_point_shift.png"
+ }
+}

@@ -1,0 +1,8 @@
+{
+  "variables": [
+    {"path": "assumptions.aero.AR"},
+    {"path": "assumptions.propulsion.battery_Wh_kg"},
+    {"path": "assumptions.propulsion.systems_power_W"},
+    {"path": "requirements.payload_mass"}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "label": "Fuel burn present but fuel price missing → term unassessed (never silent zero)",
+  "flight_hours_per_year": 200,
+  "unit_price": 100000.0,
+  "fuel_kg_per_h": 30.0,
+  "profile": "elements",
+  "sources": {
+    "unit_price": "EXAMPLE acquisition 1e5 USD"
+  },
+  "reference": "Raymer 2018 Ch. 18; unassessed≠zero"
+}

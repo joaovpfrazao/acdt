@@ -1,0 +1,18 @@
+---
+description: Problema descrito em linguagem livre (vigiar uma área, entregar algo, inspecionar…) → estudo conceptual de missão, requisitos e arquitetura de frota com o acdt
+alwaysApply: false
+---
+
+Quando o utilizador descreve um **problema** (não um avião), segue o prompt MCP `concept_trade` (texto em
+`src/acdt/ai/prompts/concept_trade.md`; resumo em `docs/ai-concept-trade.md`):
+
+* tu defines a missão, os requisitos e as alternativas; as ferramentas `concept_*`, `geo_measure`,
+  `transit_time`, `sweep_coverage`, `persistent_coverage`, `fleet_reliability`, `radar_horizon`,
+  `sensor_footprint`, `johnson_range`, `size_fleet` e `compare_alternatives` só calculam;
+* não há esquema fixo de entradas: escolhe as métricas que importam para este caso e justifica-as;
+* pesquisa dados atuais na web (datasheets, alvo, geografia, preços) e regista-os com URL e data; o resto é
+  PRESSUPOSTO com justificação;
+* inclui alternativas criativas, incluindo as que o acdt ainda não dimensiona (`evaluable=false`);
+* compara pela frente de Pareto, sem pesos por omissão; faz sensibilidades; nível conceptual (L0), sem alta
+  fidelidade;
+* passa `study_id` a todas as chamadas e termina com `concept_study_report`.

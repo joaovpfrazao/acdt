@@ -1,0 +1,258 @@
+# Tailless flying wing (NO vertical surface) with split ailerons for yaw and an active yaw SAS (10 nov 2026,
+# branch tailless-split-aileron). Same mission as uav150_flying_wing_closed.yaml; the drawing is
+# flying_wing_pusher_tailless.json (= the closed drawing without the winglets). Examples without
+# options.flying_wing.yaw_control are unchanged. PRESSUPOSTO ilustrativo — não valida uma aeronave real.
+name: UAV gasolina 150 kg — asa voadora sem deriva, split ailerons + SAS
+description: >
+  UAV de asa fixa com motor a gasolina de 2 tempos e hélice propulsora, trem triciclo fixo,
+  descolagem/aterragem em pista. Payload EO/IR + SAR ligeiro. Valores ilustrativos.
+  Asa voadora sem superfícies verticais: guinada por split ailerons (drag rudders, arrasto de
+  perfil McCormick 1995 Eq. 3.45) e piloto automático ativo (SAS de guinada) como hipótese base no
+  UAV. Rolamento holandês e espiral reportados com a célula nua E com SAS.
+aircraft_class: uav_tactical_recce_ucav
+# Requisitos rastreáveis (16 nov 2026, docs/REQUISITOS.md): id, texto, origem, pai, método e fidelidade; o
+# avaliador por omissão vem do domínio (perf:…, sizing:stall_speed, entrada:…, check:…). Não mudam o dimensionamento.
+requirements:
+  propulsion_type: {target: piston_prop, id: MIS-CFG-01, text: "Motor a gasolina com hélice propulsora",
+                    method: inspecao, notes: "escolha de configuração; sem avaliador automático"}
+  regulatory_category: {target: easa_specific, id: MIS-CERT-01, text: "Categoria específica (UAS)",
+                        source: "Reg. (UE) 2019/947", source_kind: regulamento}
+  payload_mass: {target: 30, unit: kg, id: MIS-PL-01, text: "Carga útil EO/IR + SAR ligeiro de 30 kg"}
+  endurance: {min: 10, unit: h, id: MIS-END-01, text: "Autonomia em espera ≥ 10 h"}
+  cruise_speed: {target: 45, unit: m/s, id: MIS-CRZ-01, text: "Velocidade de cruzeiro 45 m/s"}
+  cruise_altitude: {target: 3000, unit: m, id: MIS-CRZ-02, text: "Altitude de cruzeiro 3000 m"}
+  stall_speed: {max: 26, unit: m/s, id: MIS-STALL-01, text: "Velocidade de perda ≤ 26 m/s", parent: MIS-OPS-01}
+  climb_rate: {min: 3.0, unit: m/s, id: MIS-CLB-01, text: "Razão de subida ao nível do mar ≥ 3 m/s"}
+  service_ceiling: {min: 5000, unit: m, id: MIS-CEIL-01, text: "Teto de serviço ≥ 5000 m"}
+  takeoff_ground_roll: {max: 300, unit: m, id: MIS-TO-01, text: "Corrida de descolagem ≤ 300 m",
+                        parent: MIS-OPS-01}
+verification:
+  requirements:
+    - {id: MIS-OPS-01, text: "Operar de pista de 300 m com o vento cruzado regulamentar", source: missao,
+       source_kind: missao, comparison: bool, method: analise, fidelity: N1,
+       notes: "sem avaliador próprio: estado = pior estado dos filhos"}
+    - {id: REG-23233-01, text: "Controlo direcional com vento cruzado a 90° ≥ 0,2 V_S0",
+       source: "14 CFR 23.233(a) (pré-Amdt 23-64)", source_kind: regulamento, parent: MIS-OPS-01,
+       comparison: bool, evaluator: "check:hq:yaw_crosswind", method: analise, fidelity: N1}
+    - {id: DER-TO-XW-01, text: "Corrida de descolagem no 6-DOF com o vento cruzado de REG-23233-01 ≤ 300 m",
+       source: derivado, source_kind: derivado, parent: [MIS-TO-01, REG-23233-01], comparison: max, threshold: 300,
+       unit: m, method: simulacao, fidelity: N2,
+       notes: "evidência em acdt simulate (6-DOF); ligar com ficheiro:<relativo>#<caminho> quando a saída da simulação estiver na pasta"}
+    - {id: REG-23485-01, text: "Pernas do trem principal às cargas laterais de 23.485",
+       source: "14 CFR 23.485(c) (pré-Amdt 23-64)", source_kind: regulamento, comparison: bool,
+       evaluator: "check:asm:gear_side_load_structure", method: analise, fidelity: N1}
+    - {id: NRM-HQ-01, text: "Rolamento holandês Nível 1 (com SAS)", source: "MIL-F-8785C Table VI",
+       source_kind: norma, comparison: bool, evaluator: "check:hq:dutch_roll", method: analise, fidelity: N1}
+    - {id: DER-HQ-02, text: "Autoridade e taxa dos split ailerons para o SAS em turbulência + vento cruzado",
+       source: derivado, source_kind: derivado, parent: [NRM-HQ-01, REG-23233-01], comparison: bool,
+       evaluator: "check:hq:sas_authority", method: analise, fidelity: N1}
+    - {id: DER-SM-01, text: "Margem estática mínima de 2 % (asa voadora)", source: "NACA TR-796 (Donlan 1944)",
+       source_kind: derivado, comparison: bool, evaluator: "check:asm:static_margin", method: analise, fidelity: N1}
+    - {id: DER-PKG-01, text: "Carga útil e combustível arrumados junto ao CG", source: derivado, source_kind: derivado,
+       parent: MIS-PL-01, comparison: bool, evaluator: "check:asm:useful_load_packaging", method: analise,
+       fidelity: N1}
+    - {id: SORA-01, text: "Requisitos de contenção SORA 2.5 Step #8", source: "EASA AMC1 Art. 11 Reg. (UE) 2019/947 (SORA 2.5)",
+       source_kind: sora, parent: MIS-CERT-01, comparison: bool, method: analise, fidelity: N0,
+       notes: "avaliado em acdt certify (fora deste pipeline); o operador é o dono da SORA"}
+    - {id: PL-FOV-01, text: "Campo de visão do payload EO/IR desobstruído", source: missao, source_kind: missao,
+       parent: MIS-PL-01, comparison: bool, method: analise, fidelity: N1,
+       notes: "avaliado em acdt integration (ray casting); sem avaliador neste pipeline"}
+assumptions:
+  weights:
+    method: components
+    initial_class: uav_tactical_recce_ucav
+    components:
+      material: composite
+      structural_category: utility
+      landing_gear: tricycle
+      # 12 nov 2026: legs lengthened for the 19° nose-up stance (gear.ground_attitude_deg): ground plane 0.12 m
+      # lower and the nose strut 0.36 m longer (gear_layout, shortest wheelbase in Raymer's band); Raymer
+      # Eq. 15.50/15.51 take the lengths. PRESSUPOSTO: same attach heights as before, vertical legs (no splay).
+      main_gear_length_m: 0.47
+      nose_gear_length_m: 0.78
+      engine_kW_per_kg: 0.9
+      avionics_uninstalled_kg: 6
+      n_tanks: 1
+      items:
+        - {name: gerador/alternador + regulador, mass_kg: 2.0, group: equipment}
+        # Actuators per surface (10 nov 2026, tailless_actuation): hinge moments NACA TN 690 (split leaves) /
+        # AVL HM (elevons), servos from the Volz datasheets in options.flying_wing.actuators.catalog.
+        # 10 nov 2026 (tailless-pitch-trim): with the trimmed design the split leaves need 2x Volz DA 30 per leaf
+        # (hq:actuators); the DA 30-HT budget (8.8 kg) was updated to the selected servo.
+        - {name: atuadores split aileron (8x Volz DA 30, 630 g cada), mass_kg: 5.04, group: equipment}
+        # 12 nov 2026: after the gear change (W0 ~150 kg) the elevon hinge moment selects 1x Volz DA 30 per elevon.
+        - {name: atuadores elevon (2x Volz DA 30, 630 g cada), mass_kg: 1.26, group: equipment}
+        # PRESSUPOSTO conservador: mantém os 2.5 kg do orçamento original (servos + cablagem) como cablagem/hastes.
+        - {name: cablagem de sinal + hastes e suportes, mass_kg: 2.5, group: equipment}
+        - {name: suporte do payload + amortecimento, mass_kg: 1.5}
+        - {name: bateria de backup (avionics), mass_kg: 1.5, group: equipment}
+      growth_allowance: 0.05
+  aero:
+    fidelity: lowfi
+    AR: 16
+    taper: 0.6
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 4415
+    clmax_airfoil: 1.5
+    # No flap on the tailless drawing (11 nov 2026): the sizing CLmax is the trimmed one of the assembly
+    # (flying_wing.clmax: trimmed, assembly/tailless_trim.py), not clean + a plain-flap increment.
+    flap: {kind: none}
+    roughness: smooth_molded_composite
+    laminar: {wing: 0.30, htail: 0.30, vtail: 0.30, fuselage: 0.10}
+    extra_drag_areas_m2: {fixed_gear: 0.03, gimbal_eo_ir: 0.012, antennas_misc: 0.004}
+  # 12 nov 2026: Phase 5/6 must keep the drawn t/c, camber and Panknin tip washout (−10°) that
+  # close the pitch trim (the unconstrained optimum had dropped twist to −2° and t/c root to 0.10).
+  structures:
+    wingbox:
+      hold_section: true
+  geometry:
+    # Explicit dihedral matches the drawn wing in flying_wing_pusher.json (2°); required for
+    # hq:spiral to be assessed (Etkin & Reid / Nelson via AVL Clβ). Unknown≠pass.
+    dihedral_deg: 2.0
+    # The fixed-type model still carries a horizontal tail (the scissor is written for one).
+    # The body is the centerbody: narrower than the 0.40 m pod, so the fuselage Cnβ
+    # (Raymer Eq. 16.47) is smaller.
+    fuselage_length_m: 3.4
+    fuselage_diameter_m: 0.34
+    c_ht: 0.55
+    # Fixed-type record only (the assembly has NO vertical surface; per-part masses replace the fixed-type
+    # vtail mass in the loop). Kept as in the closed example. Raymer Eq. 6.29. The drawn winglets were about 0.03;
+    # 0.03 left the dutch roll unstable. Since hq:* read the assembly, this volume only feeds the
+    # fixed-type record (res.dynamics['fixed_type']) and the fixed-type weights.
+    c_vt: 0.10
+    # At constant c_VT, C_nr grows with l_VT/b (Nelson: C_nr = −2 V_v (l_v/b) C_Lα_v) while
+    # C_nβ stays with the volume. 0.50 L left ζ_d = 0.063, under the Table VI floor of 0.08.
+    tail_arm_fraction: 0.80
+  stability:
+    stations:
+      # Pusher, not Roskam's tractor station (Part V Table 8.1, 8 % L). The engine mass is at the
+      # propeller, aft on the centerbody. PRESSUPOSTO: 72 % L. Avionics stay forward so the
+      # component pitch inertia (Roskam Part V Ch. 10) is not a single point.
+      engine_installed: [L, 0.72]
+      propeller: [L, 0.92]
+      motor_esc: [L, 0.70]
+      avionics: [L, 0.12]
+      electrical: [L, 0.16]
+      harness: [L, 0.20]
+      # Payload and fuel on the fixed-mass CG (Raymer 2018 Sec. 15.1): a tank at 30 % MAC would
+      # sit ahead of the pusher and widen the CG travel past the Raymer Ch. 11 nose-load band.
+      fuel: [balance, 0]
+  propulsion:
+    eta_cruise: 0.78
+  assembly:
+    file: ../integration/flying_wing_pusher_tailless.json
+    options:
+      scaling: uniform
+      close_on: nominal
+      check_pessimistic: true
+      K_source: avl
+      # NACA TR-796 (Donlan 1944): static margin 0.02–0.08 reasonable for tailless aeroplanes (lower bound here).
+      static_margin_min: 0.02
+      # Payload and fuel (no drawn tank/bay) on the CG of the fixed masses so the loading cases do not move
+      # the CG (Raymer 2018 Sec. 15.1). PRESSUPOSTO: the volume there is not checked (packaging unassessed).
+      useful_load_at: empty_cg
+      # Wing station for 10 % minimum static margin (Raymer Sec. 16.3). The gasoline engine
+      # mass sits on the pusher disc, aft of the as-drawn neutral point.
+      flying_wing:
+        # No fin / winglet: yaw by split ailerons (tailless.py). SAS default true for a UAV
+        # (João, 10 nov 2026: "o piloto automático ativo será hipótese no UAV sempre").
+        yaw_control: split_aileron
+        # Size on the trimmed CLmax of the drawn wing (elevon-limited + critical section), 11 nov 2026.
+        clmax: trimmed
+        sas: true
+        split_aileron:
+          # PRESSUPOSTO layout: outboard span (largest arm), 40 % chord split trailing edge. Sized so the
+          # SAS turbulence authority fits (tailless span_required: 0.28 of the semispan at 40 % chord);
+          # the steady-sideslip crosswind case needs 0.65 and is reported as failing (max ≈ 8 kt).
+          eta_inner: 0.45
+          eta_outer: 0.98
+          cf_c: 0.40
+          # PRESSUPOSTO leaf limit; Löchert et al. 2019 used δ_u 45° / δ_l 32° on MULDICON.
+          delta_max_deg: 60
+          # Fallback rate (Volz DA 26-30-5024 rated speed 200 °/s). With actuators.catalog the surface rate
+          # of the selected servo through its gearing supersedes it (tailless_followup).
+          rate_max_deg_s: 200
+          rate_source: "Volz DA 26-30-5024 datasheet, rated speed 200 deg/s (volz-servos.com, 2026-11-10)"
+          # 11 nov 2026: symmetric pre-deflection δ0 of both splits (design option chosen; linear ΔC_n = 2C₁ sin2δ0
+          # sin2d near zero, Rajput, Zhang & Qu 2014; Wang, Wang & Jia 2011). Closes the lateral gust without
+          # touching the rate limit; its cruise drag (McCormick Eq. 3.45, both sides) is in the sizing polar.
+          bias_deg: 2
+        elevon:
+          # PRESSUPOSTO: elevons inboard of the split ailerons; ±25° (Sadraey 2012 Sec. 12.4.4).
+          eta_inner: 0.20
+          eta_outer: 0.45
+          cf_c: 0.25
+          max_deg: 25
+        turbulence: moderate
+        actuators:
+          # Vendor datasheets (rated torque at rated speed, peak torque at rated voltage, mass ±10 %), read
+          # 10 nov 2026 from volz-servos.com. Travel only given for the DA 26 (others: unassessed); stiffness not checked.
+          catalog:
+            - {name: Volz DA 26-30-5024, torque_Nm: 2.7, peak_torque_Nm: 5.0, speed_deg_s: 200, mass_kg: 0.270,
+               travel_deg: 45, source: "volz-servos.com DA-26_Datasheet_uni.pdf (travel ±45° default)"}
+            - {name: Volz DA 30, torque_Nm: 8.0, peak_torque_Nm: 16.0, speed_deg_s: 150, mass_kg: 0.630,
+               source: "volz-servos.com DA-30_Datasheet_RevI.pdf (D-Sub)"}
+            - {name: Volz DA 30-HT, torque_Nm: 18.0, peak_torque_Nm: 32.0, speed_deg_s: 100, mass_kg: 1.100,
+               source: "volz-servos.com DA-30-HT_Datasheet_Rev_H.pdf (D-Sub)"}
+            - {name: Volz DA 58-D, torque_Nm: 80.0, peak_torque_Nm: 200.0, speed_deg_s: 80, mass_kg: 5.600,
+               source: "volz-servos.com DA-58-Duplex_Datasheet_Rev_C.pdf"}
+          factor_of_safety: 1.5
+          # PRESSUPOSTO: up to two identical servos ganged per leaf / elevon (equal load sharing).
+          max_per_surface: 2
+          # Volz gives no bandwidth / delay: left unknown → the SAS is designed and checked with a 0.10 s
+          # equivalent delay (MIL-F-8785C 3.5.3 Level-1 limit) and the delay margin is reported.
+          lag_s: null
+          delay_s: null
+        place_gear: true
+        gear:
+          tipback_deg: 15.0
+          # 12 nov 2026 (tailless-gear-rotation-track): with a level stance the elevon cannot lift the nose wheel —
+          # its download cancels most of its own pitching moment about the main wheels (Sadraey 2012 Sec. 9.6.2,
+          # gear:takeoff_rotation) and the 6-DOF ground roll was 1053 m. Nose-strut extension to a 19° nose-up
+          # stance = lift-off attitude (fly-off, no rotation; the exception named in the same section): tip-back,
+          # nose load and overturn measured in that attitude (Raymer Ch. 11), propeller clearance in both
+          # attitudes (14 CFR 23.925(a)(1)). PRESSUPOSTO design option; Raymer's 8–15 % nose band is met again.
+          ground_attitude_deg: 19.0
+          nose_fraction: [0.08, 0.15]
+          # top of the band (15 % on the nose): shortest wheelbase → shortest nose-strut extension (lighter leg)
+          wheelbase: shortest
+          # Half-track 0.48 m ≥ μ_side·h_cg,static = 0.8 × 0.59 m (Sadraey 2012 Eq. 9.26–9.27 roll-over moment
+          # balance with the tyre side-friction limit of the 6-DOF ground model, PRESSUPOSTO μ 0.8); covers the
+          # 14 CFR 23.485 side/vertical ratio 0.83/1.33 (0.37 m), Raymer's 63° overturn (0.33 m) and the 5° tip
+          # clearance about the wheel (Torenbeek 1982 / CS 25.149 basis). The minimum overturn track (0.42 m) let
+          # the 6-DOF touchdown roll over the downwind wheel onto the wing tip.
+          half_track: 0.48
+          # 12 nov 2026 (tip strike in the 19° stance, 10 kt / 14 CFR 23.233(a) 0.2 V_S0): widening the track to
+          # 0.8–1.0 m removed the contact but put the outboard side load at ~1.5× 23.485 — rejected as the sole
+          # fix. Lowering the demonstrated crosswind below 0.2 V_S0 would fail 23.233(a). Ground roll-hold is
+          # already active in fly-off and landing rollout and is not enough with ~11° static clearance. Opt-in
+          # tip skids (Raymer 2018 Ch. 11 outrigger / tip gear; energy E = η N δ, Currey 1988 / Raymer Sec. 18.2 /
+          # Sadraey 2012 Sec. 9.7). Designed contact does not fail side_load_ok (23.485 stays on the main gear).
+          tip_skids: true
+          # 12 nov 2026: item 3 — estrutura 23.485, bitola Sadraey 9.5.3.2, área de arrasto com o
+          # comprimento. 0.03 m² veio da família UAV 150 kg com pernas 0,35/0,30 m; aqui as pernas
+          # (weights.components) são 0,47/0,78 m. A área escalada é reportada, não entra no polar
+          # neste passo (aplicar 1,72× no C_D0 quebraria a margem da descolagem 299 m ≤ 300 m).
+          # 16 nov 2026 (l1-trem-ventocruzado): `apply_scaled_drag: true` aplica a diferença (0,0216 m²) ao polar
+          # (aero/gear_drag.py, Raymer 2018 Eq. 12.24). Não ligado aqui: a escala da área inteira com ΣL das pernas
+          # (rodas incluídas) é um limite superior PRESSUPOSTO e o redimensionamento muda a aeronave (W0 149,7 →
+          # 161,7 kg); ver docs/HANDOFF.md. Decisão do projetista.
+          assess_structure: true
+          scale_drag: true
+          drag_ref_main_m: 0.35
+          drag_ref_nose_m: 0.30
+          main_gear_length_m: 0.47
+          nose_gear_length_m: 0.78
+        extend_fuselage_for_gear: false
+      balance:
+        # Middle of the NACA TR-796 band 0.02–0.08 (was 0.10, Raymer Sec. 16.3 for conventional layouts).
+        static_margin: 0.05
+certification:
+  safety:
+    t_flight_h: 10
+    baseline: {backup_battery: true}
+    unit: {battery_kg: 1.5}
+  sora:
+    population: "<50"
+    aec: 5

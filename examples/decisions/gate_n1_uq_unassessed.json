@@ -1,0 +1,24 @@
+{
+  "level": "N1",
+  "metrics": {
+    "radar_mass_kg": 18,
+    "CL_alpha": 5.0,
+    "baseline_CL_alpha": 5.0
+  },
+  "checks": [
+    {
+      "key": "mtow",
+      "ok": true,
+      "message": "ok"
+    }
+  ],
+  "uq": {
+    "kind": "monte_carlo",
+    "status": "unassessed",
+    "reason": "no successful samples",
+    "summaries": {},
+    "gate_metrics": {}
+  },
+  "require_uq": true,
+  "source": "PRESSUPOSTO \u2014 UQ unassessed must not pass gate"
+}

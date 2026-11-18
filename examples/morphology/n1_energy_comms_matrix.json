@@ -1,0 +1,63 @@
+{
+  "dimensions": {
+    "wing": [
+      "high"
+    ],
+    "fuselage": [
+      "twin_boom"
+    ],
+    "tail": [
+      "inverted_V"
+    ],
+    "propulsion_layout": [
+      "pusher"
+    ],
+    "propulsion_kind": [
+      "electric",
+      "hybrid"
+    ],
+    "launch_recovery": [
+      "catapult"
+    ],
+    "landing_gear": [
+      "none"
+    ],
+    "energy": [
+      "battery_LiIon",
+      "hybrid_series",
+      {
+        "id": "custom_h2",
+        "source": "",
+        "note": "intentionally missing source → unassessed"
+      }
+    ],
+    "avionics_link": [
+      {
+        "id": "datalink_LOS",
+        "power_W": 25,
+        "mass_kg": 0.4,
+        "source": "PRESSUPOSTO demo LOS C2 25 W — not a datasheet",
+        "retrieved": "2026-11-10"
+      },
+      {
+        "id": "SATCOM_Ku",
+        "power_W": 80,
+        "mass_kg": 1.2,
+        "source": "PRESSUPOSTO demo Ku SATCOM 80 W — not a datasheet",
+        "retrieved": "2026-11-10"
+      },
+      {
+        "id": "SATCOM_custom",
+        "note": "no power_W/source → unassessed"
+      }
+    ],
+    "payload": [
+      "EO_IR"
+    ]
+  },
+  "notes": [
+    "P4 energy/hybrid/datalink/SATCOM demo — open matrix, seeds are shortcuts not a catalogue.",
+    "custom_h2 and SATCOM_custom intentionally lack source/power → unassessed.",
+    "Eastlake/CER operational cost still open (not in this slice)."
+  ]
+}

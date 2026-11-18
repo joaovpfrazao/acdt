@@ -1,0 +1,16 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative study; no published aircraft/pack/tank data claimed.
+storage:
+  fuel:
+    loaded_mass_kg: 18195.51759267494
+    unusable_mass_kg: 0
+    density_kg_m3: 800
+    tank_internal_volume_m3: 30
+    fill_fraction: 0.95
+    tank_external_volume_m3: 31
+    available_volume_m3: 32
+  assumption_sources:
+    loaded_mass_kg: size_jet(examples/jet/coupled_size.yaml) at main 8105d18; computed
+      fuel_mass_kg, NOT a published capacity
+    other: 'PRESSUPOSTO: zero separate unusable mass, density, net allocated volumes;
+      not a real A320 tank'

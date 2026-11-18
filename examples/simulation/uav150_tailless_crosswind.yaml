@@ -1,0 +1,21 @@
+# Tailless flying wing (no vertical surface) — 6-DOF mission with the yaw channel through the split ailerons
+# (11 nov 2026). Use with examples/heavy/uav150_flying_wing_tailless.yaml:
+#   acdt simulate examples/heavy/uav150_flying_wing_tailless.yaml examples/simulation/uav150_tailless_crosswind.yaml -o output/tl_sim
+#
+# Wind 5.2 m/s (10.1 kt) from 270° = 90° crosswind on the runway heading 000°: the crosswind of the sizing case
+# (0.2 V_S0, 14 CFR 23.233(a) pre-Amdt 23-64, see res.dynamics['tailless']['crosswind']). No turbulence so the
+# touchdown numbers are repeatable (design choice of the test case). Approach glide 2° (high L/D, idle glide
+# shallower than 3°, as in uav_endurance.yaml). Landing: crabbed approach, decrab in the flare (yaw SAS + heading
+# loop through the split ailerons) from 30 m AGL (wing-low final; design choice — at the flare alone the 6-DOF left
+# 0.6 m/s drift at touchdown), main-gear side loads vs 14 CFR 23.485.
+mission:
+  name: UAV 150 kg sem deriva — circuito com vento cruzado
+  dt: 0.02
+  extrapolate_after_s: 60
+  wind: {speed_m_s: 5.2, from_deg: 270}
+  segments:
+    - {type: takeoff, heading_deg: 0}
+    - {type: climb, to_altitude_m: 300}
+    - {type: waypoints, points_km: [[3, 0], [3, 3], [-2, 3], [-2, 0]]}
+    - {type: descent, to_altitude_m: 60}
+    - {type: landing, flap: 0, glide_deg: 2, heading_deg: 0, decrab_height_m: 30}

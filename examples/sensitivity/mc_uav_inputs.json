@@ -1,0 +1,25 @@
+{
+  "n": 8,
+  "method": "lhs",
+  "seed": 0,
+  "percentiles": [
+    5,
+    50,
+    95
+  ],
+  "inputs": [
+    {
+      "name": "assumptions.aero.AR",
+      "dist": "uniform",
+      "low": 13.0,
+      "high": 15.0
+    },
+    {
+      "name": "assumptions.propulsion.battery_Wh_kg",
+      "dist": "uniform",
+      "low": 180.0,
+      "high": 220.0
+    }
+  ],
+  "note": "PRESSUPOSTO small N smoke for handbook MC"
+}

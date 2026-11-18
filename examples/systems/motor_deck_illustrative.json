@@ -1,0 +1,16 @@
+{
+  "label": "Deck Drela 2007 — EXAMPLE / PRESSUPOSTO, NÃO é uma cotação de motor real",
+  "deck": {
+    "kv_rpm_per_V": 500,
+    "R_ohm": 0.15,
+    "I0_A": 0.6,
+    "I_max_A": 55,
+    "V_max_V": 25.2,
+    "source": "EXAMPLE / PRESSUPOSTO ilustrativo de parâmetros Drela — substituir por Kv, R, I0 do datasheet com fonte e data",
+    "retrieved": "2026-11-10"
+  },
+  "operating": {
+    "V_V": 22.0,
+    "rpm": 8000
+  }
+}

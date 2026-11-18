@@ -1,0 +1,55 @@
+{
+ "out_stem": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/geometry/uav_endurance_payload",
+ "fuselage": {
+  "length": 1.8,
+  "diameter": 0.22,
+  "x": -0.49941166891417044
+ },
+ "wing": {
+  "semispan": 2.139380648876815,
+  "c_root": 0.38203225872800267,
+  "c_tip": 0.2292193552368016,
+  "sweep_c4_deg": 0.0,
+  "dihedral_deg": 3.0000000000000004,
+  "x": 0.0,
+  "z": 0.0,
+  "incidence_deg": 0.0,
+  "airfoil": "4412",
+  "tc": [
+   0.13,
+   0.11
+  ],
+  "tess_w": 33,
+  "tess_u": 24
+ },
+ "htail": {
+  "semispan": 0.4539352186005726,
+  "c_root": 0.28370951162535785,
+  "c_tip": 0.1702257069752147,
+  "sweep_c4_deg": 0.0,
+  "x": 1.0145806867756613,
+  "z": 0.0,
+  "airfoil": "0012",
+  "tc": [
+   0.1,
+   0.1
+  ],
+  "tess_w": 33,
+  "tess_u": 10
+ },
+ "vtail": {
+  "semispan": 0.5043148192500686,
+  "c_root": 0.44827983933339427,
+  "c_tip": 0.22413991966669713,
+  "sweep_c4_deg": 20.0,
+  "x": 0.9983425403671742,
+  "z": 0.0,
+  "airfoil": "0010",
+  "tc": [
+   0.1,
+   0.1
+  ],
+  "tess_w": 33,
+  "tess_u": 8
+ }
+}

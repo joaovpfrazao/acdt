@@ -1,0 +1,50 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative table map (NOT a CFM56/LEAP deck or cycle output).
+# Lapse nodes sampled from Mattingly/Ihme correlation × throttle; TSFC uses a
+# PRESSUPOSTO part-power factor (1.15−0.15·Π) on Ihme so cruise Π=1 matches the
+# default correlation while part power is explicitly worse. No pyCycle/NPSS.
+configuration_id: illustrative-transport-engine-map
+aircraft_class: jet_transport
+payload_kg: 15000
+crew_kg: 800
+mass_bounds_kg: [40000, 110000]
+mtow_limit_kg: 78000
+wing_area_m2: 122.6
+aspect_ratio: 9.48
+mach: 0.79
+altitude_m: 11277.6
+range_m: 5000000
+thrust_sl_N: 120000
+n_engines: 2
+cd0: 0.020
+oswald: 0.82
+reserve_fraction: 0.06
+wave:
+  thickness_ratio: 0.12
+  sweep_deg: 25
+  technology_factor: 0.95
+engine:
+  installation_factor: 0.97
+  throttle_ratio: 1.05
+  tsfc_multiplier: 1.0
+  map:
+    mode: table
+    source: 'PRESSUPOSTO: illustrative Mach/altitude/throttle table; not OEM data or a cycle deck'
+    out_of_domain: unassessed
+    axes:
+      mach: [0.0, 0.79]
+      altitude_m: [0.0, 11277.6]
+      throttle: [0.5, 1.0]
+    # Uninstalled thrust lapse α·Π (installation_factor applied in engine_point)
+    thrust_lapse:
+    - - [0.5, 1.0]
+      - [0.106897, 0.213794]
+    - - [0.352027, 0.704054]
+      - [0.091076, 0.182152]
+    TSFC_kg_N_s:
+    - - [1.217994e-05, 1.133018e-05]
+      - [1.056125e-05, 9.824418e-06]
+    - - [2.300487e-05, 2.139988e-05]
+      - [1.994756e-05, 1.855587e-05]
+assumption_sources:
+  engine.map: 'PRESSUPOSTO: table built from Mattingly/Ihme sample × part-power SFC factor; not certification'

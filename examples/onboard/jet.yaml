@@ -1,0 +1,47 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Todos os valores novos são PRESSUPOSTOS ilustrativos, não dados publicados.
+schema_version: '1.0'
+model: jet
+onboard:
+  schema_version: '1.0'
+  source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+    não é uma referência de aeronave'
+  items:
+  - id: instrument
+    role: payload
+    mass_kg: 100
+    mass_accounting: incremental
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  - id: power_unit
+    role: equipment
+    mass_kg: 30
+    mass_accounting: incremental
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  loads:
+  - id: instrument_load
+    item_id: instrument
+    source_id: bus
+    power_W: 3000
+    peak_W: 5000
+    duty: 0.5
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  sources:
+  - id: bus
+    kind: generator
+    item_id: power_unit
+    delivery_efficiency: 0.9
+    continuous_W: 10000
+    peak_W: 10000
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+    fuel_kg_kWh_terminal: 0.4
+    thrust_penalty_N_per_W_terminal: 0.03
+aircraft: ../jet/coupled_size.yaml
+duration:
+  precruise_s: 300
+  postcruise_s: 180
+  source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+    não é uma referência de aeronave'

@@ -1,0 +1,306 @@
+{
+  "schema": "acdt.benchmark_reference/1",
+  "id": "nansei_jcg_senkaku",
+  "title": "JCG Nansei/Senkaku maritime ISR UAV fleet (concept trade)",
+  "source_branch": "estudo-nansei",
+  "source_commit": "b3f87c9",
+  "retrieved_study_date": "2026-10-30",
+  "extracted": "2026-11-06",
+  "note": "Benchmark only: problem + reference numbers to track framework capability. Full study (scripts, figures, narrative) stays on branch estudo-nansei — do not merge the full study.",
+  "geography": {
+    "A_TS_km2": 4494.5,
+    "A_area_km2": 15224.0,
+    "T_window_h": 1.200001036717958,
+    "dist_km": {
+      "Ishigaki": 162.15358989443519,
+      "Shimojishima": 163.90392270089922,
+      "Naha": 371.5429377013988,
+      "Kitakyushu": 1122.388315017096,
+      "Yonaguni": 180.2524590517542
+    },
+    "radio_horizon_km": 248.33720056407174,
+    "far_edge_km": 217.05409691144914,
+    "sweep_width_km": {
+      "L12": 20.4,
+      "L18": 20.4,
+      "L24": 20.4,
+      "XL24": 74.0,
+      "M12": 10.0
+    }
+  },
+  "operations": {
+    "E_curfew_Ishigaki_h": 16.711781555699616,
+    "night_gap_h": 13.355890777849808,
+    "E_curfew_Shimojishima_h": 18.257244745477905,
+    "transit_Ishigaki": {
+      "t_out_h": 1.2869332531304383,
+      "t_back_h": 0.8189575247193697,
+      "t_round_trip_h": 2.105890777849808,
+      "method": "kinematics, ground speed V ∓ w",
+      "validity": "steady wind along track; no climb/descent",
+      "study_call": 4
+    }
+  },
+  "sized_variants": {
+    "L12": {
+      "W0_kg": 112.9,
+      "b_m": 4.94,
+      "endurance_Breguet_h": 13.26,
+      "endurance_nominal_h": 12,
+      "unit_cost_kUSD_N50": 171,
+      "p_loss_per_sortie": 0.0226,
+      "viable": true,
+      "failed_checks": [
+        "gear:rotation"
+      ],
+      "cert": [
+        "stanag4703"
+      ]
+    },
+    "L18": {
+      "W0_kg": 131.5,
+      "b_m": 5.33,
+      "endurance_Breguet_h": 19.18,
+      "endurance_nominal_h": 18,
+      "unit_cost_kUSD_N50": 183,
+      "p_loss_per_sortie": 0.0324,
+      "viable": true,
+      "failed_checks": [
+        "hq:dutch_roll",
+        "gear:rotation",
+        "perf:endurance"
+      ],
+      "cert": [
+        "stanag4703"
+      ]
+    },
+    "L24": {
+      "W0_kg": 151.6,
+      "b_m": 5.72,
+      "endurance_Breguet_h": 24.96,
+      "endurance_nominal_h": 24,
+      "unit_cost_kUSD_N50": 195,
+      "p_loss_per_sortie": 0.0418,
+      "viable": true,
+      "failed_checks": [
+        "hq:CAP",
+        "hq:dutch_roll",
+        "gear:position",
+        "gear:tipback",
+        "perf:endurance"
+      ],
+      "cert": [
+        "stanag4671"
+      ]
+    },
+    "XL24": {
+      "W0_kg": 224.8,
+      "b_m": 6.97,
+      "endurance_Breguet_h": 25.14,
+      "endurance_nominal_h": 24,
+      "unit_cost_kUSD_N50": 248,
+      "p_loss_per_sortie": 0.0421,
+      "viable": true,
+      "failed_checks": [
+        "gear:rotation",
+        "perf:endurance"
+      ],
+      "cert": [
+        "stanag4671"
+      ]
+    },
+    "M12": {
+      "W0_kg": 94.6,
+      "b_m": 4.52,
+      "endurance_Breguet_h": 13.02,
+      "endurance_nominal_h": 12,
+      "unit_cost_kUSD_N50": 161,
+      "p_loss_per_sortie": 0.0222,
+      "viable": true,
+      "failed_checks": [
+        "gear:rotation",
+        "perf:endurance"
+      ],
+      "cert": [
+        "stanag4703"
+      ]
+    }
+  },
+  "fleet_alternatives": [
+    {
+      "id": "A1",
+      "metrics": {
+        "n_aircraft": 4,
+        "acquisition_usd": 731271.7878581458,
+        "pod_window": 0.22932935984369596,
+        "p_enough_available": 0.98801875,
+        "flight_hours_per_day": 27.861032297059953,
+        "fuel_kg_per_day": 47.7943162690602,
+        "losses_per_year": 19.39268464165842,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A2",
+      "metrics": {
+        "n_aircraft": 6,
+        "acquisition_usd": 1096907.6817872187,
+        "pod_window": 0.4060667644010726,
+        "p_enough_available": 0.9526614062500001,
+        "flight_hours_per_day": 55.72206459411991,
+        "fuel_kg_per_day": 95.5886325381204,
+        "losses_per_year": 38.78536928331684,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A3",
+      "metrics": {
+        "n_aircraft": 9,
+        "acquisition_usd": 1645361.5226808279,
+        "pod_window": 0.5422730931108697,
+        "p_enough_available": 0.9660684842734375,
+        "flight_hours_per_day": 83.58309689117985,
+        "fuel_kg_per_day": 143.38294880718055,
+        "losses_per_year": 58.17805392497526,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A4",
+      "metrics": {
+        "n_aircraft": 6,
+        "acquisition_usd": 1171041.633138962,
+        "pod_window": 0.4060667644010726,
+        "p_enough_available": 0.9526614062500001,
+        "flight_hours_per_day": 53.47772520092357,
+        "fuel_kg_per_day": 94.72230389663248,
+        "losses_per_year": 35.481467107966076,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A5",
+      "metrics": {
+        "n_aircraft": 6,
+        "acquisition_usd": 1025559.7890529449,
+        "pod_window": 0.4060667644010726,
+        "p_enough_available": 0.9526614062500001,
+        "flight_hours_per_day": 61.08206021356378,
+        "fuel_kg_per_day": 103.5708767766563,
+        "losses_per_year": 45.854418798151904,
+        "curfew_ok": 0.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A6",
+      "metrics": {
+        "n_aircraft": 4,
+        "acquisition_usd": 992883.2125553265,
+        "pod_window": 0.6112931722729689,
+        "p_enough_available": 0.98801875,
+        "flight_hours_per_day": 26.738862600461786,
+        "fuel_kg_per_day": 68.12994883352174,
+        "losses_per_year": 17.860517392853733,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A7",
+      "metrics": {
+        "n_aircraft": 6,
+        "acquisition_usd": 1489324.8188329898,
+        "pod_window": 0.8489070020783882,
+        "p_enough_available": 0.9526614062500001,
+        "flight_hours_per_day": 53.47772520092357,
+        "fuel_kg_per_day": 136.25989766704348,
+        "losses_per_year": 35.72103478570747,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A9",
+      "metrics": {
+        "n_aircraft": 13,
+        "acquisition_usd": 2091798.6020184318,
+        "pod_window": 0.3182414249594713,
+        "p_enough_available": 0.9658354279713857,
+        "flight_hours_per_day": 133.67614190962294,
+        "fuel_kg_per_day": 207.2085046295117,
+        "losses_per_year": 98.58500626437727,
+        "curfew_ok": 1.0,
+        "los_ok": 0.0
+      }
+    },
+    {
+      "id": "A10",
+      "metrics": {
+        "n_aircraft": 9,
+        "acquisition_usd": 2233987.2282494847,
+        "pod_window": 0.9412691200861234,
+        "p_enough_available": 0.9660684842734375,
+        "flight_hours_per_day": 80.21658780138534,
+        "fuel_kg_per_day": 204.38984650056517,
+        "losses_per_year": 53.581552178561196,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A8",
+      "metrics": {
+        "n_aircraft": 8,
+        "acquisition_usd": 1724155.0004134723,
+        "pod_window": 0.7004350602424827,
+        "p_enough_available": 0.9761810503515624,
+        "flight_hours_per_day": 54.599894897521736,
+        "fuel_kg_per_day": 115.92426510258193,
+        "losses_per_year": 37.25320203451216,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    },
+    {
+      "id": "A11",
+      "metrics": {
+        "n_aircraft": 11,
+        "acquisition_usd": 2468817.409829967,
+        "pod_window": 0.8835570625686163,
+        "p_enough_available": 0.9760605892530273,
+        "flight_hours_per_day": 81.33875749798352,
+        "fuel_kg_per_day": 184.05421393610368,
+        "losses_per_year": 55.113719427365886,
+        "curfew_ok": 1.0,
+        "los_ok": 1.0
+      }
+    }
+  ],
+  "pareto_with_constraints": [
+    "A10"
+  ],
+  "pareto_unconstrained": [
+    "A1",
+    "A6",
+    "A7",
+    "A10"
+  ],
+  "recommendation": {
+    "chosen": "A10",
+    "text": "A10: XL24, 3 em simultâneo, Ishigaki — 9 aeronaves, aquisição ≈ 2.23 M$ (CER L0, baixa confiança), POD na janela 0.94, P(frota suficiente) 0.966, 80 h de voo/dia, perdas previstas 53.6/ano (taxas genéricas).",
+    "rationale": "alternativa mais barata do conjunto de Pareto que cumpre as restrições; sem pesos. A endurance é imposta pelo horário de Ishigaki e a POD pelo radar de 360°."
+  },
+  "framework_hooks": [
+    "concept_study_* / size_fleet / persistent_coverage / sweep_coverage / compare_alternatives",
+    "acdt size L0/L1 on variant_*.yaml (branch only)",
+    "pointmass / 6dof mission judge",
+    "payload_trade + electrical_analyse (P4)",
+    "decisions_* (P5); sensitivity_* (P7); shape study (P6 light)"
+  ]
+}

@@ -1,0 +1,200 @@
+{
+ "_comment": "PRESSUPOSTO L0 demo: sphere + cylinder equipment items (Meriam & Kraige inertia/volume) and a yawed boom that AVL/Torenbeek cannot represent faithfully \u2192 bodies contribution unassessed. Box items remain the default elsewhere. Not a product study.",
+ "assembly": {
+  "components": [
+   {
+    "type": "body",
+    "name": "fuselage",
+    "role": "fuselage",
+    "origin": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "pod": {
+     "length": 2.4,
+     "width": 0.4,
+     "height": 0.36,
+     "nose_frac": 0.2,
+     "tail_frac": 0.25,
+     "tail_scale": 0.4
+    }
+   },
+   {
+    "type": "body",
+    "name": "side_boom",
+    "role": "boom",
+    "origin": [
+     0.8,
+     0.0,
+     0.05
+    ],
+    "orientation": {
+     "yaw": 20.0
+    },
+    "pod": {
+     "length": 1.2,
+     "width": 0.1,
+     "height": 0.1,
+     "nose_frac": 0.1,
+     "tail_frac": 0.1,
+     "tail_scale": 0.8
+    },
+    "mass_kg": 1.5
+   },
+   {
+    "type": "surface",
+    "name": "wing",
+    "role": "wing",
+    "origin": [
+     0.9,
+     0.0,
+     0.05
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.45,
+     "tip_chord": 0.28,
+     "span": 1.6,
+     "dihedral_deg": 2.0,
+     "tc_root": 0.14,
+     "tc_tip": 0.12
+    }
+   },
+   {
+    "type": "surface",
+    "name": "htail",
+    "role": "horizontal tail",
+    "origin": [
+     2.1,
+     0.0,
+     0.05
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.28,
+     "tip_chord": 0.18,
+     "span": 0.45,
+     "dihedral_deg": 0.0,
+     "tc_root": 0.1,
+     "tc_tip": 0.1
+    }
+   },
+   {
+    "type": "disc",
+    "name": "prop",
+    "role": "propeller",
+    "origin": [
+     -0.08,
+     0.0,
+     0.0
+    ],
+    "diameter": 0.55
+   }
+  ]
+ },
+ "items": [
+  {
+   "name": "eo_ball",
+   "mass_kg": 2.5,
+   "size_m": [
+    0.18,
+    0.18,
+    0.18
+   ],
+   "shape": "sphere",
+   "protuberance_shape": "sphere",
+   "position": [
+    0.35,
+    0.0,
+    -0.22
+   ],
+   "obstructs": true,
+   "power_w": {
+    "avg": 15,
+    "peak": 40
+   },
+   "heat_w": 12
+  },
+  {
+   "name": "antenna_mast",
+   "mass_kg": 0.8,
+   "size_m": [
+    0.06,
+    0.06,
+    0.35
+   ],
+   "shape": "cylinder",
+   "cylinder_axis": "z",
+   "protuberance_shape": "cylinder",
+   "position": [
+    1.5,
+    0.0,
+    0.28
+   ],
+   "obstructs": true,
+   "power_w": {
+    "avg": 5,
+    "peak": 20
+   },
+   "heat_w": 4
+  },
+  {
+   "name": "avionics_box",
+   "mass_kg": 1.2,
+   "size_m": [
+    0.2,
+    0.15,
+    0.08
+   ],
+   "shape": "box",
+   "position": [
+    0.7,
+    0.0,
+    0.0
+   ],
+   "host": "fuselage",
+   "power_w": {
+    "avg": 25,
+    "peak": 60
+   },
+   "heat_w": 20
+  }
+ ],
+ "constraints": [
+  {
+   "type": "within",
+   "item": "avionics_box",
+   "body": "fuselage"
+  },
+  {
+   "type": "min_separation",
+   "a": "eo_ball",
+   "b": "antenna_mast",
+   "distance_m": 0.3
+  }
+ ],
+ "base": {
+  "mass_kg": 12.0,
+  "cg": [
+   0.9,
+   0.0,
+   0.0
+  ]
+ },
+ "flight": {
+  "W0_kg": 35.0,
+  "V_m_s": 28.0,
+  "altitude_m": 500.0,
+  "Wf_kg": 0.0,
+  "payload_kg": 2.5
+ },
+ "gear": {
+  "type": "none"
+ },
+ "options": {
+  "run_avl": true,
+  "static_margin_min": 0.05,
+  "np_source": "avl_bodies"
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "vsp3": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/geometry/uav_endurance_payload.vsp3",
+ "step": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/geometry/uav_endurance_payload.step",
+ "step_wing": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/geometry/uav_endurance_payload_wing.step",
+ "stl": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/geometry/uav_endurance_payload.stl",
+ "vsp_version": "OpenVSP 3.55.0",
+ "wetted": [
+  {
+   "component": "fuselage",
+   "Swet_vsp_m2": 0.8674831464043642,
+   "Swet_L0_m2": 1.0474395222695825,
+   "ratio": 0.8281940178509873
+  },
+  {
+   "component": "wing",
+   "Swet_vsp_m2": 2.520162982931897,
+   "Swet_L0_m2": 2.49728009890452,
+   "ratio": 1.009163122725967
+  },
+  {
+   "component": "htail",
+   "Swet_vsp_m2": 0.3897720235472903,
+   "Swet_L0_m2": 0.41809002366979175,
+   "ratio": 0.9322681754662793
+  },
+  {
+   "component": "vtail",
+   "Swet_vsp_m2": 0.337024002989291,
+   "Swet_L0_m2": 0.3440283623340002,
+   "ratio": 0.9796401689175005
+  }
+ ],
+ "Swet_total_vsp": 4.114442155872843,
+ "Swet_total_L0": 4.306838007177895,
+ "Swet_ratio": 0.9553278179990983,
+ "ref": "McDonald & Gloudemans, Open Vehicle Sketch Pad, AIAA 2022-0004 (NASA Open Source Agreement 1.3)",
+ "note": "CompGeom exclui as interse\u00e7\u00f5es (asa\u2013fuselagem, cauda\u2013fuselagem); L0: Raymer Eq. 7.12 com \u00e1rea exposta e Torenbeek App. F para a fuselagem",
+ "render_png": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/geometry/uav_endurance_payload_3d.png"
+}

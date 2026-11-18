@@ -1,0 +1,144 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Esquema 1.1 + fecho de massa VTOL opt-in (aircraft.closure): MTOW resolvido a partir de componentes.
+# Todos os números novos são PRESSUPOSTOS, não dados publicados; coeficientes NDARC citados no código.
+schema_version: '1.1'
+source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+  do fornecedor; não valida uma aeronave real'
+mission:
+  envelope:
+    distance_km:
+    - 1
+    - 1
+    speed_m_s:
+    - 22
+    - 22
+    on_station_h:
+    - 0.02
+    - 0.02
+    payload_kg:
+    - 2
+    - 2
+  samples:
+  - id: VTOL-local
+    distance_km: 1
+    speed_m_s: 22
+    on_station_h: 0.02
+    payload_kg: 2
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+operations:
+  availability: 0.9
+  n_stations: 1
+  handoff_overlap_h: 0
+  reserve_h: 0
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  operational_reserve:
+    time_h: 0.05
+    divert_km: 2
+    native_reserve: replace
+    source: 'PRESSUPOSTO: reserva operacional ilustrativa (tempo/desvio), não requisito
+      regulamentar; substituir pela política do operador'
+  dwell_policy: derived_max
+candidates:
+- id: VTOL-fecho-massa
+  architecture: VTOL-elétrico — opção fornecida, não preseleção automática
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 2
+    turnaround_h:
+    - 0.1
+    - 0.3
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: vtol
+    onboard:
+      schema_version: '1.0'
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+      items:
+      - id: instrument
+        role: payload
+        mass_kg: 1
+        mass_accounting: included
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+        included_in: mtow
+      loads:
+      - id: instrument_load
+        item_id: instrument
+        source_id: bus
+        power_W: 50
+        peak_W: 100
+        duty: 0.5
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      sources:
+      - id: bus
+        kind: main_battery
+        delivery_efficiency: 0.9
+        continuous_W: 1000
+        peak_W: 1000
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+    aircraft:
+      electric:
+        systems_power_W: 0
+      closure:
+        mass_bounds_kg:
+        - 3
+        - 200
+        source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados medidos/fornecedor
+          com fonte; não é coeficiente publicado'
+        components:
+          rotors:
+            method: AFDD00
+            n_blades: 2
+            flap_frequency_per_rev: 1.1
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          motors:
+            method: NASA15
+            torque_class: other
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          controllers:
+            method: fraction_of_motor
+            fraction: 0.3
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          rotor_support:
+            method: fraction_of_mtow
+            fraction: 0.05
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          airframe:
+            method: fraction_of_mtow
+            fraction: 0.25
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          other:
+          - id: avionics
+            mass_kg: 0.5
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+  turnaround:
+    method: charge
+    average_input_W: 300
+    efficiency: 0.9
+    allocation: dedicated_per_aircraft
+    fixed_h: 0.1
+    combine: serial
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+objectives:
+  fleet_required: min
+  fleet_mtow_kg: min
+  derived_max_on_station_h: max

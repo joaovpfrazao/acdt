@@ -1,0 +1,156 @@
+{
+ "_comment": "NACA TR 540 combination 13: d/c = -0.75, k/c = 0.0, i_w = 0, n_0 = 0.067, xbar_np = 0.183. Geometry transcribed from the report; not a design.",
+ "assembly": {
+  "components": [
+   {
+    "type": "body",
+    "name": "fuselage",
+    "role": "fuselage",
+    "origin": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "stations": [
+     {
+      "x": 0.0,
+      "w": 0.0,
+      "h": 0.0,
+      "n": 2.0
+     },
+     {
+      "x": 0.0039624,
+      "w": 0.0196088,
+      "h": 0.0196088,
+      "n": 2.0
+     },
+     {
+      "x": 0.010312400000000001,
+      "w": 0.0315468,
+      "h": 0.0315468,
+      "n": 2.0
+     },
+     {
+      "x": 0.0166624,
+      "w": 0.0399288,
+      "h": 0.0399288,
+      "n": 2.0
+     },
+     {
+      "x": 0.029362399999999997,
+      "w": 0.0519176,
+      "h": 0.0519176,
+      "n": 2.0
+     },
+     {
+      "x": 0.0547624,
+      "w": 0.06731,
+      "h": 0.06731,
+      "n": 2.0
+     },
+     {
+      "x": 0.10556239999999999,
+      "w": 0.08224519999999999,
+      "h": 0.08224519999999999,
+      "n": 2.0
+     },
+     {
+      "x": 0.15636239999999998,
+      "w": 0.086614,
+      "h": 0.086614,
+      "n": 2.0
+     },
+     {
+      "x": 0.2071624,
+      "w": 0.087376,
+      "h": 0.087376,
+      "n": 2.0
+     },
+     {
+      "x": 0.2579624,
+      "w": 0.0865124,
+      "h": 0.0865124,
+      "n": 2.0
+     },
+     {
+      "x": 0.3087624,
+      "w": 0.08300719999999999,
+      "h": 0.08300719999999999,
+      "n": 2.0
+     },
+     {
+      "x": 0.3595624,
+      "w": 0.075946,
+      "h": 0.075946,
+      "n": 2.0
+     },
+     {
+      "x": 0.41036239999999996,
+      "w": 0.0639064,
+      "h": 0.0639064,
+      "n": 2.0
+     },
+     {
+      "x": 0.43576239999999994,
+      "w": 0.05511799999999999,
+      "h": 0.05511799999999999,
+      "n": 2.0
+     },
+     {
+      "x": 0.4611624,
+      "w": 0.0431292,
+      "h": 0.0431292,
+      "n": 2.0
+     },
+     {
+      "x": 0.48656239999999995,
+      "w": 0.0254,
+      "h": 0.0254,
+      "n": 2.0
+     },
+     {
+      "x": 0.49926239999999994,
+      "w": 0.013919200000000001,
+      "h": 0.013919200000000001,
+      "n": 2.0
+     },
+     {
+      "x": 0.5119623999999999,
+      "w": 0.0,
+      "h": 0.0,
+      "n": 2.0
+     }
+    ]
+   },
+   {
+    "type": "surface",
+    "name": "wing",
+    "role": "wing",
+    "origin": [
+     0.270662,
+     0.0,
+     0.0
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.127,
+     "tip_chord": 0.127,
+     "span": 0.381,
+     "sweep_le_deg": 0.0,
+     "dihedral_deg": 0.0,
+     "tc_root": 0.12,
+     "tc_tip": 0.12,
+     "n_sections": 2
+    }
+   }
+  ]
+ },
+ "validation": {
+  "mach": 0.0,
+  "reference": {
+   "xbar_np": 0.183,
+   "source": "Eastman N. Jacobs and Kenneth E. Ward, Interference of Wing and Fuselage from Tests of 209 Combinations in the N.A.C.A. Variable-Density Tunnel, NACA Report No. 540, 1936 (Langley, 8 March 1935). Table V, combination 13, rectangular NACA 0012 with the round fuselage, wing setting i_w = 0. The column n_0 is dC_m/dC_L at zero lift, the aerodynamic centre as a fraction of the wing chord ahead of the wing quarter-chord (report p. 8). xbar_np = 0.25 - n_0, from the leading edge of the MAC.",
+   "conditions": "Variable-density tunnel, Reynolds number about 3.1e6 (report p. 4). Mach is not stated; the tunnel is low-speed, so the AVL run uses Mach 0. Moments about the wing quarter-chord; coefficients on the original wing area and chord (150 in^2, c = 5 in, b = 30 in, AR = 6). d/c positive is the wing quarter-chord ahead of the fuselage reference; k/c positive is the wing chord plane above the fuselage axis (report p. 8). The fuselage reference is the maximum cross-section: station 8.000 in on p. 3, 8.156 in aft of the nose (station -0.156 in), because Figure 1 draws that point through the maximum ordinate. Stations 1.500, 2.312 and 3.406 in are omitted: 1.500 is blank in the printed diameter column and 2.312 / 3.406 are the dashed source-sink rows, not diameters. Model scale is the tunnel model (inches converted at 0.0254 m/in). The wing is the rectangular NACA 0012, no twist, no dihedral. This row: combination 13, d/c = -0.75, k/c = 0.0, i_w = 0 deg, n_0 = 0.067 (Table V)."
+  }
+ }
+}

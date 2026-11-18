@@ -1,0 +1,68 @@
+{
+ "design": "uav_endurance_payload",
+ "factors": {
+  "k_EI": {
+   "group": "structures",
+   "value": 0.7148585443016449,
+   "hifi": 0.1538239,
+   "lowfi": 0.1099623292328018,
+   "what": "effective bending stiffness ratio = tip deflection beam(Phase 3 EI) / FEM",
+   "valid": true
+  },
+  "k_GJ": {
+   "group": "structures",
+   "value": 0.2167431396503761,
+   "hifi": 0.773563631286735,
+   "lowfi": 0.16766461016443285,
+   "what": "effective torsional stiffness ratio = tip twist beam(Phase 3 GJ) / FEM",
+   "valid": true
+  },
+  "k_sigma_cap": {
+   "group": "structures",
+   "value": 0.36156662433862435,
+   "hifi": -180.78331216931218,
+   "lowfi": 500.0,
+   "what": "spar-cap abs(\u03c3) at ultimate / allowable (Phase 3 sizing target \u2264 1)",
+   "valid": true
+  },
+  "lambda_buckling": {
+   "group": "structures",
+   "value": 0.9833898,
+   "hifi": 0.9833898,
+   "lowfi": 1.0,
+   "what": "linear buckling eigenvalue at ultimate load (Phase 3 sized to 1.0)",
+   "valid": true
+  },
+  "k_f_bending": {
+   "group": "structures",
+   "value": 0.8597929055924205,
+   "hifi": 9.033584,
+   "lowfi": 10.506697532908365,
+   "what": "1st bending frequency FEM / strip",
+   "valid": true
+  },
+  "k_f_torsion": {
+   "group": "structures",
+   "value": 0.9638486276383724,
+   "hifi": 76.88396,
+   "lowfi": 79.76767076836695,
+   "what": "1st torsion frequency FEM / strip",
+   "valid": true
+  },
+  "k_flutter": {
+   "group": "flutter",
+   "value": 1.0396524397673756,
+   "hifi": 131.6859785711319,
+   "lowfi": 126.66346322488013,
+   "what": "flutter speed FEM+DLM p-k (g = 0.03, min sym/antisym) / Phase 3 strip V_F",
+   "valid": true
+  }
+ },
+ "sources": {
+  "cfd2d": "cfd2d",
+  "fem": "fem",
+  "flutter": "flutter",
+  "lowfi": "examples/uav_endurance_payload.yaml (acdt size)"
+ },
+ "note": "ratios L3/L1-L2 of the same design; applied only if listed in assumptions.calibration.apply"
+}

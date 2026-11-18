@@ -1,0 +1,47 @@
+{
+  "what": "Manter twin-boom + asa alta como configura\u00e7\u00e3o viva N1",
+  "why": "Pareto morph_evaluate: L/D e envelope de CG dentro da banda \u00b115%",
+  "fidelity": "N1",
+  "level_gate": "N1",
+  "rejected": [
+    {
+      "id": "flying_wing",
+      "reason": "hq:dutch_roll fora dos limites",
+      "metrics": {
+        "dutch_roll_damping": 0.02,
+        "radar_mass_kg": 12.0
+      }
+    },
+    {
+      "id": "conventional_low",
+      "reason": "dominada em L/D e RCS m\u00e9dio",
+      "metrics": {
+        "LD": 14.0,
+        "rcs_m2": 0.8
+      }
+    }
+  ],
+  "conditions": [
+    {
+      "metric": "radar_mass_kg",
+      "op": ">",
+      "value": 25
+    },
+    {
+      "metric": "CL_alpha",
+      "op": "<",
+      "relative_to": "baseline_CL_alpha",
+      "pct": -10
+    }
+  ],
+  "evidence": [
+    {
+      "tool": "morph_prune",
+      "summary": "twin-boom viva; flying_wing rejeitada"
+    }
+  ],
+  "tags": [
+    "configuration",
+    "N1"
+  ]
+}

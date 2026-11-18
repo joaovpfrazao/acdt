@@ -1,0 +1,2339 @@
+{
+ "year": 2025,
+ "N": 820,
+ "parts": [
+  {
+   "name": "wing skin",
+   "kind": "skin",
+   "mass_kg": 27.66123463384466,
+   "area_m2": 6.210889050808068,
+   "perimeter_m": 12.904819942158598,
+   "max_dim_m": 5.067772638229664,
+   "thickness_m": 0.0016020386645562428,
+   "count": 4,
+   "group": "wing",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "wing spar",
+   "kind": "spar",
+   "mass_kg": 3.75018070219122,
+   "area_m2": 1.6840865254288029,
+   "perimeter_m": 10.135545276459329,
+   "max_dim_m": 5.067772638229664,
+   "thickness_m": 0.0016020386645562428,
+   "count": 4,
+   "group": "wing",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "wing rib",
+   "kind": "rib",
+   "mass_kg": 0.4610877912530187,
+   "area_m2": 0.20705981870026258,
+   "perimeter_m": 1.5784865594485835,
+   "max_dim_m": 0.7330432938615713,
+   "thickness_m": 0.0016020386645562428,
+   "count": 14,
+   "group": "wing",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "htail skin",
+   "kind": "skin",
+   "mass_kg": 2.8761227204420563,
+   "area_m2": 1.4347980716859654,
+   "perimeter_m": 5.045516363800185,
+   "max_dim_m": 1.681838787933395,
+   "thickness_m": 0.000721060711302003,
+   "count": 4,
+   "group": "htail",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "htail spar",
+   "kind": "spar",
+   "mass_kg": 0.2835015002900007,
+   "area_m2": 0.28285817085972714,
+   "perimeter_m": 3.36367757586679,
+   "max_dim_m": 1.681838787933395,
+   "thickness_m": 0.000721060711302003,
+   "count": 2,
+   "group": "htail",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "htail rib",
+   "kind": "rib",
+   "mass_kg": 0.06378783756525017,
+   "area_m2": 0.0636430884434386,
+   "perimeter_m": 0.9250113333633673,
+   "max_dim_m": 0.4730171591062673,
+   "thickness_m": 0.0007210607113020031,
+   "count": 8,
+   "group": "htail",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "vtail skin",
+   "kind": "skin",
+   "mass_kg": 2.985532897544108,
+   "area_m2": 1.1879791094677994,
+   "perimeter_m": 4.417766432353157,
+   "max_dim_m": 1.325329929705947,
+   "thickness_m": 0.0009039996481414739,
+   "count": 2,
+   "group": "vtail",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "vtail spar",
+   "kind": "spar",
+   "mass_kg": 0.294286140714057,
+   "area_m2": 0.23419992300991613,
+   "perimeter_m": 2.650659859411894,
+   "max_dim_m": 1.325329929705947,
+   "thickness_m": 0.0009039996481414739,
+   "count": 1,
+   "group": "vtail",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "vtail rib",
+   "kind": "rib",
+   "mass_kg": 0.08828584221421713,
+   "area_m2": 0.07025997690297485,
+   "perimeter_m": 0.9719086151176947,
+   "max_dim_m": 0.5301319718823788,
+   "thickness_m": 0.0009039996481414741,
+   "count": 3,
+   "group": "vtail",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "fuselage shell",
+   "kind": "shell",
+   "mass_kg": 43.03957573496049,
+   "area_m2": 11.998904427801918,
+   "perimeter_m": 19.830578884717813,
+   "max_dim_m": 8.098083707755956,
+   "thickness_m": 0.0012902729468611805,
+   "count": 2,
+   "group": "fuselage",
+   "double_curvature": true,
+   "axisymmetric": true,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  },
+  {
+   "name": "fuselage frame",
+   "kind": "frame",
+   "mass_kg": 0.7540752864113375,
+   "area_m2": 0.42045383294368127,
+   "perimeter_m": 3.6344114692059004,
+   "max_dim_m": 1.1568691011079937,
+   "thickness_m": 0.00129027294686118,
+   "count": 17,
+   "group": "fuselage",
+   "double_curvature": false,
+   "axisymmetric": false,
+   "n_plies": null,
+   "material": "al2024_t3",
+   "notes": []
+  }
+ ],
+ "decomposition_notes": [
+  "part masses: component masses (weight build-up) split by face area \u2014 uniform equivalent gauge (ASSUMPTION)",
+  "wing rib pitch 0.6 MAC (Phase 2 box-sizing ASSUMPTION)",
+  "fuselage frames: 17 at 0.5 m pitch; web depth 0.05 D (layout ASSUMPTION \u2014 no cited value, override)"
+ ],
+ "f_comp": 0.0,
+ "plan": {
+  "N": 820,
+  "year": 2025,
+  "learning_factor": 0.2700898416444121,
+  "parts": [
+   {
+    "part": {
+     "name": "wing skin",
+     "kind": "skin",
+     "mass_kg": 27.66123463384466,
+     "area_m2": 6.210889050808068,
+     "perimeter_m": 12.904819942158598,
+     "max_dim_m": 5.067772638229664,
+     "thickness_m": 0.0016020386645562428,
+     "count": 4,
+     "group": "wing",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "wing skin",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 9627 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 6.211 m2",
+       "assembly FOPV on 12.90 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 240.54028354845917,
+      "assembly_hours": 445.4811753550817,
+      "labour_hours": 686.0214589035409,
+      "machine_hours": null,
+      "cycle_time_h": 686.0214589035409,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 184.40823089229775,
+      "scrap_kg": 156.7469962584531,
+      "material_cost": 4422.628274653622,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 904513.2389771128,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 27.66123463384466,
+      "labour_cost": 20784.66556621106,
+      "tooling_per_unit": 1103.0649255818448,
+      "unit_cost_per_part": 26310.358766446527,
+      "unit_cost": 105241.4350657861,
+      "count": 4,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "wing skin",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 9627 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 6.211 m2",
+       "assembly FOPV on 12.90 m of joined perimeter",
+       "538 rivets (D=4.8 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 240.54028354845917,
+      "assembly_hours": 445.4811753550817,
+      "labour_hours": 686.0214589035409,
+      "machine_hours": null,
+      "cycle_time_h": 686.0214589035409,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 55.32246926768932,
+      "scrap_kg": 27.66123463384466,
+      "material_cost": 1522.3708483269834,
+      "fasteners": 538,
+      "fastener_cost": 201.16763530778164,
+      "machine_cost": 0.0,
+      "tooling_cost": 904513.2389771128,
+      "needs_tooling": true,
+      "mass_kg": 27.66123463384466,
+      "labour_cost": 20784.66556621106,
+      "tooling_per_unit": 1103.0649255818448,
+      "unit_cost_per_part": 23611.268975427673,
+      "unit_cost": 94445.07590171069,
+      "count": 4,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "wing skin",
+     "process": "sheet_metal_riveted",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 9627 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 6.211 m2",
+      "assembly FOPV on 12.90 m of joined perimeter",
+      "538 rivets (D=4.8 mm, pitch 5D, 1 row(s))"
+     ],
+     "sources": [
+      "bao2002",
+      "daher_nesting",
+      "faa_h_8083_31",
+      "gutowski1994"
+     ],
+     "touch_hours": 240.54028354845917,
+     "assembly_hours": 445.4811753550817,
+     "labour_hours": 686.0214589035409,
+     "machine_hours": null,
+     "cycle_time_h": 686.0214589035409,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 2.0,
+     "bought_mass_kg": 55.32246926768932,
+     "scrap_kg": 27.66123463384466,
+     "material_cost": 1522.3708483269834,
+     "fasteners": 538,
+     "fastener_cost": 201.16763530778164,
+     "machine_cost": 0.0,
+     "tooling_cost": 904513.2389771128,
+     "needs_tooling": true,
+     "mass_kg": 27.66123463384466,
+     "labour_cost": 20784.66556621106,
+     "tooling_per_unit": 1103.0649255818448,
+     "unit_cost_per_part": 23611.268975427673,
+     "unit_cost": 94445.07590171069,
+     "count": 4,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "wing spar",
+     "kind": "spar",
+     "mass_kg": 3.75018070219122,
+     "area_m2": 1.6840865254288029,
+     "perimeter_m": 10.135545276459329,
+     "max_dim_m": 5.067772638229664,
+     "thickness_m": 0.0016020386645562428,
+     "count": 4,
+     "group": "wing",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "wing spar",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 2610 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 1.684 m2",
+       "assembly FOPV on 10.14 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 148.53890989987192,
+      "assembly_hours": 384.8654338092252,
+      "labour_hours": 533.4043437090971,
+      "machine_hours": null,
+      "cycle_time_h": 533.4043437090971,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 25.001204681274803,
+      "scrap_kg": 21.25102397908358,
+      "material_cost": 599.5992379992334,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 245259.3413555073,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 3.75018070219122,
+      "labour_cost": 16160.76399895347,
+      "tooling_per_unit": 299.0967577506186,
+      "unit_cost_per_part": 17059.459994703324,
+      "unit_cost": 68237.8399788133,
+      "count": 4,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "wing spar",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 2610 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 1.684 m2",
+       "assembly FOPV on 10.14 m of joined perimeter",
+       "422 rivets (D=4.8 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 148.53890989987192,
+      "assembly_hours": 384.8654338092252,
+      "labour_hours": 533.4043437090971,
+      "machine_hours": null,
+      "cycle_time_h": 533.4043437090971,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 7.50036140438244,
+      "scrap_kg": 3.75018070219122,
+      "material_cost": 206.39591300053291,
+      "fasteners": 422,
+      "fastener_cost": 157.79320092915214,
+      "machine_cost": 0.0,
+      "tooling_cost": 245259.3413555073,
+      "needs_tooling": true,
+      "mass_kg": 3.75018070219122,
+      "labour_cost": 16160.76399895347,
+      "tooling_per_unit": 299.0967577506186,
+      "unit_cost_per_part": 16824.049870633775,
+      "unit_cost": 67296.1994825351,
+      "count": 4,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "wing spar",
+     "process": "sheet_metal_riveted",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 2610 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 1.684 m2",
+      "assembly FOPV on 10.14 m of joined perimeter",
+      "422 rivets (D=4.8 mm, pitch 5D, 1 row(s))"
+     ],
+     "sources": [
+      "bao2002",
+      "daher_nesting",
+      "faa_h_8083_31",
+      "gutowski1994"
+     ],
+     "touch_hours": 148.53890989987192,
+     "assembly_hours": 384.8654338092252,
+     "labour_hours": 533.4043437090971,
+     "machine_hours": null,
+     "cycle_time_h": 533.4043437090971,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 2.0,
+     "bought_mass_kg": 7.50036140438244,
+     "scrap_kg": 3.75018070219122,
+     "material_cost": 206.39591300053291,
+     "fasteners": 422,
+     "fastener_cost": 157.79320092915214,
+     "machine_cost": 0.0,
+     "tooling_cost": 245259.3413555073,
+     "needs_tooling": true,
+     "mass_kg": 3.75018070219122,
+     "labour_cost": 16160.76399895347,
+     "tooling_per_unit": 299.0967577506186,
+     "unit_cost_per_part": 16824.049870633775,
+     "unit_cost": 67296.1994825351,
+     "count": 4,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "wing rib",
+     "kind": "rib",
+     "mass_kg": 0.4610877912530187,
+     "area_m2": 0.20705981870026258,
+     "perimeter_m": 1.5784865594485835,
+     "max_dim_m": 0.7330432938615713,
+     "thickness_m": 0.0016020386645562428,
+     "count": 14,
+     "group": "wing",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "wing rib",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 321 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.207 m2",
+       "assembly FOPV on 1.58 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 59.94855534317519,
+      "assembly_hours": 139.0709451261704,
+      "labour_hours": 199.0195004693456,
+      "machine_hours": null,
+      "cycle_time_h": 199.0195004693456,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 3.073918608353458,
+      "scrap_kg": 2.6128308171004395,
+      "material_cost": 73.72121778679096,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 30154.83705190662,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 0.4610877912530187,
+      "labour_cost": 6029.773128410783,
+      "tooling_per_unit": 36.77419152671539,
+      "unit_cost_per_part": 6140.26853772429,
+      "unit_cost": 85963.75952814006,
+      "count": 14,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "wing rib",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 321 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.207 m2",
+       "assembly FOPV on 1.58 m of joined perimeter",
+       "66 rivets (D=4.8 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 59.94855534317519,
+      "assembly_hours": 139.0709451261704,
+      "labour_hours": 199.0195004693456,
+      "machine_hours": null,
+      "cycle_time_h": 199.0195004693456,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 0.9221755825060374,
+      "scrap_kg": 0.4610877912530187,
+      "material_cost": 25.37654668039338,
+      "fasteners": 66,
+      "fastener_cost": 24.678557491289197,
+      "machine_cost": 0.0,
+      "tooling_cost": 30154.83705190662,
+      "needs_tooling": true,
+      "mass_kg": 0.4610877912530187,
+      "labour_cost": 6029.773128410783,
+      "tooling_per_unit": 36.77419152671539,
+      "unit_cost_per_part": 6116.602424109181,
+      "unit_cost": 85632.43393752853,
+      "count": 14,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "wing rib",
+     "process": "sheet_metal_riveted",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 321 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.207 m2",
+      "assembly FOPV on 1.58 m of joined perimeter",
+      "66 rivets (D=4.8 mm, pitch 5D, 1 row(s))"
+     ],
+     "sources": [
+      "bao2002",
+      "daher_nesting",
+      "faa_h_8083_31",
+      "gutowski1994"
+     ],
+     "touch_hours": 59.94855534317519,
+     "assembly_hours": 139.0709451261704,
+     "labour_hours": 199.0195004693456,
+     "machine_hours": null,
+     "cycle_time_h": 199.0195004693456,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 2.0,
+     "bought_mass_kg": 0.9221755825060374,
+     "scrap_kg": 0.4610877912530187,
+     "material_cost": 25.37654668039338,
+     "fasteners": 66,
+     "fastener_cost": 24.678557491289197,
+     "machine_cost": 0.0,
+     "tooling_cost": 30154.83705190662,
+     "needs_tooling": true,
+     "mass_kg": 0.4610877912530187,
+     "labour_cost": 6029.773128410783,
+     "tooling_per_unit": 36.77419152671539,
+     "unit_cost_per_part": 6116.602424109181,
+     "unit_cost": 85632.43393752853,
+     "count": 14,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "htail skin",
+     "kind": "skin",
+     "mass_kg": 2.8761227204420563,
+     "area_m2": 1.4347980716859654,
+     "perimeter_m": 5.045516363800185,
+     "max_dim_m": 1.681838787933395,
+     "thickness_m": 0.000721060711302003,
+     "count": 4,
+     "group": "htail",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "htail skin",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 2224 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 1.435 m2",
+       "assembly FOPV on 5.05 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 113.4294409460419,
+      "assembly_hours": 258.1636262880415,
+      "labour_hours": 371.5930672340834,
+      "machine_hours": null,
+      "cycle_time_h": 371.5930672340834,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 19.174151469613708,
+      "scrap_kg": 16.298028749171653,
+      "material_cost": 459.85010550603766,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 208954.6022287967,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 2.8761227204420563,
+      "labour_cost": 11258.303262885207,
+      "tooling_per_unit": 254.822685644874,
+      "unit_cost_per_part": 11972.976054036119,
+      "unit_cost": 47891.904216144474,
+      "count": 4,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "htail skin",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 2224 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 1.435 m2",
+       "assembly FOPV on 5.05 m of joined perimeter",
+       "467 rivets (D=2.2 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 113.4294409460419,
+      "assembly_hours": 258.1636262880415,
+      "labour_hours": 371.5930672340834,
+      "machine_hours": null,
+      "cycle_time_h": 371.5930672340834,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 5.752245440884113,
+      "scrap_kg": 2.8761227204420563,
+      "material_cost": 158.2910323335524,
+      "fasteners": 467,
+      "fastener_cost": 174.6194901277584,
+      "machine_cost": 0.0,
+      "tooling_cost": 208954.6022287967,
+      "needs_tooling": true,
+      "mass_kg": 2.8761227204420563,
+      "labour_cost": 11258.303262885207,
+      "tooling_per_unit": 254.822685644874,
+      "unit_cost_per_part": 11846.036470991392,
+      "unit_cost": 47384.14588396557,
+      "count": 4,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "htail skin",
+     "process": "sheet_metal_riveted",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 2224 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 1.435 m2",
+      "assembly FOPV on 5.05 m of joined perimeter",
+      "467 rivets (D=2.2 mm, pitch 5D, 1 row(s))"
+     ],
+     "sources": [
+      "bao2002",
+      "daher_nesting",
+      "faa_h_8083_31",
+      "gutowski1994"
+     ],
+     "touch_hours": 113.4294409460419,
+     "assembly_hours": 258.1636262880415,
+     "labour_hours": 371.5930672340834,
+     "machine_hours": null,
+     "cycle_time_h": 371.5930672340834,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 2.0,
+     "bought_mass_kg": 5.752245440884113,
+     "scrap_kg": 2.8761227204420563,
+     "material_cost": 158.2910323335524,
+     "fasteners": 467,
+     "fastener_cost": 174.6194901277584,
+     "machine_cost": 0.0,
+     "tooling_cost": 208954.6022287967,
+     "needs_tooling": true,
+     "mass_kg": 2.8761227204420563,
+     "labour_cost": 11258.303262885207,
+     "tooling_per_unit": 254.822685644874,
+     "unit_cost_per_part": 11846.036470991392,
+     "unit_cost": 47384.14588396557,
+     "count": 4,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "htail spar",
+     "kind": "spar",
+     "mass_kg": 0.2835015002900007,
+     "area_m2": 0.28285817085972714,
+     "perimeter_m": 3.36367757586679,
+     "max_dim_m": 1.681838787933395,
+     "thickness_m": 0.000721060711302003,
+     "count": 2,
+     "group": "htail",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "htail spar",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 438 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 0.283 m2",
+       "assembly FOPV on 3.36 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 60.516115751957244,
+      "assembly_hours": 207.0535953854531,
+      "labour_hours": 267.5697111374103,
+      "machine_hours": null,
+      "cycle_time_h": 267.5697111374103,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 1.8900100019333381,
+      "scrap_kg": 1.6065085016433374,
+      "material_cost": 45.32775805875188,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 41193.613056440954,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 0.2835015002900007,
+      "labour_cost": 8106.666182902501,
+      "tooling_per_unit": 50.23611348346458,
+      "unit_cost_per_part": 8202.230054444717,
+      "unit_cost": 16404.460108889434,
+      "count": 2,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "htail spar",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 438 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 0.283 m2",
+       "assembly FOPV on 3.36 m of joined perimeter",
+       "311 rivets (D=2.2 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 60.516115751957244,
+      "assembly_hours": 207.0535953854531,
+      "labour_hours": 267.5697111374103,
+      "machine_hours": null,
+      "cycle_time_h": 267.5697111374103,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 0.5670030005800014,
+      "scrap_kg": 0.2835015002900007,
+      "material_cost": 15.60286173815204,
+      "fasteners": 311,
+      "fastener_cost": 116.28835423925668,
+      "machine_cost": 0.0,
+      "tooling_cost": 41193.613056440954,
+      "needs_tooling": true,
+      "mass_kg": 0.2835015002900007,
+      "labour_cost": 8106.666182902501,
+      "tooling_per_unit": 50.23611348346458,
+      "unit_cost_per_part": 8288.793512363374,
+      "unit_cost": 16577.58702472675,
+      "count": 2,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "htail spar",
+     "process": "cnc_machining",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "machine/autoclave envelope not given: size not checked (envelope_m)",
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 438 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 0.283 m2",
+      "assembly FOPV on 3.36 m of joined perimeter"
+     ],
+     "sources": [
+      "airbus2018_b2f",
+      "bao2002",
+      "gutowski1994"
+     ],
+     "touch_hours": 60.516115751957244,
+     "assembly_hours": 207.0535953854531,
+     "labour_hours": 267.5697111374103,
+     "machine_hours": null,
+     "cycle_time_h": 267.5697111374103,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 6.666666666666667,
+     "bought_mass_kg": 1.8900100019333381,
+     "scrap_kg": 1.6065085016433374,
+     "material_cost": 45.32775805875188,
+     "fasteners": 0,
+     "fastener_cost": 0.0,
+     "machine_cost": 0.0,
+     "tooling_cost": 41193.613056440954,
+     "needs_tooling": true,
+     "price_source": {
+      "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+      "retrieved": "2026-10-28",
+      "source_type": "distributor"
+     },
+     "mass_kg": 0.2835015002900007,
+     "labour_cost": 8106.666182902501,
+     "tooling_per_unit": 50.23611348346458,
+     "unit_cost_per_part": 8202.230054444717,
+     "unit_cost": 16404.460108889434,
+     "count": 2,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "htail rib",
+     "kind": "rib",
+     "mass_kg": 0.06378783756525017,
+     "area_m2": 0.0636430884434386,
+     "perimeter_m": 0.9250113333633673,
+     "max_dim_m": 0.4730171591062673,
+     "thickness_m": 0.0007210607113020031,
+     "count": 8,
+     "group": "htail",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "htail rib",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 99 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.064 m2",
+       "assembly FOPV on 0.93 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 33.21419996919191,
+      "assembly_hours": 105.6744219049269,
+      "labour_hours": 138.88862187411883,
+      "machine_hours": null,
+      "cycle_time_h": 138.88862187411883,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 0.42525225043500114,
+      "scrap_kg": 0.36146441286975095,
+      "material_cost": 10.198745563219175,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 9268.562937699216,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 0.06378783756525017,
+      "labour_cost": 4207.963933401393,
+      "tooling_per_unit": 11.303125533779532,
+      "unit_cost_per_part": 4229.465804498391,
+      "unit_cost": 33835.726435987126,
+      "count": 8,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "htail rib",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 99 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.064 m2",
+       "assembly FOPV on 0.93 m of joined perimeter",
+       "86 rivets (D=2.2 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 33.21419996919191,
+      "assembly_hours": 105.6744219049269,
+      "labour_hours": 138.88862187411883,
+      "machine_hours": null,
+      "cycle_time_h": 138.88862187411883,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 0.12757567513050033,
+      "scrap_kg": 0.06378783756525017,
+      "material_cost": 3.5106438910842095,
+      "fasteners": 86,
+      "fastener_cost": 32.15690824622532,
+      "machine_cost": 0.0,
+      "tooling_cost": 9268.562937699216,
+      "needs_tooling": true,
+      "mass_kg": 0.06378783756525017,
+      "labour_cost": 4207.963933401393,
+      "tooling_per_unit": 11.303125533779532,
+      "unit_cost_per_part": 4254.934611072482,
+      "unit_cost": 34039.476888579855,
+      "count": 8,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "htail rib",
+     "process": "cnc_machining",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "machine/autoclave envelope not given: size not checked (envelope_m)",
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 99 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.064 m2",
+      "assembly FOPV on 0.93 m of joined perimeter"
+     ],
+     "sources": [
+      "airbus2018_b2f",
+      "bao2002",
+      "gutowski1994"
+     ],
+     "touch_hours": 33.21419996919191,
+     "assembly_hours": 105.6744219049269,
+     "labour_hours": 138.88862187411883,
+     "machine_hours": null,
+     "cycle_time_h": 138.88862187411883,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 6.666666666666667,
+     "bought_mass_kg": 0.42525225043500114,
+     "scrap_kg": 0.36146441286975095,
+     "material_cost": 10.198745563219175,
+     "fasteners": 0,
+     "fastener_cost": 0.0,
+     "machine_cost": 0.0,
+     "tooling_cost": 9268.562937699216,
+     "needs_tooling": true,
+     "price_source": {
+      "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+      "retrieved": "2026-10-28",
+      "source_type": "distributor"
+     },
+     "mass_kg": 0.06378783756525017,
+     "labour_cost": 4207.963933401393,
+     "tooling_per_unit": 11.303125533779532,
+     "unit_cost_per_part": 4229.465804498391,
+     "unit_cost": 33835.726435987126,
+     "count": 8,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "vtail skin",
+     "kind": "skin",
+     "mass_kg": 2.985532897544108,
+     "area_m2": 1.1879791094677994,
+     "perimeter_m": 4.417766432353157,
+     "max_dim_m": 1.325329929705947,
+     "thickness_m": 0.0009039996481414739,
+     "count": 2,
+     "group": "vtail",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "vtail skin",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 1841 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 1.188 m2",
+       "assembly FOPV on 4.42 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 103.10938042527121,
+      "assembly_hours": 239.98112979997524,
+      "labour_hours": 343.0905102252465,
+      "machine_hours": null,
+      "cycle_time_h": 343.0905102252465,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 19.903552650294053,
+      "scrap_kg": 16.918019752749945,
+      "material_cost": 477.3431982472541,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 173009.50368805285,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 2.985532897544108,
+      "labour_cost": 10394.749932997553,
+      "tooling_per_unit": 210.98719961957664,
+      "unit_cost_per_part": 11083.080330864383,
+      "unit_cost": 22166.160661728765,
+      "count": 2,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "vtail skin",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 1841 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 1.188 m2",
+       "assembly FOPV on 4.42 m of joined perimeter",
+       "326 rivets (D=2.7 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 103.10938042527121,
+      "assembly_hours": 239.98112979997524,
+      "labour_hours": 343.0905102252465,
+      "machine_hours": null,
+      "cycle_time_h": 343.0905102252465,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 5.971065795088216,
+      "scrap_kg": 2.985532897544108,
+      "material_cost": 164.31255907793926,
+      "fasteners": 326,
+      "fastener_cost": 121.89711730545876,
+      "machine_cost": 0.0,
+      "tooling_cost": 173009.50368805285,
+      "needs_tooling": true,
+      "mass_kg": 2.985532897544108,
+      "labour_cost": 10394.749932997553,
+      "tooling_per_unit": 210.98719961957664,
+      "unit_cost_per_part": 10891.946809000527,
+      "unit_cost": 21783.893618001053,
+      "count": 2,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "vtail skin",
+     "process": "sheet_metal_riveted",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 1841 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 1.188 m2",
+      "assembly FOPV on 4.42 m of joined perimeter",
+      "326 rivets (D=2.7 mm, pitch 5D, 1 row(s))"
+     ],
+     "sources": [
+      "bao2002",
+      "daher_nesting",
+      "faa_h_8083_31",
+      "gutowski1994"
+     ],
+     "touch_hours": 103.10938042527121,
+     "assembly_hours": 239.98112979997524,
+     "labour_hours": 343.0905102252465,
+     "machine_hours": null,
+     "cycle_time_h": 343.0905102252465,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 2.0,
+     "bought_mass_kg": 5.971065795088216,
+     "scrap_kg": 2.985532897544108,
+     "material_cost": 164.31255907793926,
+     "fasteners": 326,
+     "fastener_cost": 121.89711730545876,
+     "machine_cost": 0.0,
+     "tooling_cost": 173009.50368805285,
+     "needs_tooling": true,
+     "mass_kg": 2.985532897544108,
+     "labour_cost": 10394.749932997553,
+     "tooling_per_unit": 210.98719961957664,
+     "unit_cost_per_part": 10891.946809000527,
+     "unit_cost": 21783.893618001053,
+     "count": 2,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "vtail spar",
+     "kind": "spar",
+     "mass_kg": 0.294286140714057,
+     "area_m2": 0.23419992300991613,
+     "perimeter_m": 2.650659859411894,
+     "max_dim_m": 1.325329929705947,
+     "thickness_m": 0.0009039996481414739,
+     "count": 1,
+     "group": "vtail",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "vtail spar",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 363 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 0.234 m2",
+       "assembly FOPV on 2.65 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 55.054169289208,
+      "assembly_hours": 182.37872661619022,
+      "labour_hours": 237.43289590539823,
+      "machine_hours": null,
+      "cycle_time_h": 237.43289590539823,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 1.96190760476038,
+      "scrap_kg": 1.6676214640463232,
+      "material_cost": 47.05206488390874,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 34107.34424604295,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 0.294286140714057,
+      "labour_cost": 7193.599080265205,
+      "tooling_per_unit": 41.59432225127189,
+      "unit_cost_per_part": 7282.245467400385,
+      "unit_cost": 7282.245467400385,
+      "count": 1,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "vtail spar",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 363 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 0.234 m2",
+       "assembly FOPV on 2.65 m of joined perimeter",
+       "196 rivets (D=2.7 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 55.054169289208,
+      "assembly_hours": 182.37872661619022,
+      "labour_hours": 237.43289590539823,
+      "machine_hours": null,
+      "cycle_time_h": 237.43289590539823,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 0.588572281428114,
+      "scrap_kg": 0.294286140714057,
+      "material_cost": 16.196407991911215,
+      "fasteners": 196,
+      "fastener_cost": 73.28783739837398,
+      "machine_cost": 0.0,
+      "tooling_cost": 34107.34424604295,
+      "needs_tooling": true,
+      "mass_kg": 0.294286140714057,
+      "labour_cost": 7193.599080265205,
+      "tooling_per_unit": 41.59432225127189,
+      "unit_cost_per_part": 7324.677647906762,
+      "unit_cost": 7324.677647906762,
+      "count": 1,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "vtail spar",
+     "process": "cnc_machining",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "machine/autoclave envelope not given: size not checked (envelope_m)",
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 363 in2 < 2 tau V0 = 181893 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'spar' (V0=2.4624 in2/min, tau=36934 min) on 0.234 m2",
+      "assembly FOPV on 2.65 m of joined perimeter"
+     ],
+     "sources": [
+      "airbus2018_b2f",
+      "bao2002",
+      "gutowski1994"
+     ],
+     "touch_hours": 55.054169289208,
+     "assembly_hours": 182.37872661619022,
+     "labour_hours": 237.43289590539823,
+     "machine_hours": null,
+     "cycle_time_h": 237.43289590539823,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 6.666666666666667,
+     "bought_mass_kg": 1.96190760476038,
+     "scrap_kg": 1.6676214640463232,
+     "material_cost": 47.05206488390874,
+     "fasteners": 0,
+     "fastener_cost": 0.0,
+     "machine_cost": 0.0,
+     "tooling_cost": 34107.34424604295,
+     "needs_tooling": true,
+     "price_source": {
+      "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+      "retrieved": "2026-10-28",
+      "source_type": "distributor"
+     },
+     "mass_kg": 0.294286140714057,
+     "labour_cost": 7193.599080265205,
+     "tooling_per_unit": 41.59432225127189,
+     "unit_cost_per_part": 7282.245467400385,
+     "unit_cost": 7282.245467400385,
+     "count": 1,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "vtail rib",
+     "kind": "rib",
+     "mass_kg": 0.08828584221421713,
+     "area_m2": 0.07025997690297485,
+     "perimeter_m": 0.9719086151176947,
+     "max_dim_m": 0.5301319718823788,
+     "thickness_m": 0.0009039996481414741,
+     "count": 3,
+     "group": "vtail",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "vtail rib",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 109 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.070 m2",
+       "assembly FOPV on 0.97 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 34.89917995019355,
+      "assembly_hours": 108.37814783607034,
+      "labour_hours": 143.2773277862639,
+      "machine_hours": null,
+      "cycle_time_h": 143.2773277862639,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 0.5885722814281142,
+      "scrap_kg": 0.5002864392138971,
+      "material_cost": 14.115619465172628,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 10232.203273812887,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 0.08828584221421713,
+      "labour_cost": 4340.930305616893,
+      "tooling_per_unit": 12.47829667538157,
+      "unit_cost_per_part": 4367.524221757448,
+      "unit_cost": 13102.572665272342,
+      "count": 3,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "vtail rib",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 109 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.070 m2",
+       "assembly FOPV on 0.97 m of joined perimeter",
+       "72 rivets (D=2.7 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 34.89917995019355,
+      "assembly_hours": 108.37814783607034,
+      "labour_hours": 143.2773277862639,
+      "machine_hours": null,
+      "cycle_time_h": 143.2773277862639,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 0.17657168442843427,
+      "scrap_kg": 0.08828584221421713,
+      "material_cost": 4.858922397573367,
+      "fasteners": 72,
+      "fastener_cost": 26.922062717770032,
+      "machine_cost": 0.0,
+      "tooling_cost": 10232.203273812887,
+      "needs_tooling": true,
+      "mass_kg": 0.08828584221421713,
+      "labour_cost": 4340.930305616893,
+      "tooling_per_unit": 12.47829667538157,
+      "unit_cost_per_part": 4385.189587407618,
+      "unit_cost": 13155.568762222854,
+      "count": 3,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "vtail rib",
+     "process": "cnc_machining",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "machine/autoclave envelope not given: size not checked (envelope_m)",
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 109 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.070 m2",
+      "assembly FOPV on 0.97 m of joined perimeter"
+     ],
+     "sources": [
+      "airbus2018_b2f",
+      "bao2002",
+      "gutowski1994"
+     ],
+     "touch_hours": 34.89917995019355,
+     "assembly_hours": 108.37814783607034,
+     "labour_hours": 143.2773277862639,
+     "machine_hours": null,
+     "cycle_time_h": 143.2773277862639,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 6.666666666666667,
+     "bought_mass_kg": 0.5885722814281142,
+     "scrap_kg": 0.5002864392138971,
+     "material_cost": 14.115619465172628,
+     "fasteners": 0,
+     "fastener_cost": 0.0,
+     "machine_cost": 0.0,
+     "tooling_cost": 10232.203273812887,
+     "needs_tooling": true,
+     "price_source": {
+      "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+      "retrieved": "2026-10-28",
+      "source_type": "distributor"
+     },
+     "mass_kg": 0.08828584221421713,
+     "labour_cost": 4340.930305616893,
+     "tooling_per_unit": 12.47829667538157,
+     "unit_cost_per_part": 4367.524221757448,
+     "unit_cost": 13102.572665272342,
+     "count": 3,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "fuselage shell",
+     "kind": "shell",
+     "mass_kg": 43.03957573496049,
+     "area_m2": 11.998904427801918,
+     "perimeter_m": 19.830578884717813,
+     "max_dim_m": 8.098083707755956,
+     "thickness_m": 0.0012902729468611805,
+     "count": 2,
+     "group": "fuselage",
+     "double_curvature": true,
+     "axisymmetric": true,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "fuselage shell",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 18598 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "part kind 'shell' timed with the FOPV 'skin' parameters (nearest published part type)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 11.999 m2",
+       "assembly FOPV on 19.83 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 341.8307000379799,
+      "assembly_hours": 585.5420076905446,
+      "labour_hours": 927.3727077285245,
+      "machine_hours": null,
+      "cycle_time_h": 927.3727077285245,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 286.93050489973666,
+      "scrap_kg": 243.89092916477614,
+      "material_cost": 6881.400888072925,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 1747441.9232711752,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 43.03957573496049,
+      "labour_cost": 28096.9805466088,
+      "tooling_per_unit": 2131.026735696555,
+      "unit_cost_per_part": 37109.40817037828,
+      "unit_cost": 74218.81634075656,
+      "count": 2,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "fuselage shell",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "double curvature: needs stretch/hydro forming tooling (supply tooling_cost)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 18598 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "part kind 'shell' timed with the FOPV 'skin' parameters (nearest published part type)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 11.999 m2",
+       "assembly FOPV on 19.83 m of joined perimeter",
+       "1025 rivets (D=3.9 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 341.8307000379799,
+      "assembly_hours": 585.5420076905446,
+      "labour_hours": 927.3727077285245,
+      "machine_hours": null,
+      "cycle_time_h": 927.3727077285245,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 86.07915146992099,
+      "scrap_kg": 43.03957573496049,
+      "material_cost": 2368.7371981255005,
+      "fasteners": 1025,
+      "fastener_cost": 383.2654761904762,
+      "machine_cost": 0.0,
+      "tooling_cost": 1747441.9232711752,
+      "needs_tooling": true,
+      "mass_kg": 43.03957573496049,
+      "labour_cost": 28096.9805466088,
+      "tooling_per_unit": 2131.026735696555,
+      "unit_cost_per_part": 32980.00995662133,
+      "unit_cost": 65960.01991324266,
+      "count": 2,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "fuselage shell",
+     "process": "sheet_metal_riveted",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "double curvature: needs stretch/hydro forming tooling (supply tooling_cost)",
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 18598 in2 < 2 tau V0 = 188232 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "part kind 'shell' timed with the FOPV 'skin' parameters (nearest published part type)",
+      "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'skin' (V0=3.024 in2/min, tau=31123 min) on 11.999 m2",
+      "assembly FOPV on 19.83 m of joined perimeter",
+      "1025 rivets (D=3.9 mm, pitch 5D, 1 row(s))"
+     ],
+     "sources": [
+      "bao2002",
+      "daher_nesting",
+      "faa_h_8083_31",
+      "gutowski1994"
+     ],
+     "touch_hours": 341.8307000379799,
+     "assembly_hours": 585.5420076905446,
+     "labour_hours": 927.3727077285245,
+     "machine_hours": null,
+     "cycle_time_h": 927.3727077285245,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 2.0,
+     "bought_mass_kg": 86.07915146992099,
+     "scrap_kg": 43.03957573496049,
+     "material_cost": 2368.7371981255005,
+     "fasteners": 1025,
+     "fastener_cost": 383.2654761904762,
+     "machine_cost": 0.0,
+     "tooling_cost": 1747441.9232711752,
+     "needs_tooling": true,
+     "mass_kg": 43.03957573496049,
+     "labour_cost": 28096.9805466088,
+     "tooling_per_unit": 2131.026735696555,
+     "unit_cost_per_part": 32980.00995662133,
+     "unit_cost": 65960.01991324266,
+     "count": 2,
+     "learning_factor": 0.2700898416444121
+    }
+   },
+   {
+    "part": {
+     "name": "fuselage frame",
+     "kind": "frame",
+     "mass_kg": 0.7540752864113375,
+     "area_m2": 0.42045383294368127,
+     "perimeter_m": 3.6344114692059004,
+     "max_dim_m": 1.1568691011079937,
+     "thickness_m": 0.00129027294686118,
+     "count": 17,
+     "group": "fuselage",
+     "double_curvature": false,
+     "axisymmetric": false,
+     "n_plies": null,
+     "material": "al2024_t3",
+     "notes": []
+    },
+    "options": [
+     {
+      "part": "fuselage frame",
+      "process": "cnc_machining",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "machine/autoclave envelope not given: size not checked (envelope_m)",
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 652 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "part kind 'frame' timed with the FOPV 'rib' parameters (nearest published part type)",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.420 m2",
+       "assembly FOPV on 3.63 m of joined perimeter"
+      ],
+      "sources": [
+       "airbus2018_b2f",
+       "bao2002",
+       "gutowski1994"
+      ],
+      "touch_hours": 85.50860582011548,
+      "assembly_hours": 215.85483957232094,
+      "labour_hours": 301.3634453924364,
+      "machine_hours": null,
+      "cycle_time_h": 301.3634453924364,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 6.666666666666667,
+      "bought_mass_kg": 5.027168576075583,
+      "scrap_kg": 4.273093289664246,
+      "material_cost": 120.56564817319489,
+      "fasteners": 0,
+      "fastener_cost": 0.0,
+      "machine_cost": 0.0,
+      "tooling_cost": 61232.14489345151,
+      "needs_tooling": true,
+      "price_source": {
+       "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+       "retrieved": "2026-10-28",
+       "source_type": "distributor"
+      },
+      "mass_kg": 0.7540752864113375,
+      "labour_cost": 9130.528418708871,
+      "tooling_per_unit": 74.67334743103842,
+      "unit_cost_per_part": 9325.767414313104,
+      "unit_cost": 158538.04604332277,
+      "count": 17,
+      "learning_factor": 0.2700898416444121
+     },
+     {
+      "part": "fuselage frame",
+      "process": "sheet_metal_riveted",
+      "material": "al2024_t3",
+      "feasible": true,
+      "reasons": [],
+      "warnings": [
+       "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+       "FOPV time-constant regime (area 652 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+       "part kind 'frame' timed with the FOPV 'rib' parameters (nearest published part type)",
+       "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+       "tooling allocated from the top-down tooling pool by area"
+      ],
+      "missing": [],
+      "method": [
+       "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.420 m2",
+       "assembly FOPV on 3.63 m of joined perimeter",
+       "188 rivets (D=3.9 mm, pitch 5D, 1 row(s))"
+      ],
+      "sources": [
+       "bao2002",
+       "daher_nesting",
+       "faa_h_8083_31",
+       "gutowski1994"
+      ],
+      "touch_hours": 85.50860582011548,
+      "assembly_hours": 215.85483957232094,
+      "labour_hours": 301.3634453924364,
+      "machine_hours": null,
+      "cycle_time_h": 301.3634453924364,
+      "labour_rate_usd_h": 112.17526132404181,
+      "b2f": 2.0,
+      "bought_mass_kg": 1.508150572822675,
+      "scrap_kg": 0.7540752864113375,
+      "material_cost": 41.50148208033481,
+      "fasteners": 188,
+      "fastener_cost": 70.29649709639953,
+      "machine_cost": 0.0,
+      "tooling_cost": 61232.14489345151,
+      "needs_tooling": true,
+      "mass_kg": 0.7540752864113375,
+      "labour_cost": 9130.528418708871,
+      "tooling_per_unit": 74.67334743103842,
+      "unit_cost_per_part": 9316.999745316645,
+      "unit_cost": 158388.99567038298,
+      "count": 17,
+      "learning_factor": 0.2700898416444121
+     }
+    ],
+    "selected": {
+     "part": "fuselage frame",
+     "process": "sheet_metal_riveted",
+     "material": "al2024_t3",
+     "feasible": true,
+     "reasons": [],
+     "warnings": [
+      "labour rate default: 60.0 USD/h (2000, Bao & Samareh) x CPI -> 112 USD/h; supply the shop rate (labour_rate_usd_h)",
+      "FOPV time-constant regime (area 652 in2 < 2 tau V0 = 170580 in2): the time is set by tau (generic transport-wing parts) and is likely high for small parts \u2014 calibrate (labour_calibration / V0, tau from shop data)",
+      "part kind 'frame' timed with the FOPV 'rib' parameters (nearest published part type)",
+      "sheet metal timed with the aluminium-milled FOPV parameters (only published metal set) \u2014 supply shop V0/tau for formed sheet",
+      "tooling allocated from the top-down tooling pool by area"
+     ],
+     "missing": [],
+     "method": [
+      "FOPV metal 'rib' (V0=2.059 in2/min, tau=41423 min) on 0.420 m2",
+      "assembly FOPV on 3.63 m of joined perimeter",
+      "188 rivets (D=3.9 mm, pitch 5D, 1 row(s))"
+     ],
+     "sources": [
+      "bao2002",
+      "daher_nesting",
+      "faa_h_8083_31",
+      "gutowski1994"
+     ],
+     "touch_hours": 85.50860582011548,
+     "assembly_hours": 215.85483957232094,
+     "labour_hours": 301.3634453924364,
+     "machine_hours": null,
+     "cycle_time_h": 301.3634453924364,
+     "labour_rate_usd_h": 112.17526132404181,
+     "b2f": 2.0,
+     "bought_mass_kg": 1.508150572822675,
+     "scrap_kg": 0.7540752864113375,
+     "material_cost": 41.50148208033481,
+     "fasteners": 188,
+     "fastener_cost": 70.29649709639953,
+     "machine_cost": 0.0,
+     "tooling_cost": 61232.14489345151,
+     "needs_tooling": true,
+     "mass_kg": 0.7540752864113375,
+     "labour_cost": 9130.528418708871,
+     "tooling_per_unit": 74.67334743103842,
+     "unit_cost_per_part": 9316.999745316645,
+     "unit_cost": 158388.99567038298,
+     "count": 17,
+     "learning_factor": 0.2700898416444121
+    }
+   }
+  ],
+  "totals": {
+   "material_cost": 13936.771941845038,
+   "labour_cost": 579527.6330173454,
+   "fastener_cost": 4685.186747967479,
+   "machine_cost": 0.0,
+   "tooling_per_unit": 13366.177377757864,
+   "unit_cost": 611515.7690849159,
+   "labour_hours": 5166.2695159074165,
+   "bought_mass_kg": 507.8594193313033,
+   "flown_mass_kg": 250.11132780591467
+  },
+  "unresolved_parts": [],
+  "selection": {
+   "wing skin": [
+    "sheet_metal_riveted",
+    "al2024_t3"
+   ],
+   "wing spar": [
+    "sheet_metal_riveted",
+    "al2024_t3"
+   ],
+   "wing rib": [
+    "sheet_metal_riveted",
+    "al2024_t3"
+   ],
+   "htail skin": [
+    "sheet_metal_riveted",
+    "al2024_t3"
+   ],
+   "htail spar": [
+    "cnc_machining",
+    "al2024_t3"
+   ],
+   "htail rib": [
+    "cnc_machining",
+    "al2024_t3"
+   ],
+   "vtail skin": [
+    "sheet_metal_riveted",
+    "al2024_t3"
+   ],
+   "vtail spar": [
+    "cnc_machining",
+    "al2024_t3"
+   ],
+   "vtail rib": [
+    "cnc_machining",
+    "al2024_t3"
+   ],
+   "fuselage shell": [
+    "sheet_metal_riveted",
+    "al2024_t3"
+   ],
+   "fuselage frame": [
+    "sheet_metal_riveted",
+    "al2024_t3"
+   ]
+  },
+  "notes": [
+   "labour: FOPV/process hours taken as first-unit time, averaged over N=820 with a 85% crawford curve -> LF=0.270 (ASSUMPTION; hours_basis='standard' for LF=1)"
+  ],
+  "materials": {
+   "al2024_t3": {
+    "rho": 2780.0,
+    "kind": "metal",
+    "usd_per_kg": 27.518129043746658,
+    "price_provenance": {
+     "source_url": "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+     "retrieved": "2026-10-28",
+     "source_type": "distributor"
+    },
+    "price_issues": [
+     {
+      "severity": "warning",
+      "field": "source_type",
+      "message": "source_type 'distributor': prefer a manufacturer datasheet, MMPDS/CMH-17 handbook, standard or peer-reviewed source"
+     }
+    ],
+    "price_escalation": 0.955490591796759
+   },
+   "cf_fabric_vari": {
+    "kind": "composite",
+    "rho": 1452.5,
+    "usd_per_kg": 89.14727221463761,
+    "price_provenance": {
+     "source_url": "https://www.aircraftspruce.com/catalog/cmpages/bigraphite.php",
+     "retrieved": "2026-10-28",
+     "source_type": "distributor",
+     "notes": "resina: https://www.aircraftspruce.com/catalog/cmpages/aeropoxy.php; propriedades: https://ph04.tci-thaijo.org/index.php/SUJST/article/view/12583"
+    },
+    "price_issues": [
+     {
+      "severity": "warning",
+      "field": "source_type",
+      "message": "source_type 'distributor': prefer a manufacturer datasheet, MMPDS/CMH-17 handbook, standard or peer-reviewed source"
+     }
+    ],
+    "price_escalation": 0.955490591796759
+   }
+  },
+  "mass_change": {
+   "sized_structure_kg": 250.11132780591467,
+   "selected_structure_kg": 250.11132780591467,
+   "delta_kg": 0.0,
+   "note": "mass change of the selected materials (Ashby scaling) is NOT fed back into the sizing loop \u2014 use the Pareto sweep / re-size with the chosen material"
+  }
+ },
+ "topdown": {
+  "year": 2025,
+  "cpi_2012": 1.402227410123958,
+  "N": 820,
+  "V_H_kt": 122.0001053996591,
+  "We_kg": 720.5311647963871,
+  "f_comp": 0.0,
+  "eastlake": {
+   "engineering": 13922756.394505406,
+   "tooling": 10960265.449761448,
+   "manufacturing": 120382447.91359967,
+   "dev_support": 444903.6023399294,
+   "flight_test": 74985.71077766524,
+   "quality": 15649718.228767958,
+   "materials": 17457898.24188974,
+   "per_unit_variable": 62746.66926370439,
+   "unit_cost": 280908.83455838956,
+   "fixed": 25402911.157384448,
+   "variable_per_unit": 249929.67461035974,
+   "hours": {
+    "engineering": 51468.46607616964,
+    "tooling": 61107.577271513124,
+    "manufacturing": 772486.9095616566,
+    "manufacturing_per_unit": 942.0572067825082
+   },
+   "inputs": {
+    "W_airframe_kg": 468.3452571176516,
+    "V_H_kt": 122.0001053996591,
+    "N": 820,
+    "Q_m": 13.666666666666666,
+    "N_P": 2,
+    "rate_eng": 92.0,
+    "rate_tool": 61.0,
+    "rate_mfg": 53.0,
+    "cpi": 1.402227410123958,
+    "F_CERT": 1.0,
+    "F_CF": 1.03,
+    "F_COMP": 1.0,
+    "F_PRESS": 1.0,
+    "F_TAPER": 1.0,
+    "engine_cost": 41713.25811184502,
+    "avionics_cost": 21033.41115185937,
+    "propeller_cost": 0.0,
+    "f_comp": 0.0,
+    "liability_fraction": 0.0
+   }
+  },
+  "dapca4": {
+   "unit_cost": 793594.6855537429,
+   "flyaway_per_unit": 654022.3600055352,
+   "non_recurring": 114449306.9495303,
+   "recurring": 536298335.2045388,
+   "hours": {
+    "engineering": 326558.41017192695,
+    "tooling": 304111.9532750488,
+    "manufacturing": 2343310.67480752,
+    "quality": 311660.3197494002,
+    "manufacturing_per_unit": 2857.69594488722
+   },
+   "costs": {
+    "engineering": 52659552.6812015,
+    "tooling": 50319225.76217596,
+    "manufacturing": 322013736.947815,
+    "quality": 47198013.44406546,
+    "dev_support": 6857713.320067889,
+    "flight_test": 4612815.186084959,
+    "materials": 115634316.01642075,
+    "engines_per_aircraft": 41713.25811184502,
+    "avionics_per_aircraft": 21033.41115185937
+   },
+   "notes": [
+    "DAPCA IV database is military/transport aircraft; for light GA prefer Eastlake (Gudmundsson 2014) and treat DAPCA as an upper reference"
+   ]
+  },
+  "engine_cost": 41713.25811184502,
+  "avionics_cost": 21033.41115185937,
+  "propeller_cost": 0.0,
+  "airframe_fraction_of_empty": 0.65
+ },
+ "bottom_up": {
+  "structure_parts": 611515.7690849159,
+  "purchased": {
+   "engine (Eastlake CER)": 41713.25811184502,
+   "avionics (cost.avionics_cost / Gudmundsson default)": 21033.41115185937
+  },
+  "final_assembly": null,
+  "non_recurring_per_unit (Eastlake eng+dev+flight test)/N": 17612.98257027195,
+  "unit_cost": 691875.4209188921,
+  "notes": [
+   "structure parts: bottom-up process model; final assembly/systems installation NOT included (give final_assembly_hours)",
+   "non-recurring engineering/development/flight test taken from Eastlake (no bottom-up model)"
+  ]
+ },
+ "calibration": {
+  "eastlake_recurring_mfg_qc_mat_per_unit": 187183.00534665535,
+  "bottom_up_structure_recurring_per_unit": 598149.591707158,
+  "ratio_eastlake_over_bottom_up": 0.3129367769230149,
+  "eastlake_mfg_hours_per_unit": 942.0572067825082,
+  "bottom_up_hours_per_unit": 5166.2695159074165,
+  "note": "Eastlake manufacturing covers the whole airframe (parts, assembly, systems installation) while the bottom-up covers the structural parts \u2014 a ratio > 1 is expected; a ratio << 1 means the FOPV parameters (transport-wing parts) overestimate these parts: set labour_calibration from shop data (or 'eastlake')",
+  "labour_calibration": 1.0,
+  "labour_calibration_mode": "input",
+  "material_calibration": 1.0
+ },
+ "detailed": null,
+ "fidelity": {
+  "levels": {
+   "L0": {
+    "method": "top-down CERs (modified Eastlake central; DAPCA IV as second CER)",
+    "unit_cost": 280908.83455838956,
+    "eastlake": 280908.83455838956,
+    "dapca4": 793594.6855537429,
+    "calibrated": false,
+    "model_spread": {
+     "min": 280908.83455838956,
+     "max": 793594.6855537429,
+     "ratio_max_min": 2.8250969279814044
+    },
+    "outside_database": false,
+    "reasons": [],
+    "confidence": "medium",
+    "databases": {
+     "eastlake": "general-aviation aircraft (Gudmundsson 2014 Ch. 2)",
+     "dapca4": "military and transport aircraft (Raymer 2018 Ch. 18)"
+    },
+    "band": {
+     "aace_class": 5,
+     "position": 0.0,
+     "low": 224727.06764671166,
+     "high": 365181.48492590646,
+     "low_pct": -20.0,
+     "high_pct": 30.0,
+     "source": "aace_18r97"
+    },
+    "band_rule": "wide end if outside the CER database, narrow end inside; half-way after a cost_L0 calibration"
+   },
+   "L1": {
+    "method": "parametric bottom-up by part/process (preliminary design)",
+    "unit_cost": 691875.4209188921,
+    "labour_anchor": "input",
+    "confidence": "low-medium",
+    "band": {
+     "aace_class": 4,
+     "position": 1.0,
+     "low": 484312.79464322445,
+     "high": 1037813.1313783382,
+     "low_pct": -30.0,
+     "high_pct": 50.0,
+     "source": "aace_18r97"
+    },
+    "band_rule": "wide end with uncalibrated public process parameters or Eastlake anchoring (inherits L0 confidence); middle with a shop labour factor; narrow end after cost_L1 (L2) calibration"
+   }
+  },
+  "recommended": "L0",
+  "recommended_why": "conventional design inside the CER database and L1 not calibrated by shop/L2 data (public FOPV parameters): keep the CER as the reference, use L1 for relative choices",
+  "note": "use the recommended level; lower levels are kept for traceability and calibrated by the higher one (cost_calibration)",
+  "applied_calibration": [],
+  "calibration_in": {
+   "factors": {}
+  },
+  "calibration_out": {
+   "design": "Cessna 172S (verifica\u00e7\u00e3o)",
+   "kind": "cost",
+   "factors": {
+    "k_cost_L0_eastlake": {
+     "group": "cost_L0",
+     "value": 2.4629891829730948,
+     "hifi": 691875.4209188921,
+     "lowfi": 280908.83455838956,
+     "hifi_level": "L1",
+     "independent": true,
+     "what": "unit cost L1 bottom-up / eastlake CER (same design, N, USD year)"
+    },
+    "k_cost_L0_dapca4": {
+     "group": "cost_L0",
+     "value": 0.8718246650506807,
+     "hifi": 691875.4209188921,
+     "lowfi": 793594.6855537429,
+     "hifi_level": "L1",
+     "independent": true,
+     "what": "unit cost L1 bottom-up / dapca4 CER (same design, N, USD year)"
+    }
+   },
+   "sources": {
+    "year": 2025,
+    "N": 820,
+    "l1_labour_calibration": 1.0
+   },
+   "note": "ratios higher/lower fidelity of the same design; applied only if the group is listed in manufacturing.cost_calibration.apply (cost_L0, cost_L1)"
+  }
+ },
+ "references": {
+  "aace_18r97": "AACE International (2020). Recommended Practice 18R-97: Cost Estimate Classification System - as applied in engineering, procurement and construction for the process industries, Table 1 (expected accuracy ranges at 80 % confidence: Class 5 L -20..-50 % H +30..+100 %; Class 4 L -15..-30 % H +20..+50 %; Class 3 L -10..-20 % H +10..+30 %; Class 2 L -5..-15 % H +5..+20 %; Class 1 L -3..-10 % H +3..+15 %); generic principles in RP 17R-97. Ranges widen with technological complexity and weak reference data <https://web.aacei.org/docs/default-source/toc/toc_18r-97.pdf> (retrieved 2026-10-28)",
+  "airbus2018_b2f": "Airbus (2018-04). Metals and composites: finding the right material for each application \u2014 'only 10-20 percent of what we buy ends up in use on an aircraft' (subtractive metal parts) <https://www.airbus.com/en/newsroom/stories/2018-04-metals-and-composites-finding-the-right-material-for-each-application> (retrieved 2026-10-28)",
+  "bao2002": "Bao, H.P. (2002). Process Cost Modeling for Multi-Disciplinary Design Optimization. Final report, NASA grant NAG-1-2195 (ODU), Table 4.1 'V0 and tau values for generic wing' (eq. 3.3) <https://ntrs.nasa.gov/api/citations/20020065232/downloads/20020065232.pdf> (retrieved 2026-10-28)",
+  "bls_cpi": "U.S. Bureau of Labor Statistics, CPI-U, U.S. city average, all items (CUUR0000SA0), annual averages <https://data.bls.gov/timeseries/CUUR0000SA0> (retrieved 2026-10-28)",
+  "daher_nesting": "Alma CAM / DAHER-Socata (Tarbes) case study: routed aluminium sheet parts, automatic nesting reduced offcuts from 65 % to 50 % <https://www.casestudies.com/company/alma-cam/case-study/intelligent-nesting-software-for-routing-socatas-aluminium-parts> (retrieved 2026-10-28)",
+  "faa_h_8083_31": "FAA-H-8083-31 Aviation Maintenance Technician Handbook - Airframe Vol. 1, Ch. 4: rivet pitch 4-6 rivet diameters (typical), transverse pitch 75 % of pitch, rivet diameter about 3x the thicker sheet; AC 43.13-1B par. 4-57: minimum edge distance 2D, minimum pitch 3D (single row) / 4D (multi-row) <https://www.faa.gov/documentlibrary/media/advisory_circular/ac_43.13-1b_w-chg1.pdf> (retrieved 2026-10-28)",
+  "gudmundsson2014": "Gudmundsson, S. (2014). General Aviation Aircraft Design: Applied Methods and Procedures, Elsevier, Ch. 2 (modified Eastlake model, 2012 USD; labour cost = 2.0969 H R CPI; R_ENG 92, R_TOOL 61, R_MFG 53 USD/h; avionics 15000 USD; piston engine 174 P_BHP; constant-speed propeller 209.66 N D^2 (P/D)^0.12) <https://computationaldesignlab.github.io/aircraft-design/cost/unit_cost.html> (retrieved 2026-10-28)",
+  "gutowski1994": "Gutowski, T.G., Hoult, D., Dillon, G., Neoh, E.T., Muter, S., Kim, E., Tse, M. (1994). Development of a theoretical cost model for advanced composite fabrication. Composites Manufacturing 5(4):231-239 <https://doi.org/10.1016/0956-7143(94)90138-4>",
+  "nasa_learning": "NASA JSC Cost Estimating \u2014 Learning Curve Calculator (Wright cumulative-average and Crawford unit theories; aerospace 85 %) <https://web.archive.org/web/20120830021941/http://cost.jsc.nasa.gov/learn.html> (retrieved 2026-10-28)",
+  "raymer_dapca": "Raymer, D.P. (2018). Aircraft Design: A Conceptual Approach, 6th ed., AIAA, Ch. 18 (DAPCA IV, constant 2012 USD): H_E = 4.86 We^0.777 V^0.894 Q^0.163, H_T = 5.99 We^0.777 V^0.696 Q^0.263, H_M = 7.37 We^0.820 V^0.484 Q^0.641, H_Q = 0.076 H_M (cargo) / 0.133 H_M; C_D = 91.3 We^0.630 V^1.3; C_F = 2498 We^0.325 V^0.822 FTA^1.21; C_M = 22.1 We^0.921 V^0.621 Q^0.799; C_eng = 3112 (0.043 T_max + 243.25 M_max + 0.969 T_t4 - 2228); wrap rates R_E 115, R_T 118, R_Q 108, R_M 98 USD/h. Cross-checked against Ozgen (METU AE452 'Cost of an airplane', 2016) and the SI form of the same equations (5.18/7.22/10.5/67.4/1947/31.2 in kg, km/h) <http://ae.metu.edu.tr/~ae452/cost.pdf> (retrieved 2026-10-28)"
+ },
+ "validation": {
+  "public_price_usd": 499000.0,
+  "source": "fliegermagazin 2025-05-05: Cessna 172 Skyhawk list price USD 499,000",
+  "eastlake_unit_cost": 280908.83455838956,
+  "dapca4_unit_cost": 793594.6855537429,
+  "bottom_up_unit_cost": 691875.4209188921,
+  "ratio_eastlake": 0.5629435562292376,
+  "ratio_dapca4": 1.590370111330146,
+  "ratio_bottom_up": 1.3865238896170182,
+  "note": "models give manufacturer COST; a list PRICE adds profit, liability, distribution \u2014 ratio < 1 expected"
+ }
+}

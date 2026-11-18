@@ -1,0 +1,13 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative study; no published aircraft/pack/tank data claimed.
+storage:
+  battery:
+    nominal_Wh: 1000
+    dod: 0.8
+    pack_Wh_kg: 180
+    pack_Wh_L: 200
+    available_volume_m3: 0.006
+    max_continuous_power_W: 10000
+  assumption_sources:
+    '*': 'PRESSUPOSTO: independently specified pack capacity/rating and complete pack
+      properties, not cell data; no mass/flight-model feedback'

@@ -1,0 +1,134 @@
+{
+  "spec": "examples/uav_gasoline_150kg.yaml",
+  "W0_kg": 136.34385108909152,
+  "bases": [
+    "stanag4703"
+  ],
+  "rationale": [
+    "UAV com MTOW 136.3 kg → STANAG 4703 (< 150 kg)",
+    "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+  ],
+  "counts": {
+    "compliant": 5,
+    "needs-test": 10,
+    "non-compliant": 0,
+    "open": 6
+  },
+  "notes": [
+    "VNO ≈ VC de projeto = 75 kt EAS≈CAS (PRESSUPOSTO para o nível de desempenho)",
+    "EASA SC Light-UAS (Medium Risk): verificação de projeto para operações SAIL III–IV na categoria específica (SAIL III por declaração; SAIL IV com Design Verification Report da EASA) — https://www.easa.europa.eu/en/special-condition-sc-light-uas-medium-risk",
+    "Meios de conformidade EASA (p.ex. MoC Light-UAS.2510-01 para SAIL IV) — https://www.easa.europa.eu/en/document-library/product-certification-consultations/final-means-compliance-uas-2510-01-sail-iv",
+    "SAIL V–VI ou GRC final > 7: certificação de tipo da UAS (categoria certificada / alto risco) — verificar a base aplicável com a EASA; o STANAG 4671 é usado aqui como referência técnica.",
+    "'CS-LUAS' (JARUS) é uma recomendação, não um código EASA adotado; usar apenas como orientação.",
+    "servo redundante = mesmo servo selecionado (0.180 kg, 5 canais; superfície dividida, PRESSUPOSTO conservador)",
+    "aileron (each): 2 servos por partilha de binário (não redundância); a FTA considera um canal por superfície e a opção 'dual' duplica-os todos",
+    "rudder: sem servo na base de dados para 6.0 N·m — massa da redundância deste canal não contabilizada (em aberto)",
+    "FCC redundante = generic_f7_fc_class (0.01 kg; não certificado — massa de referência)",
+    "SORA: velocidade máxima = V_D 48.5 m/s (PRESSUPOSTO conservador)"
+  ],
+  "scheme": "stanag4703",
+  "xlsx": "examples/output/certification/uav_gasoline_150kg/compliance_matrix.xlsx",
+  "safety": {
+    "options": {
+      "servo": "dual",
+      "fcc": "dual",
+      "backup_battery": true
+    },
+    "meets": true,
+    "failure_conditions": [
+      {
+        "id": "FC-U1",
+        "name": "perda de controlo da aeronave",
+        "severity": "catastrophic",
+        "target_per_fh": 1.1001596243748837e-05,
+        "P_per_fh": 3.8127628431207337e-06,
+        "status": "cumpre",
+        "single_point_failures": [],
+        "required": null
+      },
+      {
+        "id": "FC-U2",
+        "name": "perda de propulsão (aterragem forçada)",
+        "severity": "hazardous",
+        "target_per_fh": null,
+        "P_per_fh": 0.0009950166250831947,
+        "status": "sem alvo",
+        "single_point_failures": [
+          "engine"
+        ],
+        "required": null
+      },
+      {
+        "id": "FC-U3",
+        "name": "perda de controlo direcional (leme)",
+        "severity": "major",
+        "target_per_fh": null,
+        "P_per_fh": 2.587774277567487e-06,
+        "status": "sem alvo",
+        "single_point_failures": [],
+        "required": null
+      },
+      {
+        "id": "FC-U4",
+        "name": "perda da ligação C2 (comando e controlo)",
+        "severity": "major",
+        "target_per_fh": null,
+        "P_per_fh": null,
+        "status": "em aberto",
+        "single_point_failures": null,
+        "required": null
+      }
+    ],
+    "cumulative_catastrophic": {
+      "P_per_fh": 3.8127628431207337e-06,
+      "target": 1.1001596243748837e-05,
+      "ok": true,
+      "ref": "STANAG 4703 Annex G"
+    },
+    "selected": {
+      "options": {
+        "servo": "dual",
+        "fcc": "dual",
+        "backup_battery": true
+      },
+      "dm_kg": 0.9099999999999999,
+      "dW0_kg": 1.93126199260311,
+      "dcost": null,
+      "W0_resized_kg": 138.27535917292437,
+      "missing_inputs": [
+        "servo_cost",
+        "fcc_cost"
+      ]
+    },
+    "reason": "conjunto mais leve que cumpre todos os alvos quantitativos e a regra de falha única",
+    "growth_dW0_dm": 2.1222659259374836,
+    "baseline_n_fail": 2
+  },
+  "sora": {
+    "iGRC": 5,
+    "final_GRC": 5,
+    "residual_ARC": "c",
+    "SAIL": "IV",
+    "category": "específica",
+    "design_route": "Design Verification Report (DVR) da EASA — SC Light-UAS Medium Risk / MoC Light-UAS.2510-01",
+    "column": "8 m / 75 m/s",
+    "containment": {
+      "step": "#8",
+      "source": "EASA AMC1 Article 11 Reg. (EU) 2019/947 (SORA 2.5) § S.4.8 Tables 8–13 and Annex E § E.4, ED Decision 2025/018/R — https://www.easa.europa.eu/en/document-library/acceptable-means-of-compliance-and-guidance-materials/amc-gm-regulation-eu-2019947",
+      "requested": false,
+      "requirement_status": "unassessed",
+      "compliance_status": "unassessed",
+      "status": "unassessed",
+      "required_robustness": null,
+      "claimed_robustness": null,
+      "notes": [
+        "Passo #8 contenção não pedido — requisito e conformidade unassessed (nunca pass silencioso)"
+      ],
+      "unassessed_terms": [
+        "containment inputs (passo #8 não pedido)"
+      ],
+      "p_exit_target_per_fh": null,
+      "adjacent_radius_km": null
+    }
+  }
+}

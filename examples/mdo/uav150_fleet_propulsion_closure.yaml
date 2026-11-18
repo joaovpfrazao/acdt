@@ -1,0 +1,34 @@
+# Fecho frota ↔ propulsão ↔ projeto por iteração (regra do workflow: a frota do N0 é provisória, a propulsão
+# compara-se no N1 e fecha-se por iteração), sobre examples/uav_150kg_stanag4671.yaml:
+#   acdt mdo examples/uav_150kg_stanag4671.yaml --spec examples/mdo/uav150_fleet_propulsion_closure.yaml \
+#       -o output/mdo_fleet --workers 2
+# Ciclo exterior: tipo de propulsão (discreta). Fecho: n aviões por estação de presença contínua.
+#   Ciclo de Ha 2010 (AFIT-OR-MS-ENS-10-03; acdt.core.concept.ops.cycle): T_L = E − t_out − t_back,
+#   T_rt = t_out + t_back + t_ta, n = ceil((T_L + T_rt)/T_L). Com n fixo, a autonomia por avião que chega é
+#   E = t_out + t_back + T_rt/(n − 1) → requisito aplicado ao avião; o MDO interior minimiza a massa da frota; o n
+#   volta a ser calculado com a autonomia do ótimo até não mudar.
+# Os tempos de trânsito e de terra são PRESSUPOSTOS ilustrativos (o exemplo é só um caso de teste).
+mdo:
+  design_variables:
+    - {path: requirements.propulsion_type, type: discrete, values: [piston_prop, electric],
+       source: "alternativas de propulsão comparadas no N1 (DESIGN_WORKFLOW.md)"}
+    - {path: assumptions.aero.AR, lower: 7, upper: 12, x0: 9, source: "PRESSUPOSTO: banda de AR do estudo"}
+  constants: {t_out: 1.0, t_back: 1.0, t_ta: 2.0}
+  constants_source: "PRESSUPOSTO ilustrativo: 1 h de trânsito para cada lado, 2 h de reabastecimento/terra"
+  derived:
+    endurance_h: "req_REQ_endurance / 3600"
+    fleet_mass_kg: "n * W0_kg"
+  objectives:
+    - {metric: fleet_mass_kg, sense: min}
+  closure:
+    name: n
+    x0: 2
+    apply:
+      requirements.endurance: "t_out + t_back + (t_out + t_back + t_ta) / (n - 1)"
+    update: "ceil((endurance_h - t_out - t_back + t_out + t_back + t_ta) / (endurance_h - t_out - t_back) - 1e-9)"
+    max_iter: 5
+    source: "Ha 2010, ciclo de presença contínua (acdt.core.concept.ops.cycle)"
+  constraints: {requirements: all, policy: limiar}
+  strategy: slsqp
+  options: {maxiter: 15, fd_step: 0.01}
+  model: {fidelity: handbook, skip_stages: [aeroelasticity], workers: 2}

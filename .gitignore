@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv*/
+build/
+dist/
+.pytest_cache/
+out/
+runs/
+examples/ai_session/output/runs/
+examples/ai_session/output/transcript.json
+/output/

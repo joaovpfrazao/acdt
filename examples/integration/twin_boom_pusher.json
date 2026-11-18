@@ -1,0 +1,351 @@
+{
+ "_note": "Exemplo P1 (geometria por componentes + requisitos de integra\u00e7\u00e3o). Geometria e equipamento ILUSTRATIVOS (PRESSUPOSTO): n\u00e3o s\u00e3o dados de fornecedor. Frame: x para tr\u00e1s, y estibordo, z para cima [m]. O motor dimensionado fica no disco propulsor (atr\u00e1s); a asa e o V invertido est\u00e3o onde o ponto neutro (AVL sem corpos + Torenbeek App. E) fica \u00e0 frente do CG de vazio com margem ~12 % (Raymer Sec. 16.3) e o combust\u00edvel/payload agrupam-se nesse CG para a viagem caber na banda de 8\u201315 % do nariz (Raymer Ch. 11). options.balance confirma o alvo.",
+ "assembly": {
+  "components": [
+   {
+    "type": "body",
+    "name": "pod",
+    "role": "fuselage",
+    "pod": {
+     "length": 2.38,
+     "width": 0.5,
+     "nose_frac": 0.28,
+     "tail_frac": 0.06,
+     "tail_scale": 0.8
+    }
+   },
+   {
+    "type": "body",
+    "name": "radome",
+    "role": "radome",
+    "origin": [
+     1.45,
+     0,
+     -0.38
+    ],
+    "transparent_to": [
+     "rf"
+    ],
+    "pod": {
+     "length": 1.0,
+     "width": 0.42,
+     "height": 0.3,
+     "nose_frac": 0.25,
+     "tail_frac": 0.25,
+     "tail_scale": 0.2
+    }
+   },
+   {
+    "type": "body",
+    "name": "satcom_dome",
+    "role": "radome",
+    "origin": [
+     1.65,
+     0,
+     0.22
+    ],
+    "transparent_to": [
+     "rf"
+    ],
+    "pod": {
+     "length": 0.6,
+     "width": 0.3,
+     "height": 0.16,
+     "nose_frac": 0.25,
+     "tail_frac": 0.25,
+     "tail_scale": 0.3
+    }
+   },
+   {
+    "type": "surface",
+    "name": "wing",
+    "role": "wing",
+    "origin": [
+     1.8,
+     0,
+     0.1
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.55,
+     "tip_chord": 0.35,
+     "span": 2.6,
+     "dihedral_deg": 2.0,
+     "tc_root": 0.14,
+     "tc_tip": 0.12
+    }
+   },
+   {
+    "type": "body",
+    "name": "boom",
+    "role": "boom",
+    "origin": [
+     0.7,
+     0.9,
+     0.1
+    ],
+    "mirror": true,
+    "pod": {
+     "length": 4.065,
+     "width": 0.11,
+     "nose_frac": 0.1,
+     "tail_frac": 0.1,
+     "tail_scale": 0.6
+    }
+   },
+   {
+    "type": "surface",
+    "name": "tail",
+    "role": "inverted V tail",
+    "mirror": true,
+    "sections": [
+     {
+      "le": [
+       4.05,
+       0.9,
+       0.1
+      ],
+      "chord": 0.665,
+      "tc": 0.1
+     },
+     {
+      "le": [
+       4.23,
+       0.0,
+       0.55
+      ],
+      "chord": 0.475,
+      "tc": 0.1
+     }
+    ]
+   },
+   {
+    "type": "disc",
+    "name": "prop",
+    "role": "propeller",
+    "origin": [
+     2.48,
+     0,
+     0
+    ],
+    "diameter": 0.7
+   }
+  ]
+ },
+ "items": [
+  {
+   "name": "radar",
+   "mass_kg": 12.0,
+   "size_m": [
+    0.4,
+    0.34,
+    0.12
+   ],
+   "position": [
+    1.95,
+    0,
+    -0.38
+   ],
+   "host": "radome",
+   "power_w": {
+    "avg": 250,
+    "peak": 400
+   },
+   "heat_w": 230,
+   "fov": [
+    {
+     "name": "360_az_down",
+     "band": "rf",
+     "az_deg": [
+      -180,
+      180
+     ],
+     "el_deg": [
+      -30,
+      -3
+     ],
+     "step_deg": 5
+    }
+   ],
+   "aperture_offset": [
+    0,
+    0,
+    -0.03
+   ],
+   "group": "payload"
+  },
+  {
+   "name": "eoir_gimbal",
+   "mass_kg": 4.5,
+   "size_m": [
+    0.2,
+    0.2,
+    0.22
+   ],
+   "position": [
+    0.3,
+    0,
+    -0.3
+   ],
+   "obstructs": true,
+   "power_w": {
+    "avg": 60,
+    "peak": 120
+   },
+   "heat_w": 55,
+   "fov": [
+    {
+     "name": "forward_down",
+     "band": "optical",
+     "az_deg": [
+      -100,
+      100
+     ],
+     "el_deg": [
+      -90,
+      -10
+     ],
+     "step_deg": 5
+    }
+   ],
+   "group": "payload",
+   "protuberance_shape": "sphere"
+  },
+  {
+   "name": "satcom",
+   "mass_kg": 3.0,
+   "size_m": [
+    0.2,
+    0.2,
+    0.06
+   ],
+   "position": [
+    1.95,
+    0,
+    0.24
+   ],
+   "host": "satcom_dome",
+   "power_w": {
+    "avg": 40,
+    "peak": 90
+   },
+   "heat_w": 35,
+   "aperture_offset": [
+    0,
+    0,
+    0.03
+   ],
+   "group": "payload"
+  },
+  {
+   "name": "fuel_tank",
+   "mass_kg": 34.0,
+   "size_m": [
+    0.36,
+    0.32,
+    0.2
+   ],
+   "position": [
+    2.0,
+    0.0,
+    -0.08
+   ],
+   "host": "pod",
+   "group": "fuel"
+  },
+  {
+   "name": "payload_bay",
+   "mass_kg": 10.5,
+   "size_m": [
+    0.24,
+    0.22,
+    0.12
+   ],
+   "position": [
+    1.92,
+    0.0,
+    0.14
+   ],
+   "host": "pod",
+   "group": "payload"
+  },
+  {
+   "name": "avionics",
+   "mass_kg": 3.0,
+   "size_m": [
+    0.22,
+    0.18,
+    0.1
+   ],
+   "position": [
+    0.95,
+    0.0,
+    0.0
+   ],
+   "host": "pod",
+   "power_w": {
+    "avg": 35,
+    "peak": 50
+   },
+   "heat_w": 35,
+   "group": "equipment"
+  }
+ ],
+ "constraints": [
+  {
+   "type": "sky_view",
+   "item": "satcom",
+   "el_min_deg": 10,
+   "band": "rf"
+  },
+  {
+   "type": "min_separation",
+   "a": "radar",
+   "b": "satcom",
+   "distance_m": 0.3
+  },
+  {
+   "type": "keep_out",
+   "name": "prop arc",
+   "zone": {
+    "component": "prop",
+    "clearance_m": 0.05
+   },
+   "items": "*"
+  },
+  {
+   "type": "range",
+   "item": "fuel_tank",
+   "axis": "x",
+   "min": 1.6,
+   "max": 2.15
+  },
+  {
+   "type": "max_distance",
+   "a": "avionics",
+   "b": "satcom",
+   "distance_m": 1.5
+  },
+  {
+   "type": "cg_range",
+   "axis": "x",
+   "min": 1.35,
+   "max": 1.85
+  }
+ ],
+ "options": {
+  "static_margin_min": 0.12,
+  "balance": {
+   "static_margin": 0.12
+  }
+ },
+ "base": {
+  "mass_kg": 45.0,
+  "cg": [
+   1.25,
+   0,
+   0.05
+  ],
+  "_note": "estrutura + motor (PRESSUPOSTO ilustrativo)"
+ }
+}

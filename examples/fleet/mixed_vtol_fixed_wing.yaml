@@ -1,0 +1,269 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Esquema 1.2: frota mista VTOL + asa fixa elétrica por atribuição de estações, recursos de solo partilhados.
+# Todos os números são PRESSUPOSTOS ilustrativos.
+# min_stations_by_type: PRESSUPOSTO — uma estação sem pista exige VTOL (requisito de missão ilustrativo).
+schema_version: '1.2'
+source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+  do fornecedor; não valida uma aeronave real'
+mission:
+  envelope:
+    distance_km:
+    - 10
+    - 10
+    speed_m_s:
+    - 30
+    - 30
+    on_station_h:
+    - 0.25
+    - 0.25
+    payload_kg:
+    - 5
+    - 5
+  samples:
+  - id: missão-lenta
+    distance_km: 10
+    speed_m_s: 30
+    on_station_h: 0.25
+    payload_kg: 5
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+operations:
+  availability: 0.9
+  n_stations: 3
+  handoff_overlap_h: 0
+  reserve_h: 0
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  dwell_policy: requested
+  ground_resources:
+    source: 'PRESSUPOSTO: frota mista/recursos ilustrativos, substituir por dados
+      do operador; não valida aeronaves reais'
+    pools:
+      charger: 4
+      crew: 2
+candidates:
+- id: elétrico
+  architecture: elétrico — opção fornecida, não preseleção automática
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 2
+    turnaround_h:
+    - 0.1
+    - 0.3
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: prop
+    onboard:
+      schema_version: '1.0'
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+      items:
+      - id: instrument
+        role: payload
+        mass_kg: 1
+        mass_accounting: incremental
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      loads:
+      - id: instrument_load
+        item_id: instrument
+        source_id: bus
+        power_W: 50
+        peak_W: 100
+        duty: 0.5
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      sources:
+      - id: bus
+        kind: main_battery
+        delivery_efficiency: 0.9
+        continuous_W: 1000
+        peak_W: 1000
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+    aircraft:
+      name: PRESSUPOSTO common electric
+      aircraft_class: uav_small
+      requirements:
+        propulsion_type: electric
+        payload_mass:
+          target: 4
+          unit: kg
+        endurance:
+          min: 0.5
+          unit: h
+        cruise_speed:
+          target: 22
+          unit: m/s
+        cruise_altitude:
+          target: 300
+          unit: m
+        stall_speed:
+          max: 13
+          unit: m/s
+        climb_rate:
+          min: 2
+          unit: m/s
+      assumptions:
+        aero:
+          fidelity: handbook
+        weights:
+          method: statistical
+          initial_class: uav_small
+        propulsion:
+          systems_power_W: 0
+          energy_reserve: 0.2
+        geometry:
+          fuselage_length_m: 1.8
+          fuselage_diameter_m: 0.22
+  pack_power:
+    continuous_C: 5
+    peak_C: 8
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  endurance:
+    tolerance_h: 0.01
+    closure_tolerance_h: 0.02
+    closure_max_iterations: 6
+  ground_process:
+    source: 'PRESSUPOSTO: frota mista/recursos ilustrativos, substituir por dados
+      do operador; não valida aeronaves reais'
+    activities:
+    - id: post_flight_check
+      resource: crew
+      duration_h: 0.1
+    - id: charge
+      resource: charger
+      duration: charge
+      average_input_W: 2000
+      efficiency: 0.9
+- id: VTOL-fecho-massa
+  architecture: VTOL-elétrico — opção fornecida, não preseleção automática
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 2
+    turnaround_h:
+    - 0.1
+    - 0.3
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: vtol
+    onboard:
+      schema_version: '1.0'
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+      items:
+      - id: instrument
+        role: payload
+        mass_kg: 1
+        mass_accounting: included
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+        included_in: mtow
+      loads:
+      - id: instrument_load
+        item_id: instrument
+        source_id: bus
+        power_W: 50
+        peak_W: 100
+        duty: 0.5
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      sources:
+      - id: bus
+        kind: main_battery
+        delivery_efficiency: 0.9
+        continuous_W: 1000
+        peak_W: 1000
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+    aircraft:
+      electric:
+        systems_power_W: 0
+      closure:
+        mass_bounds_kg:
+        - 3
+        - 200
+        source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados medidos/fornecedor
+          com fonte; não é coeficiente publicado'
+        components:
+          rotors:
+            method: AFDD00
+            n_blades: 2
+            flap_frequency_per_rev: 1.1
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          motors:
+            method: NASA15
+            torque_class: other
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          controllers:
+            method: fraction_of_motor
+            fraction: 0.3
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          rotor_support:
+            method: fraction_of_mtow
+            fraction: 0.05
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          airframe:
+            method: fraction_of_mtow
+            fraction: 0.2
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          other:
+          - id: avionics
+            mass_kg: 0.5
+            source: 'PRESSUPOSTO: valor ilustrativo de exemplo, substituir por dados
+              medidos/fornecedor com fonte; não é coeficiente publicado'
+          cruise_propulsor:
+            method: supplied
+            mass_kg: 0.6
+            source: 'PRESSUPOSTO: frota mista/recursos ilustrativos, substituir por
+              dados do operador; não valida aeronaves reais'
+      architecture: lift_cruise
+      rotors:
+        disk_loading_N_m2: 150
+  ground_process:
+    source: 'PRESSUPOSTO: frota mista/recursos ilustrativos, substituir por dados
+      do operador; não valida aeronaves reais'
+    activities:
+    - id: post_flight_check
+      resource: crew
+      duration_h: 0.1
+    - id: charge
+      resource: charger
+      duration: charge
+      average_input_W: 2000
+      efficiency: 0.9
+objectives:
+  fleet_required: min
+  fleet_mtow_kg: min
+mixed_fleet:
+  source: 'PRESSUPOSTO: frota mista/recursos ilustrativos, substituir por dados do
+    operador; não valida aeronaves reais'
+  members:
+  - elétrico
+  - VTOL-fecho-massa
+  max_types: 2
+  shared_ground: true
+  objectives:
+    fleet_required: min
+    fleet_mtow_kg: min
+    energy_rate_Wh_per_h: min
+  min_stations_by_type:
+    VTOL-fecho-massa: 1

@@ -1,0 +1,27 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative study; no published aircraft/pack/tank data claimed.
+name: prop_mission
+aircraft:
+  source: PRESSUPOSTO analytic piston candidate, not aircraft reference data
+  mass_kg: 1000
+  S_m2: 16
+  CD0: 0.03
+  K: 0.05
+  CLmax: 1.5
+  propulsion:
+    kind: piston_prop
+    P_sl_W: 120000
+    eta_cruise: 0.75
+    eta_takeoff: 0.55
+    c_p: 8.0e-08
+    fuel_kg: 80
+    n_engines: 1
+    P_systems_W: 0
+pointmass_dt: 2
+initial:
+  altitude_m: 300
+segments:
+- type: cruise
+  time_min: 2
+  speed_m_s: 50
+  altitude_m: 300

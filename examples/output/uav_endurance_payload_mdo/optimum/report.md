@@ -1,0 +1,896 @@
+# Relatório de dimensionamento — UAV ISR elétrico 25 kg
+
+_acdt 0.1.0 · Fase 1 (conceptual) + 1E (sistemas) + Fase 2 (baixa fidelidade)_
+
+UAV de asa fixa lançado por catapulta e recuperado por paraquedas/rede, com gimbal EO/IR. Sem requisito de pista (não há restrição de descolagem/aterragem).
+
+
+**Resultado:** ❌ INVIÁVEL / requisitos não cumpridos
+
+**Verificação por segmentos (Fase 2):** ⚠️ pelo menos um requisito não cumprido na missão por segmentos (ver §13)
+
+## 1. Requisitos desta corrida
+
+| requisito | sentido | valor | qualificadores | estágios | avaliado |
+|---|---|---|---|---|---|
+| propulsion_type | target | electric | - | context | sim |
+| regulatory_category | target | easa_specific | - | check, systems | sim |
+| payload_mass | target | 4.0 kg | - | sizing | sim |
+| endurance | min | 2.5 h | - | sizing | sim |
+| cruise_speed | target | 22 m/s | - | constraint, sizing | sim |
+| cruise_altitude | target | 600 m | - | context | sim |
+| stall_speed | max | 13 m/s | - | constraint | sim |
+| climb_rate | min | 3.0 m/s | - | constraint | sim |
+| service_ceiling | min | 3000 m | - | constraint | sim |
+| wing_span | max | 4.2 m | - | check | sim |
+| mtow | max | 25 kg | - | check | sim |
+
+Requisitos não definidos (livres / por omissão): crew_mass, range, max_speed, load_factor, turn_rate, takeoff_ground_roll, landing_distance, power_available, thrust_available, unit_cost, noise, mtow_objective
+
+### Validação
+
+- **info**: Valor inicial estatístico We/W0 = 0.65 não fecha (We/W0 + Wf/W0 > 0.98); iteração por componentes reiniciada com We/W0 = 0.30.
+- **info**: Nz das equações de massa = 1.5 × n_lim do diagrama V-n (5.07, rajada; stanag_4671)
+- **warning**: n_lim = 5.07 está acima da linha de perda mesmo a VD (n = 3.20 com CLmax quase-estático): valor CONSERVATIVO mantido (a perda dinâmica numa rajada pode excedê-lo); VC baixo face a VS1 — rever VC/CLmax antes de dimensionar
+- **info**: Massa do caixão da asa (Megson/Bruhn) = 3.24 kg vs Raymer Eq. 15.46 3.41 kg (razão 0.95); usado: Raymer
+- **warning**: Massa da fuselagem L1 / Raymer Eq. 15.49 = 1.50 (1.7 kg vs 1.2 kg).
+- **info**: Energia de descolagem + subida no dimensionamento = 94.8 Wh (modelo de segmentos: 1 min à potência de descolagem + subida integrada a V_y — o mesmo da verificação; Hepperle só energia potencial daria 57.0 Wh)
+- **info**: Sem trem de aterragem (landing_gear: none) — lançamento/recuperação como itens do utilizador.
+- **info**: W0 = 22 kg está abaixo da base de dados das equações GA de Raymer (~1000–8000 lb): extrapolação — calibrar com dados próprios (calibration).
+- **warning**: We/W0 por componentes = 0.453 fora da banda estatística [0.77, 0.90] (±15 %) — rever itens em falta (recuperação, suportes, pintura, cablagem de sinal) ou calibrar com dados próprios.
+- **error**: Infeasible: fixed W/S 177.7 N/m² above the W/S limit 176.5
+
+## 2. Peso à descolagem (Raymer Cap. 3; Hepperle 2012 para elétrico)
+
+| grandeza | valor |
+|---|---|
+| W0 [kg] | 21.63 |
+| We [kg] | 9.794 |
+| Combustível/bateria [kg] | 7.832 |
+| Payload + tripulação [kg] | 4 |
+| We/W0 | 0.4529 |
+| Wf/W0 | 0.3622 |
+| Energia bateria nominal [Wh] | 1789 |
+
+Pernas da missão: loiter 9000 (SI) @ V=22.0 m/s, L/D=17.2, h=600 m
+
+## 2a. Estimativa de pesos por componentes (Raymer 6th ed. Cap. 15 + sistemas)
+
+Valor inicial do peso vazio: Raymer 6th ed. Table 3.1 (We/W0 = A W0^C, W0 in lb) 'uav_small'.
+
+Fator de carga último Nz = 7.61 (1.5 × limite). Iteração: estatística → geometria → componentes → novo We → re-dimensionar, até convergir (histórico na secção 8).
+
+| grupo | item | kg | % W0 | método |
+|---|---|---|---|---|
+| structure | asa | 3.407 | 15.75 | Raymer Eq. 15.46; composite x0.875 (Raymer Table 15.4) |
+| structure | empenagem horizontal | 0.3801 | 1.757 | minimum gauge: Swet 0.422 m² x 0.9 kg/m² (user layup) > Raymer Eq. 15.47 |
+| structure | empenagem vertical | 0.2329 | 1.077 | minimum gauge: Swet 0.259 m² x 0.9 kg/m² (user layup) > Raymer Eq. 15.48 |
+| structure | fuselagem | 1.065 | 4.925 | Raymer Eq. 15.49 (unpressurized); composite x0.925 (Raymer Table 15.4) |
+| propulsion | motor(es) + ESC(s) | 0.69 | 3.191 | selected components (Phase 1E database) |
+| propulsion | hélice(s) | 0.08 | 0.3699 | user (datasheet) |
+| equipment | comandos (hastes/charneiras) | 0.06424 | 0.297 | Raymer Eq. 15.54 |
+| equipment | servos | 0.17 | 0.7861 | selected components (Phase 1E) |
+| equipment | autopiloto + aviónica + extras | 0.075 | 0.3468 | selected components / user list |
+| equipment | cablagem de potência | 0.29 | 1.341 | sized wire gauges x length x ρCu (IEC 60028) x1.3 insulation + 5 connectors x 0.01 kg (ASSUMPTIONS) |
+| user_items | paraquedas de recuperação + ejetor | 1 | 4.624 | user-listed item |
+| user_items | suporte/amortecimento do gimbal | 0.3 | 1.387 | user-listed item |
+| equipment | datalink C2 + antenas | 0.25 | 1.156 | user-listed item |
+| equipment | GNSS + bússola (x2) | 0.1 | 0.4624 | user-listed item |
+| equipment | pitot/ADS-B | 0.1 | 0.4624 | user-listed item |
+| equipment | cablagem de sinal + conectores | 0.3 | 1.387 | user-listed item |
+| user_items | ferragens/fixações/pintura | 0.4 | 1.85 | user-listed item |
+| allowance | margem de crescimento/integração | 0.8904 | 4.117 | 10% of the build-up (ASSUMPTION, labelled) |
+
+
+Resumo por grupo e composição de W0:
+
+| grupo | kg | % W0 |
+|---|---|---|
+| structure | 5.085 | 23.51 |
+| propulsion | 0.77 | 3.561 |
+| equipment | 1.349 | 6.239 |
+| user_items | 1.7 | 7.861 |
+| allowance | 0.8904 | 4.117 |
+| **peso vazio We** | 9.795 | 45.29 |
+| combustível / bateria | 7.832 | 36.22 |
+| payload | 4 | 18.5 |
+| tripulação | 0 | 0 |
+| **W0** | 21.63 | 100 |
+
+
+Notas do build-up:
+
+- Sem trem de aterragem (landing_gear: none) — lançamento/recuperação como itens do utilizador.
+- W0 = 22 kg está abaixo da base de dados das equações GA de Raymer (~1000–8000 lb): extrapolação — calibrar com dados próprios (calibration).
+
+Cross-check estatístico (We/W0 das classes publicadas no W0 obtido; 'fora' = W0 fora do intervalo da base de dados):
+
+| classe | We/W0 | We [kg] | na gama | fonte |
+|---|---|---|---|---|
+| uav_small | 0.7693 | 16.64 | - | Raymer 6th ed. Table 3.1 (We/W0 = A W0^C, W0 in lb) 'uav_small' |
+| uav_tactical_recce_ucav | 0.8999 | 19.46 | - | Raymer 6th ed. Table 3.1 (We/W0 = A W0^C, W0 in lb) 'uav_tactical_recce_ucav' |
+| nicolai_uav_prop_endurance_lt12h | 1.067 | 23.06 | - | Nicolai & Carichner (AIAA 2010) Table 5.1 (We = A W0^B, lb) 'nicolai_uav_prop_endurance_lt12h' |
+| nicolai_uav_prop_endurance_gt12h | 0.8121 | 17.56 | - | Nicolai & Carichner (AIAA 2010) Table 5.1 (We = A W0^B, lb) 'nicolai_uav_prop_endurance_gt12h' |
+
+
+## 3. Design point (diagrama de restrições)
+
+![constraint diagram](constraint_diagram.png)
+
+- **W0/S = 177.7 N/m² (18.12 kg/m²)**
+- **P/W_SL = 52.31 W/kg** → P_SL = 1.13 kW
+- Restrições ativas: RC 3.0 m/s @ 0 m, Perda 13.0 m/s
+- Área alar S = 1.193 m²
+
+## 4. Geometria de primeira iteração
+
+| parâmetro | valor |
+|---|---|
+| S_m2 | 1.193 |
+| AR | 10.42 |
+| span_m | 3.527 |
+| taper | 0.6 |
+| c_root_m | 0.4229 |
+| c_tip_m | 0.2537 |
+| MAC_m | 0.3454 |
+| y_MAC_m | 0.8082 |
+| sweep_c4_deg | 0 |
+| sweep_LE_deg | 1.374 |
+| t/c | 0.12 |
+
+Fuselagem: L = 1.80 m, D = 0.220 m. Empenagem horizontal S = 0.208 m², vertical S = 0.128 m², braço = 0.99 m (coef. de volume, Raymer Eq. 6.28–6.29).
+
+Caixão da asa (parametrizado na geometria, análise na Fase 2): longarinas a 20%/65% c, largura na raiz 0.190 m.
+
+## 5. Aerodinâmica (Raymer Cap. 12 / DATCOM)
+
+![polar](drag_polar.png)
+
+- CLα = 4.888 /rad (0.0853 /deg)
+- CLmax limpo / descolagem / aterragem = 1.30 / 1.36 / 1.71
+- CD0 = 0.02381, K = 0.0326 (e = 0.937), (L/D)max = 17.95 a CL = 0.85
+
+Decomposição do CD0 (component build-up):
+
+| component | Swet_m2 | Cf | FF | Q | CD0 |
+|---|---|---|---|---|---|
+| wing | 2.246 | 0.004144 | 1.033 | 1 | 0.008059 |
+| htail | 0.4223 | 0.00456 | 0.9916 | 1.04 | 0.001664 |
+| vtail | 0.2587 | 0.004278 | 0.9782 | 1.04 | 0.0009437 |
+| fuselage | 1.047 | 0.003471 | 1.13 | 1 | 0.003443 |
+
+D/q adicional (trem, antenas, ...): 0.0080 m²; L&P: 5%
+
+## 6. Verificações
+
+- ➖ `regulatory_category` — easa_specific: no numeric limit
+- ✅ `wing_span` — b = 3.53 m vs max 4.20 m
+- ✅ `mtow` — W0 = 21.6 kg vs max 25.0 kg
+- ✅ `static_margin` — SM no CG traseiro 10.0 % (alvo 10 %; dianteiro 10.0 %) — posicionamento da asa por bisseção
+- ✅ `trim` — CLmax limpo (CG dianteiro): δe -10.8°; cruzeiro (CG dianteiro): δe -7.4°
+- ✅ `hq:scissor` — S_h/S atual 0.174 vs mínimo 0.174 (estabilidade 0.174 no CG traseiro, controlo 0.107 a CLmax no CG dianteiro; dimensionante: estabilidade)
+- ✅ `hq:short_period` — período curto ζ = 0.764 → Nível 1 (N1: 0.30–2.00; MIL-F-8785C Table IV, Classe I, Cat. B) — UAV: indicativo
+- ❌ `hq:CAP` — CAP = ω²/(n/α) [1/(g s²)] = 9.02 → Nível 2 (N1: 0.085–3.6; MIL-F-8785C Figs. 1–3, Classe I, Cat. B) — UAV: indicativo
+- ✅ `hq:phugoid` — fugóide ζ = 0.0705 → Nível 1 (N1: ≥ 0.04; MIL-F-8785C 3.2.1.2, Classe I, Cat. B) — UAV: indicativo
+- ✅ `hq:dutch_roll` — rolamento holandês ζ / ζω / ω = 0.196 / 0.798 / 4.06 → Nível 1 (N1: 0.08 / 0.15 / 0.4; MIL-F-8785C Table VI, Classe I, Cat. B) — UAV: indicativo
+- ✅ `hq:roll` — rolamento τ_R [s] = 0.0602 → Nível 1 (N1: ≤ 1.4; MIL-F-8785C Table VII, Classe I, Cat. B) — UAV: indicativo
+- ➖ `hq:spiral` — espiral unassessed: declare assumptions.geometry.dihedral_deg (current TrapezoidalWing default Γ=3° is PRESSUPOSTO only; Clβ/spiral need an explicit dihedral — Etkin & Reid 1996 Ch. 6 / MIL-F-8785C Table VIII)
+- ✅ `wb:envelope` — Todos os 3 carregamentos dentro dos limites conceptuais; extremos 0.758 m (vazio, 18 kg) e 0.758 m (vazio, 18 kg).
+- ✅ `aeroel:divergence` — divergência torsional V = 357.1 m/s EAS vs 32.1 (= 1.2 V_D); margem +1014 %
+- ✅ `aeroel:reversal` — inversão de aileron: não ocorre (V → ∞) vs 32.1 m/s EAS
+- ✅ `aeroel:flutter` — flutter binário: não ocorre (V → ∞) vs 32.1 m/s EAS
+- ✅ `aeroel:aeer45` — AEER-45 / 23.629(d): F = 0.000859 vs F_max = 0.056 (balanceamento do aileron não avaliado)
+- ✅ `perf:endurance` — tempo em espera (segmentos): 2.5 h vs requerido ≥ 2.5 (missão por segmentos — verificação, não altera a viabilidade do dimensionamento)
+- ✅ `perf:service_ceiling` — teto de serviço (Anderson) > 9000 m (não atingido): 9000 m vs requerido ≥ 3000 (missão por segmentos — verificação, não altera a viabilidade do dimensionamento)
+- ✅ `perf:climb_rate` — ROC máx. ao nível do mar: 3 m/s vs requerido ≥ 3 (missão por segmentos — verificação, não altera a viabilidade do dimensionamento)
+
+## 8. Histórico do ciclo MDA (peso ↔ design point ↔ geometria ↔ arrasto)
+
+| iter | W0 | We/W0 usado | We | Wf | E descolagem+subida [Wh] | n_lim (V-n) | asa Raymer [kg] | asa caixão [kg] | We_comp | We_comp/W0 | CD0 | W/S | P/W | L/D_max | aero |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 12.55 | 0.3 | 3.766 | 4.788 | 59.79 | 4.966 | 1.612 | 1.858 | 7.276 | 0.5796 | 0.02947 | 177.7 | 5.392 | 14.39 | manual |
+| 2 | 20.22 | 0.3598 | 7.276 | 8.948 | 90.79 | 4.784 | 3.101 | 3.018 | 9.37 | 0.4633 | 0.02258 | 177.7 | 5.661 | 16.44 | manual |
+| 3 | 21.6 | 0.4339 | 9.37 | 8.227 | 96.9 | 4.757 | 3.305 | 3.226 | 9.666 | 0.4475 | 0.02187 | 177.7 | 5.48 | 16.71 | manual |
+| 4 | 21.85 | 0.4423 | 9.666 | 8.187 | 98.01 | 4.752 | 3.345 | 3.264 | 9.723 | 0.4449 | 0.02175 | 177.7 | 5.461 | 16.75 | manual |
+| 5 | 21.91 | 0.4438 | 9.723 | 8.183 | 98.24 | 4.751 | 3.353 | 3.273 | 9.735 | 0.4444 | 0.02172 | 177.7 | 5.458 | 16.76 | manual |
+| 6 | 21.92 | 0.4442 | 9.735 | 8.182 | 98.29 | 4.751 | 3.355 | 3.275 | 9.738 | 0.4443 | 0.02172 | 177.7 | 5.457 | 16.77 | manual |
+| 7 | 21.92 | 0.4442 | 9.738 | 8.182 | 98.3 | 4.751 | 3.355 | 3.275 | 9.738 | 0.4443 | 0.02171 | 177.7 | 5.457 | 16.77 | manual |
+| 8 | 21.92 | 0.4443 | 9.738 | 8.182 | 98.3 | 4.751 | 3.355 | 3.275 | 9.738 | 0.4443 | 0.02171 | 177.7 | 5.457 | 16.77 | manual |
+| 9 | 21.92 | 0.4443 | 9.738 | 8.182 | 98.3 | 4.751 | 3.355 | 3.275 | 9.738 | 0.4443 | 0.02171 | 177.7 | 5.457 | 16.77 | manual |
+| 10 | 21.92 | 0.4443 | 9.738 | 8.182 | 95.79 | 5.068 | 3.355 | 3.282 | 9.738 | 0.4443 | 0.02366 | 177.7 | 5.457 | 18 | lowfi |
+| 11 | 21.5 | 0.453 | 9.738 | 7.761 | 94.29 | 5.074 | 3.381 | 3.217 | 9.758 | 0.4539 | 0.02388 | 177.7 | 5.332 | 17.93 | lowfi |
+| 12 | 21.59 | 0.452 | 9.758 | 7.83 | 94.65 | 5.073 | 3.4 | 3.23 | 9.785 | 0.4533 | 0.02384 | 177.7 | 5.335 | 17.94 | lowfi |
+| 13 | 21.62 | 0.4526 | 9.785 | 7.832 | 94.77 | 5.072 | 3.405 | 3.234 | 9.792 | 0.453 | 0.02381 | 177.7 | 5.334 | 17.95 | lowfi |
+| 14 | 21.62 | 0.4529 | 9.792 | 7.83 | 94.8 | 5.072 | 3.406 | 3.235 | 9.794 | 0.4529 | 0.02382 | 177.7 | 5.334 | 17.95 | lowfi |
+| 15 | 21.63 | 0.4529 | 9.794 | 7.832 | 94.82 | 5.072 | 3.407 | 3.236 | 9.795 | 0.4529 | 0.02381 | 177.7 | 5.334 | 17.95 | lowfi |
+
+## 9. Sistemas e eletrónica (Fase 1E)
+
+- **Hélice**: D = 0.560 m (22.0 in), rpm máx ≈ 4169, rpm cruzeiro ≈ 3367 (J = 0.7), Mach de ponta 0.36 — limited by geometric D_max (0.560 m). Passo a escolher com dados de hélice (UIUC Propeller Data Site / APC) para o J de cruzeiro.
+- **Motor**: Kv alvo 170 rpm/V, P_eixo máx 1131 W, I máx 54.4 A @ 28.8 V → outrunner_50xx_200kv_class; **ESC** → esc_80a_12s_class
+- **Bateria**: 8S4P de `liion_pouch_high_energy_class` (li_ion), 80.0 Ah, 29.6 V nom., 2368 Wh, massa 10.37 kg (228 Wh/kg pack), C pico 0.73 (OK), dimensionada por energy. Massa atribuída no sizing: 7.83 kg.
+
+Servos (momentos de charneira a V_D):
+
+| superfície | S_c m² | c_c m | H N·m | binário req. N·m | servo | n |
+|---|---|---|---|---|---|---|
+| aileron (each) | 0.04568 | 0.07401 | 0.4646 | 0.6969 | servo_mini_8kgcm_class | 2 |
+| elevator | 0.07284 | 0.0815 | 0.8159 | 1.224 | servo_standard_20kgcm_class | 1 |
+| rudder | 0.04463 | 0.1058 | 0.6492 | 0.9737 | servo_standard_20kgcm_class | 1 |
+
+- **Autopiloto**: `cubepilot_cube_orange_plus` (IMU×3, baro×2, CAN×2, massa≈0.075 kg) — https://docs.cubepilot.org/user-guides/autopilot/the-cube-module-overview
+  - rejeitados: holybro_pixhawk_6c: IMU 2<3, baro 1<2; generic_f7_fc_class: IMU 1<3, baro 1<2, CAN 0<1
+
+Power budget:
+
+| load | bus | P_W | duty | P_avg_W | P_peak_W |
+|---|---|---|---|---|---|
+| autopilot cubepilot_cube_orange_plus | avionics | 2.5 | 1 | 2.5 | 2.5 |
+| GNSS + compass (x2) | avionics | 1.5 | 1 | 1.5 | 1.5 |
+| C2 datalink radio | avionics | 6 | 1 | 6 | 10 |
+| payload EO/IR gimbal | payload | 15 | 1 | 15 | 30 |
+| airspeed + ADS-B out | avionics | 2 | 1 | 2 | 2 |
+| servo aileron (each) x2 | servo | 2 | 1 | 2 | 25.2 |
+| servo elevator x1 | servo | 1 | 1 | 1 | 25.2 |
+| servo rudder x1 | servo | 1 | 1 | 1 | 25.2 |
+
+Média 31.0 W, pico 121.6 W; regulador aviónica ≥ 24.0 W, servos ≥ 113.4 W.
+
+Cablagem de potência (secção por corrente e queda de tensão):
+
+| fio | AWG | mm² | ΔV V | ΔV % | governado por |
+|---|---|---|---|---|---|
+| W1 | 6 | 13.3 | 0.06523 | 0.2265 | ampacity |
+| W2 | 6 | 13.3 | 0.06523 | 0.2265 | ampacity |
+| W3 | 22 | 0.3255 | 0.1177 | 2.353 | voltage drop |
+| W4 | 22 | 0.3255 | 0.1177 | 2.353 | voltage drop |
+| W5 | 12 | 3.309 | 0.1628 | 1.938 | voltage drop |
+| W6 | 12 | 3.309 | 0.1628 | 1.938 | voltage drop |
+
+Exportado: `harness.wireviz.yml` (WireViz), `harness.dot` (Graphviz), `netlist.csv`, `harness.net` (netlist KiCad, formato "E" — importar no Pcbnew).
+
+Massas de sistemas selecionados:
+
+| item | kg |
+|---|---|
+| motor(s) | 0.54 |
+| ESC(s) | 0.15 |
+| servo aileron (each) | 0.05 |
+| servo elevator | 0.06 |
+| servo rudder | 0.06 |
+| autopilot cubepilot_cube_orange_plus | 0.075 |
+| battery | 10.37 |
+
+Fecho massa/energia sistemas → sizing:
+
+| iter | W0 | We | systems_kg | battery_Wh_kg | pack_Wh_kg | systems_power_W | budget_W | battery_mass_alloc | battery_mass_sel |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 22 | 8.97 | 0.935 | 200 | 228.4 | 30 | 31 | 9.034 | 10.37 |
+| 2 | 21.63 | 9.794 | 0.935 | 228.4 | 228.4 | 31 | 31 | 7.832 | 10.37 |
+| 3 | 21.63 | 9.794 | 0.935 | 228.4 | 228.4 | 31 | 31 | 7.832 | 10.37 |
+
+### Checklist de normas (categoria: `easa_specific`, MTOW 21.6 kg, UAS, features: li_battery)
+
+> Orientação de primeira análise. A base de certificação é acordada com a autoridade; confirmar sempre a edição em vigor de cada documento.
+
+- [ ] **EU-2019/947-945** — Commission Implementing Reg. (EU) 2019/947 & Delegated Reg. (EU) 2019/945 — UAS operations & products (European Commission / EASA). <https://www.easa.europa.eu/en/domains/civil-drones>
+  - [ ] operational category (open/specific/certified)
+  - [ ] operator registration
+  - [ ] remote ID
+  - [ ] class marking
+- [ ] **EASA-SORA-2.5** — SORA 2.5 — AMC1 to Art. 11 of Reg. (EU) 2019/947 (ED Decision 2025/018/R, Sept 2025) (EASA (based on JARUS SORA v2.5, 2024)). <https://www.easa.europa.eu/en/document-library/agency-decisions/ed-decision-2025018r>
+  - [ ] ConOps
+  - [ ] intrinsic ground risk class
+  - [ ] air risk class
+  - [ ] SAIL
+  - [ ] operational safety objectives (OSO)
+  - [ ] containment
+- [ ] **EASA-SC-Light-UAS** — Special Condition Light-UAS Medium Risk (Issue 01, 2020) + FTB MoC SC Light-UAS (SAIL III and below) (EASA). <https://www.easa.europa.eu/en/special-condition-sc-light-uas-medium-risk>
+  - [ ] design verification
+  - [ ] flight test
+  - [ ] system safety
+  - [ ] C2 link
+  - [ ] software/AEH assurance proportional to SAIL
+- [ ] **ASTM-F3298-24** — ASTM F3298-24 Design and Construction of Lightweight UAS (fixed-wing) (ASTM F38.01). <https://www.astm.org/f3298-24.html>
+  - [ ] structure
+  - [ ] propulsion
+  - [ ] systems
+  - [ ] C2
+  - [ ] launch & recovery
+  - [ ] verification
+- [ ] **ASTM-F2910-22** — ASTM F2910-22 Design and Construction of a Small UAS (sUAS) (ASTM F38.01). <https://www.astm.org/f2910-22.html>
+  - [ ] sUAS design & construction baseline
+- [ ] **ASTM-F3002-22** — ASTM F3002-22 Design of the Command and Control System for sUAS (generally <= 25 kg) (ASTM F38.01). <https://www.astm.org/f3002-22.html>
+  - [ ] C2 link
+  - [ ] spectrum
+  - [ ] lost-link and fly-away functionality
+- [ ] **ASTM-F3005-22** — ASTM F3005-22 Batteries for Use in sUAS (ASTM F38.01). <https://www.astm.org/f3005-22.html>
+  - [ ] battery design
+  - [ ] BMS
+  - [ ] marking
+  - [ ] testing
+- [ ] **ASTM-F3201** — ASTM F3201 Ensuring Dependability of Software Used in UAS (ASTM F38.01). <https://www.astm.org/f3201-26.html>
+  - [ ] software development assurance proportional to risk
+- [ ] **UN-38.3** — UN Manual of Tests and Criteria, Part III, Sub-section 38.3 — Lithium batteries (transport) (UNECE). <https://unece.org/transport/dangerous-goods>
+  - [ ] altitude
+  - [ ] thermal
+  - [ ] vibration
+  - [ ] shock
+  - [ ] external short circuit
+  - [ ] impact
+  - [ ] overcharge tests; transport certification
+- [ ] **SAE-AS50881** — SAE AS50881 Wiring, Aerospace Vehicle (SAE). <https://www.sae.org/standards/content/as50881/>
+  - [ ] wire selection & derating
+  - [ ] voltage drop
+  - [ ] bundle routing
+  - [ ] separation
+  - [ ] protection
+  - [ ] identification
+- [ ] **IPC-WHMA-A-620** — IPC/WHMA-A-620 Requirements and Acceptance for Cable and Wire Harness Assemblies (IPC / WHMA). <https://www.ipc.org>
+  - [ ] crimping
+  - [ ] soldering
+  - [ ] splices
+  - [ ] connectors
+  - [ ] workmanship classes 1–3 (use class 3 for flight-critical)
+- [ ] **RTCA-DO-160G** — RTCA DO-160G Environmental Conditions and Test Procedures for Airborne Equipment (EUROCAE ED-14G) (RTCA / EUROCAE). <https://www.rtca.org>
+  - [ ] temperature/altitude
+  - [ ] vibration
+  - [ ] EMC (Sect. 20/21)
+  - [ ] lightning
+  - [ ] power input (Sect. 16)
+- [ ] **RTCA-DO-178C** — RTCA DO-178C / ED-12C Software Considerations in Airborne Systems (awareness; DAL per safety assessment) (RTCA / EUROCAE). <https://www.rtca.org>
+  - [ ] software development assurance; SC Light-UAS / SORA high-SAIL may require equivalent evidence
+- [ ] **RTCA-DO-254** — RTCA DO-254 / ED-80 Design Assurance for Airborne Electronic Hardware (awareness) (RTCA / EUROCAE). <https://www.rtca.org>
+  - [ ] complex electronic hardware (FPGA/ASIC) assurance
+
+
+## 10. Aerodinâmica de baixa fidelidade (Fase 2: XFOIL + AVL)
+
+![lowfi](lowfi_polar.png)
+
+- Perfil: XFOIL 6.99 (Ncrit 9, xtr ≤ 0.30); Re de cruzeiro 4.96e+05, cm0 = -0.0977
+- clmax do perfil (Re de perda 3.37e+05) = 1.445 → CLmax limpo 1.300 (Raymer Eq. 12.15)
+- Carga em envergadura: AVL 3.40 (VLM), 2 ângulos; e_inv = 0.977, fator de fuselagem (Kroo) 0.9922
+- CDp da asa (integração em faixas, CL = 0.5) = 0.00995 vs termo do manual 0.00806
+- **Polar usada no ciclo: CD0 = 0.02381, K = 0.03259 (e = 0.937)**
+
+- perfil NACA 4412: Re cruzeiro 4.96e+05 (xtr = 0.30), clmax a Re_stall 3.37e+05 (transição livre, Ncrit 9)
+
+### Comparação AVL / baixa fidelidade vs métodos de manual
+
+| grandeza | manual | AVL / baixa fid. | método manual | nota |
+|---|---|---|---|---|
+| CLα asa [/rad] | 4.888 | 5.451 | DATCOM / Raymer Eq. 12.6 | AVL: avião completo (asa + cauda), sem fuselagem |
+| CDi a CL = 0.635 | 0.01653 | 0.0127 | Oswald Raymer e = 0.746 | AVL e (Trefftz) = 0.971; Oswald inclui arrasto viscoso dependente de CL |
+| x̄_NP [MAC] | 0.4499 | 0.4853 | Raymer Eq. 16.9 + Torenbeek (fuselagem) | sem fuselagem: 0.475 (AVL não modela a fuselagem) |
+| CLδe [/rad] | 0.3913 | 0.4584 | Nelson Ch. 2/5 (τ: Raymer Fig. 16.7 / DATCOM) |  |
+| Cmδe [/rad] | -1.122 | -1.21 | Nelson Ch. 2/5 (τ: Raymer Fig. 16.7 / DATCOM) | AVL: Cmδe no CG traseiro; Cnδr com convenção de sinal AVL |
+| |Clδa| [/rad] | 0.3573 | 0.2586 | Nelson Ch. 2/5 (τ: Raymer Fig. 16.7 / DATCOM) |  |
+| Cnδr [/rad] | -0.06125 | 0.05844 | Nelson Ch. 2/5 (τ: Raymer Fig. 16.7 / DATCOM) | AVL: Cmδe no CG traseiro; Cnδr com convenção de sinal AVL |
+| CD0 (polar ajustada) | 0.02185 | 0.02381 | Raymer Eq. 12.24 | perfil XFOIL 6.99 (Ncrit 9, xtr ≤ 0.30); ajuste rms 2.7e-04 |
+| e efetivo | 0.7456 | 0.937 | Raymer Eq. 12.49 | baixa fid.: AVL e_inv × Kroo (fuselagem) + cd(cl) do perfil |
+| cl_max do perfil | 1.45 | 1.445 | pressuposto do utilizador | XFOIL/NeuralFoil a Re = 3.37e+05 |
+
+## 11. Estruturas: V-n, cargas na asa e caixão (Fase 2)
+
+![V-n](vn_diagram.png)
+
+| grandeza | valor |
+|---|---|
+| regulation | stanag_4671 |
+| category | utility |
+| VS1_EAS_m_s | 14.94 |
+| VA_EAS_m_s | 21.37 |
+| VC_EAS_m_s | 21.37 |
+| VD_EAS_m_s | 26.71 |
+| n_manoeuvre_pos | 4.4 |
+| n_manoeuvre_neg | -1.76 |
+| n_gust_VC | 5.072 / -3.072 |
+| n_gust_VD | 3.545 / -1.545 |
+| mu_g | 16.72 |
+| Kg | 0.6682 |
+| n_limit_pos | 5.072 |
+| n_limit_neg | -3.072 |
+| governing | rajada |
+| n_ultimate | 7.608 |
+
+Cláusulas aplicadas: USAR.333 (envelope); USAR.335(a)(1) VC from operating requirements; USAR.335(b)(1) VD ≥ 1.25 VC; USAR.335(c) VA ≥ VS√n; USAR.337; USAR.341 / USAR.333(c); USAR.303 FS = 1.5
+
+- ⚠️ n_lim = 5.07 está acima da linha de perda mesmo a VD (n = 3.20 com CLmax quase-estático): valor CONSERVATIVO mantido (a perda dinâmica numa rajada pode excedê-lo); VC baixo face a VS1 — rever VC/CLmax antes de dimensionar
+
+Condição crítica de dimensionamento: n = 5.07 (rajada), q a VD = 26.7 m/s EAS.
+
+![loads](wing_loads.png)
+
+Raiz (limite): V = 453.0 N, M = 349.9 N·m, T = 7.9 N·m.
+
+![box](wing_box.png)
+
+| parcela | massa [kg] |
+|---|---|
+| caps | 0.1098 |
+| box_skins | 1.341 |
+| core | 0.1632 |
+| webs | 0.08731 |
+| web_uprights | 0 |
+| LE_TE_skins | 0.8494 |
+| ribs | 0.03775 |
+| ideal | 2.589 |
+| nonoptimum | 0.6472 |
+| total | 3.236 |
+
+Cross-check da massa da asa:
+
+| método | massa da asa [kg] |
+|---|---|
+| Raymer Eq. 15.46 (estatístico) | 3.407 |
+| caixão Megson/Bruhn, carga Schrenk (CFRP (UD caps / ±45 fabric — ASSUMPTION)) | 3.236 |
+| caixão Megson/Bruhn, carga AVL | 3.231 |
+
+- Revestimentos em sanduíche: núcleo PVC/PMI foam (ASSUMPTION) ρ = 75 kg/m³, E_c = 70 MPa, G_c = 30 MPa (PRESSUPOSTO); núcleo na raiz 2.0 mm, máx. 2.0 mm; interação R_c + R_s² ≤ 1 (Bruhn C5)
+- Enrugamento das faces σ_wr = 0.5 (E_f E_c G_c)^(1/3) = 251 MPa (Hoff & Mautner) → OK
+- Almas: núcleo sanduíche onde τ > τ_cr (máx. 2.0 mm)
+- allowables are ASSUMPTIONS (knock-down for environment/damage)
+- 20 nervuras (passo 0.21 m)
+- fator não-ótimo 1.25 (PRESSUPOSTO)
+- superfícies de comando, flaps e carenagens NÃO incluídos (secundários)
+- Eixo elástico = centro de corte da secção real (Megson, multicélula, com bordo de ataque D): x_sc/c raiz 0.339 (meio do caixão 0.425); EI/GJ da secção idealizada no contorno do perfil
+
+### Viga L1: fuselagem, empenagens e torção elástica
+
+Fuselagem 1.7 kg, Raymer Eq. 15.49 1.2 kg (razão 1.50). Estabilizador 0.2 kg, deriva 0.2 kg. CG estrutural 0.7864359709000409 m (não move as estações Roskam do peso e centragem).
+Deflexão da cauda no caso limite 0.1 mm; torção da deriva 0.008°.
+Correção elástica de cruzeiro: aplicada = não; K_flex/K_rígido = 0.9997; torção de ponta -0.022°; CLα flexível 4.979 /rad. O CLα de manual do resultado mantém-se.
+- Fuselagem: casca circular não reforçada, γ de NASA SP-8007 (1968) na encurvadura clássica 0,605 E t/R (Timoshenko & Gere, ν = 0,3). Longarinas só com área mínima (o momento já está no revestimento).
+- Piso 0.45 L × 0.75 D, duas anteparas π R² à espessura mínima (Torenbeek 1982 App. D lista estes itens; a espessura é a mínima do material — PRESSUPOSTO). Fator não-ótimo 1.25 só em revestimento + longarinas + cavernas.
+- Envelope de manobra: sustentação atingível do estabilizador a VA (Raymer 12.15), equilíbrio + 23.423(b), inércia do motor e aterragem (23.473). 23.427 (rajada) e 23.441 (leme) não estão modelados. Torção assimétrica do estabilizador omitida.
+- Estação da asa neste fecho: x = 0.72 m (centro aerodinâmico: ápice colocado pela estabilidade + quarto da corda média).
+- γ de SP-8007 é uma correlação de cilindros de alumínio. Em CFRP entra como PRESSUPOSTO conservativo, não como ensaio do laminado.
+- Empenagens: caixão de duas longarinas (Megson), carga em envergadura uniforme — PRESSUPOSTO, M_raiz = L b/8 por semienvergadura, mais pesado em flexão do que uma elipse. c_lmax de secção 1 (estabilizador) e 0.8 (deriva), não o da asa; CLmax pela Eq. 12.15 de Raymer.
+- k_EI e k_GJ multiplicam EI e GJ da asa (razão viga/BoxFEM). A fuselagem não os usa.
+- Massa da fuselagem L1 / Raymer Eq. 15.49 = 1.50. A regressão de Raymer inclui portas, janelas e suportes que esta casca não tem.
+
+## 12. Estabilidade e controlo (Fase 2: Raymer Cap. 16, Etkin & Reid, Nelson)
+
+![cg](cg_envelope.png)
+
+- asa posicionada para SM = 10% no CG mais recuado (ápice a 34.3% L); ápice da asa a x = 0.618 m
+- Ponto neutro x̄_NP = 0.450 MAC (manual), 0.485 (AVL); dε/dα = 0.299
+- **Margem estática: 10.0 % (CG dianteiro) … 10.0 % (CG traseiro)**
+- AVL, cruzeiro compensado no CG traseiro: α = 3.21°, δe = -2.91°, Cnβ = 0.0672, Clβ = -0.0771, Cmq = -10.69
+- Coef. de volume: V_h = 0.500, V_v = 0.0300 (Raymer Table 6.4: - / -)
+
+| caso | massa [kg] | x_cg [m] | x̄_cg [MAC] | SM |
+|---|---|---|---|---|
+| vazio + bateria | 17.63 | 0.7582 | 0.3499 | 0.1 |
+| MTOW | 21.63 | 0.7582 | 0.3499 | 0.1 |
+
+Compensação (trim) no CG dianteiro:
+
+| condição | CL | δe [°] | ok (|δe| ≤ máx.) |
+|---|---|---|---|
+| CLmax limpo (CG dianteiro) | 1.3 | -10.83 | True |
+| cruzeiro (CG dianteiro) | 0.6354 | -7.43 | True |
+
+- Clδa comparado em módulo (convenções de sinal do aileron diferem entre AVL e Nelson).
+- Estações de estrutura: PRESSUPOSTOS (Roskam Part V Table 8.1, valores típicos). Tripulação, carga e bateria, se a missão não as der, ficam no CG da massa fixa (Raymer 2018 Sec. 15.1: a estação que não desloca o balanço). Um UAV sem massa de tripulação não leva tripulação. O combustível de asa fica a 30 % da CMA. Substituir em assumptions.stability.stations.
+
+## 12a. Peso e centragem operacional e trem de aterragem
+
+Peso e centragem (Raymer 2018 Sec. 15.1; Roskam Parte II Cap. 10). Os limites, quando não são dados no ficheiro, são os conceptuais: margem estática alvo atrás e, à frente, o mais à ré entre o trim no CLmax limpo e o flare com flaps.
+
+![carregamento](wb_loading.png)
+
+Todos os 3 carregamentos dentro dos limites conceptuais; extremos 0.758 m (vazio, 18 kg) e 0.758 m (vazio, 18 kg).
+
+| carregamento | massa [kg] | x_cg [m] | x̄ [% CMA] |
+|---|---|---|---|
+| vazio | 17.63 | 0.7582 | 34.99 |
+| payload | 21.63 | 0.7582 | 34.99 |
+| payload | 21.63 | 0.7582 | 34.99 |
+
+Limites a W0: dianteiro 0.7479134609354364 m, traseiro 0.7581803511100906 m.
+
+- Limite dianteiro conceptual: dimensiona «flare com flaps» a 0.748 m. Casos: limpo a 0.684 m (CL 1.30, Cm0 -0.0819), flare com flaps a 0.748 m (CL 1.71, Cm0 -0.2732). Nelson 1998 Cap. 2, |δe| = 25°. Cm0 da asa = -0.0819 (Raymer Eq. 16.13, cm0 do perfil) Cm0,f = -0.0212 entra no flare (Multhopp, Nelson 1998 Cap. 2; k2−k1 da tabela de Lamb em Tuckerman, NACA Report 139; α0 = -3.98°. Largura constante igual a D e i_f = 0, PRESSUPOSTO — fuselagem de revolução, Torenbeek App. F, sem segmentar nariz e cauda) ΔCm do flap = -0.1700 entra no flare (Glauert 1926, b_C·δ·S_f/S; δ = 30° (PRESSUPOSTO, omissão de flightsim/controls.py — substituir em assumptions.aero.flap.landing_deg); c_f/c = 0.25 (PRESSUPOSTO, omissão de flightsim/controls.py — substituir em assumptions.aero.flap.cf_c); S_f/S = 0.500; corda da parte com flap igual à CMA, PRESSUPOSTO). Efeito de solo no flare: CLα da cauda × 1.010 (φ = 0.969 = 1 − exp[−2.48 (2h/b)^0.768], Torenbeek 1982, citado por Phillips e Hunsaker, Journal of Aircraft, Vol. 50, No. 4, 2013, Eq. (4); h/b = 0.778, h = 0.710 m, trem + 0.5 D, omissão 0.60 m (PRESSUPOSTO, weights_detailed.DEFAULT_MAIN_GEAR_LENGTH_M); PRESSUPOSTO: o centro aerodinâmico da cauda está à altura do eixo da fuselagem). 1/CLα = 1/a0 + φ/(π AR), a0 = 0.95·2π, e = 1 (PRESSUPOSTO). O quociente multiplica o CLα livre e não substitui o declive de Helmbold. O CLmax não aumenta e o dε/dα do ponto neutro não é reduzido: essa redução é a penalização de rotação, não um alívio do flare. Na tesoura, φ repete-se em cada S_h/S porque a envergadura muda com a área. O flare fica em efeito de solo só neste declive. O fator de Hoerner e Borst não é usado como CLα.
+- Limite traseiro conceptual: ponto neutro menos a margem estática alvo (Raymer Cap. 16).
+- Estações de CG: as da estabilidade. Estrutura: Roskam Parte V, Tabela 8.1 (PRESSUPOSTO). Tripulação, carga e bateria, se a missão não as der, ficam no CG da massa fixa (Raymer 2018 Sec. 15.1); combustível de asa a 30 % da CMA. Substituir em assumptions.stability.stations, weight_balance.loading ou extra_items. O combustível arde na estação do tanque; não há combustível inutilizável separado.
+- A tripulação, quando existe, vai em todos os carregamentos.
+
+**Trem (none).** sem trem
+
+sem trem; 14 CFR 23.473 não aplicado
+
+- Sem trem de aterragem (landing_gear: none) — lançamento e recuperação ficam por analisar.
+
+## 13. Desempenho por segmentos (Fase 2: Raymer Cap. 17, Anderson)
+
+Orçamento utilizável: E_nom 1789 Wh × DoD 0.85 / (1 + reserva 0.2).
+
+Missão requerida (segmentos):
+
+| segmento | t [min] | dist [km] | consumo [Wh] | h [m] | V [m/s] | nota |
+|---|---|---|---|---|---|---|
+| descolagem | 1 | 0 | 16.72 | 0→0 | 0 | 1 min potência de descolagem (PRESSUPOSTO) |
+| subida (V_y) | 3.348 | 3.6 | 78.09 | 0→600 | 18.17 | potência de subida, integrado (V médio) |
+| espera (loiter) | 150 | 198 | 1172 | 600→600 | 22 |  |
+| descida (L/D máx, ralenti) + aterragem | 9.602 | 10.77 | 0 | 600→0 | 18.69 | planado, energia ≈ 0 |
+
+Missão até esgotar o orçamento: **alcance 212.4 km, endurance 2.73 h**.
+
+| segmento | t [min] | dist [km] | consumo [Wh] | h [m] | V [m/s] | nota |
+|---|---|---|---|---|---|---|
+| descolagem | 1 | 0 | 16.72 | 0→0 | 0 | 1 min potência de descolagem (PRESSUPOSTO) |
+| subida (V_y) | 3.348 | 3.6 | 78.09 | 0→600 | 18.17 | potência de subida, integrado (V médio) |
+| espera (loiter) | 150 | 198 | 1172 | 600→600 | 22 | estendido até esgotar o orçamento |
+| descida (L/D máx, ralenti) + aterragem | 9.602 | 10.77 | 0 | 600→0 | 18.69 | planado, energia ≈ 0 |
+
+Requisitos vs desempenho por segmentos:
+
+| requisito | grandeza | obtido | requerido | unidade | ok |
+|---|---|---|---|---|---|
+| endurance | tempo em espera (segmentos) | 2.5 | 2.5 | h | ✅ |
+| service_ceiling | teto de serviço (Anderson) > 9000 m (não atingido) | 9000 | 3000 | m | ✅ |
+| climb_rate | ROC máx. ao nível do mar | 3 | 3 | m/s | ✅ |
+
+![payload-range](payload_range.png)
+
+| ponto | payload_kg | massa_kg | range_km | endurance_h |
+|---|---|---|---|---|
+| O | 4 | 21.63 | 0 | 0 |
+| A | 4 | 21.63 | 212.4 | 2.733 |
+| B (projeto) | 4 | 21.63 | 212.4 | 2.733 |
+| D (sem payload) | 0 | 17.63 | 239.8 | 3.097 |
+
+Nota: elétrico: massa de bateria fixa; menos payload → menor massa → mais alcance.
+
+![climb](climb_ceiling.png)
+
+- ROC máx. ao nível do mar 3.00 m/s; teto de serviço > 9000 m; teto absoluto > 9000 m
+- Descolagem (Raymer 17.8): corrida 62 m, total sobre 15 m 210 m (V_TO 16.0 m/s)
+- Aterragem (Raymer 17.9): corrida 79 m, total sobre 15 m 373 m (μ_travagem 0.4; aproximação γ = 3° — `performance.approach_angle_deg`, por omissão o máximo de 5.2 % / 3° de CS/14 CFR 23.75(a)(1))
+
+- Os resultados de segmentos usam a mesma polar e reservas do dimensionamento; diferenças face aos requisitos vêm da subida/descida integradas vs. frações históricas (Raymer Table 3.2).
+
+## 14. Caixão da asa dimensionado à estabilidade (Fase 3: Bruhn C5/C7/C11, Farrar, Kuhn)
+
+| caixão | massa [kg] | / Raymer 15.46 |
+|---|---|---|
+| resistência (Fase 2, limite inferior) | 3.032 | 0.8899 |
+| encurvadura (Fase 3, CFRP (UD caps / ±45 fabric — ASSUMPTION)) | 3.236 | 0.9498 |
+| Raymer Eq. 15.46 (asa completa, estatístico) | 3.407 | 1 |
+
+Parcelas (caixão de encurvadura):
+
+| parcela | massa [kg] |
+|---|---|
+| caps | 0.1098 |
+| box_skins | 1.341 |
+| core | 0.1632 |
+| webs | 0.08731 |
+| web_uprights | 0 |
+| LE_TE_skins | 0.8494 |
+| ribs | 0.03775 |
+| ideal | 2.589 |
+| nonoptimum | 0.6472 |
+| total | 3.236 |
+
+- Almas Kuhn: fator de tração diagonal k máx. 0.000 (k = 0: alma resistente ao corte, sem tração diagonal)
+- Revestimentos em sanduíche: núcleo PVC/PMI foam (ASSUMPTION) ρ = 75 kg/m³, E_c = 70 MPa, G_c = 30 MPa (PRESSUPOSTO); núcleo na raiz 2.0 mm, máx. 2.0 mm; interação R_c + R_s² ≤ 1 (Bruhn C5)
+- Enrugamento das faces σ_wr = 0.5 (E_f E_c G_c)^(1/3) = 251 MPa (Hoff & Mautner) → OK
+- Almas: núcleo sanduíche onde τ > τ_cr (máx. 2.0 mm)
+- allowables are ASSUMPTIONS (knock-down for environment/damage)
+- 20 nervuras (passo 0.21 m)
+- fator não-ótimo 1.25 (PRESSUPOSTO)
+- superfícies de comando, flaps e carenagens NÃO incluídos (secundários)
+- Eixo elástico = centro de corte da secção real (Megson, multicélula, com bordo de ataque D): x_sc/c raiz 0.339 (meio do caixão 0.425); EI/GJ da secção idealizada no contorno do perfil
+
+## 15. Aeroelasticidade clássica (Fase 3)
+
+V_D = 26.7 m/s EAS.
+
+| fenómeno | V [m/s EAS] | requerido 1.2 V_D | margem | ok | método |
+|---|---|---|---|---|---|
+| divergência torsional | 357.1 | 32.06 | +1014 % | ✅ | W&C 8.3 / Bisplinghoff 8-2 (faixas + FE) |
+| inversão do aileron | n/a | 32.06 | sem ocorrência | ✅ | W&C 8.4, Glauert (flap 2D) |
+| flutter binário (flexão–torção) | n/a | 32.06 | sem ocorrência | ✅ | W&C 11 (modos assumidos, quase-estacionário) |
+
+- Frequências desacopladas: flexão 18.3 Hz, torção 107 Hz; flutter a n/a Hz
+- AEER-45 (fator de flexibilidade torsional da asa): F = 8.589e-04 vs F_max = 200/V_D² = 5.601e-02 → OK
+
+![flutter](flutter_vg.png)
+
+### Acoplamento aero-estrutural estático (OpenAeroStruct, VLM + caixão)
+
+| ponto | modelo | α [°] | CL | CDi | CLα [/rad] | flecha ponta [m] | torção ponta [°] |
+|---|---|---|---|---|---|---|---|
+| cruise | rígido | 7.176 | 0.6354 | 0.01202 | 5.047 | 6.605e-07 | 4.04e-06 |
+| cruise | flexível | 7.152 | 0.6354 | 0.01203 | 5.066 | 0.006613 | 0.04044 |
+| manobra (n_lim, V_D EAS, nível do mar) | rígido | 23.9 | 2.062 | 0.1261 | 4.669 | 3.155e-06 | 1.916e-05 |
+| manobra (n_lim, V_D EAS, nível do mar) | flexível | 23.71 | 2.062 | 0.1263 | 4.73 | 0.03163 | 0.192 |
+
+- Efeito da forma deformada no arrasto induzido de cruzeiro: K_flex/K = 1.0003
+- Missão por segmentos: rígido 212.4 km / 2.733 h → flexível 212.1 km / 2.730 h (comparação com o resultado desacoplado da Fase 2)
+- ponto de manobra: CL = 2.06 > CLmax limpo 1.30 (n_lim de rajada acima da linha de perda) — caso de carga válido para a deformação (VLM linear), α não físico
+- OpenAeroStruct VLM (sem viscoso/onda: só arrasto induzido) + FEM de caixão 'wingbox' acoplados por NLBGS; rígido = E, G × 10⁴
+- secção do caixão: NACA-4 entre longarinas; espessuras de alma/revestimento do caixão acdt (5 pontos de controlo); revestimento único equivalente que reproduz EI(y) do caixão acdt e G ajustado para GJ (PRESSUPOSTO)
+- sem alívio de peso estrutural nem de combustível na asa (conservativo para a deformação)
+- índice de falha OAS (von Mises/KS, σ_adm = σ_cap/1.5) na manobra: -0.537 (< 0 = OK) — critério de resistência do OAS sobre o revestimento equivalente — INDICATIVO (o dimensionamento é o do caixão acdt)
+- massa da asa 3.41 kg distribuída ∝ corda; CG da secção a 0.50 c; eixo elástico a 0.339 c (centro de corte da secção, média), e = 0.089 c atrás do c.a.; a_w = 6.283/rad (2D, teoria das faixas — sem correção 3D/compressibilidade)
+- encastramento na parede da fuselagem y0 = 0.110 m; EI/GJ do caixão buckling
+- requisito: livre de flutter/divergência/inversão até 1.2 V_D = 32.1 m/s EAS (14 CFR 23.629(c) legado; CS/14 CFR 23.2245 'suficientemente além'; STANAG 4671 USAR.629 — verificar)
+- flutter: modelo binário de modos assumidos (W&C Cap. 11), aerodinâmica quase-estacionária — ESTIMATIVA; a análise racional exige modos FEM + DLM (Fase 4)
+- UAV (STANAG 4671): AEER-45 é um critério FAA para aviação geral — informativo
+
+## 16. Diagrama de tesoura, modos dinâmicos e qualidades de voo (Fase 3)
+
+![scissor](scissor.png)
+
+- S_h/S atual 0.174; requerido 0.174 (estabilidade 0.174, controlo 0.107; dimensionante: estabilidade) → ✅ (Torenbeek Cap. 9)
+- linha de controlo: o x̄ mais à ré entre o CLmax limpo 1.30 (Cm0 asa -0.0819) e o flare com flaps (CLmax aterragem 1.71, Cm0 -0.2732), δe = −25°, τ_e = 0.661. Cm0 da asa = -0.0819 (Raymer Eq. 16.13, cm0 do perfil) Cm0,f = -0.0212 entra no flare (Multhopp, Nelson 1998 Cap. 2; k2−k1 da tabela de Lamb em Tuckerman, NACA Report 139; α0 = -3.98°. Largura constante igual a D e i_f = 0, PRESSUPOSTO — fuselagem de revolução, Torenbeek App. F, sem segmentar nariz e cauda) ΔCm do flap = -0.1700 entra no flare (Glauert 1926, b_C·δ·S_f/S; δ = 30° (PRESSUPOSTO, omissão de flightsim/controls.py — substituir em assumptions.aero.flap.landing_deg); c_f/c = 0.25 (PRESSUPOSTO, omissão de flightsim/controls.py — substituir em assumptions.aero.flap.cf_c); S_f/S = 0.500; corda da parte com flap igual à CMA, PRESSUPOSTO). Efeito de solo no flare: CLα da cauda × 1.010 (φ = 0.969 = 1 − exp[−2.48 (2h/b)^0.768], Torenbeek 1982, citado por Phillips e Hunsaker, Journal of Aircraft, Vol. 50, No. 4, 2013, Eq. (4); h/b = 0.778, h = 0.710 m, trem + 0.5 D, omissão 0.60 m (PRESSUPOSTO, weights_detailed.DEFAULT_MAIN_GEAR_LENGTH_M); PRESSUPOSTO: o centro aerodinâmico da cauda está à altura do eixo da fuselagem). 1/CLα = 1/a0 + φ/(π AR), a0 = 0.95·2π, e = 1 (PRESSUPOSTO). O quociente multiplica o CLα livre e não substitui o declive de Helmbold. O CLmax não aumenta e o dε/dα do ponto neutro não é reduzido: essa redução é a penalização de rotação, não um alívio do flare. Na tesoura, φ repete-se em cada S_h/S porque a envergadura muda com a área. O flare fica em efeito de solo só neste declive. O fator de Hoerner e Borst não é usado como CLα.
+- massa da cauda não realimentada (posição da asa e braço fixos)
+- gama de CG: a mesma do trim (extremos dos casos de carregamento)
+
+![modes](root_locus.png)
+
+| modo | ωn [rad/s] | ζ | período [s] | τ / T [s] |
+|---|---|---|---|---|
+| período curto | 8.676 | 0.7636 | 1.122 | - |
+| fugóide | 0.4991 | 0.07048 | 12.62 | - |
+| rolamento holandês | 4.06 | 0.1965 | 1.578 | - |
+| rolamento (constante de tempo) | - | - | - | 0.06023 |
+| espiral instável | - | - | - | 13.08 |
+
+- n/α = 8.35 g/rad, CAP = 9.02 1/(g s²)
+- Inércias (Roskam V, soma por componentes): Ixx 3.13, Iyy 1.3, Izz 4.4 kg·m²
+- derivadas de taxa e laterais: AVL (sem fuselagem) + Cnβ da fuselagem (Raymer 16.47) -0.0178
+- Cmα = −CLα·SM no CG de MTOW (ponto neutro de manual com fuselagem)
+- inércias por soma de componentes (Roskam Parte V) — PRESSUPOSTOS de estações
+
+Qualidades de voo — MIL-F-8785C, Classe I, categoria B (nível exigido 1):
+
+| modo | valor | nível | limite N1 | ref |
+|---|---|---|---|---|
+| período curto ζ | 0.7636 | 1 | 0.30–2.00 | MIL-F-8785C Table IV |
+| CAP = ω²/(n/α) [1/(g s²)] | 9.017 | 2 | 0.085–3.6 | MIL-F-8785C Figs. 1–3 |
+| fugóide ζ | 0.07048 | 1 | ≥ 0.04 | MIL-F-8785C 3.2.1.2 |
+| rolamento holandês ζ / ζω / ω | 0.196 / 0.798 / 4.06 | 1 | 0.08 / 0.15 / 0.4 | MIL-F-8785C Table VI |
+| rolamento τ_R [s] | 0.06023 | 1 | ≤ 1.4 | MIL-F-8785C Table VII |
+| espiral T2 [s] (∞ = estável) | 13.08 | 2 | ≥ 20 | MIL-F-8785C Table VIII |
+
+
+## Pressupostos usados
+
+```yaml
+weights:
+  method: components
+  initial_class: uav_small
+  fixed_fraction: null
+  A: null
+  C: null
+  tech_factor: 1.0
+  Kvs: 1.0
+  fixed_mass_kg: 0.0
+  components:
+    material: composite
+    structural_category: utility
+    landing_gear: none
+    min_areal_density_kg_m2: 0.9
+    propeller_mass_kg: 0.08
+    items:
+    - name: paraquedas de recuperação + ejetor
+      mass_kg: 1.0
+    - name: suporte/amortecimento do gimbal
+      mass_kg: 0.3
+    - name: datalink C2 + antenas
+      mass_kg: 0.25
+      group: equipment
+    - name: GNSS + bússola (x2)
+      mass_kg: 0.1
+      group: equipment
+    - name: pitot/ADS-B
+      mass_kg: 0.1
+      group: equipment
+    - name: cablagem de sinal + conectores
+      mass_kg: 0.3
+      group: equipment
+    - name: ferragens/fixações/pintura
+      mass_kg: 0.4
+    growth_allowance: 0.1
+aero:
+  AR: 10.4247
+  taper: 0.6
+  sweep_c4_deg: 0.0
+  tc_root: 0.13
+  tc_tip: 0.11
+  xc_max_t: 0.3
+  airfoil: NACA 4412
+  clmax_airfoil: 1.45
+  flap:
+    kind: plain
+    flapped_area_ratio: 0.5
+  oswald: null
+  cfe: 0.0055
+  swet_sref: 3.5
+  laminar:
+    wing: 0.3
+    htail: 0.3
+    vtail: 0.3
+    fuselage: 0.1
+  roughness: smooth_molded_composite
+  Q: {}
+  lp_fraction: 0.05
+  extra_drag_areas_m2:
+    gimbal_eo_ir: 0.006
+    antennas_pitot: 0.002
+  CL_ground: 0.5
+  dCD0_takeoff: 0.01
+  mu_roll: 0.04
+  fidelity: lowfi
+  airfoil_solver: xfoil
+propulsion:
+  eta_cruise: 0.8
+  eta_climb: 0.75
+  eta_takeoff: 0.55
+  bsfc_lb_hp_h: null
+  tsfc_1_h: 0.5
+  battery_Wh_kg: 228.39506172839506
+  eta_total: 0.62
+  dod: 0.85
+  energy_reserve: 0.2
+  systems_power_W: 31.0
+  n_engines: 1
+  propeller: null
+geometry:
+  fuselage_length_m: 1.8
+  fuselage_diameter_m: 0.22
+  fuselage_fineness: 7.0
+  fuselage_class: null
+  tail_class: null
+  c_ht: 0.5
+  c_vt: 0.03
+  tail_arm_fraction: 0.55
+  ar_h: 4.0
+  ar_v: 1.5
+  dihedral_deg: null
+  configuration: conventional
+  tail_dihedral_deg: null
+  boom_span_fraction: 0.35
+  pod_length_fraction: 0.55
+  boom_width_m: null
+  taper_v: 0.5
+constraints:
+  cruise_weight_fraction: 1.0
+  landing_weight_fraction: 1.0
+  approach_distance_ft: 600.0
+  margin: 0.0
+  ws_initial_psf: 6
+  ws_min: 50.0
+  ws_max: 3000.0
+  default_cruise_altitude_m: 0.0
+  ws_fixed: 177.74233342681697
+  value_fixed: null
+  criterion: fixed_ws
+mda:
+  max_iter: 30
+  tol: 1.0e-05
+  tol_lowfi: 0.0002
+structures:
+  regulation: auto
+  load_factor_from_vn: true
+  material: auto
+  nonoptimum_factor: 1.25
+  VH_eas_m_s: null
+  elastic_axis: section
+  le_cell: true
+  flex: false
+  mass_in_loop: false
+  wingbox:
+    hold_section: false
+stability:
+  target_static_margin: 0.1
+  wing_apex_x_fraction: null
+  stations: {}
+  inertia_method: components
+  roskam_reference: null
+  radii_of_gyration: null
+  elevator_max_deg: 25.0
+  use_avl: true
+  dynamics: true
+  hq_category: B
+  hq_required_level: 1
+performance:
+  fuel_capacity_kg: null
+  max_payload_kg: null
+  mu_brake: 0.4
+  approach_angle_deg: 3.0
+aeroelasticity:
+  enabled: true
+  a_w: 6.283185307179586
+  x_cg_chord: null
+  margin_factor: 1.2
+  static_aerostructural: true
+mdo:
+  objective: null
+  solver: nlbgs
+  trust_region_iterations: 8
+  trust_region_radius: 0.3
+  design_vars:
+  - ws
+  - AR
+  AR_bounds:
+  - 5.0
+  - 16.0
+  ws_bounds_factor:
+  - 0.6
+  - 1.4
+  pw_bounds_factor:
+  - 0.6
+  - 1.6
+  maxiter: 60
+  tol: 1.0e-06
+  hq_aeroel_constraints: false
+  hq_aeroel_keys: null
+cost: {}
+calibration:
+  file: null
+  apply: []
+  factors: {}
+weight_balance:
+  crew_optional: false
+  extra_items: []
+  x_forward_m: null
+  x_aft_m: null
+  forward_limit: null
+  aft_limit: null
+  lemac_arm_in: null
+  mac_in: null
+landing_gear:
+  h_cg_m: null
+  tipback_deg: 15.0
+  overturn_max_deg: 63.0
+  nose_fraction_min: 0.08
+  nose_fraction_max: 0.15
+  wing_lift_fraction: 0.6666666666666666
+  absorber: oleo
+  eta: null
+  stroke_m: null
+  tire_stroke_m: 0.0
+  max_stroke_m: null
+  rotation_min_deg: 10.0
+  x_nose_m: null
+  x_main_m: null
+  x_tail_m: null
+  track_m: null
+  x_nose_min_m: 0.0
+  x_main_max_m: null
+launch_recovery: null
+```
+
+## Referências
+
+- Raymer, D. P., *Aircraft Design: A Conceptual Approach*, 6th ed., AIAA, 2018 (equation numbers as in the 6th ed.).
+- Roskam, J., *Airplane Design*, Parts I–VIII, DARcorporation.
+- Gudmundsson, S., *General Aviation Aircraft Design: Applied Methods and Procedures*, Elsevier, 2014.
+- Anderson, J. D., *Aircraft Performance and Design*, McGraw-Hill, 1999.
+- Torenbeek, E., *Synthesis of Subsonic Airplane Design*, Delft Univ. Press, 1982.
+- USAF Stability and Control DATCOM, 1978.
+- Hepperle, M., "Electric Flight – Potential and Limitations", NATO STO-MP-AVT-209, 2012.
+- Niu, M. C. Y., *Airframe Structural Design*, Conmilit, 1988.
+- Drela, M., "First-Order DC Electric Motor Model", MIT, 2007.
+- ISO 2533:1975 Standard Atmosphere.
+- Nicolai, L. M., Carichner, G. E., *Fundamentals of Aircraft and Airship Design*, Vol. I, AIAA, 2010 (Table 5.1, We = A·W0^B incl. UAV classes).
+- EASA CS-23 (Amdt. 4 and earlier) / 14 CFR 23.337 (pre-Amdt. 23-64): limit manoeuvring load factors.
+- IEC 60028:1925, International standard of resistance for copper (ρCu = 8890 kg/m³).
+- FAA Type Certificate Data Sheet 1E10 (Lycoming O-360/IO-360 series) — engine dry mass in the C172 check.
+- Drela, M., "XFOIL: An Analysis and Design System for Low Reynolds Number Airfoils", 1989; XFOIL 6.99 (GPL).
+- Drela, M., Youngren, H., AVL 3.40 (Athena Vortex Lattice), MIT, 2022 (GPL).
+- Sharpe, P., NeuralFoil, MIT, 2024 (fallback section polars).
+- Schrenk, O., "A Simple Approximation Method for Obtaining the Spanwise Lift Distribution", NACA TM 948, 1940.
+- Megson, T. H. G., *Aircraft Structures for Engineering Students*, 5th ed., 2013 (Ch. 16, 19–23).
+- Bruhn, E. F., *Analysis and Design of Flight Vehicle Structures*, 1973 (Ch. A3, C5, C11).
+- Etkin, B., Reid, L. D., *Dynamics of Flight: Stability and Control*, 3rd ed., Wiley, 1996.
+- Nelson, R. C., *Flight Stability and Automatic Control*, 2nd ed., McGraw-Hill, 1998.
+- Kroo, I., *Aircraft Design: Synthesis and Analysis*, Stanford (lift-dependent drag, fuselage span-efficiency factor).
+- EASA CS-23 Amdt. 4 / 14 CFR 23.333–23.341 (flight envelope, design speeds, gust loads); 14 CFR/CS 23.65 (climb speed).
+- NATO STANAG 4671 Ed. 1 (USAR), 2009: USAR.303, .333, .335, .337, .341.
+- Abbott, I. H., von Doenhoff, A. E., *Theory of Wing Sections*, Dover, 1959.

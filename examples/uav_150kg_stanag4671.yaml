@@ -1,0 +1,68 @@
+# Fase 10 — variante do Exemplo 5 com payload 38 kg para MTOW ≥ 150 kg → STANAG 4671 (USAR.1(a)).
+# Exemplo 5 — UAV a gasolina de asa fixa, classe ~150 kg (MALE/tático ligeiro)
+# Mistura de requisitos: ENDURANCE + PAYLOAD + pista. We/W0 inicial: Raymer 6th ed. Tab. 3.1
+# "UAV tactical recce & UCAV" (valor inicial e cross-check); o peso vazio final vem da estimativa por componentes.
+name: UAV gasolina ≥150 kg (STANAG 4671)
+description: >
+  UAV de asa fixa com motor a gasolina de 2 tempos e hélice propulsora, trem triciclo fixo,
+  descolagem/aterragem em pista. Payload EO/IR + SAR ligeiro. Valores ilustrativos.
+aircraft_class: uav_tactical_recce_ucav
+requirements:
+  propulsion_type: piston_prop
+  regulatory_category: easa_specific
+  payload_mass: {target: 38, unit: kg}           # +8 kg vs Exemplo 5 → MTOW ≥ 150 kg
+  endurance: {min: 10, unit: h}
+  cruise_speed: {target: 45, unit: m/s}
+  cruise_altitude: {target: 3000, unit: m}
+  stall_speed: {max: 26, unit: m/s}
+  climb_rate: {min: 3.0, unit: m/s}
+  service_ceiling: {min: 5000, unit: m}
+  takeoff_ground_roll: {max: 300, unit: m}
+assumptions:
+  weights:
+    method: components
+    initial_class: uav_tactical_recce_ucav  # Raymer 6th ed. Tab. 3.1 (só valor inicial)
+    components:
+      material: composite
+      structural_category: utility      # n_lim 4.4 — PRESSUPOSTO
+      landing_gear: tricycle
+      main_gear_length_m: 0.35
+      nose_gear_length_m: 0.30
+      engine_kW_per_kg: 0.9             # PRESSUPOSTO: 2 tempos UAV (ex. ~10–15 kW com 12–17 kg c/ ignição)
+      avionics_uninstalled_kg: 6        # PRESSUPOSTO: piloto automático + datalink + transponder + GNSS
+      n_tanks: 1
+      items:                            # EXEMPLOS rotulados — substituir por datasheets
+        - {name: gerador/alternador + regulador, mass_kg: 2.0, group: equipment}
+        - {name: servos (6) + cablagem de sinal, mass_kg: 2.5, group: equipment}
+        - {name: suporte do payload + amortecimento, mass_kg: 1.5}
+        - {name: bateria de backup (avionics), mass_kg: 1.5, group: equipment}
+      growth_allowance: 0.05            # PRESSUPOSTO
+  aero:
+    fidelity: lowfi                # Fase 2: XFOIL (perfil) + AVL (carga em envergadura); 'handbook' = Raymer
+    AR: 16
+    taper: 0.6
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 4415
+    clmax_airfoil: 1.5
+    flap: {kind: plain, flapped_area_ratio: 0.5}
+    roughness: smooth_molded_composite
+    laminar: {wing: 0.30, htail: 0.30, vtail: 0.30, fuselage: 0.10}
+    extra_drag_areas_m2: {fixed_gear: 0.03, gimbal_eo_ir: 0.012, antennas_misc: 0.004}
+  geometry:
+    fuselage_length_m: 3.2
+    fuselage_diameter_m: 0.40
+    c_ht: 0.50
+    c_vt: 0.03
+    tail_arm_fraction: 0.55
+  propulsion:
+    eta_cruise: 0.78
+certification:                        # Fase 10 — ignorado pelo dimensionamento; usado por `acdt certify`
+  # base automática: MTOW ≥ 150 kg → STANAG 4671 (+ SORA, categoria específica EASA)
+  safety:
+    t_flight_h: 10                    # = endurance requerida (voo típico) — PRESSUPOSTO
+    baseline: {backup_battery: true}  # já no orçamento de massas (item "bateria de backup")
+    unit: {battery_kg: 1.5}           # item do orçamento de massas acima (EXEMPLO rotulado)
+  sora:
+    population: "<50"                 # PRESSUPOSTO: zona rural esparsa — a definir pelo operador
+    aec: 5                            # cruzeiro a 3000 m: > 120 m AGL, não controlado, rural — PRESSUPOSTO

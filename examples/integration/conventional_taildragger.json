@@ -1,0 +1,69 @@
+{
+  "_comment": "PRESSUPOSTO L0 demo: tractor UAV with opt-in taildragger layout, drawn legs and a retract arc check. Not a product study. Methods: Raymer Ch. 11, Currey 1988, 14 CFR 23.925(a)(1) 9 in.",
+  "assembly": {
+    "components": [
+      {
+        "type": "body",
+        "name": "fuselage",
+        "role": "fuselage",
+        "pod": {"length": 3.2, "width": 0.36, "height": 0.40, "nose_frac": 0.22, "tail_frac": 0.28, "tail_scale": 0.35},
+        "origin": [0.0, 0.0, 0.0]
+      },
+      {
+        "type": "surface",
+        "name": "wing",
+        "role": "wing",
+        "origin": [1.1, 0.0, 0.05],
+        "mirror": true,
+        "panel": {"root_chord": 0.55, "tip_chord": 0.35, "span": 2.4, "dihedral_deg": 2.0, "tc_root": 0.14, "tc_tip": 0.12}
+      },
+      {
+        "type": "surface",
+        "name": "htail",
+        "role": "horizontal tail",
+        "origin": [2.85, 0.0, 0.05],
+        "mirror": true,
+        "panel": {"root_chord": 0.32, "tip_chord": 0.22, "span": 0.55, "dihedral_deg": 0.0, "tc_root": 0.10, "tc_tip": 0.10}
+      },
+      {
+        "type": "surface",
+        "name": "vtail",
+        "role": "fin",
+        "origin": [2.85, 0.0, 0.05],
+        "panel": {"root_chord": 0.35, "tip_chord": 0.22, "span": 0.45, "dihedral_deg": 90.0, "tc_root": 0.10, "tc_tip": 0.10}
+      },
+      {
+        "type": "disc",
+        "name": "prop",
+        "role": "propeller",
+        "origin": [-0.12, 0.0, 0.0],
+        "diameter": 0.70,
+        "orientation": {"yaw": 0.0}
+      }
+    ]
+  },
+  "masses": [
+    {"name": "engine", "mass_kg": 8.0, "position": [0.25, 0.0, 0.0]},
+    {"name": "avionics", "mass_kg": 3.0, "position": [0.6, 0.0, 0.05]},
+    {"name": "battery", "mass_kg": 6.0, "position": [1.2, 0.0, -0.02]}
+  ],
+  "flight": {"W0_kg": 55.0, "V_m_s": 32.0, "altitude_m": 500.0, "Wf_kg": 0.0, "payload_kg": 5.0},
+  "gear": {
+    "type": "taildragger",
+    "tipback_deg": 15.0,
+    "overturn_max_deg": 63.0,
+    "half_track": 0.55,
+    "x_tail": 3.05,
+    "draw_legs": true,
+    "leg_diameter_m": 0.05,
+    "retract": {
+      "main": {
+        "hinge": [1.0, 0.55, 0.15],
+        "axis": [0.0, 1.0, 0.0],
+        "angle_deg": 85.0,
+        "y": 0.55
+      }
+    }
+  },
+  "options": {"run_avl": false, "static_margin_min": 0.05}
+}

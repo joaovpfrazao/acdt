@@ -1,0 +1,184 @@
+{
+ "material": "al2024_t3",
+ "ribs": {
+  "pitch_m": 0.8394064384610933,
+  "n_ribs_per_side": 7,
+  "rows": [
+   {
+    "y_m": 0.0,
+    "M_ult_Nm": 67346.32624080754,
+    "h_m": 0.15274239322365787,
+    "w_crush_N_per_m": 20505.505960430855,
+    "t_web_mm": 1.9273163985650403,
+    "governed_by": "crushing",
+    "mass_kg": 1.1687021757705927
+   },
+   {
+    "y_m": 0.8394064384610933,
+    "M_ult_Nm": 44786.21608489797,
+    "h_m": 0.14515249382698625,
+    "w_crush_N_per_m": 13576.131652838683,
+    "t_web_mm": 1.6236713996346452,
+    "governed_by": "crushing",
+    "mass_kg": 0.8891577090961053
+   },
+   {
+    "y_m": 1.6788128769221866,
+    "M_ult_Nm": 27189.657257820254,
+    "h_m": 0.1375625944303146,
+    "w_crush_N_per_m": 7908.955625517902,
+    "t_web_mm": 1.3083674900119584,
+    "governed_by": "crushing",
+    "mass_kg": 0.6435200969292324
+   },
+   {
+    "y_m": 2.5182193153832797,
+    "M_ult_Nm": 14322.422175443815,
+    "h_m": 0.12997269503364295,
+    "w_crush_N_per_m": 3752.741551136283,
+    "t_web_mm": 0.9825939690340613,
+    "governed_by": "crushing",
+    "mass_kg": 0.4314296579942287
+   },
+   {
+    "y_m": 3.3576257538443732,
+    "M_ult_Nm": 5850.369805735568,
+    "h_m": 0.12238279563697131,
+    "w_crush_N_per_m": 1218.858868932383,
+    "t_web_mm": 0.6488652455151714,
+    "governed_by": "crushing",
+    "mass_kg": 0.2525962544897878
+   },
+   {
+    "y_m": 4.197032192305467,
+    "M_ult_Nm": 1311.767762744912,
+    "h_m": 0.1147928962402997,
+    "w_crush_N_per_m": 155.89819772336156,
+    "t_web_mm": 0.51,
+    "governed_by": "t_min",
+    "mass_kg": 0.17467544434681742
+   },
+   {
+    "y_m": 5.036438630766559,
+    "M_ult_Nm": 2.4397387816056164,
+    "h_m": 0.10720299684362807,
+    "w_crush_N_per_m": 0.0008745742707835492,
+    "t_web_mm": 0.51,
+    "governed_by": "t_min",
+    "mass_kg": 0.15234060723321904
+   }
+  ],
+  "mass_both_sides_kg": 7.4248438917199655,
+  "phase3_rib_mass_kg": 1.8065308944976013,
+  "notes": [
+   "Niu Ch. 5 / Brazier: w = M\u00b2 h t_e s/(2 I EI); coluna larga \u03c3_cr = \u03c0\u00b2E t\u00b2/(12(1\u2212\u03bd\u00b2)h\u00b2)",
+   "furos de aligeiramento, banzos de nervura e corte de redistribui\u00e7\u00e3o N\u00c3O inclu\u00eddos"
+  ]
+ },
+ "root_joint": {
+  "M_root_ult_Nm": 67346.32624080754,
+  "h_root_m": 0.15274239322365787,
+  "P_cap_with_fitting_factor_N": 507051.6019971128,
+  "fitting_factor": 1.15,
+  "Fbru_Pa": 781200000.0,
+  "joint": {
+   "bolt": "AN7",
+   "d_mm": 11.112499999999999,
+   "n_bolts_per_cap": 6,
+   "P_bolt_double_shear_N": 100305.24725656142,
+   "MS_shear": 0.18692354223701946,
+   "t_fitting_mm": 9.734797013605112,
+   "e_min_mm": 22.224999999999998,
+   "pitch_min_mm": 44.449999999999996
+  },
+  "notes": [
+   "Bruhn D1: corte duplo (2 chapas de ferragem), esmagamento Fbru d t; e/D = 2, passo 4D",
+   "Fbru \u2248 1.8 Ftu (PRESSUPOSTO \u2014 usar MMPDS)",
+   "sem fadiga/concentra\u00e7\u00e3o (Kt) nem pr\u00e9-carga \u2014 ver Niu Ch. 9 para dimensionamento final"
+  ]
+ },
+ "control_surfaces": [
+  {
+   "surface": "aileron (each)",
+   "S_c_m2": 0.5598143014982387,
+   "c_c_m": 0.3156158626348432,
+   "H_Nm": 307.3558811615719,
+   "torque_req_Nm": 461.0338217423579
+  },
+  {
+   "surface": "elevator",
+   "S_c_m2": 0.9900035980090447,
+   "c_c_m": 0.30045349180268455,
+   "H_Nm": 517.4313578559921,
+   "torque_req_Nm": 776.1470367839881
+  },
+  {
+   "surface": "rudder",
+   "S_c_m2": 0.4098498652673532,
+   "c_c_m": 0.3206971187930439,
+   "H_Nm": 228.6433480324879,
+   "torque_req_Nm": 342.96502204873184
+  }
+ ],
+ "roskam_class_ii": {
+  "rows": [
+   {
+    "item": "wing (USAF)",
+    "roskam_kg": 118.26264646950213,
+    "raymer_kg": 132.1008904216858,
+    "ratio": 0.8952448851176558,
+    "used": true
+   },
+   {
+    "item": "wing (Cessna)",
+    "roskam_kg": 178.16046442331992,
+    "raymer_kg": 132.1008904216858,
+    "ratio": 1.3486696709961992,
+    "used": true
+   },
+   {
+    "item": "htail (USAF)",
+    "roskam_kg": 19.62981128187802,
+    "raymer_kg": 12.581796582870227,
+    "ratio": 1.5601755403201696,
+    "used": true
+   },
+   {
+    "item": "htail (Cessna)",
+    "roskam_kg": 57.420860999777915,
+    "raymer_kg": 12.581796582870227,
+    "ratio": 4.563804590351973,
+    "used": false
+   },
+   {
+    "item": "vtail (USAF)",
+    "roskam_kg": 6.657020524769236,
+    "raymer_kg": 6.530209462444924,
+    "ratio": 1.0194191416146143,
+    "used": true
+   },
+   {
+    "item": "vtail (Cessna)",
+    "roskam_kg": 258.79391854157274,
+    "raymer_kg": 6.530209462444924,
+    "ratio": 39.63026301528156,
+    "used": false
+   },
+   {
+    "item": "fuselage (USAF)",
+    "roskam_kg": 104.21510526769525,
+    "raymer_kg": 98.89843133891371,
+    "ratio": 1.0537589308222888,
+    "used": true
+   }
+  ],
+  "n_ult": 5.928654633544939,
+  "W_to_lb": 2559.7608942882903,
+  "ref": "Roskam, Airplane Design Part V (DARcorporation), \u00a75.1\u20135.3: Cessna method (Eqs. 5.2, 5.12, 5.13; V_max < 200 kt) and USAF method (Eqs. 5.4, 5.14, 5.15, 5.25; light/utility \u2264 ~300 kt)",
+  "notes": [
+   "V_H \u2248 1.1 V_C (PRESSUPOSTO); altura da deriva b_v = \u221a(A_v S_v); n_ult = 1.5 n_lim; equa\u00e7\u00f5es verificadas no texto de Roskam Parte V (p\u00e1gs. 67\u201376)",
+   "Cessna (asa): inclui comandos e carenagem de ponta; exclui tanques e carry-through",
+   "Cessna Eqs. 5.12\u20135.13 (empenagem) mostradas s\u00f3 por transpar\u00eancia e EXCLU\u00cdDAS da compara\u00e7\u00e3o: d\u00e3o valores implaus\u00edveis (para o C172 v\u00e1rias vezes o peso real da empenagem) \u2014 poss\u00edvel erro de impress\u00e3o; n\u00e3o corrigidas por ajuste"
+  ]
+ }
+}

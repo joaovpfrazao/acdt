@@ -1,0 +1,6 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Common jet pointmass over operational phases (PRESSUPOSTO numbers).
+# Run via tests / Python API: simulate_common_mission(model="jet", ...).
+# Not acdt simulate 6dof; not a certified AFM profile.
+name: jet_common_pointmass_demo
+note: 'See examples/fleet/jet_common_sim.yaml for the fleet opt-in path.'

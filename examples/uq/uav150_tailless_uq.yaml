@@ -1,0 +1,69 @@
+# Estudo de incerteza + sensibilidade (docs/INCERTEZA.md) para o exemplo de teste
+# examples/heavy/uav150_flying_wing_tailless.yaml:
+#   acdt uq examples/heavy/uav150_flying_wing_tailless.yaml --spec examples/uq/uav150_tailless_uq.yaml -o output/uq_tailless
+# O exemplo é só um caso de teste da framework. As dispersões marcadas PRESSUPOSTO são ilustrativas (não há dados
+# de fornecedor nem de ensaio); só o atrito de rolamento tem origem publicada.
+uncertainty:
+  method: lhs
+  n: 4000            # propagação no substituto (barata); o modelo verdadeiro corre surrogate.n_train vezes
+  seed: 20261116
+  confidence: 0.95
+  target_probability: 0.90
+  target_source: "PRESSUPOSTO: alvo ilustrativo de 90 % para o teste da camada (sem requisito de fiabilidade da missão)"
+  rel_tol: 0.01
+  model:
+    skip_stages: [aeroelasticity]   # nenhum requisito deste exemplo usa a aeroelasticidade
+    workers: auto
+  # Cada corrida do pipeline deste exemplo (laço de montagem + caixão de asa + AVL) leva ~2 min: o modelo verdadeiro
+  # corre 48 vezes num LHS de treino e a propagação/Sobol/Morris correm numa superfície de resposta quadrática,
+  # aceite por saída só com Q² (PRESS) ≥ 0,95. Saídas rejeitadas ficam com as 48 amostras do modelo verdadeiro.
+  surrogate:
+    n_train: 48
+    q2_min: 0.95
+  metrics: [W0_kg, We_kg, Wf_kg, S_m2, CD0, "req:MIS-TO-01", "req:MIS-END-01", "req:MIS-STALL-01",
+            "req:MIS-CLB-01", "req:MIS-CEIL-01"]
+  inputs:
+    - path: assumptions.aero.mu_roll
+      dist: uniform
+      low: 0.03
+      high: 0.05
+      source: "Raymer, Aircraft Design: A Conceptual Approach, 6.ª ed. (2018), Tab. 17.1 — betão/asfalto seco, travões soltos 0,03–0,05"
+    - path: assumptions.propulsion.eta_takeoff
+      dist: triangular
+      rel: 0.10
+      pressuposto: "η da hélice na corrida sem mapa de hélice medido; ±10 % em torno do valor por omissão"
+    - path: assumptions.propulsion.eta_cruise
+      dist: normal
+      cv: 0.03
+      low: 0.6
+      high: 0.88
+      pressuposto: "η de cruzeiro declarada 0,78 sem ensaio de banco; σ = 3 % ilustrativo"
+    - path: assumptions.weights.components.growth_allowance
+      dist: uniform
+      low: 0.0
+      high: 0.10
+      pressuposto: "margem de crescimento de massa 0–10 % em torno dos 5 % declarados"
+    - path: assumptions.aero.extra_drag_areas_m2.fixed_gear
+      dist: lognormal
+      cv: 0.25
+      pressuposto: "área de arrasto do trem fixo 0,03 m² sem medição; dispersão lognormal cv 25 % (positiva)"
+    - path: assumptions.weights.components.avionics_uninstalled_kg
+      dist: interval
+      low: 5.0
+      high: 7.0
+      pressuposto: "massa de aviónica ainda sem lista fechada: só se sabe o intervalo 5–7 kg (sem distribuição)"
+  correlations:
+    - {a: assumptions.propulsion.eta_takeoff, b: assumptions.propulsion.eta_cruise, rho: 0.5,
+       pressuposto: "a mesma hélice: η de descolagem e de cruzeiro sobem ou descem juntas (ilustrativo)"}
+  # Fatores de calibração H1 (alta fidelidade) com a sua incerteza GCI. O registo H1 deste exemplo é nao_aplicar
+  # (razão de CL fora da banda), por isso fica listado como não propagado — é o comportamento pretendido.
+  calibration:
+    file: ../output/uav150_flying_wing_tailless_hifi_win/h1_wing_gci.json
+  sobol:
+    n: 4096
+    bootstrap: 200
+    metrics: [W0_kg, "req:MIS-TO-01", "req:MIS-END-01", "req:MIS-STALL-01"]
+  morris:
+    r: 20
+    levels: 4
+    metrics: [W0_kg, "req:MIS-TO-01", "req:MIS-END-01"]

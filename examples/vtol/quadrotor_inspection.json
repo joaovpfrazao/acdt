@@ -1,0 +1,11 @@
+{
+  "name": "quadrotor de inspeção 5 kg (exemplo)",
+  "architecture": "multirotor",
+  "mass_kg": 5.0,
+  "altitude_m": 0.0,
+  "rotors": {"n": 4, "diameter_m": 0.38, "FM": 0.65},
+  "mission": {"t_hover_s": 900, "climb_height_m": 60, "climb_rate_m_s": 2.0,
+              "cruise_distance_m": 2000, "cruise_speed_m_s": 10},
+  "electric": {"pack_Wh_kg": 160, "c_rate_max": 10, "systems_power_W": 15},
+  "_nota": "Exemplo ilustrativo. FM, Wh/kg de pacote, C máx e L/D_eff são PRESSUPOSTOS (ver docs/tutorial-vtol.md)."
+}

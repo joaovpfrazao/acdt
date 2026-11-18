@@ -1,0 +1,123 @@
+# Standards / regulations knowledge base for the compliance checklist generator.
+# Applicability rules are first-cut guidance; the certification basis is agreed with the authority.
+# applies: uas (bool), categories (list or "any"), mtow_kg [min, max], needs (list of features)
+- id: EU-2019/947-945
+  title: Commission Implementing Reg. (EU) 2019/947 & Delegated Reg. (EU) 2019/945 — UAS operations & products
+  issuer: European Commission / EASA
+  applies: {uas: true, categories: any}
+  topics: [operational category (open/specific/certified), operator registration, remote ID, class marking]
+  url: https://www.easa.europa.eu/en/domains/civil-drones
+- id: EASA-SORA-2.5
+  title: SORA 2.5 — AMC1 to Art. 11 of Reg. (EU) 2019/947 (ED Decision 2025/018/R, Sept 2025)
+  issuer: EASA (based on JARUS SORA v2.5, 2024)
+  applies: {uas: true, categories: [easa_specific]}
+  topics: [ConOps, intrinsic ground risk class, air risk class, SAIL, operational safety objectives (OSO), containment]
+  url: https://www.easa.europa.eu/en/document-library/agency-decisions/ed-decision-2025018r
+- id: EASA-SC-Light-UAS
+  title: Special Condition Light-UAS Medium Risk (Issue 01, 2020) + FTB MoC SC Light-UAS (SAIL III and below)
+  issuer: EASA
+  applies: {uas: true, categories: [easa_specific, easa_certified], mtow_kg: [0, 600]}
+  topics: [design verification, flight test, system safety, C2 link, software/AEH assurance proportional to SAIL]
+  url: https://www.easa.europa.eu/en/special-condition-sc-light-uas-medium-risk
+- id: STANAG-4703
+  title: STANAG 4703 (AEP-83) Light UAS Airworthiness Requirements (fixed-wing, MTOW <= 150 kg, impact energy > 66 J)
+  issuer: NATO
+  applies: {uas: true, categories: [stanag_4703], mtow_kg: [0, 150]}
+  topics: [flight, structure, design & construction, powerplant, systems & equipment, C2, ground station]
+  url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/391827/20140916-STANAG-4703_AEP-83_A__1_.pdf
+- id: STANAG-4671
+  title: STANAG 4671 (AEP-4671) UAV Systems Airworthiness Requirements (USAR), fixed-wing 150–20 000 kg
+  issuer: NATO
+  applies: {uas: true, categories: [stanag_4671], mtow_kg: [150, 20000]}
+  topics: [CS-23-derived airworthiness code adapted to UAV]
+  url: https://nso.nato.int
+- id: ASTM-F3298-24
+  title: ASTM F3298-24 Design and Construction of Lightweight UAS (fixed-wing)
+  issuer: ASTM F38.01
+  applies: {uas: true, categories: any}
+  topics: [structure, propulsion, systems, C2, launch & recovery, verification]
+  url: https://www.astm.org/f3298-24.html
+- id: ASTM-F2910-22
+  title: ASTM F2910-22 Design and Construction of a Small UAS (sUAS)
+  issuer: ASTM F38.01
+  applies: {uas: true, categories: any, mtow_kg: [0, 25]}
+  topics: [sUAS design & construction baseline]
+  url: https://www.astm.org/f2910-22.html
+- id: ASTM-F3002-22
+  title: ASTM F3002-22 Design of the Command and Control System for sUAS (generally <= 25 kg)
+  issuer: ASTM F38.01
+  applies: {uas: true, categories: any, mtow_kg: [0, 25]}
+  topics: [C2 link, spectrum, lost-link and fly-away functionality]
+  url: https://www.astm.org/f3002-22.html
+- id: ASTM-F3005-22
+  title: ASTM F3005-22 Batteries for Use in sUAS
+  issuer: ASTM F38.01
+  applies: {uas: true, categories: any, needs: [li_battery], mtow_kg: [0, 25]}
+  topics: [battery design, BMS, marking, testing]
+  url: https://www.astm.org/f3005-22.html
+- id: ASTM-F3201
+  title: ASTM F3201 Ensuring Dependability of Software Used in UAS
+  issuer: ASTM F38.01
+  applies: {uas: true, categories: any}
+  topics: [software development assurance proportional to risk]
+  url: https://www.astm.org/f3201-26.html
+- id: UN-38.3
+  title: UN Manual of Tests and Criteria, Part III, Sub-section 38.3 — Lithium batteries (transport)
+  issuer: UNECE
+  applies: {categories: any, needs: [li_battery]}
+  topics: [altitude, thermal, vibration, shock, external short circuit, impact, overcharge tests; transport certification]
+  url: https://unece.org/transport/dangerous-goods
+- id: SAE-AS50881
+  title: SAE AS50881 Wiring, Aerospace Vehicle
+  issuer: SAE
+  applies: {categories: any}
+  topics: [wire selection & derating, voltage drop, bundle routing, separation, protection, identification]
+  url: https://www.sae.org/standards/content/as50881/
+- id: IPC-WHMA-A-620
+  title: IPC/WHMA-A-620 Requirements and Acceptance for Cable and Wire Harness Assemblies
+  issuer: IPC / WHMA
+  applies: {categories: any}
+  topics: [crimping, soldering, splices, connectors, workmanship classes 1–3 (use class 3 for flight-critical)]
+  url: https://www.ipc.org
+- id: MIL-STD-704F
+  title: MIL-STD-704F Aircraft Electric Power Characteristics
+  issuer: US DoD
+  applies: {categories: [stanag_4703, stanag_4671]}
+  topics: [28 VDC / 270 VDC / 115 VAC power quality — when integrating MIL equipment or on military programmes]
+  url: https://quicksearch.dla.mil
+- id: RTCA-DO-160G
+  title: RTCA DO-160G Environmental Conditions and Test Procedures for Airborne Equipment (EUROCAE ED-14G)
+  issuer: RTCA / EUROCAE
+  applies: {categories: [easa_specific, easa_certified, stanag_4703, stanag_4671, cs_23, far_23]}
+  topics: [temperature/altitude, vibration, EMC (Sect. 20/21), lightning, power input (Sect. 16)]
+  url: https://www.rtca.org
+- id: RTCA-DO-178C
+  title: RTCA DO-178C / ED-12C Software Considerations in Airborne Systems (awareness; DAL per safety assessment)
+  issuer: RTCA / EUROCAE
+  applies: {categories: [easa_certified, stanag_4671, cs_23, far_23, easa_specific]}
+  topics: [software development assurance; SC Light-UAS / SORA high-SAIL may require equivalent evidence]
+  url: https://www.rtca.org
+- id: RTCA-DO-254
+  title: RTCA DO-254 / ED-80 Design Assurance for Airborne Electronic Hardware (awareness)
+  issuer: RTCA / EUROCAE
+  applies: {categories: [easa_certified, stanag_4671, cs_23, far_23, easa_specific]}
+  topics: [complex electronic hardware (FPGA/ASIC) assurance]
+  url: https://www.rtca.org
+- id: CS-23-Amdt5
+  title: EASA CS-23 Amdt 5 (objective-based) with consensus means of compliance (e.g. ASTM F3264 series)
+  issuer: EASA
+  applies: {uas: false, categories: [cs_23, far_23]}
+  topics: [performance, flight characteristics, structures, design & construction, powerplant, systems]
+  url: https://www.easa.europa.eu/en/document-library/certification-specifications/group/cs-23-normal-utility-aerobatic-and-commuter-aeroplanes
+- id: CS-VLA
+  title: EASA CS-VLA Very Light Aeroplanes (MTOM <= 750 kg, VS0 <= 45 KCAS)
+  issuer: EASA
+  applies: {uas: false, categories: [cs_vla]}
+  topics: [flight, structure, design & construction, powerplant, equipment]
+  url: https://www.easa.europa.eu/en/document-library/certification-specifications/cs-vla-amendment-1
+- id: CS-LSA
+  title: EASA CS-LSA Light Sport Aeroplanes (MTOM <= 600 kg) referencing ASTM F2245
+  issuer: EASA / ASTM
+  applies: {uas: false, categories: [cs_lsa]}
+  topics: [ASTM F2245 design & performance]
+  url: https://www.easa.europa.eu/en/document-library/certification-specifications/cs-lsa-amendment-1

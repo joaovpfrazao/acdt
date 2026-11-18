@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "acdt": {
+      "command": "${workspaceFolder}/.venv/Scripts/acdt.exe",
+      "args": ["mcp"],
+      "env": {
+        "PYTHONUTF8": "1",
+        "ACDT_RUNS_DIR": "${workspaceFolder}/runs",
+        "ACDT_MCP_HEAVY": "approval"
+      }
+    }
+  }
+}

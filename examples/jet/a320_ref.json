@@ -1,0 +1,65 @@
+{
+  "_copyright": "Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0",
+  "name": "A320-200 / CFM56 class — illustrative mixed public configuration",
+  "spec": {
+    "mtow_kg": 77000.0,
+    "wing_area_m2": 122.6,
+    "aspect_ratio": 9.48,
+    "mach": 0.79,
+    "altitude_m": 11277.6,
+    "range_m": 5639000.0,
+    "thrust_sl_N": 120000.0,
+    "n_engines": 2,
+    "wave": {
+      "thickness_ratio": 0.12,
+      "sweep_deg": 25.0,
+      "technology_factor": 0.95
+    },
+    "loads": {
+      "vc_eas_m_s": 160.0
+    }
+  },
+  "published": {
+    "mtow_kg": 77000.0,
+    "oew_kg": 42175.0,
+    "thrust_per_engine_N": 120000.0,
+    "economic_speed_km_h": 840.0,
+    "economic_altitude_ft": 37000.0,
+    "range_m": 5639000.0,
+    "wing_area_m2": 122.6,
+    "span_m": 34.09
+  },
+  "sources": [
+    {
+      "source_url": "https://www.gccports.com/aircraft-technical-data-details/airbus-a320",
+      "retrieved": "2026-11-06",
+      "source_type": "public technical summary (Frawley, International Directory of Civil Aircraft)",
+      "fields": [
+        "oew_kg (CFM)",
+        "mtow_kg (optional)",
+        "thrust_per_engine_N (CFM56-5B4)",
+        "economic_speed_km_h",
+        "economic_altitude_ft",
+        "range_m (one CFM option)",
+        "wing_area_m2",
+        "span_m"
+      ]
+    },
+    {
+      "source_url": "https://mediaassets.airbus.com/pm_38_916_916266-iujedqawwy.pdf?fileName=aca32001-jul-2026-2.pdf",
+      "retrieved": "2026-11-06",
+      "source_type": "manufacturer airport planning manual, July 2026, 2-2-0",
+      "fields": [
+        "MTOW variants (77000 kg WV010; other variants up to 78000 kg)"
+      ]
+    }
+  ],
+  "pressupostos": {
+    "mach": "0.79 rounded from 840 km/h at 37000 ft ISA (~0.791)",
+    "aspect_ratio": "34.09² / 122.6 rounded to 9.48",
+    "wave": "representative t/c=0.12, sweep=25 deg and kappa=0.95; not measured wing-strip data",
+    "loads": "VC=160 m/s EAS selected at a separate envelope condition, not cruise EAS; clean CL defaults",
+    "configuration": "OEW/MTOW/thrust/range are illustrative options, not a matched tail-number/weight-variant specification"
+  },
+  "limitations": "Public brochure-level check only; no certification claim. Statistical We differs from OEW. Range and thrust are inputs, not independent validation."
+}

@@ -1,0 +1,62 @@
+### Checklist de normas (categoria: `easa_specific`, MTOW 32.9 kg, UAS, features: li_battery)
+
+> Orientação de primeira análise. A base de certificação é acordada com a autoridade; confirmar sempre a edição em vigor de cada documento.
+
+- [ ] **EU-2019/947-945** — Commission Implementing Reg. (EU) 2019/947 & Delegated Reg. (EU) 2019/945 — UAS operations & products (European Commission / EASA). <https://www.easa.europa.eu/en/domains/civil-drones>
+  - [ ] operational category (open/specific/certified)
+  - [ ] operator registration
+  - [ ] remote ID
+  - [ ] class marking
+- [ ] **EASA-SORA-2.5** — SORA 2.5 — AMC1 to Art. 11 of Reg. (EU) 2019/947 (ED Decision 2025/018/R, Sept 2025) (EASA (based on JARUS SORA v2.5, 2024)). <https://www.easa.europa.eu/en/document-library/agency-decisions/ed-decision-2025018r>
+  - [ ] ConOps
+  - [ ] intrinsic ground risk class
+  - [ ] air risk class
+  - [ ] SAIL
+  - [ ] operational safety objectives (OSO)
+  - [ ] containment
+- [ ] **EASA-SC-Light-UAS** — Special Condition Light-UAS Medium Risk (Issue 01, 2020) + FTB MoC SC Light-UAS (SAIL III and below) (EASA). <https://www.easa.europa.eu/en/special-condition-sc-light-uas-medium-risk>
+  - [ ] design verification
+  - [ ] flight test
+  - [ ] system safety
+  - [ ] C2 link
+  - [ ] software/AEH assurance proportional to SAIL
+- [ ] **ASTM-F3298-24** — ASTM F3298-24 Design and Construction of Lightweight UAS (fixed-wing) (ASTM F38.01). <https://www.astm.org/f3298-24.html>
+  - [ ] structure
+  - [ ] propulsion
+  - [ ] systems
+  - [ ] C2
+  - [ ] launch & recovery
+  - [ ] verification
+- [ ] **ASTM-F3201** — ASTM F3201 Ensuring Dependability of Software Used in UAS (ASTM F38.01). <https://www.astm.org/f3201-26.html>
+  - [ ] software development assurance proportional to risk
+- [ ] **UN-38.3** — UN Manual of Tests and Criteria, Part III, Sub-section 38.3 — Lithium batteries (transport) (UNECE). <https://unece.org/transport/dangerous-goods>
+  - [ ] altitude
+  - [ ] thermal
+  - [ ] vibration
+  - [ ] shock
+  - [ ] external short circuit
+  - [ ] impact
+  - [ ] overcharge tests; transport certification
+- [ ] **SAE-AS50881** — SAE AS50881 Wiring, Aerospace Vehicle (SAE). <https://www.sae.org/standards/content/as50881/>
+  - [ ] wire selection & derating
+  - [ ] voltage drop
+  - [ ] bundle routing
+  - [ ] separation
+  - [ ] protection
+  - [ ] identification
+- [ ] **IPC-WHMA-A-620** — IPC/WHMA-A-620 Requirements and Acceptance for Cable and Wire Harness Assemblies (IPC / WHMA). <https://www.ipc.org>
+  - [ ] crimping
+  - [ ] soldering
+  - [ ] splices
+  - [ ] connectors
+  - [ ] workmanship classes 1–3 (use class 3 for flight-critical)
+- [ ] **RTCA-DO-160G** — RTCA DO-160G Environmental Conditions and Test Procedures for Airborne Equipment (EUROCAE ED-14G) (RTCA / EUROCAE). <https://www.rtca.org>
+  - [ ] temperature/altitude
+  - [ ] vibration
+  - [ ] EMC (Sect. 20/21)
+  - [ ] lightning
+  - [ ] power input (Sect. 16)
+- [ ] **RTCA-DO-178C** — RTCA DO-178C / ED-12C Software Considerations in Airborne Systems (awareness; DAL per safety assessment) (RTCA / EUROCAE). <https://www.rtca.org>
+  - [ ] software development assurance; SC Light-UAS / SORA high-SAIL may require equivalent evidence
+- [ ] **RTCA-DO-254** — RTCA DO-254 / ED-80 Design Assurance for Airborne Electronic Hardware (awareness) (RTCA / EUROCAE). <https://www.rtca.org>
+  - [ ] complex electronic hardware (FPGA/ASIC) assurance

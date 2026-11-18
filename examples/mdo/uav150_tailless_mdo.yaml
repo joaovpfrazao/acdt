@@ -1,0 +1,32 @@
+# MDO de sistema (docs/MDO.md) sobre o exemplo de teste examples/heavy/uav150_flying_wing_tailless.yaml:
+#   acdt mdo examples/heavy/uav150_flying_wing_tailless.yaml --spec examples/mdo/uav150_tailless_mdo.yaml \
+#       -o output/mdo_tailless --workers 3
+# O exemplo é só um caso de teste da framework: os limites das variáveis são PRESSUPOSTOS do estudo.
+# Troca MTOW × autonomia: quanto custa em W0 cada hora de autonomia, com o AR da asa e a velocidade de perda
+# como variáveis; todas as restrições numéricas vêm do registo de requisitos da missão.
+mdo:
+  # A reescala 'uniform' da montagem mantém o AR do desenho (assumptions.aero.AR não muda o projeto: o aviso
+  # "objetivo não muda" do acdt mdo apanhou isto); com 'surfaces' o AR passa a ser variável da montagem.
+  fixed:
+    assumptions.assembly.options.scaling: surfaces
+  design_variables:
+    - {path: assumptions.assembly.options.AR, lower: 12, upper: 20, x0: 16,
+       source: "PRESSUPOSTO: banda de AR de asas voadoras de UAV de longa autonomia em torno do desenho (16)"}
+    - {path: requirements.endurance, lower: 8, upper: 14, x0: 10,
+       source: "PRESSUPOSTO: troca de autonomia em torno do requisito de 10 h"}
+    - {path: requirements.stall_speed, lower: 22, upper: 28, x0: 26,
+       source: "PRESSUPOSTO: banda de velocidade de perda em torno dos 26 m/s da missão"}
+  objectives:
+    - {metric: W0_kg, sense: min, ref: 150}
+    - {metric: endurance_h, sense: max, ref: 10}
+  derived:
+    endurance_h: "req_MIS_END_01 / 3600"
+  constraints:
+    requirements: all      # todas as numéricas do registo (min/max/target) com a sua tolerância
+    policy: limiar         # cumprir o limiar; 'passa' exige folga além da banda; 'no_limite' aceita a banda
+  strategy: nsga2
+  options: {pop_size: 6, max_gen: 1, seed: 20261116}   # orçamento mínimo: 12 corridas (~2–6 min cada)
+  model:
+    fidelity: handbook
+    skip_stages: [aeroelasticity]
+    workers: 3

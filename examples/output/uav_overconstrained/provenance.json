@@ -1,0 +1,211 @@
+{
+ "schema": "acdt.provenance/1",
+ "created": {
+  "utc": "2026-11-18T11:14:36+00:00",
+  "europe_lisbon": "2026-11-18T11:14:36+00:00"
+ },
+ "entry_point": {
+  "command": "acdt size",
+  "argv": [
+   "size",
+   "examples/uav_overconstrained.yaml",
+   "-o",
+   "examples/output/uav_overconstrained"
+  ],
+  "cwd": "."
+ },
+ "acdt": {
+  "version": "0.1.0",
+  "git": {
+   "commit": "633283811fcb3656170f8e9706b8e01940e00e56",
+   "dirty": true,
+   "branch": "publicacao",
+   "dirty_diff_sha256": "8668ee8466cde988e81eaa9a27410e8e284540675ead3f241aae0b00967430b8"
+  }
+ },
+ "python": {
+  "version": "3.13.5",
+  "implementation": "CPython",
+  "executable": "/workspace/.venv-acdt/bin/python3"
+ },
+ "packages": {
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "matplotlib": "3.11.2",
+  "pyyaml": "6.0.3",
+  "openmdao": "3.45.1",
+  "openaerostruct": "2.12.0",
+  "aerosandbox": "4.2.10",
+  "neuralfoil": "0.3.3",
+  "pyNastran": "1.3.4",
+  "PanelAero": "2025.8",
+  "jsbsim": "1.3.3",
+  "mcp": "2.3.0"
+ },
+ "platform": {
+  "system": "Linux",
+  "release": "6.12.113+",
+  "version": "#1 SMP PREEMPT_DYNAMIC Fri Nov 13 20:25:27 UTC 2026",
+  "machine": "x86_64",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41"
+ },
+ "tools": {
+  "avl": {
+   "name": "avl",
+   "path": "/workspace/tools/Avl/bin/avl",
+   "found": true,
+   "size_bytes": 767032,
+   "mtime_utc": "2026-11-14T12:53:19+00:00",
+   "sha256": "72597822ceea9e2c5f0407d9e2416e0a7a19dcb2f637227ac3060bc1fc4459ee",
+   "version": null,
+   "version_note": "sem opção de versão não-interactiva conhecida: a identidade é o SHA-256 do binário"
+  }
+ },
+ "inputs": [
+  {
+   "path": "examples/uav_overconstrained.yaml",
+   "sha256_bytes": "a39603e41619ce898f36ac92bc6d8e4d78bc5c58abc2b5fd9d66a2db3f77e40c",
+   "size_bytes": 4078,
+   "kind": "yaml-canonical",
+   "sha256": "7f355aba78cb31f92fb5656056dd0615ab476e8bc7570d2f2a77256b8c79c189"
+  }
+ ],
+ "seeds": {},
+ "notes": [
+  "nenhuma semente declarada nesta corrida (desconhecido ≠ determinístico)"
+ ],
+ "outputs": [
+  {
+   "path": "cg_envelope.png",
+   "size_bytes": 44518,
+   "written_this_run": true,
+   "sha256": "3456e04bf24af766071e6a34c7454d53987fd87b648c77dcaedb1edef12b30df"
+  },
+  {
+   "path": "climb_ceiling.png",
+   "size_bytes": 30110,
+   "written_this_run": true,
+   "sha256": "8ce90ce05b2ecda46dc4db3adc388cdef161d446b7a39fd0b8bd6f223f8676d2"
+  },
+  {
+   "path": "compliance_checklist.md",
+   "size_bytes": 3435,
+   "written_this_run": true,
+   "sha256": "77789d99e54bacc0e6e21b34e0fbc230c448bedbe772eec24a75490ddacebd4f"
+  },
+  {
+   "path": "constraint_diagram.png",
+   "size_bytes": 63110,
+   "written_this_run": true,
+   "sha256": "cb398768ef46e7033f5b38abed50391ffda0391886ab88da96aba7b542efcdbc"
+  },
+  {
+   "path": "drag_polar.png",
+   "size_bytes": 51048,
+   "written_this_run": true,
+   "sha256": "846503189e111eb86f7b6dced89ce15054976273da58cc89adb6a5ee0c1fb177"
+  },
+  {
+   "path": "flutter_vg.png",
+   "size_bytes": 70506,
+   "written_this_run": true,
+   "sha256": "45d85d7a64d51390f31ba25101cd8005cf0049094c155f65cffeaa4b64f537f9"
+  },
+  {
+   "path": "harness.dot",
+   "size_bytes": 687,
+   "written_this_run": true,
+   "sha256": "904f9f1e1a6a1678b24134580d3b5a3ef7d4d0ae3f8b44047e1b76fc5eaf3465"
+  },
+  {
+   "path": "harness.net",
+   "size_bytes": 2173,
+   "written_this_run": true,
+   "sha256": "383553ed55dbc9e14802127750c0de9982ef0be4d60a17f392b92bbcd8c7053e"
+  },
+  {
+   "path": "harness.wireviz.yml",
+   "size_bytes": 1166,
+   "written_this_run": true,
+   "sha256": "fc97b2c1bc24a6ef92c451f620c0202aecc2bced634edc73e159437218193b2a"
+  },
+  {
+   "path": "netlist.csv",
+   "size_bytes": 311,
+   "written_this_run": true,
+   "sha256": "978938647768c264c5c08b2b62022e7324a5f9e94df2987611c627452ce16b00"
+  },
+  {
+   "path": "payload_range.png",
+   "size_bytes": 38255,
+   "written_this_run": true,
+   "sha256": "e88ea8760539bf336145ecfaf6b25f8a7da28dd4b16de7c8e7d8ed1ecfcfef03"
+  },
+  {
+   "path": "report.md",
+   "size_bytes": 46036,
+   "written_this_run": true,
+   "sha256": "2a02dac582b3d0b519cf8797442b07ba5b83c6391d4d7361767ef5e37f742370"
+  },
+  {
+   "path": "result.json",
+   "size_bytes": 66984,
+   "written_this_run": true,
+   "sha256": "11958c7dbd4a5cfd996f5df897131ba0a106ce54bad474a92ad943cc73001004"
+  },
+  {
+   "path": "root_locus.png",
+   "size_bytes": 25856,
+   "written_this_run": true,
+   "sha256": "f60341b7d062365e73715efd9247ab4539fd36804e265a486bc320ba0b4a0b35"
+  },
+  {
+   "path": "scissor.png",
+   "size_bytes": 46733,
+   "written_this_run": true,
+   "sha256": "a4e74fdc6c88b573e53658b863fcad298a732a29c0b3786df7cf449902284001"
+  },
+  {
+   "path": "verification_matrix.csv",
+   "size_bytes": 4445,
+   "written_this_run": true,
+   "sha256": "ebce5c8b7f97523565c37793377150de1d7c761bf6b29759141b18fdab4c31af"
+  },
+  {
+   "path": "verification_matrix.json",
+   "size_bytes": 11932,
+   "written_this_run": true,
+   "sha256": "ded65248bb91a240399e7c155b48441579e1ae7dc2e19cf04b0e8bb03dcb7bf0"
+  },
+  {
+   "path": "verification_matrix.md",
+   "size_bytes": 3403,
+   "written_this_run": true,
+   "sha256": "5224d1236103cf53637116e3245102cd2c1461e978c37b72ad2a6f4092597ab9"
+  },
+  {
+   "path": "vn_diagram.png",
+   "size_bytes": 54722,
+   "written_this_run": true,
+   "sha256": "c7866293a63b8901e9e9be4ad4d95761930e9e36fe097f14a443a18376e60ef0"
+  },
+  {
+   "path": "wb_loading.png",
+   "size_bytes": 33651,
+   "written_this_run": true,
+   "sha256": "2fef9bd4e86019fd9ec60637c5f377798cb8ce165100bed5dd3a494ef2bf6382"
+  },
+  {
+   "path": "wing_box.png",
+   "size_bytes": 49794,
+   "written_this_run": true,
+   "sha256": "438daa650186f5db5bf685f2e8eabaf34ab519fd03dc63117989ff0e5b03b9f9"
+  },
+  {
+   "path": "wing_loads.png",
+   "size_bytes": 94222,
+   "written_this_run": true,
+   "sha256": "af5a6d10952b6cb76c1cc29ae93bece1a914f474b756d8b3329390870183f87f"
+  }
+ ]
+}

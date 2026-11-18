@@ -1,0 +1,125 @@
+# Verificação contra um avião conhecido: Cessna 172S Skyhawk (Cessna Information Manual 172S / POH).
+# Valores reais para comparação: MTOW 2550 lb (1157 kg), peso vazio standard 1663 lb (754 kg, We/W0 0.652),
+# payload com combustível standard 577 lb (262 kg, inclui piloto), 53 gal utilizáveis,
+# S = 16.2 m² (174 ft²), b = 11.0 m, Lycoming IO-360-L2A 180 hp (134 kW),
+# W/S ≈ 71 kg/m², P/W ≈ 116 W/kg, Vs0 48 KCAS, corrida de descolagem 293 m (960 ft).
+# Nota (2026-10): a versão anterior usava MTOW 1111 kg (valor do 172R) e payload 251 kg + piloto com
+# combustível total, carga que o 172S real não leva — corrigido para a carga do POH com combustível total.
+name: Cessna 172S (verificação)
+description: Requisitos ao estilo do POH do C172S para validar o método.
+aircraft_class: ga_single_engine
+# IDs rastreáveis (docs/REQUISITOS.md); origem = POH do 172S. Avaliadores por omissão do domínio.
+requirements:
+  propulsion_type: {target: piston_prop, id: C172-CFG-01, method: inspecao}
+  regulatory_category: {target: cs_23, id: C172-CERT-01, source: "CS-23", source_kind: regulamento}
+  crew_mass: {target: 77, unit: kg, id: C172-PL-01, source: "POH 172S"}
+  payload_mass: {target: 185, unit: kg, id: C172-PL-02, source: "POH 172S"}  # 262 kg (577 lb, POH c/ combustível std) − piloto 77 kg
+  range: {min: 1185, unit: km, id: C172-RNG-01, source: "POH 172S"}
+  cruise_speed: {target: 122, unit: kt, id: C172-CRZ-01, source: "POH 172S"}
+  cruise_altitude: {target: 8000, unit: ft, id: C172-CRZ-02, source: "POH 172S"}
+  stall_speed: {max: 48, unit: kt, id: C172-STALL-01, source: "POH 172S (V_S0)"}
+  takeoff_ground_roll: {max: 293, unit: m, id: C172-TO-01, source: "POH 172S"}
+  landing_distance: {max: 407, unit: m, id: C172-LD-01, source: "POH 172S"}
+  climb_rate: {min: 730, unit: ft/min, id: C172-CLB-01, source: "POH 172S"}
+  service_ceiling: {min: 13500, unit: ft, id: C172-CEIL-01, source: "POH 172S"}
+verification:
+  requirements:
+    - {id: C172-HQ-01, text: "Rolamento holandês Nível 1", source: "MIL-F-8785C Table VI", source_kind: norma,
+       comparison: bool, evaluator: "check:hq:dutch_roll", method: analise, fidelity: N1}
+    - {id: C172-HQ-02, text: "Espiral Nível 1", source: "MIL-F-8785C Table VIII", source_kind: norma,
+       comparison: bool, evaluator: "check:hq:spiral", method: analise, fidelity: N1}
+    - {id: C172-GEAR-01, text: "Folga de rotação na descolagem 10–15°", source: "Raymer 2018 Cap. 11",
+       source_kind: derivado, parent: C172-TO-01, comparison: bool, evaluator: "check:gear:rotation",
+       method: analise, fidelity: N0}
+assumptions:
+  weights:
+    method: components            # estatística (Raymer Table 3.1) só como valor inicial
+    components:
+      material: metal
+      landing_gear: tricycle
+      main_gear_length_m: 0.65
+      nose_gear_length_m: 0.55
+      engine_dry_mass_kg: 121.6   # IO-360-L2A, 268 lb (FAA TCDS 1E10, Note 7) — confirmar no TCDS
+      avionics_uninstalled_kg: 15 # PRESSUPOSTO: painel VFR/IFR básico
+      n_tanks: 2
+  aero:
+    fidelity: lowfi                # Fase 2: XFOIL (perfil) + AVL (carga em envergadura); 'handbook' = Raymer
+    AR: 7.32
+    taper: 0.7
+    tc_root: 0.12
+    tc_tip: 0.12
+    airfoil: NACA 2412
+    clmax_airfoil: 1.6
+    flap: {kind: slotted, flapped_area_ratio: 0.55}
+    extra_drag_areas_m2: {fixed_landing_gear: 0.20, cooling_and_engine: 0.10}
+    Q: {wing: 1.0}
+  geometry:
+    tail_arm_fraction: 0.60
+    wing_position: high          # Cessna 172: strut-braced high wing (struts not modelled)
+  stability:
+    # Inércias (Fase 9 / passo 0): raios de giração de Roskam Part V Tab. B2 (Cessna 172M, base W_OE com piloto)
+    # no peso operacional vazio + payload/combustível por componentes. Comparação com a soma de componentes e
+    # com o c172p do JSBSim (carregado a 2550 lb) em docs/tutorial-fase9-camber-flaps.md.
+    inertia_method: roskam
+    roskam_reference: cessna_172m
+    # Datum do POH 172S, Secção 6 (Weight & Balance): face dianteira da firewall.
+    # A estação de massa do motor é 8 % L (Roskam Parte V, Tabela 8.1, PRESSUPOSTO).
+    # A firewall fica meio comprimento de motor atrás desse ponto. Esse meio-comprimento
+    # é PRESSUPOSTO: a estação de massa não está demonstrada como o meio do motor.
+    # Comprimento total do IO-360-L2A: 29.81 in = 0.757174 m (EASA TCDS IM.E.032).
+    firewall_from_engine: true
+    engine_length_m: 0.757174
+    stations:
+      crew: [firewall, 37]      # bancos dianteiros, POH Sec. 6, braço 37.0 in
+      payload: [firewall, 73]   # bancos traseiros, POH Sec. 6, braço 73.0 in
+      fuel: [firewall, 48]      # combustível nas asas, POH Sec. 6, FS 48.00
+  weight_balance:
+    # Substitui os montantes tripulação / payload / combustível. A estrutura fica nas
+    # estações da estabilidade. O piloto (77 kg, requisito da missão) vai em todos os
+    # carregamentos.
+    # LEMAC e CMA do formulário de pesagem (POH Sec. 6): % CMA = (braço − 25.90) / 58.80.
+    # Não movem a asa. wb:envelope continua em metros, na CMA dimensionada.
+    # 15.6–36.5 % é o polígono certificado (35.0 in a ≤1950 lb, linha até 41.0 in a
+    # 2550 lb, e 47.3 in atrás), não a nuvem de carregamentos.
+    lemac_arm_in: 25.90
+    mac_in: 58.80
+    # Bagagem (POH Sec. 6): área 1 máx. 120 lb a 95 in, área 2 máx. 50 lb a 123 in,
+    # e 120 lb no conjunto. A área 1 fica em 70 lb para a soma dos máximos ser esse
+    # limite. O canto mais atrás legal do POH é 70 lb a 95 in + 50 lb a 123 in
+    # (momento 12 800 lb·in), e não 120 lb + 50 lb.
+    # Bancos traseiros a 60 kg: com essa bagagem cheia e o combustível dimensionado
+    # cheio, o canto fica à frente do limite conceptual (ponto neutro − 10 % da CMA
+    # dimensionada), que é mais apertado do que os 47.3 in do POH. Não é um limite
+    # de banco do POH. Os 185 kg de payload da missão continuam na estação de
+    # estabilidade (73 in) para a posição da asa e a tesoura; não se somam outra vez
+    # neste diagrama.
+    loading:
+      - {name: bancos dianteiros, arm_in: 37, mass_min_kg: 77, mass_max_kg: 77, kind: fixed}
+      - {name: bancos traseiros, arm_in: 73, mass_min_kg: 0, mass_max_kg: 60, kind: variable}
+      - {name: bagagem 1, arm_in: 95, mass_min_kg: 0, mass_max_kg: 31.751, kind: variable}   # 70 lb
+      - {name: bagagem 2, arm_in: 123, mass_min_kg: 0, mass_max_kg: 22.680, kind: variable}  # 50 lb
+      - {name: combustível, arm_in: 48, mass_max_kg: null, kind: fuel}
+  landing_gear:
+    # POH 172S Sec. 6, lista de equipamento: roda de nariz −6.8 in, roda principal 58.2 in.
+    # Sec. 1, vista em três planos, nota 2: entre-eixos 65 in. 58.2 − (−6.8) = 65.0.
+    # f = (58.2 − X) / 65 no CG de categoria normal: 35.7 % a 35.0 in, 16.8 % a 47.3 in.
+    # O envelope certificado está fora da banda 8–15 % de Raymer (Cap. 11).
+    # PRESSUPOSTO: braços da lista de equipamento na atitude de solo publicada.
+    # O formulário de pesagem não fixa A e B (mudam com a altura do amortecedor);
+    # não se usa um talão de balança preenchido.
+    nose_fraction_min: 0.1676923076923077    # (58.2 - 47.3) / 65
+    nose_fraction_max: 0.3569230769230769    # (58.2 - 35.0) / 65
+  propulsion:
+    # Hélice de passo fixo (propeller.py, BEMT): McCauley 1A170E/JHA7660 — 2 pás, Ø 76 in, passo 60 in a 0.75 R
+    # (POH 172S Sec. 1/2; designação McCauley "7660" = diâmetro/passo; Textron parts 1A170E-JHA7660).
+    # Corda calibrada à rotação estática medida: 2300–2400 rpm a todo o gás (POH Sec. 2) → 2350 (meio da banda).
+    # Perfil Clark Y: PRESSUPOSTO (secção da McCauley não publicada; Clark Y = NACA Rep. 640).
+    propeller: {type: fixed_pitch, rpm_rated: 2700, blades: 2, diameter_m: 1.930, pitch_m: 1.524,
+                static_rpm: 2350, airfoil: clarky}
+certification:                        # Fase 10 — ignorado pelo dimensionamento; usado por `acdt certify`
+  max_passenger_seats: 3              # C172S: 4 lugares (piloto + 3) → CS 23.2005 Nível 2 (2–6 passageiros)
+  safety:
+    t_flight_h: 1.0                   # duração média de voo — PRESSUPOSTO (AC 23.1309-1E: média por hora de voo)
+    unit:
+      altimeter_kg: 0.37              # United Instruments 5934 (13 oz) — unitedinst.com/Products/Altimeters
+      attitude_kg: 0.73               # Mid-Continent MD302 SAM (1.6 lb) — manual de instalação 9017782

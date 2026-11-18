@@ -1,0 +1,84 @@
+{
+ "design": "uav_endurance_payload",
+ "factors": {
+  "k_clmax": {
+   "group": "aero",
+   "value": 1.1749559036514619,
+   "hifi": 1.686335347,
+   "lowfi": 1.435232881301589,
+   "what": "section clmax at stall Re, SU2 RANS-SA / XFOIL"
+  },
+  "k_cd_profile": {
+   "group": "aero",
+   "value": 1.4031083304196825,
+   "hifi": 0.0157988420676855,
+   "lowfi": 0.01125988758327728,
+   "what": "section cd at cl 0.5, cruise Re, SU2 RANS-SA (fully turbulent) / XFOIL",
+   "valid": false,
+   "invalid_reason": "fully turbulent RANS-SA vs XFOIL with transition: not the same section cd; ratio reported, not applied"
+  },
+  "d_cm0": {
+   "group": "aero",
+   "value": -0.0056845019,
+   "hifi": -0.1031845019,
+   "lowfi": -0.0975,
+   "what": "section cm0 (c/4), RANS \u2212 XFOIL"
+  },
+  "k_EI": {
+   "group": "structures",
+   "value": 1.4867437718401704,
+   "hifi": 0.09872451,
+   "lowfi": 0.14677805037047262,
+   "what": "effective bending stiffness ratio = tip deflection beam(Phase 3 EI) / FEM"
+  },
+  "k_GJ": {
+   "group": "structures",
+   "value": 1.1163446422212484,
+   "hifi": 0.7341104126809251,
+   "lowfi": 0.8195202259951804,
+   "what": "effective torsional stiffness ratio = tip twist beam(Phase 3 GJ) / FEM"
+  },
+  "k_sigma_cap": {
+   "group": "structures",
+   "value": 0.26560790052910055,
+   "hifi": -132.80395026455028,
+   "lowfi": 500.0,
+   "what": "spar-cap |\u03c3| at ultimate / allowable (Phase 3 sizing target \u2264 1)"
+  },
+  "lambda_buckling": {
+   "group": "structures",
+   "value": 3.535721,
+   "hifi": 3.535721,
+   "lowfi": 1.0,
+   "what": "linear buckling eigenvalue at ultimate load (Phase 3 sized to 1.0)"
+  },
+  "k_f_bending": {
+   "group": "structures",
+   "value": 1.2622247547996184,
+   "hifi": 11.36423,
+   "lowfi": 9.003333167716317,
+   "what": "1st bending frequency FEM / strip"
+  },
+  "k_f_torsion": {
+   "group": "structures",
+   "value": 1.1190193608076244,
+   "hifi": 76.58352,
+   "lowfi": 68.438065222328,
+   "what": "1st torsion frequency FEM / strip"
+  },
+  "k_flutter": {
+   "group": "flutter",
+   "value": 1.3730559453461464,
+   "hifi": 126.82613005399577,
+   "lowfi": 92.36778041263497,
+   "what": "flutter speed FEM+DLM p-k (g = 0.03, min sym/antisym) / Phase 3 strip V_F"
+  }
+ },
+ "sources": {
+  "cfd2d": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/cfd2d",
+  "fem": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/fem",
+  "flutter": "/workspace/aircraft-design-tools/examples/output/uav_endurance_payload_hifi/flutter",
+  "lowfi": "examples/uav_endurance_payload.yaml (acdt size)"
+ },
+ "note": "ratios L3/L1-L2 of the same design; applied only if listed in assumptions.calibration.apply"
+}

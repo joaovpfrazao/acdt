@@ -1,0 +1,154 @@
+[
+ {
+  "id": "RM1",
+  "nivel": "missão",
+  "requisito": "Área de vigilância: mar territorial + zona contígua das Senkaku",
+  "valor": "15224 km²",
+  "justificacao": "área de maior atividade CCG na cadeia Nansei; união de círculos de 24 NM validada pelo mar territorial",
+  "fonte": "JCG Relatório 2025; Wikipedia (coordenadas); cálculo do estudo"
+ },
+ {
+  "id": "RM2",
+  "nivel": "missão",
+  "requisito": "Presença permanente 24/7 (P de haver aeronaves suficientes para o ciclo)",
+  "valor": ">= 0.95",
+  "justificacao": "CCG presente 357/365 dias em 2025; a JCG mantém navios 24/365; 0.95 = PRESSUPOSTO de credibilidade",
+  "fonte": "The Diplomat jan 2026; JCG Relatório 2025; limiar PRESSUPOSTO"
+ },
+ {
+  "id": "RM3",
+  "nivel": "missão",
+  "requisito": "Detetar um pesqueiro a entrar na área antes de chegar ao mar territorial",
+  "valor": ">= 0.9",
+  "justificacao": "janela = travessia da zona contígua (12 NM) a 10 kn = 1.20 h (transit_time); POD de Koopman",
+  "fonte": "alvos JCG FY2026; NSP-7 datasheet; limiar 0.9 e 10 kn PRESSUPOSTO"
+ },
+ {
+  "id": "RM4",
+  "nivel": "missão",
+  "requisito": "Identificar (EO/IR) um navio de 20 m a ≥ 10 km",
+  "valor": "IFOV <= 0.15 mrad (→ 10.4 km)",
+  "justificacao": "Johnson, identificação 50 %; 10 km de afastamento = PRESSUPOSTO (fora do alcance visual/armas ligeiras)",
+  "fonte": "johnson_range; afastamento PRESSUPOSTO"
+ },
+ {
+  "id": "RM5",
+  "nivel": "missão",
+  "requisito": "Operar a partir de aeroporto existente do 11.º Distrito, com descolagens/aterragens dentro do horário",
+  "valor": "Ishigaki 08:00–21:00 (ou Naha 24 h)",
+  "justificacao": "evita infraestrutura nova; o horário impõe a endurance (RA2)",
+  "fonte": "JMA Naha Airport (ROIG/RORS); 国土数値情報 C28-21"
+ },
+ {
+  "id": "RM6",
+  "nivel": "missão",
+  "requisito": "C2 em linha de vista a partir da base em toda a área",
+  "valor": "<= 248 km",
+  "justificacao": "sem SATCOM no modelo; horizonte rádio 4/3",
+  "fonte": "radar_horizon; PRESSUPOSTO antena 30 m"
+ },
+ {
+  "id": "RM7",
+  "nivel": "missão",
+  "requisito": "Minimizar custo de aquisição (e horas de voo/dia, perdas/ano)",
+  "valor": "min",
+  "justificacao": "orçamento desconhecido (Q4); FY2026 opera UAVs com 113.2 億円/ano",
+  "fonte": "JCG FY2026 (contexto)"
+ },
+ {
+  "id": "RM8",
+  "nivel": "missão",
+  "requisito": "Resiliência meteorológica: paragem anual por tufão",
+  "valor": "≈ 15 dias/ano (estimativa)",
+  "justificacao": "7.7 aproximações/ano × 2 dias (PRESSUPOSTO) → disponibilidade meteorológica ≈ 0.958; cobrir com navios/satélite",
+  "fonte": "JMA normal 1991–2020; PRESSUPOSTO 2 dias"
+ },
+ {
+  "id": "RA1",
+  "nivel": "aeronave",
+  "requisito": "Massa de payload",
+  "valor": "14.3 kg (L) / 28.35 kg (XL) / 5.0 kg (M)",
+  "justificacao": "radar + EO/IR + suportes",
+  "fonte": "datasheets NSP-7, Gabbiano UL, NSP-2, HD45; suportes PRESSUPOSTO"
+ },
+ {
+  "id": "RA2",
+  "nivel": "aeronave",
+  "requisito": "Endurance",
+  "valor": ">= 16.7 h (escolhido 18 h nominal; 19.1 h de projeto)",
+  "justificacao": "aeronave da noite com o aeroporto fechado (cálculo acima) + reserva 1 h",
+  "fonte": "cálculo do estudo; RM5"
+ },
+ {
+  "id": "RA3",
+  "nivel": "aeronave",
+  "requisito": "Velocidade de cruzeiro",
+  "valor": "45 m/s (87 kt)",
+  "justificacao": "velocidade de patrulha; dá 162 km/h de varrimento e trânsito ~1 h a Ishigaki",
+  "fonte": "PRESSUPOSTO (igual à família 150 kg)"
+ },
+ {
+  "id": "RA4",
+  "nivel": "aeronave",
+  "requisito": "Altitude de patrulha",
+  "valor": "3000 m",
+  "justificacao": "horizonte radar ≫ alcance; acima do tráfego VFR baixo; horizonte rádio ≥ 230 km",
+  "fonte": "radar_horizon; PRESSUPOSTO"
+ },
+ {
+  "id": "RA5",
+  "nivel": "aeronave",
+  "requisito": "Teto de serviço",
+  "valor": ">= 5000 m",
+  "justificacao": "margem sobre a patrulha e para evitar meteo",
+  "fonte": "PRESSUPOSTO (família 150 kg)"
+ },
+ {
+  "id": "RA6",
+  "nivel": "aeronave",
+  "requisito": "Velocidade de perda",
+  "valor": "<= 26 m/s",
+  "justificacao": "aproximação e aterragem em pista de 2000 m com vento cruzado",
+  "fonte": "PRESSUPOSTO (família 150 kg)"
+ },
+ {
+  "id": "RA7",
+  "nivel": "aeronave",
+  "requisito": "Razão de subida ao nível do mar",
+  "valor": ">= 3 m/s",
+  "justificacao": "subida a 3000 m em < 20 min",
+  "fonte": "PRESSUPOSTO (família 150 kg)"
+ },
+ {
+  "id": "RA8",
+  "nivel": "aeronave",
+  "requisito": "Corrida de descolagem",
+  "valor": "<= 300 m",
+  "justificacao": "pista 2000 m dá grande margem; permite pistas secundárias (800–1500 m) como alternante",
+  "fonte": "PRESSUPOSTO; pistas 国土数値情報 C28-21"
+ },
+ {
+  "id": "RA9",
+  "nivel": "aeronave",
+  "requisito": "Potência elétrica para o payload",
+  "valor": "275 W (NSP-7) / 450–750 W (Gabbiano UL)",
+  "justificacao": "consumo dos radares",
+  "fonte": "datasheets (não modelado no consumo — lacuna)"
+ },
+ {
+  "id": "RA10",
+  "nivel": "aeronave",
+  "requisito": "Base de certificação / segurança",
+  "valor": "STANAG 4703 (< 150 kg) ou 4671; SORA",
+  "justificacao": "base JCAB não disponível no acdt",
+  "fonte": "certify (acdt); PRESSUPOSTO Q5"
+ },
+ {
+  "id": "RA11",
+  "nivel": "aeronave",
+  "requisito": "Folga do hélice/fuselagem na rotação e pouso",
+  "valor": ">= 10° de rotação",
+  "justificacao": "incidente MQ-9B em Kitakyushu (hélice na pista, nov 2025) mostra o risco em propulsores",
+  "fonte": "Raymer Cap. 11; Yomiuri"
+ }
+]

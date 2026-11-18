@@ -1,0 +1,36 @@
+{
+ "n_facets": 8272,
+ "frontal": {
+  "VV": {
+   "mean_m2": 0.03053340165694555,
+   "mean_dbsm": -15.152248092439113,
+   "median_dbsm": -28.64219698680799,
+   "max_dbsm": -4.002608623545447,
+   "n": 61
+  },
+  "HH": {
+   "mean_m2": 0.030533401656945545,
+   "mean_dbsm": -15.152248092439113,
+   "median_dbsm": -28.64219698680799,
+   "max_dbsm": -4.002608623545447,
+   "n": 61
+  }
+ },
+ "all_aspects": {
+  "VV": {
+   "mean_m2": 42.30676555162735,
+   "mean_dbsm": 16.264098238003267,
+   "median_dbsm": -16.954973050358106,
+   "max_dbsm": 34.63242548787945,
+   "n": 361
+  },
+  "HH": {
+   "mean_m2": 42.30676555162735,
+   "mean_dbsm": 16.264098238003267,
+   "median_dbsm": -16.954973050358106,
+   "max_dbsm": 34.63242548787945,
+   "n": 361
+  }
+ },
+ "png": "/workspace/aircraft-design-tools/examples/output/cessna172_check_rcs/cessna172_check_rcs_polar.png"
+}

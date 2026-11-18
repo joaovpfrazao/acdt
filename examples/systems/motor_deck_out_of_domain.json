@@ -1,0 +1,15 @@
+{
+  "label": "I acima de I_max → fora de domínio, η não aplicada (não se recorta o corrente)",
+  "deck": {
+    "kv_rpm_per_V": 500,
+    "R_ohm": 0.15,
+    "I0_A": 0.6,
+    "I_max_A": 20.0,
+    "source": "EXAMPLE / PRESSUPOSTO ilustrativo (I_max deliberadamente baixo)",
+    "retrieved": "2026-11-10"
+  },
+  "operating": {
+    "V_V": 22.0,
+    "rpm": 8000
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "item": "G3",
+  "applied": false,
+  "drag.calibration": null,
+  "reason": "No RANS-SA force integration was run, so no component factor was computed and none was written into an assembly. Q and FF were not revised.",
+  "case": {
+    "geometry": "NACA Report 540 combination 7, half model, same stations as examples/validation/avl_bodies/tr540_c07_mid.json",
+    "citation": "Eastman N. Jacobs and Kenneth E. Ward, NACA Report No. 540, 1936",
+    "wing": "NACA 0012, chord 0.127 m, semispan 0.381 m",
+    "flow": "Mach 0.15, Re_chord 3.1e6, the buildup point. Alpha 0 is the CD0 point (symmetric section, CL about 0).",
+    "surface": "Smooth OpenCASCADE loft. Nose and tail stations that are points in the table are closed with a 0.3 mm radius. That radius is a CAD closure, not a change to the station table."
+  },
+  "buildup": {
+    "source": "acdt cd0_buildup defaults: surface laminar fraction 0.10, body 0, smooth_paint. rho chosen so Re_chord = 3.1e6 at Mach 0.15.",
+    "Sref_m2": 0.096774,
+    "CD0_nominal": 0.015430933549716107,
+    "CD0_pessimistic": 0.017244103320097938,
+    "lp_fraction_nominal": 0.05,
+    "components": {
+      "wing": {"f_m2": 0.0009469961940702806, "CD0": 0.009785646910020054, "FF": 1.2006747543959313, "Q": 1.0},
+      "fuselage": {"f_m2": 0.000475206818634697, "CD0": 0.004910480280185763, "FF": 1.312920971973747, "Q": 1.0}
+    },
+    "denominator": "A factor would be D/q_CFD divided by f_m2 (friction*Q + upsweep + base), before the leakage and protuberance markup. The total CD0 band includes that markup."
+  },
+  "mesh": {
+    "tool": "Gmsh 4.15.2, 2026-03-24, Windows, called as gmsh.exe. The Gmsh Python API was not imported.",
+    "markers_on_the_coarse_volume": {"wing": 98, "fuselage": 4, "symmetry": 1, "farfield": 5},
+    "isotropic_level1": {
+      "file": "level1.su2",
+      "H_m": 0.008,
+      "NELEM_tets": 102184,
+      "NPOIN": 21547,
+      "MARKER_ELEMS": {"wing": 12336, "fuselage": 2676, "symmetry": 3450, "farfield": 906},
+      "prisms": 0
+    }
+  },
+  "why_not_a_calibration": [
+    "Gmsh 4.15.2 documents the BoundaryLayer field as a 2D constraint (manual: insert a 2D boundary layer next to curves). Field[3].FacesList is an unknown option on that field. Confirmed on this binary.",
+    "Extrude { Surface{...}; Layers{...}; } on the OpenCASCADE model stops with: Boundary layer extrusion not available with OpenCASCADE geometry kernel.",
+    "ClassifySurfaces + CreateGeometry + Extrude, then gmsh -3, wrote 500 nodes and 2472 tetrahedra and 0 prisms. The -3 pass remeshes extruded volumes with the tetrahedral algorithm. A rerun without -3 did not advance (the process stayed idle and was stopped).",
+    "At Re_chord = 3.1e6 and the buildup density, a y+ of about 1 is a first cell near 1e-6 m. The isotropic mesh spacing is 0.008 m. Spalart-Allmaras integrated to the wall on that mesh is not a calibration of the buildup. Three such levels would not be a Richardson study of the viscous drag.",
+    "OpenVSP is not installed on this Windows host. The image does contain an OpenVSP tree, but SU2 for this run is the Windows OpenMP build. A smooth OML was built in Gmsh instead of a faceted STEP."
+  ]
+}

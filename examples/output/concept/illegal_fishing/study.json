@@ -1,0 +1,3809 @@
+{
+ "schema": "acdt.concept_study/1",
+ "id": "vigilancia_de_pesca_ilegal_na_zee_continental_zo",
+ "title": "Vigilância de pesca ilegal na ZEE continental (zona centro)",
+ "problem": "Quero vigiar esta área de mar porque há barcos estrangeiros a fazer pesca ilegal.",
+ "created": "2026-10-29T14:05:21+00:00",
+ "interpretations": [
+  {
+   "text": "Necessidade: detetar, seguir e identificar (para prova e intervenção) embarcações de pesca estrangeiras a pescar ilegalmente numa área de mar português. A decisão a tomar é QUE ARQUITETURA de sistema aéreo não tripulado (quantas aeronaves, de que tamanho, com que sensores, a partir de onde) dá cobertura credível ao menor custo. A intervenção (abordagem) é de outra entidade (Marinha/autoridade de pescas); o sistema aéreo entrega deteção + identificação + track.",
+   "id": "INT1"
+  },
+  {
+   "text": "Cadeia de missão: radar marítimo (área larga, dia/noite, independente do AIS — quem pesca ilegalmente pode desligar o AIS) → correlação com AIS/VMS → EO/IR para identificação (nome/número de casco, artes de pesca) → registo e entrega do track. Logo, os requisitos-chave são probabilidade de deteção na área numa janela de tempo, presença permanente e capacidade de identificação.",
+   "id": "INT2"
+  }
+ ],
+ "assumptions": [
+  {
+   "text": "Área de vigilância: retângulo 38.9–40.1 N × 10.9–9.7 W (ao largo de Peniche/Nazaré, dentro da ZEE continental)",
+   "rationale": "o utilizador não indicou a área; escolhida uma área representativa (~1/20 da ZEE continental de 287 521 km²) para tornar o estudo concreto",
+   "id": "ASS1"
+  },
+  {
+   "text": "Base: BA5 Monte Real (39.828 N, 8.887 W), pista existente",
+   "rationale": "aeródromo militar público mais próximo da área; alternativa civil a avaliar",
+   "id": "ASS2"
+  },
+  {
+   "text": "Alvo: embarcação de pesca 15–40 m; a pescar 2–6 kn (arrasto de fundo 3–5 kn), em trânsito 8–12 kn",
+   "source": "FAO / IMCS (velocidades de arrasto e trânsito)",
+   "id": "ASS3"
+  },
+  {
+   "text": "Janela de deteção = tempo de travessia da área por uma embarcação a 10 kn",
+   "rationale": "pior caso razoável: embarca que entra, pesca pouco e sai; uma embarcação a pescar fica muitas horas (janela maior, requisito mais fácil) — sensibilidade a 12 h",
+   "id": "ASS4"
+  },
+  {
+   "text": "Disponibilidade operacional da aeronave A = 0.85 (sensibilidade 0.70)",
+   "rationale": "sem dado público fiável para esta classe; valor de planeamento a confirmar com MTBF/MTTR reais — o número de aeronaves é sensível a isto",
+   "id": "ASS5"
+  },
+  {
+   "text": "Turnaround no solo 4 h (L/M), reserva 1 h, sobreposição na passagem de estação 0.25 h",
+   "rationale": "abastecimento, inspeção pós-voo e briefing; reserva para desvio/meteo",
+   "id": "ASS6"
+  },
+  {
+   "text": "Largura de varrimento do radar: NSP-7 = 20.4 km (datasheet, alvo 'fishing boat'); NSP-2 = 10 km (sensibilidade 5–20 km)",
+   "rationale": "NSP-2 anuncia 44 km de deteção MMTI marítima sem indicar a classe de alvo; 10 km é deliberadamente conservador",
+   "id": "ASS7"
+  },
+  {
+   "text": "Lei de deteção de Koopman (pesquisa aleatória) para o requisito",
+   "rationale": "conservador face ao varrimento paralelo (alvo em movimento, navegação imperfeita, estado do mar); o varrimento paralelo dá o limite otimista",
+   "id": "ASS8"
+  },
+  {
+   "text": "Produção de N = 50 unidades para o CER de custo (L0); ano 2026",
+   "rationale": "ordem de grandeza de um programa pequeno; o custo unitário é sensível a N e o CER tem baixa confiança para UAV",
+   "id": "ASS9"
+  },
+  {
+   "text": "S: lançamento e recuperação no navio dentro da área (trânsito 0.25 h cada sentido), troca de bateria 1 h, reserva 0.25 h",
+   "rationale": "opção criativa 'mothership'; custo e disponibilidade do navio não incluídos",
+   "id": "ASS10"
+  }
+ ],
+ "questions": [
+  {
+   "text": "Qual é a área real (polígono) e há várias áreas/prioridades?",
+   "id": "QUE1"
+  },
+  {
+   "text": "É preciso presença 24/7 ou só em certos períodos/épocas (ex.: campanhas de pesca, noite)?",
+   "id": "QUE2"
+  },
+  {
+   "text": "Que meios já existem (navios-patrulha, aviões de patrulha marítima, dados de satélite EMSA/Copernicus) e com quem o sistema tem de partilhar dados?",
+   "id": "QUE3"
+  },
+  {
+   "text": "Orçamento de aquisição e de operação, e horizonte do programa?",
+   "id": "QUE4"
+  },
+  {
+   "text": "Bases possíveis (BA5, aeródromos civis, navios) e restrições de espaço aéreo?",
+   "id": "QUE5"
+  }
+ ],
+ "requirements": [
+  {
+   "id": "REQ1",
+   "text": "Detetar uma embarcação de pesca na área dentro da janela de travessia",
+   "metric": "pod_window",
+   "threshold": ">= 0.9",
+   "justification": "janela = 5.56 h (travessia de 103 km a 10 kn, chamada transit_time); 0.9 = PRESSUPOSTO de eficácia credível"
+  },
+  {
+   "id": "REQ2",
+   "text": "Presença permanente (24/7) dos sensores previstos na estação",
+   "metric": "p_enough_available",
+   "threshold": ">= 0.95",
+   "justification": "prob. de haver aeronaves disponíveis suficientes para manter o ciclo (binomial k-de-N); 0.95 = PRESSUPOSTO"
+  },
+  {
+   "id": "REQ3",
+   "text": "Identificação EO/IR de uma embarcação de 15 m a distância de segurança",
+   "metric": "ifov_rad",
+   "threshold": "<= 1e-4 (≈ 11.7 km a 50 %)",
+   "justification": "Johnson (identificação, 6.4 ciclos): IFOV 0.1 mrad → 11.7 km; o datasheet da HD45 tem de ser verificado contra este valor (não avaliado aqui)"
+  },
+  {
+   "id": "REQ4",
+   "text": "Minimizar o custo de aquisição da frota (e, como indicador de operação, horas de voo e combustível por dia)",
+   "metric": "acquisition_usd",
+   "threshold": "min",
+   "justification": "objetivo, não limite (orçamento desconhecido — pergunta Q4)"
+  }
+ ],
+ "alternatives": [
+  {
+   "id": "A1",
+   "text": "1×L, sem continuidade (uma aeronave grande)",
+   "evaluable": true,
+   "how": "size_fleet + persistent_coverage(fleet 1)"
+  },
+  {
+   "id": "A2",
+   "text": "L, 1 estação 24/7",
+   "evaluable": true,
+   "how": "persistent_coverage + sweep_coverage + size_fleet"
+  },
+  {
+   "id": "A3",
+   "text": "L, 2 estações 24/7",
+   "evaluable": true,
+   "how": "idem"
+  },
+  {
+   "id": "A4",
+   "text": "M, 2 estações 24/7 (radar ligeiro)",
+   "evaluable": true,
+   "how": "idem"
+  },
+  {
+   "id": "A5",
+   "text": "M, 3 estações 24/7",
+   "evaluable": true,
+   "how": "idem"
+  },
+  {
+   "id": "A6",
+   "text": "Misto: 1 estação L (área larga) + 1 estação M (identificação/seguimento por cueing)",
+   "evaluable": true,
+   "how": "idem; POD combinada pela aditividade do esforço de Koopman"
+  },
+  {
+   "id": "A7",
+   "text": "S elétrico 25 kg lançado de navio, 2 estações",
+   "evaluable": true,
+   "how": "trânsito ~0; custo do navio NÃO incluído"
+  },
+  {
+   "id": "X1",
+   "text": "Aeróstato cativo costeiro com radar",
+   "evaluable": false,
+   "reason": "acdt não dimensiona aeróstatos; cobre só a faixa costeira (a área começa ~25 km da costa)"
+  },
+  {
+   "id": "X2",
+   "text": "Satélite SAR + AIS (ex.: serviços EMSA/Copernicus) com aeronave só para identificação",
+   "evaluable": false,
+   "reason": "revisita e latência de satélite não modeladas; muito promissor como cueing — pergunta Q3"
+  },
+  {
+   "id": "X3",
+   "text": "Avião tripulado de patrulha marítima existente",
+   "evaluable": false,
+   "reason": "meio existente, custo/hora não público aqui"
+  },
+  {
+   "id": "X4",
+   "text": "VTOL lançado de navio-patrulha",
+   "evaluable": false,
+   "reason": "acdt ainda não dimensiona VTOL"
+  },
+  {
+   "id": "X5",
+   "text": "HALE solar / estratosférico",
+   "evaluable": false,
+   "reason": "fora do âmbito do dimensionamento atual"
+  },
+  {
+   "id": "X6",
+   "text": "Veículos de superfície não tripulados (USV) com radar",
+   "evaluable": false,
+   "reason": "não é aeronave; horizonte baixo"
+  }
+ ],
+ "sources": [
+  {
+   "text": "IMSAR NSP-7: 10.9 kg, 275 W, banda Ku; marítimo: faixa 20.4 km para barco de pesca",
+   "url": "https://www.radartutorial.eu/19.kartei/08.airborne/pubs/nsp-7_datasheet_spreads.pdf",
+   "retrieved": "2026-10-29",
+   "id": "SOU1"
+  },
+  {
+   "text": "IMSAR NSP-2: 1.5–2.1 kg, ≤ 56 W; MMTI marítimo deteção/track 44 km (classe não indicada)",
+   "url": "https://www.imsar.com/radar-products/nsp-2",
+   "retrieved": "2026-10-29",
+   "id": "SOU2"
+  },
+  {
+   "text": "Trillium HD25 0.35–0.39 kg; HD45-LV-CZ 1.35 kg",
+   "url": "https://www.trilliumeng.com",
+   "retrieved": "2026-10-29",
+   "id": "SOU3"
+  },
+  {
+   "text": "ZEE de Portugal continental 287 521 km²",
+   "url": "https://www.dgrm.pt",
+   "retrieved": "2026-10-29",
+   "id": "SOU4"
+  },
+  {
+   "text": "Velocidades de arrasto 2–6 kn, trânsito 8–12 kn",
+   "url": "FAO fishing techniques / IMCS network",
+   "retrieved": "2026-10-29",
+   "id": "SOU5"
+  },
+  {
+   "text": "Gasolina 95 em Portugal: 2.067 €/L (média DGEG, 27 out 2026)",
+   "url": "https://www.combustivel.com.pt",
+   "retrieved": "2026-10-29",
+   "id": "SOU6"
+  }
+ ],
+ "findings": [
+  {
+   "text": "Horizonte radar a 3000 m = 235 km e a 600 m = 110 km, muito acima dos alcances dos radares (20–44 km): a deteção é limitada pelo sensor, não pelo horizonte; voar mais baixo não penaliza a deteção mas reduz a área por hora apenas pela velocidade.",
+   "id": "FIN1"
+  },
+  {
+   "text": "Variante L: W0 127.9 kg, endurance 16.45 h, custo unitário 184 k$ (N=50), perda por surtida 0.0279; viável=False; verificações falhadas: trim, hq:scissor, hq:dutch_roll, wb:envelope, gear:position, gear:tipback, perf:endurance; base de certificação ['stanag4703'].",
+   "id": "FIN2"
+  },
+  {
+   "text": "Variante M: W0 92.4 kg, endurance 10.62 h, custo unitário 163 k$ (N=50), perda por surtida 0.0182; viável=True; verificações falhadas: hq:scissor, hq:dutch_roll, wb:envelope, gear:position, gear:tipback; base de certificação ['stanag4703'].",
+   "id": "FIN3"
+  },
+  {
+   "text": "Variante S: W0 23.6 kg, endurance 2.73 h, custo unitário 42 k$ (N=50), perda por surtida 0.0047; viável=False; verificações falhadas: wing_span, hq:scissor, hq:CAP, hq:spiral, wb:envelope, perf:endurance; base de certificação ['stanag4703'].",
+   "id": "FIN4"
+  },
+  {
+   "text": "Indicadores derivados no script (aritmética sobre resultados das ferramentas): pod_window de frotas mistas = 1 − Π(1 − POD_i) (aditividade do esforço de Koopman); losses_per_year = surtidas/dia · 365 · p_loss_per_sortie (ARP4761 low-fi, taxas genéricas do template 'uas'); A6 dimensionada com confiança √0.95 por tipo (independência).",
+   "id": "FIN5"
+  },
+  {
+   "text": "A taxa de perda por surtida vem do template ARP4761 low-fi 'uas' com taxas de falha genéricas: com dezenas de surtidas por semana, a atrição prevista (losses_per_year) pesa mais do que a aquisição. É o PRESSUPOSTO mais crítico para o custo de ciclo de vida e tem de ser substituído por dados de fiabilidade reais (MTBF dos componentes) antes de qualquer decisão.",
+   "id": "FIN6"
+  },
+  {
+   "text": "Sensibilidades: A4 POD com W_NSP-2=5 km → 0.481; A4 POD com W_NSP-2=20 km → 0.927; A3 frota L para 95 % com A=0.7 → 9; A2 POD com janela 12 h → 0.944; A2 POD varrimento paralelo (otimista) → 1",
+   "id": "FIN7"
+  }
+ ],
+ "notes": [],
+ "recommendation": {
+  "chosen": "A3",
+  "text": "A3: L, 2 estações 24/7 — 6 aeronaves, aquisição ≈ 1.10 M$ (CER L0, baixa confiança), POD na janela 0.93, P(frota suficiente) 0.953, 54 h de voo/dia.",
+  "rationale": "alternativa mais barata no conjunto de Pareto que cumpre REQ1 (POD ≥ 0.9 na janela) e REQ2 (P ≥ 0.95); sem pesos — o compromisso custo/POD/horas de voo está no gráfico e na tabela. ATENÇÃO: a variante L ainda não fecha no dimensionamento L0 (verificações falhadas: trim, hq:scissor, hq:dutch_roll, wb:envelope, gear:position, gear:tipback, perf:endurance); a arquitetura é válida ao nível conceptual, a aeronave tem de ser corrigida (trim/estabilidade/W&B/trem; a verificação por segmentos dá endurance ligeiramente abaixo de 16 h). A atrição prevista (FIN6) domina o custo de ciclo de vida se as taxas genéricas se confirmarem.",
+  "sensitivities": {
+   "A4 POD com W_NSP-2=5 km": 0.48084864030988916,
+   "A4 POD com W_NSP-2=20 km": 0.9273599753006473,
+   "A3 frota L para 95 % com A=0.7": 9,
+   "A2 POD com janela 12 h": 0.9442374961964141,
+   "A2 POD varrimento paralelo (otimista)": 1.0
+  },
+  "not_evaluated": "X1–X6 (aeróstato, satélite+aeronave, avião tripulado, VTOL, HALE, USV); custo de operação (manutenção, pessoal, seguros); meteorologia e espaço aéreo; desempenho do radar com estado do mar; o custo do navio em A7; a câmara (REQ3) contra o datasheet",
+  "next_steps": "responder às perguntas Q1–Q5; obter a largura de varrimento do NSP-2 para barco de pesca; corrigir as verificações falhadas da variante escolhida (trim/HQ/W&B/trem) em L1; avaliar X2 (satélite como cueing) porque pode reduzir muito o número de aeronaves"
+ },
+ "calls": [
+  {
+   "seq": 1,
+   "tool": "geo_measure",
+   "args": {
+    "points": {
+     "BA5": [
+      39.828,
+      -8.887
+     ],
+     "centro": [
+      39.5,
+      -10.3
+     ],
+     "bordo_E": [
+      39.5,
+      -9.7
+     ],
+     "bordo_W": [
+      39.5,
+      -10.9
+     ]
+    },
+    "legs": [
+     [
+      "BA5",
+      "centro"
+     ],
+     [
+      "BA5",
+      "bordo_E"
+     ],
+     [
+      "bordo_W",
+      "bordo_E"
+     ]
+    ],
+    "polygon": [
+     [
+      38.9,
+      -10.9
+     ],
+     [
+      38.9,
+      -9.7
+     ],
+     [
+      40.1,
+      -9.7
+     ],
+     [
+      40.1,
+      -10.9
+     ]
+    ]
+   },
+   "result": {
+    "method": "Sinnott 1984 (haversine); R = 6371.0088 km (Moritz 2000, GRS 80 R1); Chamberlain & Duquette 2007, JPL Publ. 07-03 (polygon on a sphere)",
+    "validity": "spherical Earth; simple polygon without a pole; short edges",
+    "area_km2": 13738.260752262873,
+    "polygon_reference_point": [
+     39.5,
+     -10.3
+    ],
+    "legs": [
+     {
+      "from": "BA5",
+      "to": "centro",
+      "distance_km": 126.3277359695501
+     },
+     {
+      "from": "BA5",
+      "to": "bordo_E",
+      "distance_km": 78.56888738358921
+     },
+     {
+      "from": "bordo_W",
+      "to": "bordo_E",
+      "distance_km": 102.96026755648526
+     }
+    ]
+   }
+  },
+  {
+   "seq": 2,
+   "tool": "transit_time",
+   "args": {
+    "distance_km": 102.96026755648526,
+    "airspeed_m_s": 5.14444
+   },
+   "result": {
+    "t_out_h": 5.559414498224473,
+    "t_back_h": 5.559414498224473,
+    "t_round_trip_h": 11.118828996448945,
+    "method": "kinematics, ground speed V ∓ w",
+    "validity": "steady wind along track; no climb/descent"
+   }
+  },
+  {
+   "seq": 3,
+   "tool": "johnson_range",
+   "args": {
+    "target_dim_m": 15.0,
+    "task": "identification",
+    "ifov_rad": 0.0001
+   },
+   "result": {
+    "task": "identification",
+    "cycles": 6.4,
+    "pixels_on_target": 12.8,
+    "ifov_rad": 0.0001,
+    "max_range_km": 11.718749999999998,
+    "method": "Johnson 1958 'Analysis of image forming systems' (Image Intensifier Symposium)",
+    "validity": "50 % task probability; geometric resolution only (no atmosphere, contrast, MTF, motion)"
+   }
+  },
+  {
+   "seq": 4,
+   "tool": "radar_horizon",
+   "args": {
+    "h_sensor_m": 3000,
+    "h_target_m": 5
+   },
+   "result": {
+    "horizon_km": 234.9777493845074,
+    "k": 1.3333333333333333,
+    "method": "Skolnik 2001 'Introduction to Radar Systems' 3rd ed. Sec. 8.2 (4/3-earth refraction)",
+    "validity": "standard atmosphere refraction; ducting/sub-refraction not modelled"
+   }
+  },
+  {
+   "seq": 5,
+   "tool": "radar_horizon",
+   "args": {
+    "h_sensor_m": 600,
+    "h_target_m": 5
+   },
+   "result": {
+    "horizon_km": 110.18008738139915,
+    "k": 1.3333333333333333,
+    "method": "Skolnik 2001 'Introduction to Radar Systems' 3rd ed. Sec. 8.2 (4/3-earth refraction)",
+    "validity": "standard atmosphere refraction; ducting/sub-refraction not modelled"
+   }
+  },
+  {
+   "seq": 6,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "L",
+      "spec_path": "examples/concept/illegal_fishing/variant_L.yaml",
+      "quantity": 1,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     },
+     {
+      "id": "M",
+      "spec_path": "examples/concept/illegal_fishing/variant_M.yaml",
+      "quantity": 1,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     },
+     {
+      "id": "S",
+      "spec_path": "examples/concept/illegal_fishing/variant_S.yaml",
+      "quantity": 1,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "L",
+      "quantity": 1,
+      "status": "done",
+      "run_id": "20261029-140521-size-pesca_ilegal_l_gasolina_radar_nsp_7_eo_i-f453",
+      "level": "L0",
+      "feasible": false,
+      "failed_checks": [
+       "trim",
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback",
+       "perf:endurance"
+      ],
+      "aircraft": {
+       "W0_kg": 127.87106667760281,
+       "We_kg": 85.36118085363634,
+       "payload_kg": 14.3,
+       "fuel_or_battery_kg": 28.209885821026358,
+       "P_SL_W": 12573.082861048722,
+       "T_SL_N": null,
+       "wing_span_m": 5.2546224261761045,
+       "wing_area_m2": 1.7256910526045532,
+       "endurance_h": 16.4464526312886,
+       "range_km": 2639.458155975764,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.7152565634341341
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 127.9 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 184132.72517988578,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 92066.36258994289,
+         "high": 368265.45035977155,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.6207582623597223,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 482567.3608859977,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 16.860781208430794,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 16.4464526312886,
+       "catastrophic_per_fh": 0.0017214049126849007,
+       "target_per_fh": 1.1730566100476049e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.027914003194668857,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     },
+     {
+      "id": "M",
+      "quantity": 1,
+      "status": "done",
+      "run_id": "20261029-140529-size-pesca_ilegal_m_gasolina_radar_nsp_2_eo_i-baed",
+      "level": "L0",
+      "feasible": true,
+      "failed_checks": [
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback"
+      ],
+      "aircraft": {
+       "W0_kg": 92.41949725558875,
+       "We_kg": 70.63143566048957,
+       "payload_kg": 5.0,
+       "fuel_or_battery_kg": 16.788061592020984,
+       "P_SL_W": 10521.14172997238,
+       "T_SL_N": null,
+       "wing_span_m": 4.467218260572168,
+       "wing_area_m2": 1.2472524367243394,
+       "endurance_h": 10.615531033785269,
+       "range_km": 1695.6507523897587,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.5814622498479687
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 92.4 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 162601.57741691457,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 81300.78870845729,
+         "high": 325203.15483382915,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.5881009878953423,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 420829.3031460576,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 14.109082929972741,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 10.615531033785269,
+       "catastrophic_per_fh": 0.0017286879535579596,
+       "target_per_fh": 1.623034148142688e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.018183587368016063,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     },
+     {
+      "id": "S",
+      "quantity": 1,
+      "status": "done",
+      "run_id": "20261029-140537-size-pesca_ilegal_s_el_trico_25_kg_nsp_2_hd25-5f7e",
+      "level": "L0",
+      "feasible": false,
+      "failed_checks": [
+       "wing_span",
+       "hq:scissor",
+       "hq:CAP",
+       "hq:spiral",
+       "wb:envelope",
+       "perf:endurance"
+      ],
+      "aircraft": {
+       "W0_kg": 23.587472811247743,
+       "We_kg": 10.216297961348447,
+       "payload_kg": 3.0,
+       "fuel_or_battery_kg": 10.371174848794665,
+       "P_SL_W": 1226.949805183903,
+       "T_SL_N": null,
+       "wing_span_m": 4.277308794408141,
+       "wing_area_m2": 1.306812180194373,
+       "endurance_h": 2.727570342607572,
+       "range_km": 212.43272674303947,
+       "cruise_speed_m_s": 22.0,
+       "cruise_altitude_m": 600.0
+      },
+      "propulsion": "electric",
+      "assumed": [
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 23.6 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 42071.40363999796,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft",
+         "propulsion 'electric' not represented in the CER databases"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 21035.70181999898,
+         "high": 84142.80727999592,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 1.9014991887918362,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 79998.73989279002,
+       "notes": [
+        "engine cost NOT included (give engine_cost or power_bhp for a piston engine)",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 42.764615779365684,
+        "unmanned": true,
+        "propulsion": "electric"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 2.727570342607572,
+       "catastrophic_per_fh": 0.0017385731502034326,
+       "target_per_fh": 6.359307807170937e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.004730854650652816,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 3,
+     "W0_kg": 243.8780367444393,
+     "We_kg": 166.2089144754744,
+     "P_SL_W": 24321.174396205006,
+     "payload_kg": 22.3,
+     "acquisition_usd": 388805.7062367983
+    },
+    "missing": [],
+    "all_feasible": false,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 7,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 1,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 2,
+    "sorties_per_day": 1.7599371059586402,
+    "flight_hours_per_day": 27.18478514123728,
+    "fleet_expected": 3,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 4
+    }
+   }
+  },
+  {
+   "seq": 8,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 2,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 4,
+    "sorties_per_day": 3.5198742119172803,
+    "flight_hours_per_day": 54.36957028247456,
+    "fleet_expected": 5,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 6
+    }
+   }
+  },
+  {
+   "seq": 9,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 3,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 6,
+    "sorties_per_day": 5.279811317875921,
+    "flight_hours_per_day": 81.55435542371185,
+    "fleet_expected": 8,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 9
+    }
+   }
+  },
+  {
+   "seq": 10,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 10.615531033785269,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 1,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 8.055929355148846,
+     "effective_time_on_station_h": 7.805929355148846,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5840343593843813,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 2,
+    "sorties_per_day": 3.074585857501955,
+    "flight_hours_per_day": 29.56377572884734,
+    "fleet_expected": 3,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 4
+    }
+   }
+  },
+  {
+   "seq": 11,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 10.615531033785269,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 2,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 8.055929355148846,
+     "effective_time_on_station_h": 7.805929355148846,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5840343593843813,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 4,
+    "sorties_per_day": 6.14917171500391,
+    "flight_hours_per_day": 59.12755145769468,
+    "fleet_expected": 5,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 6
+    }
+   }
+  },
+  {
+   "seq": 12,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 10.615531033785269,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 3,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 8.055929355148846,
+     "effective_time_on_station_h": 7.805929355148846,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5840343593843813,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 6,
+    "sorties_per_day": 9.223757572505866,
+    "flight_hours_per_day": 88.69132718654203,
+    "fleet_expected": 8,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 9
+    }
+   }
+  },
+  {
+   "seq": 13,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 2.727570342607572,
+    "turnaround_h": 1.0,
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "reserve_h": 0.25,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 1,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 1.9775703426075721,
+     "effective_time_on_station_h": 1.7275703426075721,
+     "round_trip_h": 1.5,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5352541259292457,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 2,
+    "sorties_per_day": 13.892343141162469,
+    "flight_hours_per_day": 34.41925735587185,
+    "fleet_expected": 3,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 4
+    }
+   }
+  },
+  {
+   "seq": 14,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 2.727570342607572,
+    "turnaround_h": 1.0,
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "reserve_h": 0.25,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 2,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 1.9775703426075721,
+     "effective_time_on_station_h": 1.7275703426075721,
+     "round_trip_h": 1.5,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5352541259292457,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 4,
+    "sorties_per_day": 27.784686282324937,
+    "flight_hours_per_day": 68.8385147117437,
+    "fleet_expected": 5,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 6
+    }
+   }
+  },
+  {
+   "seq": 15,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 2.727570342607572,
+    "turnaround_h": 1.0,
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "reserve_h": 0.25,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 3,
+    "availability": 0.85,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 1.9775703426075721,
+     "effective_time_on_station_h": 1.7275703426075721,
+     "round_trip_h": 1.5,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5352541259292457,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 6,
+    "sorties_per_day": 41.677029423487404,
+    "flight_hours_per_day": 103.25777206761555,
+    "fleet_expected": 8,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 9
+    }
+   }
+  },
+  {
+   "seq": 16,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "availability": 0.85,
+    "fleet_size": 1
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 2,
+    "sorties_per_day": 1.7599371059586402,
+    "flight_hours_per_day": 27.18478514123728,
+    "fleet_expected": 3,
+    "fleet": {
+     "n": 1,
+     "mean_on_station": 0.6038263179344641,
+     "continuous_stations_expected": 0,
+     "available_aircraft_expected": 0.85,
+     "feasible": true,
+     "p_enough_available": 0.0
+    }
+   }
+  },
+  {
+   "seq": 17,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 20.4,
+    "speed_m_s": 45.0,
+    "n_on_station": 0.6038263179344641,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 1995.525215509817,
+    "time_to_sweep_area_h": 6.884533778618789,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 0.8075222922851039,
+     "pod_random_search": 0.5540383388861407,
+     "pod_parallel_sweep": 0.8075222922851039
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 15.852224850861594,
+     "time_parallel_h": 6.196080400756911
+    }
+   }
+  },
+  {
+   "seq": 18,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "Lx1",
+      "spec_path": "examples/concept/illegal_fishing/variant_L.yaml",
+      "quantity": 1,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "Lx1",
+      "quantity": 1,
+      "status": "done",
+      "run_id": "20261029-140544-size-pesca_ilegal_l_gasolina_radar_nsp_7_eo_i-31e2",
+      "level": "L0",
+      "feasible": false,
+      "failed_checks": [
+       "trim",
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback",
+       "perf:endurance"
+      ],
+      "aircraft": {
+       "W0_kg": 127.87106667760281,
+       "We_kg": 85.36118085363634,
+       "payload_kg": 14.3,
+       "fuel_or_battery_kg": 28.209885821026358,
+       "P_SL_W": 12573.082861048722,
+       "T_SL_N": null,
+       "wing_span_m": 5.2546224261761045,
+       "wing_area_m2": 1.7256910526045532,
+       "endurance_h": 16.4464526312886,
+       "range_km": 2639.458155975764,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.7152565634341341
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 127.9 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 184132.72517988578,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 92066.36258994289,
+         "high": 368265.45035977155,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.6207582623597223,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 482567.3608859977,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 16.860781208430794,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 16.4464526312886,
+       "catastrophic_per_fh": 0.0017214049126849007,
+       "target_per_fh": 1.1730566100476049e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.027914003194668857,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 1,
+     "W0_kg": 127.87106667760281,
+     "We_kg": 85.36118085363634,
+     "P_SL_W": 12573.082861048722,
+     "payload_kg": 14.3,
+     "acquisition_usd": 184132.72517988578
+    },
+    "missing": [],
+    "all_feasible": false,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 19,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 1,
+    "availability": 0.85,
+    "fleet_size": 4
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 2,
+    "sorties_per_day": 1.7599371059586402,
+    "flight_hours_per_day": 27.18478514123728,
+    "fleet_expected": 3,
+    "fleet": {
+     "n": 4,
+     "mean_on_station": 2.4153052717378563,
+     "continuous_stations_expected": 1,
+     "available_aircraft_expected": 3.4,
+     "feasible": true,
+     "p_enough_available": 0.98801875
+    }
+   }
+  },
+  {
+   "seq": 20,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 20.4,
+    "speed_m_s": 45.0,
+    "n_on_station": 1,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 3304.7999999999997,
+    "time_to_sweep_area_h": 4.157062682238827,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 1.3373419943791647,
+     "pod_random_search": 0.737457418371704,
+     "pod_parallel_sweep": 1.0
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 9.571990562764967,
+     "time_parallel_h": 3.7413564140149442
+    }
+   }
+  },
+  {
+   "seq": 21,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "Lx4",
+      "spec_path": "examples/concept/illegal_fishing/variant_L.yaml",
+      "quantity": 4,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "Lx4",
+      "quantity": 4,
+      "status": "done",
+      "run_id": "20261029-140552-size-pesca_ilegal_l_gasolina_radar_nsp_7_eo_i-09c4",
+      "level": "L0",
+      "feasible": false,
+      "failed_checks": [
+       "trim",
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback",
+       "perf:endurance"
+      ],
+      "aircraft": {
+       "W0_kg": 127.87106667760281,
+       "We_kg": 85.36118085363634,
+       "payload_kg": 14.3,
+       "fuel_or_battery_kg": 28.209885821026358,
+       "P_SL_W": 12573.082861048722,
+       "T_SL_N": null,
+       "wing_span_m": 5.2546224261761045,
+       "wing_area_m2": 1.7256910526045532,
+       "endurance_h": 16.4464526312886,
+       "range_km": 2639.458155975764,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.7152565634341341
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 127.9 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 184132.72517988578,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 92066.36258994289,
+         "high": 368265.45035977155,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.6207582623597223,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 482567.3608859977,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 16.860781208430794,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 16.4464526312886,
+       "catastrophic_per_fh": 0.0017214049126849007,
+       "target_per_fh": 1.1730566100476049e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.027914003194668857,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 4,
+     "W0_kg": 511.48426671041125,
+     "We_kg": 341.44472341454536,
+     "P_SL_W": 50292.33144419489,
+     "payload_kg": 57.2,
+     "acquisition_usd": 736530.9007195431
+    },
+    "missing": [],
+    "all_feasible": false,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 22,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 2,
+    "availability": 0.85,
+    "fleet_size": 6
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 4,
+    "sorties_per_day": 3.5198742119172803,
+    "flight_hours_per_day": 54.36957028247456,
+    "fleet_expected": 5,
+    "fleet": {
+     "n": 6,
+     "mean_on_station": 3.6229579076067844,
+     "continuous_stations_expected": 2,
+     "available_aircraft_expected": 5.1,
+     "feasible": true,
+     "p_enough_available": 0.9526614062500001
+    }
+   }
+  },
+  {
+   "seq": 23,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 20.4,
+    "speed_m_s": 45.0,
+    "n_on_station": 2,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 6609.599999999999,
+    "time_to_sweep_area_h": 2.0785313411194135,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 2.6746839887583294,
+     "pod_random_search": 0.9310713928319495,
+     "pod_parallel_sweep": 1.0
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 4.785995281382483,
+     "time_parallel_h": 1.8706782070074721
+    }
+   }
+  },
+  {
+   "seq": 24,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "Lx6",
+      "spec_path": "examples/concept/illegal_fishing/variant_L.yaml",
+      "quantity": 6,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "Lx6",
+      "quantity": 6,
+      "status": "done",
+      "run_id": "20261029-140559-size-pesca_ilegal_l_gasolina_radar_nsp_7_eo_i-babf",
+      "level": "L0",
+      "feasible": false,
+      "failed_checks": [
+       "trim",
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback",
+       "perf:endurance"
+      ],
+      "aircraft": {
+       "W0_kg": 127.87106667760281,
+       "We_kg": 85.36118085363634,
+       "payload_kg": 14.3,
+       "fuel_or_battery_kg": 28.209885821026358,
+       "P_SL_W": 12573.082861048722,
+       "T_SL_N": null,
+       "wing_span_m": 5.2546224261761045,
+       "wing_area_m2": 1.7256910526045532,
+       "endurance_h": 16.4464526312886,
+       "range_km": 2639.458155975764,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.7152565634341341
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 127.9 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 184132.72517988578,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 92066.36258994289,
+         "high": 368265.45035977155,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.6207582623597223,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 482567.3608859977,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 16.860781208430794,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 16.4464526312886,
+       "catastrophic_per_fh": 0.0017214049126849007,
+       "target_per_fh": 1.1730566100476049e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.027914003194668857,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 6,
+     "W0_kg": 767.2264000656169,
+     "We_kg": 512.167085121818,
+     "P_SL_W": 75438.49716629233,
+     "payload_kg": 85.80000000000001,
+     "acquisition_usd": 1104796.3510793147
+    },
+    "missing": [],
+    "all_feasible": false,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 25,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 10.615531033785269,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 2,
+    "availability": 0.85,
+    "fleet_size": 6
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 8.055929355148846,
+     "effective_time_on_station_h": 7.805929355148846,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5840343593843813,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 4,
+    "sorties_per_day": 6.14917171500391,
+    "flight_hours_per_day": 59.12755145769468,
+    "fleet_expected": 5,
+    "fleet": {
+     "n": 6,
+     "mean_on_station": 2.9785752328603445,
+     "continuous_stations_expected": 2,
+     "available_aircraft_expected": 5.1,
+     "feasible": true,
+     "p_enough_available": 0.9526614062500001
+    }
+   }
+  },
+  {
+   "seq": 26,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 10.0,
+    "speed_m_s": 45.0,
+    "n_on_station": 2,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 3240.0,
+    "time_to_sweep_area_h": 4.240203935883603,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 1.3111196023325145,
+     "pod_random_search": 0.7304818657319091,
+     "pod_parallel_sweep": 1.0
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 9.763430374020265,
+     "time_parallel_h": 3.8161835422952426
+    }
+   }
+  },
+  {
+   "seq": 27,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "Mx6",
+      "spec_path": "examples/concept/illegal_fishing/variant_M.yaml",
+      "quantity": 6,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "Mx6",
+      "quantity": 6,
+      "status": "done",
+      "run_id": "20261029-140606-size-pesca_ilegal_m_gasolina_radar_nsp_2_eo_i-a5f4",
+      "level": "L0",
+      "feasible": true,
+      "failed_checks": [
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback"
+      ],
+      "aircraft": {
+       "W0_kg": 92.41949725558875,
+       "We_kg": 70.63143566048957,
+       "payload_kg": 5.0,
+       "fuel_or_battery_kg": 16.788061592020984,
+       "P_SL_W": 10521.14172997238,
+       "T_SL_N": null,
+       "wing_span_m": 4.467218260572168,
+       "wing_area_m2": 1.2472524367243394,
+       "endurance_h": 10.615531033785269,
+       "range_km": 1695.6507523897587,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.5814622498479687
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 92.4 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 162601.57741691457,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 81300.78870845729,
+         "high": 325203.15483382915,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.5881009878953423,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 420829.3031460576,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 14.109082929972741,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 10.615531033785269,
+       "catastrophic_per_fh": 0.0017286879535579596,
+       "target_per_fh": 1.623034148142688e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.018183587368016063,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 6,
+     "W0_kg": 554.5169835335325,
+     "We_kg": 423.78861396293746,
+     "P_SL_W": 63126.85037983428,
+     "payload_kg": 30.0,
+     "acquisition_usd": 975609.4645014874
+    },
+    "missing": [],
+    "all_feasible": true,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 28,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 10.615531033785269,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 3,
+    "availability": 0.85,
+    "fleet_size": 9
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 8.055929355148846,
+     "effective_time_on_station_h": 7.805929355148846,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5840343593843813,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 6,
+    "sorties_per_day": 9.223757572505866,
+    "flight_hours_per_day": 88.69132718654203,
+    "fleet_expected": 8,
+    "fleet": {
+     "n": 9,
+     "mean_on_station": 4.467862849290516,
+     "continuous_stations_expected": 3,
+     "available_aircraft_expected": 7.6499999999999995,
+     "feasible": true,
+     "p_enough_available": 0.9660684842734375
+    }
+   }
+  },
+  {
+   "seq": 29,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 10.0,
+    "speed_m_s": 45.0,
+    "n_on_station": 3,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 4860.0,
+    "time_to_sweep_area_h": 2.826802623922402,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 1.9666794034987718,
+     "pod_random_search": 0.8600792941335788,
+     "pod_parallel_sweep": 1.0
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 6.508953582680176,
+     "time_parallel_h": 2.544122361530162
+    }
+   }
+  },
+  {
+   "seq": 30,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "Mx9",
+      "spec_path": "examples/concept/illegal_fishing/variant_M.yaml",
+      "quantity": 9,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "Mx9",
+      "quantity": 9,
+      "status": "done",
+      "run_id": "20261029-140614-size-pesca_ilegal_m_gasolina_radar_nsp_2_eo_i-6416",
+      "level": "L0",
+      "feasible": true,
+      "failed_checks": [
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback"
+      ],
+      "aircraft": {
+       "W0_kg": 92.41949725558875,
+       "We_kg": 70.63143566048957,
+       "payload_kg": 5.0,
+       "fuel_or_battery_kg": 16.788061592020984,
+       "P_SL_W": 10521.14172997238,
+       "T_SL_N": null,
+       "wing_span_m": 4.467218260572168,
+       "wing_area_m2": 1.2472524367243394,
+       "endurance_h": 10.615531033785269,
+       "range_km": 1695.6507523897587,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.5814622498479687
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 92.4 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 162601.57741691457,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 81300.78870845729,
+         "high": 325203.15483382915,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.5881009878953423,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 420829.3031460576,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 14.109082929972741,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 10.615531033785269,
+       "catastrophic_per_fh": 0.0017286879535579596,
+       "target_per_fh": 1.623034148142688e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.018183587368016063,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 9,
+     "W0_kg": 831.7754753002988,
+     "We_kg": 635.6829209444062,
+     "P_SL_W": 94690.27556975142,
+     "payload_kg": 45.0,
+     "acquisition_usd": 1463414.196752231
+    },
+    "missing": [],
+    "all_feasible": true,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 31,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 2.727570342607572,
+    "turnaround_h": 1.0,
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "reserve_h": 0.25,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 2,
+    "availability": 0.85,
+    "fleet_size": 6
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 1.9775703426075721,
+     "effective_time_on_station_h": 1.7275703426075721,
+     "round_trip_h": 1.5,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5352541259292457,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.25,
+    "t_back_h": 0.25,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 4,
+    "sorties_per_day": 27.784686282324937,
+    "flight_hours_per_day": 68.8385147117437,
+    "fleet_expected": 5,
+    "fleet": {
+     "n": 6,
+     "mean_on_station": 2.729796042239153,
+     "continuous_stations_expected": 2,
+     "available_aircraft_expected": 5.1,
+     "feasible": true,
+     "p_enough_available": 0.9526614062500001
+    }
+   }
+  },
+  {
+   "seq": 32,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 10.0,
+    "speed_m_s": 22.0,
+    "n_on_station": 2,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 1584.0,
+    "time_to_sweep_area_h": 8.67314441430737,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 0.6409918055847849,
+     "pod_random_search": 0.4732302882705878,
+     "pod_parallel_sweep": 0.6409918055847849
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 19.970653037768724,
+     "time_parallel_h": 7.805829972876633
+    }
+   }
+  },
+  {
+   "seq": 33,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "Sx6",
+      "spec_path": "examples/concept/illegal_fishing/variant_S.yaml",
+      "quantity": 6,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "Sx6",
+      "quantity": 6,
+      "status": "done",
+      "run_id": "20261029-140622-size-pesca_ilegal_s_el_trico_25_kg_nsp_2_hd25-768a",
+      "level": "L0",
+      "feasible": false,
+      "failed_checks": [
+       "wing_span",
+       "hq:scissor",
+       "hq:CAP",
+       "hq:spiral",
+       "wb:envelope",
+       "perf:endurance"
+      ],
+      "aircraft": {
+       "W0_kg": 23.587472811247743,
+       "We_kg": 10.216297961348447,
+       "payload_kg": 3.0,
+       "fuel_or_battery_kg": 10.371174848794665,
+       "P_SL_W": 1226.949805183903,
+       "T_SL_N": null,
+       "wing_span_m": 4.277308794408141,
+       "wing_area_m2": 1.306812180194373,
+       "endurance_h": 2.727570342607572,
+       "range_km": 212.43272674303947,
+       "cruise_speed_m_s": 22.0,
+       "cruise_altitude_m": 600.0
+      },
+      "propulsion": "electric",
+      "assumed": [
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 23.6 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 42071.40363999796,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft",
+         "propulsion 'electric' not represented in the CER databases"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 21035.70181999898,
+         "high": 84142.80727999592,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 1.9014991887918362,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 79998.73989279002,
+       "notes": [
+        "engine cost NOT included (give engine_cost or power_bhp for a piston engine)",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 42.764615779365684,
+        "unmanned": true,
+        "propulsion": "electric"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 2.727570342607572,
+       "catastrophic_per_fh": 0.0017385731502034326,
+       "target_per_fh": 6.359307807170937e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.004730854650652816,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 6,
+     "W0_kg": 141.52483686748644,
+     "We_kg": 61.297787768090686,
+     "P_SL_W": 7361.698831103418,
+     "payload_kg": 18.0,
+     "acquisition_usd": 252428.42183998774
+    },
+    "missing": [],
+    "all_feasible": false,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 34,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "availability": 0.85,
+    "confidence": 0.9746794344808963
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 2,
+    "sorties_per_day": 1.7599371059586402,
+    "flight_hours_per_day": 27.18478514123728,
+    "fleet_expected": 3,
+    "fleet_for_confidence": {
+     "confidence": 0.9746794344808963,
+     "n": 4
+    }
+   }
+  },
+  {
+   "seq": 35,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 10.615531033785269,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "availability": 0.85,
+    "confidence": 0.9746794344808963
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 8.055929355148846,
+     "effective_time_on_station_h": 7.805929355148846,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.5840343593843813,
+     "feasible": true
+    },
+    "availability": 0.85,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 2,
+    "sorties_per_day": 3.074585857501955,
+    "flight_hours_per_day": 29.56377572884734,
+    "fleet_expected": 3,
+    "fleet_for_confidence": {
+     "confidence": 0.9746794344808963,
+     "n": 4
+    }
+   }
+  },
+  {
+   "seq": 36,
+   "tool": "fleet_reliability",
+   "args": {
+    "n": 4,
+    "k": 2,
+    "p_success": 0.85
+   },
+   "result": {
+    "n": 4,
+    "k": 2,
+    "p_unit": 0.85,
+    "p_at_least_k": 0.98801875,
+    "p_single_unit": 0.85,
+    "method": "O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "independent identical units; constant rate; no common cause"
+   }
+  },
+  {
+   "seq": 37,
+   "tool": "fleet_reliability",
+   "args": {
+    "n": 4,
+    "k": 2,
+    "p_success": 0.85
+   },
+   "result": {
+    "n": 4,
+    "k": 2,
+    "p_unit": 0.85,
+    "p_at_least_k": 0.98801875,
+    "p_single_unit": 0.85,
+    "method": "O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "independent identical units; constant rate; no common cause"
+   }
+  },
+  {
+   "seq": 38,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 20.4,
+    "speed_m_s": 45.0,
+    "n_on_station": 1,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 3304.7999999999997,
+    "time_to_sweep_area_h": 4.157062682238827,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 1.3373419943791647,
+     "pod_random_search": 0.737457418371704,
+     "pod_parallel_sweep": 1.0
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 9.571990562764967,
+     "time_parallel_h": 3.7413564140149442
+    }
+   }
+  },
+  {
+   "seq": 39,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 10.0,
+    "speed_m_s": 45.0,
+    "n_on_station": 1,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 1620.0,
+    "time_to_sweep_area_h": 8.480407871767206,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 0.6555598011662572,
+     "pod_random_search": 0.48084864030988916,
+     "pod_parallel_sweep": 0.6555598011662572
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 19.52686074804053,
+     "time_parallel_h": 7.632367084590485
+    }
+   }
+  },
+  {
+   "seq": 40,
+   "tool": "size_fleet",
+   "args": {
+    "variants": [
+     {
+      "id": "Lx4",
+      "spec_path": "examples/concept/illegal_fishing/variant_L.yaml",
+      "quantity": 4,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     },
+     {
+      "id": "Mx4",
+      "spec_path": "examples/concept/illegal_fishing/variant_M.yaml",
+      "quantity": 4,
+      "cost": {
+       "N": 50,
+       "year": 2026
+      },
+      "safety": {}
+     }
+    ]
+   },
+   "result": {
+    "variants": [
+     {
+      "id": "Lx4",
+      "quantity": 4,
+      "status": "done",
+      "run_id": "20261029-140630-size-pesca_ilegal_l_gasolina_radar_nsp_7_eo_i-8c7f",
+      "level": "L0",
+      "feasible": false,
+      "failed_checks": [
+       "trim",
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback",
+       "perf:endurance"
+      ],
+      "aircraft": {
+       "W0_kg": 127.87106667760281,
+       "We_kg": 85.36118085363634,
+       "payload_kg": 14.3,
+       "fuel_or_battery_kg": 28.209885821026358,
+       "P_SL_W": 12573.082861048722,
+       "T_SL_N": null,
+       "wing_span_m": 5.2546224261761045,
+       "wing_area_m2": 1.7256910526045532,
+       "endurance_h": 16.4464526312886,
+       "range_km": 2639.458155975764,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.7152565634341341
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 127.9 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 184132.72517988578,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 92066.36258994289,
+         "high": 368265.45035977155,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.6207582623597223,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 482567.3608859977,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 16.860781208430794,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 16.4464526312886,
+       "catastrophic_per_fh": 0.0017214049126849007,
+       "target_per_fh": 1.1730566100476049e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.027914003194668857,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     },
+     {
+      "id": "Mx4",
+      "quantity": 4,
+      "status": "done",
+      "run_id": "20261029-140637-size-pesca_ilegal_m_gasolina_radar_nsp_2_eo_i-62a2",
+      "level": "L0",
+      "feasible": true,
+      "failed_checks": [
+       "hq:scissor",
+       "hq:dutch_roll",
+       "wb:envelope",
+       "gear:position",
+       "gear:tipback"
+      ],
+      "aircraft": {
+       "W0_kg": 92.41949725558875,
+       "We_kg": 70.63143566048957,
+       "payload_kg": 5.0,
+       "fuel_or_battery_kg": 16.788061592020984,
+       "P_SL_W": 10521.14172997238,
+       "T_SL_N": null,
+       "wing_span_m": 4.467218260572168,
+       "wing_area_m2": 1.2472524367243394,
+       "endurance_h": 10.615531033785269,
+       "range_km": 1695.6507523897587,
+       "cruise_speed_m_s": 45.0,
+       "cruise_altitude_m": 3000.0,
+       "fuel_kg_per_fh_approx": 1.5814622498479687
+      },
+      "propulsion": "piston_prop",
+      "assumed": [
+       "fuel_kg_per_fh_approx = sized fuel (incl. reserves) / endurance — upper bound",
+       "cost V_H_kt = cruise speed (lower bound of V_H; Eastlake uses V_H)",
+       "engine cost from the Eastlake piston CER on the sized P_SL (no quote)"
+      ],
+      "certification": {
+       "bases": [
+        "stanag4703"
+       ],
+       "sora": true,
+       "rationale": [
+        "UAV com MTOW 92.4 kg → STANAG 4703 (< 150 kg)",
+        "UAS na categoria específica EASA → avaliação SORA (AMC1 Art. 11, Reg. (EU) 2019/947)"
+       ]
+      },
+      "cost": {
+       "unit_cost_usd": 162601.57741691457,
+       "year": 2026,
+       "confidence": {
+        "level": "L0",
+        "confidence": "low",
+        "outside_database": true,
+        "reasons": [
+         "unmanned: both CER databases are crewed aircraft"
+        ],
+        "band": {
+         "aace_class": 5,
+         "position": 1.0,
+         "low": 81300.78870845729,
+         "high": 325203.15483382915,
+         "low_pct": -50.0,
+         "high_pct": 100.0,
+         "source": "aace_18r97"
+        },
+        "model_spread": 2.5881009878953423,
+        "next": "L1: manufacturing_plan (part/process bottom-up); L2: manufacturing_plan with detailed={parts, bom, quotes} — each calibrates the level below"
+       },
+       "dapca4_unit_cost_usd": 420829.3031460576,
+       "notes": [
+        "engine: Eastlake piston CER (Gudmundsson 2014 eq. 2.12) — give a quote if available",
+        "avionics: Gudmundsson default 15000 USD-2012 × CPI (ASSUMPTION — give a quote)"
+       ],
+       "inputs": {
+        "N": 50,
+        "year": 2026,
+        "V_H_kt": 87.47307773052071,
+        "power_bhp": 14.109082929972741,
+        "unmanned": true,
+        "propulsion": "piston_prop"
+       }
+      },
+      "safety": {
+       "scheme": "stanag4703",
+       "template": "uas",
+       "t_flight_h": 10.615531033785269,
+       "catastrophic_per_fh": 0.0017286879535579596,
+       "target_per_fh": 1.623034148142688e-05,
+       "meets": false,
+       "p_loss_per_sortie": 0.018183587368016063,
+       "rate_kinds": [
+        "assumption",
+        "published",
+        "vendor_claim"
+       ],
+       "note": "rates of kind 'assumption' are PRESSUPOSTOS (see acdt.core.safety.rates)"
+      }
+     }
+    ],
+    "fleet": {
+     "n_aircraft": 8,
+     "W0_kg": 881.1622557327662,
+     "We_kg": 623.9704660565037,
+     "P_SL_W": 92376.89836408441,
+     "payload_kg": 77.2,
+     "acquisition_usd": 1386937.2103872015
+    },
+    "missing": [],
+    "all_feasible": false,
+    "method": "acdt size pipeline per variant (see each run_id); cost: Eastlake/DAPCA IV L0 (low confidence for unmanned — AACE Class 5); basis: acdt.core.certification.basis; loss per sortie: ARP4761 low-fi FTA (acdt.domains.aircraft.safety_assessment)"
+   }
+  },
+  {
+   "seq": 41,
+   "tool": "compare_alternatives",
+   "args": {
+    "alternatives": [
+     {
+      "id": "A1",
+      "metrics": {
+       "n_aircraft": 1,
+       "acquisition_usd": 184132.72517988578,
+       "pod_window": 0.5540383388861407,
+       "p_enough_available": 0.0,
+       "flight_hours_per_day": 16.119377357992825,
+       "fuel_kg_per_day": 27.648867811768763,
+       "losses_per_year": null
+      }
+     },
+     {
+      "id": "A2",
+      "metrics": {
+       "n_aircraft": 4,
+       "acquisition_usd": 736530.9007195431,
+       "pod_window": 0.737457418371704,
+       "p_enough_available": 0.98801875,
+       "flight_hours_per_day": 27.18478514123728,
+       "fuel_kg_per_day": 46.62888113905397,
+       "losses_per_year": 17.931314849323197
+      }
+     },
+     {
+      "id": "A3",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 1104796.3510793147,
+       "pod_window": 0.9310713928319495,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 54.36957028247456,
+       "fuel_kg_per_day": 93.25776227810795,
+       "losses_per_year": 35.862629698646394
+      }
+     },
+     {
+      "id": "A4",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 975609.4645014874,
+       "pod_window": 0.7304818657319091,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 59.12755145769468,
+       "fuel_kg_per_day": 93.50799055628737,
+       "losses_per_year": 40.81211040905797
+      }
+     },
+     {
+      "id": "A5",
+      "metrics": {
+       "n_aircraft": 9,
+       "acquisition_usd": 1463414.196752231,
+       "pod_window": 0.8600792941335788,
+       "p_enough_available": 0.9660684842734375,
+       "flight_hours_per_day": 88.69132718654203,
+       "fuel_kg_per_day": 140.26198583443107,
+       "losses_per_year": 61.21816561358697
+      }
+     },
+     {
+      "id": "A7",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 252428.42183998774,
+       "pod_window": 0.4732302882705878,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 68.8385147117437,
+       "fuel_kg_per_day": 0.0,
+       "requires_ship": 1.0,
+       "losses_per_year": 47.97753899521825
+      }
+     },
+     {
+      "id": "A6",
+      "metrics": {
+       "n_aircraft": 8,
+       "acquisition_usd": 1386937.2103872015,
+       "pod_window": 0.8637006617711183,
+       "p_enough_available": 0.9761810503515624,
+       "flight_hours_per_day": 56.74856087008462,
+       "fuel_kg_per_day": 93.38287641719765,
+       "losses_per_year": 38.33737005385218
+      }
+     }
+    ],
+    "objectives": {
+     "acquisition_usd": "min",
+     "pod_window": "max",
+     "flight_hours_per_day": "min"
+    },
+    "constraints": {
+     "pod_window": {
+      "min": 0.9
+     },
+     "p_enough_available": {
+      "min": 0.95
+     }
+    },
+    "weights": null,
+    "plot": {
+     "x": "acquisition_usd",
+     "y": "pod_window",
+     "file": "pareto.png"
+    },
+    "title": "Arquiteturas — custo de aquisição vs POD na janela (REQ1, REQ2 como restrições)",
+    "_study_folder": "examples/output/concept/illegal_fishing"
+   },
+   "result": {
+    "objectives": {
+     "acquisition_usd": "min",
+     "pod_window": "max",
+     "flight_hours_per_day": "min"
+    },
+    "constraints": {
+     "pod_window": {
+      "min": 0.9
+     },
+     "p_enough_available": {
+      "min": 0.95
+     }
+    },
+    "pareto": [
+     "A3"
+    ],
+    "rows": [
+     {
+      "id": "A1",
+      "metrics": {
+       "n_aircraft": 1,
+       "acquisition_usd": 184132.72517988578,
+       "pod_window": 0.5540383388861407,
+       "p_enough_available": 0.0,
+       "flight_hours_per_day": 16.119377357992825,
+       "fuel_kg_per_day": 27.648867811768763,
+       "losses_per_year": null
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.554 < min 0.9",
+       "p_enough_available = 0 < min 0.95"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A2",
+      "metrics": {
+       "n_aircraft": 4,
+       "acquisition_usd": 736530.9007195431,
+       "pod_window": 0.737457418371704,
+       "p_enough_available": 0.98801875,
+       "flight_hours_per_day": 27.18478514123728,
+       "fuel_kg_per_day": 46.62888113905397,
+       "losses_per_year": 17.931314849323197
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.7375 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A3",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 1104796.3510793147,
+       "pod_window": 0.9310713928319495,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 54.36957028247456,
+       "fuel_kg_per_day": 93.25776227810795,
+       "losses_per_year": 35.862629698646394
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A4",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 975609.4645014874,
+       "pod_window": 0.7304818657319091,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 59.12755145769468,
+       "fuel_kg_per_day": 93.50799055628737,
+       "losses_per_year": 40.81211040905797
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.7305 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A5",
+      "metrics": {
+       "n_aircraft": 9,
+       "acquisition_usd": 1463414.196752231,
+       "pod_window": 0.8600792941335788,
+       "p_enough_available": 0.9660684842734375,
+       "flight_hours_per_day": 88.69132718654203,
+       "fuel_kg_per_day": 140.26198583443107,
+       "losses_per_year": 61.21816561358697
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.8601 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A7",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 252428.42183998774,
+       "pod_window": 0.4732302882705878,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 68.8385147117437,
+       "fuel_kg_per_day": 0.0,
+       "requires_ship": 1.0,
+       "losses_per_year": 47.97753899521825
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.4732 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A6",
+      "metrics": {
+       "n_aircraft": 8,
+       "acquisition_usd": 1386937.2103872015,
+       "pod_window": 0.8637006617711183,
+       "p_enough_available": 0.9761810503515624,
+       "flight_hours_per_day": 56.74856087008462,
+       "fuel_kg_per_day": 93.38287641719765,
+       "losses_per_year": 38.33737005385218
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.8637 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     }
+    ],
+    "reference": "Deb 2001 (Pareto dominance); Marler & Arora 2004, SMO 26:369–395 (normalised weighted sum)",
+    "note": "no default weights: the Pareto set is the result; a weighted ranking exists only if weights were given (then each normalised term is shown)",
+    "plot": "examples/output/concept/illegal_fishing/pareto.png"
+   }
+  },
+  {
+   "seq": 42,
+   "tool": "compare_alternatives",
+   "args": {
+    "alternatives": [
+     {
+      "id": "A1",
+      "metrics": {
+       "n_aircraft": 1,
+       "acquisition_usd": 184132.72517988578,
+       "pod_window": 0.5540383388861407,
+       "p_enough_available": 0.0,
+       "flight_hours_per_day": 16.119377357992825,
+       "fuel_kg_per_day": 27.648867811768763,
+       "losses_per_year": null
+      }
+     },
+     {
+      "id": "A2",
+      "metrics": {
+       "n_aircraft": 4,
+       "acquisition_usd": 736530.9007195431,
+       "pod_window": 0.737457418371704,
+       "p_enough_available": 0.98801875,
+       "flight_hours_per_day": 27.18478514123728,
+       "fuel_kg_per_day": 46.62888113905397,
+       "losses_per_year": 17.931314849323197
+      }
+     },
+     {
+      "id": "A3",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 1104796.3510793147,
+       "pod_window": 0.9310713928319495,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 54.36957028247456,
+       "fuel_kg_per_day": 93.25776227810795,
+       "losses_per_year": 35.862629698646394
+      }
+     },
+     {
+      "id": "A4",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 975609.4645014874,
+       "pod_window": 0.7304818657319091,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 59.12755145769468,
+       "fuel_kg_per_day": 93.50799055628737,
+       "losses_per_year": 40.81211040905797
+      }
+     },
+     {
+      "id": "A5",
+      "metrics": {
+       "n_aircraft": 9,
+       "acquisition_usd": 1463414.196752231,
+       "pod_window": 0.8600792941335788,
+       "p_enough_available": 0.9660684842734375,
+       "flight_hours_per_day": 88.69132718654203,
+       "fuel_kg_per_day": 140.26198583443107,
+       "losses_per_year": 61.21816561358697
+      }
+     },
+     {
+      "id": "A7",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 252428.42183998774,
+       "pod_window": 0.4732302882705878,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 68.8385147117437,
+       "fuel_kg_per_day": 0.0,
+       "requires_ship": 1.0,
+       "losses_per_year": 47.97753899521825
+      }
+     },
+     {
+      "id": "A6",
+      "metrics": {
+       "n_aircraft": 8,
+       "acquisition_usd": 1386937.2103872015,
+       "pod_window": 0.8637006617711183,
+       "p_enough_available": 0.9761810503515624,
+       "flight_hours_per_day": 56.74856087008462,
+       "fuel_kg_per_day": 93.38287641719765,
+       "losses_per_year": 38.33737005385218
+      }
+     }
+    ],
+    "objectives": {
+     "acquisition_usd": "min",
+     "pod_window": "max"
+    },
+    "constraints": null,
+    "weights": null,
+    "plot": {
+     "x": "acquisition_usd",
+     "y": "pod_window",
+     "file": "pareto_sem_restricoes.png"
+    },
+    "title": "Compromisso custo vs POD sem restrições (o que se ganha por cada dólar)",
+    "_study_folder": "examples/output/concept/illegal_fishing"
+   },
+   "result": {
+    "objectives": {
+     "acquisition_usd": "min",
+     "pod_window": "max"
+    },
+    "constraints": {},
+    "pareto": [
+     "A1",
+     "A2",
+     "A3"
+    ],
+    "rows": [
+     {
+      "id": "A1",
+      "metrics": {
+       "n_aircraft": 1,
+       "acquisition_usd": 184132.72517988578,
+       "pod_window": 0.5540383388861407,
+       "p_enough_available": 0.0,
+       "flight_hours_per_day": 16.119377357992825,
+       "fuel_kg_per_day": 27.648867811768763,
+       "losses_per_year": null
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A2",
+      "metrics": {
+       "n_aircraft": 4,
+       "acquisition_usd": 736530.9007195431,
+       "pod_window": 0.737457418371704,
+       "p_enough_available": 0.98801875,
+       "flight_hours_per_day": 27.18478514123728,
+       "fuel_kg_per_day": 46.62888113905397,
+       "losses_per_year": 17.931314849323197
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A3",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 1104796.3510793147,
+       "pod_window": 0.9310713928319495,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 54.36957028247456,
+       "fuel_kg_per_day": 93.25776227810795,
+       "losses_per_year": 35.862629698646394
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A4",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 975609.4645014874,
+       "pod_window": 0.7304818657319091,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 59.12755145769468,
+       "fuel_kg_per_day": 93.50799055628737,
+       "losses_per_year": 40.81211040905797
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A2"
+      ],
+      "pareto": false
+     },
+     {
+      "id": "A5",
+      "metrics": {
+       "n_aircraft": 9,
+       "acquisition_usd": 1463414.196752231,
+       "pod_window": 0.8600792941335788,
+       "p_enough_available": 0.9660684842734375,
+       "flight_hours_per_day": 88.69132718654203,
+       "fuel_kg_per_day": 140.26198583443107,
+       "losses_per_year": 61.21816561358697
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A3",
+       "A6"
+      ],
+      "pareto": false
+     },
+     {
+      "id": "A7",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 252428.42183998774,
+       "pod_window": 0.4732302882705878,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 68.8385147117437,
+       "fuel_kg_per_day": 0.0,
+       "requires_ship": 1.0,
+       "losses_per_year": 47.97753899521825
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A1"
+      ],
+      "pareto": false
+     },
+     {
+      "id": "A6",
+      "metrics": {
+       "n_aircraft": 8,
+       "acquisition_usd": 1386937.2103872015,
+       "pod_window": 0.8637006617711183,
+       "p_enough_available": 0.9761810503515624,
+       "flight_hours_per_day": 56.74856087008462,
+       "fuel_kg_per_day": 93.38287641719765,
+       "losses_per_year": 38.33737005385218
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A3"
+      ],
+      "pareto": false
+     }
+    ],
+    "reference": "Deb 2001 (Pareto dominance); Marler & Arora 2004, SMO 26:369–395 (normalised weighted sum)",
+    "note": "no default weights: the Pareto set is the result; a weighted ranking exists only if weights were given (then each normalised term is shown)",
+    "plot": "examples/output/concept/illegal_fishing/pareto_sem_restricoes.png"
+   }
+  },
+  {
+   "seq": 43,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 5.0,
+    "speed_m_s": 45.0,
+    "n_on_station": 2,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 1620.0,
+    "time_to_sweep_area_h": 8.480407871767206,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 0.6555598011662572,
+     "pod_random_search": 0.48084864030988916,
+     "pod_parallel_sweep": 0.6555598011662572
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 19.52686074804053,
+     "time_parallel_h": 7.632367084590485
+    }
+   }
+  },
+  {
+   "seq": 44,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 20.0,
+    "speed_m_s": 45.0,
+    "n_on_station": 2,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 6480.0,
+    "time_to_sweep_area_h": 2.1201019679418014,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 2.622239204665029,
+     "pod_random_search": 0.9273599753006473,
+     "pod_parallel_sweep": 1.0
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 4.8817151870101325,
+     "time_parallel_h": 1.9080917711476213
+    }
+   }
+  },
+  {
+   "seq": 45,
+   "tool": "persistent_coverage",
+   "args": {
+    "endurance_h": 16.4464526312886,
+    "turnaround_h": 4.0,
+    "distance_km": 126.3277359695501,
+    "airspeed_m_s": 45.0,
+    "reserve_h": 1.0,
+    "handoff_overlap_h": 0.25,
+    "n_stations": 2,
+    "availability": 0.7,
+    "confidence": 0.95
+   },
+   "result": {
+    "cycle": {
+     "time_on_station_h": 13.886850952652178,
+     "effective_time_on_station_h": 13.636850952652178,
+     "round_trip_h": 5.559601678636421,
+     "aircraft_per_station": 2,
+     "duty_cycle": 0.7103839034523107,
+     "feasible": true
+    },
+    "availability": 0.7,
+    "availability_kind": "given",
+    "t_out_h": 0.7798008393182105,
+    "t_back_h": 0.7798008393182105,
+    "method": "Ha 2010, 'The UAV Continuous Coverage Problem', AFIT-OR-MS-ENS-10-03 (DTIC ADA517241); Blanchard & Fabrycky 2011 'Systems Engineering and Analysis' 5th ed.; MIL-HDBK-338B §5; O'Connor & Kleyner 2012 'Practical Reliability Engineering' 5th ed.; MIL-HDBK-338B §6",
+    "validity": "deterministic cycle; aircraft availability independent (no common-cause grounding, e.g. weather); hand-off gaps only as handoff_overlap_h",
+    "aircraft_needed_in_cycle": 4,
+    "sorties_per_day": 3.5198742119172803,
+    "flight_hours_per_day": 54.36957028247456,
+    "fleet_expected": 6,
+    "fleet_for_confidence": {
+     "confidence": 0.95,
+     "n": 9
+    }
+   }
+  },
+  {
+   "seq": 46,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 20.4,
+    "speed_m_s": 45.0,
+    "n_on_station": 1,
+    "time_h": 12.0
+   },
+   "result": {
+    "sweep_rate_km2_h": 3304.7999999999997,
+    "time_to_sweep_area_h": 4.157062682238827,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 12.0,
+     "coverage_factor": 2.8866536103172935,
+     "pod_random_search": 0.9442374961964141,
+     "pod_parallel_sweep": 1.0
+    }
+   }
+  },
+  {
+   "seq": 47,
+   "tool": "sweep_coverage",
+   "args": {
+    "area_km2": 13738.260752262873,
+    "sweep_width_km": 20.4,
+    "speed_m_s": 45.0,
+    "n_on_station": 1,
+    "time_h": 5.559414498224473,
+    "pod_target": 0.9
+   },
+   "result": {
+    "sweep_rate_km2_h": 3304.7999999999997,
+    "time_to_sweep_area_h": 4.157062682238827,
+    "method": "Koopman 1946/1980 'Search and Screening'; Washburn 2002 'Search and Detection'",
+    "validity": "uniform target location; W for the target class and sea state; detection only (classification/identification time not included)",
+    "pod_at_time": {
+     "time_h": 5.559414498224473,
+     "coverage_factor": 1.3373419943791647,
+     "pod_random_search": 0.737457418371704,
+     "pod_parallel_sweep": 1.0
+    },
+    "for_pod_target": {
+     "pod_target": 0.9,
+     "effort_random_km2": 31633.514411825658,
+     "effort_parallel_km2": 12364.434677036586,
+     "time_random_h": 9.571990562764967,
+     "time_parallel_h": 3.7413564140149442
+    }
+   }
+  }
+ ],
+ "comparisons": [
+  {
+   "title": "Arquiteturas — custo de aquisição vs POD na janela (REQ1, REQ2 como restrições)",
+   "result": {
+    "objectives": {
+     "acquisition_usd": "min",
+     "pod_window": "max",
+     "flight_hours_per_day": "min"
+    },
+    "constraints": {
+     "pod_window": {
+      "min": 0.9
+     },
+     "p_enough_available": {
+      "min": 0.95
+     }
+    },
+    "pareto": [
+     "A3"
+    ],
+    "rows": [
+     {
+      "id": "A1",
+      "metrics": {
+       "n_aircraft": 1,
+       "acquisition_usd": 184132.72517988578,
+       "pod_window": 0.5540383388861407,
+       "p_enough_available": 0.0,
+       "flight_hours_per_day": 16.119377357992825,
+       "fuel_kg_per_day": 27.648867811768763,
+       "losses_per_year": null
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.554 < min 0.9",
+       "p_enough_available = 0 < min 0.95"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A2",
+      "metrics": {
+       "n_aircraft": 4,
+       "acquisition_usd": 736530.9007195431,
+       "pod_window": 0.737457418371704,
+       "p_enough_available": 0.98801875,
+       "flight_hours_per_day": 27.18478514123728,
+       "fuel_kg_per_day": 46.62888113905397,
+       "losses_per_year": 17.931314849323197
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.7375 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A3",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 1104796.3510793147,
+       "pod_window": 0.9310713928319495,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 54.36957028247456,
+       "fuel_kg_per_day": 93.25776227810795,
+       "losses_per_year": 35.862629698646394
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A4",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 975609.4645014874,
+       "pod_window": 0.7304818657319091,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 59.12755145769468,
+       "fuel_kg_per_day": 93.50799055628737,
+       "losses_per_year": 40.81211040905797
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.7305 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A5",
+      "metrics": {
+       "n_aircraft": 9,
+       "acquisition_usd": 1463414.196752231,
+       "pod_window": 0.8600792941335788,
+       "p_enough_available": 0.9660684842734375,
+       "flight_hours_per_day": 88.69132718654203,
+       "fuel_kg_per_day": 140.26198583443107,
+       "losses_per_year": 61.21816561358697
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.8601 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A7",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 252428.42183998774,
+       "pod_window": 0.4732302882705878,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 68.8385147117437,
+       "fuel_kg_per_day": 0.0,
+       "requires_ship": 1.0,
+       "losses_per_year": 47.97753899521825
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.4732 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     },
+     {
+      "id": "A6",
+      "metrics": {
+       "n_aircraft": 8,
+       "acquisition_usd": 1386937.2103872015,
+       "pod_window": 0.8637006617711183,
+       "p_enough_available": 0.9761810503515624,
+       "flight_hours_per_day": 56.74856087008462,
+       "fuel_kg_per_day": 93.38287641719765,
+       "losses_per_year": 38.33737005385218
+      },
+      "missing": [],
+      "violations": [
+       "pod_window = 0.8637 < min 0.9"
+      ],
+      "feasible": false,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": false
+     }
+    ],
+    "reference": "Deb 2001 (Pareto dominance); Marler & Arora 2004, SMO 26:369–395 (normalised weighted sum)",
+    "note": "no default weights: the Pareto set is the result; a weighted ranking exists only if weights were given (then each normalised term is shown)",
+    "plot": "examples/output/concept/illegal_fishing/pareto.png"
+   },
+   "plot": "examples/output/concept/illegal_fishing/pareto.png",
+   "show": [
+    "n_aircraft",
+    "acquisition_usd",
+    "pod_window",
+    "p_enough_available",
+    "flight_hours_per_day",
+    "fuel_kg_per_day",
+    "losses_per_year"
+   ]
+  },
+  {
+   "title": "Compromisso custo vs POD sem restrições (o que se ganha por cada dólar)",
+   "result": {
+    "objectives": {
+     "acquisition_usd": "min",
+     "pod_window": "max"
+    },
+    "constraints": {},
+    "pareto": [
+     "A1",
+     "A2",
+     "A3"
+    ],
+    "rows": [
+     {
+      "id": "A1",
+      "metrics": {
+       "n_aircraft": 1,
+       "acquisition_usd": 184132.72517988578,
+       "pod_window": 0.5540383388861407,
+       "p_enough_available": 0.0,
+       "flight_hours_per_day": 16.119377357992825,
+       "fuel_kg_per_day": 27.648867811768763,
+       "losses_per_year": null
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A2",
+      "metrics": {
+       "n_aircraft": 4,
+       "acquisition_usd": 736530.9007195431,
+       "pod_window": 0.737457418371704,
+       "p_enough_available": 0.98801875,
+       "flight_hours_per_day": 27.18478514123728,
+       "fuel_kg_per_day": 46.62888113905397,
+       "losses_per_year": 17.931314849323197
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A3",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 1104796.3510793147,
+       "pod_window": 0.9310713928319495,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 54.36957028247456,
+       "fuel_kg_per_day": 93.25776227810795,
+       "losses_per_year": 35.862629698646394
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [],
+      "pareto": true
+     },
+     {
+      "id": "A4",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 975609.4645014874,
+       "pod_window": 0.7304818657319091,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 59.12755145769468,
+       "fuel_kg_per_day": 93.50799055628737,
+       "losses_per_year": 40.81211040905797
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A2"
+      ],
+      "pareto": false
+     },
+     {
+      "id": "A5",
+      "metrics": {
+       "n_aircraft": 9,
+       "acquisition_usd": 1463414.196752231,
+       "pod_window": 0.8600792941335788,
+       "p_enough_available": 0.9660684842734375,
+       "flight_hours_per_day": 88.69132718654203,
+       "fuel_kg_per_day": 140.26198583443107,
+       "losses_per_year": 61.21816561358697
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A3",
+       "A6"
+      ],
+      "pareto": false
+     },
+     {
+      "id": "A7",
+      "metrics": {
+       "n_aircraft": 6,
+       "acquisition_usd": 252428.42183998774,
+       "pod_window": 0.4732302882705878,
+       "p_enough_available": 0.9526614062500001,
+       "flight_hours_per_day": 68.8385147117437,
+       "fuel_kg_per_day": 0.0,
+       "requires_ship": 1.0,
+       "losses_per_year": 47.97753899521825
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A1"
+      ],
+      "pareto": false
+     },
+     {
+      "id": "A6",
+      "metrics": {
+       "n_aircraft": 8,
+       "acquisition_usd": 1386937.2103872015,
+       "pod_window": 0.8637006617711183,
+       "p_enough_available": 0.9761810503515624,
+       "flight_hours_per_day": 56.74856087008462,
+       "fuel_kg_per_day": 93.38287641719765,
+       "losses_per_year": 38.33737005385218
+      },
+      "missing": [],
+      "violations": [],
+      "feasible": true,
+      "comparable": true,
+      "dominated_by": [
+       "A3"
+      ],
+      "pareto": false
+     }
+    ],
+    "reference": "Deb 2001 (Pareto dominance); Marler & Arora 2004, SMO 26:369–395 (normalised weighted sum)",
+    "note": "no default weights: the Pareto set is the result; a weighted ranking exists only if weights were given (then each normalised term is shown)",
+    "plot": "examples/output/concept/illegal_fishing/pareto_sem_restricoes.png"
+   },
+   "plot": "examples/output/concept/illegal_fishing/pareto_sem_restricoes.png",
+   "show": [
+    "n_aircraft",
+    "acquisition_usd",
+    "pod_window",
+    "p_enough_available",
+    "flight_hours_per_day",
+    "fuel_kg_per_day",
+    "losses_per_year"
+   ]
+  }
+ ],
+ "files": {
+  "pareto.png": "pareto.png",
+  "pareto_sem_restricoes.png": "pareto_sem_restricoes.png",
+  "report.md": "report.md"
+ },
+ "git": {
+  "commit": "8d224179159593a2b2e6faa9840b63064a8ce9b7",
+  "dirty": true,
+  "branch": "fleet-architecture"
+ }
+}

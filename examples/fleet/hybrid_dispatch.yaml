@@ -1,0 +1,380 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Esquema 1.2: despacho híbrido L0 (série termóstato / paralelo divisão de potência) com fases comuns exigidas.
+# Todos os números são PRESSUPOSTOS ilustrativos.
+schema_version: '1.2'
+source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+  do fornecedor; não valida uma aeronave real'
+mission:
+  envelope:
+    distance_km:
+    - 10
+    - 10
+    speed_m_s:
+    - 30
+    - 30
+    on_station_h:
+    - 0.25
+    - 0.25
+    payload_kg:
+    - 5
+    - 5
+  samples:
+  - id: missão-lenta
+    distance_km: 10
+    speed_m_s: 30
+    on_station_h: 0.25
+    payload_kg: 5
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  required_phases:
+  - taxi_out
+  - takeoff
+  - climb
+  - transit_out
+  - station
+  - transit_back
+  - descent
+  - landing
+  - taxi_in
+operations:
+  availability: 0.9
+  n_stations: 1
+  handoff_overlap_h: 0
+  reserve_h: 0
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  dwell_policy: requested
+  ground_resources:
+    source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC,
+      eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave
+      real'
+    pools:
+      crew: 1
+      fuel_point: 1
+      charger: 1
+candidates:
+- id: híbrido-série
+  architecture: híbrido série, termóstato (fornecido)
+  source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC,
+    eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave
+    real'
+  n0:
+    endurance_h:
+    - 1
+    - 4
+    turnaround_h:
+    - 0.1
+    - 0.5
+    source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC,
+      eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave
+      real'
+  recipe:
+    schema_version: '1.0'
+    model: hybrid
+    aircraft:
+      hybrid:
+        architecture: series
+        mass_kg: 25.0
+        source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+          BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+          uma aeronave real'
+        hotel_power_W: 50.0
+        aero:
+          LD: 12.0
+          eta_prop: 0.75
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        engine:
+          rated_power_W: 1500.0
+          bsfc_kg_per_kWh: 0.6
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        generator:
+          efficiency: 0.9
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        motor:
+          rated_power_W: 2000.0
+          efficiency: 0.9
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        battery:
+          capacity_Wh: 300.0
+          soc_initial: 0.9
+          soc_min: 0.2
+          soc_max: 0.95
+          c_rate_max: 8.0
+          charge_efficiency: 0.95
+          discharge_efficiency: 0.95
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        fuel:
+          capacity_kg: 3.0
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        dispatch:
+          rule: thermostat
+          soc_on: 0.5
+          soc_off: 0.8
+          generator_setpoint_W: 1200.0
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        phases:
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+          taxi_out:
+            duration_h: 0.05
+            shaft_power_W: 100.0
+          takeoff:
+            duration_h: 0.01
+            shaft_power_W: 1800.0
+          climb:
+            altitude_m: 300.0
+            rate_m_s: 2.0
+            speed_m_s: 25.0
+          descent:
+            altitude_m: 300.0
+            rate_m_s: 2.0
+            speed_m_s: 25.0
+          landing:
+            duration_h: 0.01
+            shaft_power_W: 300.0
+          taxi_in:
+            duration_h: 0.05
+            shaft_power_W: 100.0
+  ground_process:
+    source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC,
+      eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave
+      real'
+    activities:
+    - id: post_flight_check
+      resource: crew
+      duration_h: 0.05
+    - id: refuel
+      resource: fuel_point
+      duration: refuel
+      flow_kg_h: 30.0
+    - id: charge
+      resource: charger
+      duration: charge
+      average_input_W: 500.0
+      efficiency: 0.9
+- id: híbrido-paralelo
+  architecture: híbrido paralelo, divisão de potência (fornecido)
+  source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC,
+    eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave
+    real'
+  n0:
+    endurance_h:
+    - 1
+    - 4
+    turnaround_h:
+    - 0.1
+    - 0.5
+    source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC,
+      eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave
+      real'
+  recipe:
+    schema_version: '1.0'
+    model: hybrid
+    aircraft:
+      hybrid:
+        architecture: parallel
+        mass_kg: 25.0
+        source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+          BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+          uma aeronave real'
+        hotel_power_W: 50.0
+        aero:
+          LD: 12.0
+          eta_prop: 0.75
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        engine:
+          rated_power_W: 1000.0
+          bsfc_kg_per_kWh: 0.6
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        motor:
+          rated_power_W: 1000.0
+          efficiency: 0.9
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        battery:
+          capacity_Wh: 300.0
+          soc_initial: 0.9
+          soc_min: 0.2
+          soc_max: 0.95
+          c_rate_max: 5.0
+          charge_efficiency: 0.95
+          discharge_efficiency: 0.95
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        fuel:
+          capacity_kg: 3.0
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        dispatch:
+          rule: power_split
+          electric_only_phases:
+          - taxi_out
+          - taxi_in
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+        phases:
+          source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências,
+            BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida
+            uma aeronave real'
+          taxi_out:
+            duration_h: 0.05
+            shaft_power_W: 100.0
+          takeoff:
+            duration_h: 0.01
+            shaft_power_W: 1800.0
+          climb:
+            altitude_m: 300.0
+            rate_m_s: 2.0
+            speed_m_s: 25.0
+          descent:
+            altitude_m: 300.0
+            rate_m_s: 2.0
+            speed_m_s: 25.0
+          landing:
+            duration_h: 0.01
+            shaft_power_W: 300.0
+          taxi_in:
+            duration_h: 0.05
+            shaft_power_W: 100.0
+  ground_process:
+    source: 'PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC,
+      eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave
+      real'
+    activities:
+    - id: post_flight_check
+      resource: crew
+      duration_h: 0.05
+    - id: refuel
+      resource: fuel_point
+      duration: refuel
+      flow_kg_h: 30.0
+    - id: charge
+      resource: charger
+      duration: charge
+      average_input_W: 500.0
+      efficiency: 0.9
+- id: elétrico
+  architecture: elétrico — opção fornecida, não preseleção automática
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 2
+    turnaround_h:
+    - 0.1
+    - 0.3
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: prop
+    onboard:
+      schema_version: '1.0'
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+      items:
+      - id: instrument
+        role: payload
+        mass_kg: 1
+        mass_accounting: incremental
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      loads:
+      - id: instrument_load
+        item_id: instrument
+        source_id: bus
+        power_W: 50
+        peak_W: 100
+        duty: 0.5
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      sources:
+      - id: bus
+        kind: main_battery
+        delivery_efficiency: 0.9
+        continuous_W: 1000
+        peak_W: 1000
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+    aircraft:
+      name: PRESSUPOSTO common electric
+      aircraft_class: uav_small
+      requirements:
+        propulsion_type: electric
+        payload_mass:
+          target: 4
+          unit: kg
+        endurance:
+          min: 0.5
+          unit: h
+        cruise_speed:
+          target: 22
+          unit: m/s
+        cruise_altitude:
+          target: 300
+          unit: m
+        stall_speed:
+          max: 13
+          unit: m/s
+        climb_rate:
+          min: 2
+          unit: m/s
+      assumptions:
+        aero:
+          fidelity: handbook
+        weights:
+          method: statistical
+          initial_class: uav_small
+        propulsion:
+          systems_power_W: 0
+          energy_reserve: 0.2
+        geometry:
+          fuselage_length_m: 1.8
+          fuselage_diameter_m: 0.22
+  turnaround:
+    method: charge
+    average_input_W: 300
+    efficiency: 0.9
+    allocation: dedicated_per_aircraft
+    fixed_h: 0.1
+    combine: serial
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  pack_power:
+    continuous_C: 5
+    peak_C: 8
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  endurance:
+    tolerance_h: 0.01
+    closure_tolerance_h: 0.02
+    closure_max_iterations: 6
+objectives:
+  fleet_required: min
+  mission_fuel_kg: min

@@ -1,0 +1,379 @@
+{
+ "schema": "acdt.provenance/1",
+ "created": {
+  "utc": "2026-11-18T11:19:48+00:00",
+  "europe_lisbon": "2026-11-18T11:19:48+00:00"
+ },
+ "entry_point": {
+  "command": "acdt optimize",
+  "argv": [
+   "optimize",
+   "examples/uav_endurance_payload.yaml",
+   "--objective",
+   "W0",
+   "-o",
+   "examples/output/uav_endurance_payload_mdo"
+  ],
+  "cwd": "."
+ },
+ "acdt": {
+  "version": "0.1.0",
+  "git": {
+   "commit": "633283811fcb3656170f8e9706b8e01940e00e56",
+   "dirty": false,
+   "branch": "publicacao",
+   "dirty_diff_sha256": null
+  }
+ },
+ "python": {
+  "version": "3.13.5",
+  "implementation": "CPython",
+  "executable": "/workspace/.venv-acdt/bin/python3"
+ },
+ "packages": {
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "matplotlib": "3.11.2",
+  "pyyaml": "6.0.3",
+  "openmdao": "3.45.1",
+  "openaerostruct": "2.12.0",
+  "aerosandbox": "4.2.10",
+  "neuralfoil": "0.3.3",
+  "pyNastran": "1.3.4",
+  "PanelAero": "2025.8",
+  "jsbsim": "1.3.3",
+  "mcp": "2.3.0"
+ },
+ "platform": {
+  "system": "Linux",
+  "release": "6.12.113+",
+  "version": "#1 SMP PREEMPT_DYNAMIC Fri Nov 13 20:25:27 UTC 2026",
+  "machine": "x86_64",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41"
+ },
+ "tools": {
+  "avl": {
+   "name": "avl",
+   "path": "/workspace/tools/Avl/bin/avl",
+   "found": true,
+   "size_bytes": 767032,
+   "mtime_utc": "2026-11-14T12:53:19+00:00",
+   "sha256": "72597822ceea9e2c5f0407d9e2416e0a7a19dcb2f637227ac3060bc1fc4459ee",
+   "version": null,
+   "version_note": "sem opção de versão não-interactiva conhecida: a identidade é o SHA-256 do binário"
+  },
+  "xfoil": {
+   "name": "xfoil",
+   "path": "/workspace/tools/Xfoil/bin/xfoil",
+   "found": true,
+   "size_bytes": 826560,
+   "mtime_utc": "2026-11-14T12:54:11+00:00",
+   "sha256": "f30cb553a90d71428a3a95253d82dfb959cef04c90743b687c2a84782983caf8",
+   "version": null,
+   "version_note": "sem opção de versão não-interactiva conhecida: a identidade é o SHA-256 do binário"
+  }
+ },
+ "inputs": [
+  {
+   "path": "examples/uav_endurance_payload.yaml",
+   "sha256_bytes": "cb4b8cb6038e9f3aa89949c71c6ff57f522f8586a1af412bb3facd25d4a85637",
+   "size_bytes": 4110,
+   "kind": "yaml-canonical",
+   "sha256": "7599207a0889bc64f141260f7a28d58e99d91e0df722db63b7b2b72d9e3065a4"
+  }
+ ],
+ "seeds": {},
+ "notes": [
+  "nenhuma semente declarada nesta corrida (desconhecido ≠ determinístico)"
+ ],
+ "outputs": [
+  {
+   "path": "baseline/cg_envelope.png",
+   "size_bytes": 41573,
+   "written_this_run": true,
+   "sha256": "5457786daa15c66fa34c826c7a9f76f381084822af9177a119d68e16ff7357b8"
+  },
+  {
+   "path": "baseline/climb_ceiling.png",
+   "size_bytes": 29925,
+   "written_this_run": true,
+   "sha256": "a7fc3db13276edea24dea1e7cd465947e99578c453f923ab5c93a7253d084c2d"
+  },
+  {
+   "path": "baseline/compliance_checklist.md",
+   "size_bytes": 4049,
+   "written_this_run": true,
+   "sha256": "c6163e5716acd48cf8993c1405af53fb8a3e3daddb71341a70f615bbdf9c5009"
+  },
+  {
+   "path": "baseline/constraint_diagram.png",
+   "size_bytes": 59882,
+   "written_this_run": true,
+   "sha256": "755243ae7997def3e27d8ef1c36f0dd7ce587f4c8becaa485c9e882692f710c8"
+  },
+  {
+   "path": "baseline/drag_polar.png",
+   "size_bytes": 44303,
+   "written_this_run": true,
+   "sha256": "14a8991ba5dbffd5c3a520042eb6e8f233131f57d0d43f086361b01690aa02cd"
+  },
+  {
+   "path": "baseline/flutter_vg.png",
+   "size_bytes": 63618,
+   "written_this_run": true,
+   "sha256": "2ff0cd350f41d78b6888667f5c546eefd027df5671cc0da4a618ca81732696b6"
+  },
+  {
+   "path": "baseline/harness.dot",
+   "size_bytes": 642,
+   "written_this_run": true,
+   "sha256": "ec3335a0ed460ebfa3336d188333f83ccaa851c57ae24452293403a17ea9f504"
+  },
+  {
+   "path": "baseline/harness.net",
+   "size_bytes": 2128,
+   "written_this_run": true,
+   "sha256": "b68d1bf15a4401b7d7a1617c25222774fdd487b31dfabd5906fb6c94b36aacb7"
+  },
+  {
+   "path": "baseline/harness.wireviz.yml",
+   "size_bytes": 1170,
+   "written_this_run": true,
+   "sha256": "3ce36839a34af3238f5ddaa2bb5cac0350196bab114a80d5264d869552a952a0"
+  },
+  {
+   "path": "baseline/lowfi_polar.png",
+   "size_bytes": 68008,
+   "written_this_run": true,
+   "sha256": "3383acf558a3d0bc1f5921697fb8f2e9f4b8bcb2af16e66e8d50c466eacc2280"
+  },
+  {
+   "path": "baseline/netlist.csv",
+   "size_bytes": 283,
+   "written_this_run": true,
+   "sha256": "4463aa6ad8b9bcc1cb0cb922e2508aa4ad036bf73532753473e14e2a7c346fd8"
+  },
+  {
+   "path": "baseline/payload_range.png",
+   "size_bytes": 35274,
+   "written_this_run": true,
+   "sha256": "edbcd48ece0092d03105328b3b47b536165178bea10fa58ecb6f7d726521484c"
+  },
+  {
+   "path": "baseline/report.md",
+   "size_bytes": 48382,
+   "written_this_run": true,
+   "sha256": "eb23b67c0c7e0cdfafdb2db64211823483953fed9dad6cdfd04364e2546788fb"
+  },
+  {
+   "path": "baseline/result.json",
+   "size_bytes": 70906,
+   "written_this_run": true,
+   "sha256": "87b0f984f7ed5dba552581fe465f5efd8c184ee41ec0e6715c9fe61a36365ede"
+  },
+  {
+   "path": "baseline/root_locus.png",
+   "size_bytes": 23581,
+   "written_this_run": true,
+   "sha256": "f9bae8586cee355582fc5cc8bec4642a1f00732f262c93a4dc3bcdc9f8b7be18"
+  },
+  {
+   "path": "baseline/scissor.png",
+   "size_bytes": 43712,
+   "written_this_run": true,
+   "sha256": "29ecafd159548437ed8c1aba38898b65f2cb2b85d5f787d745e1bab3407d648f"
+  },
+  {
+   "path": "baseline/verification_matrix.csv",
+   "size_bytes": 4491,
+   "written_this_run": true,
+   "sha256": "133a9ea0785bb2e8588b96db983d5f7cf1b3bf40d9ead36df4c209c09b3535fb"
+  },
+  {
+   "path": "baseline/verification_matrix.json",
+   "size_bytes": 11978,
+   "written_this_run": true,
+   "sha256": "2c1ae1d3dad4bf48fb63a3f56d65944ab453f5c08b5b26fbfa5f2aeaa196b0f3"
+  },
+  {
+   "path": "baseline/verification_matrix.md",
+   "size_bytes": 3402,
+   "written_this_run": true,
+   "sha256": "f1d989c3a4bca41e35fdd9ede05bd80733dfc7ef766bc2d76ee662cc7d42851e"
+  },
+  {
+   "path": "baseline/vn_diagram.png",
+   "size_bytes": 51270,
+   "written_this_run": true,
+   "sha256": "3f72ad2760e1d6b737450d60ced93627ab16192f0e4b69fa69a491ff9c0d50b9"
+  },
+  {
+   "path": "baseline/wb_loading.png",
+   "size_bytes": 29728,
+   "written_this_run": true,
+   "sha256": "c84f9e708a43e6ef5612f90fe170d9ea8b5d0ded349ab6d93217f1193a813fc6"
+  },
+  {
+   "path": "baseline/wing_box.png",
+   "size_bytes": 46916,
+   "written_this_run": true,
+   "sha256": "4be0e1cc7927be6d25b5abadc7975f5a3e4a7abb7d0e45cd9520beb16b32d086"
+  },
+  {
+   "path": "baseline/wing_loads.png",
+   "size_bytes": 82934,
+   "written_this_run": true,
+   "sha256": "d5d8b13483732e160dfc167ed864c451205a7cf672901df1b722508c693c1460"
+  },
+  {
+   "path": "mdo.json",
+   "size_bytes": 12614,
+   "written_this_run": true,
+   "sha256": "8bd7ae438e6cab3fdba49fe91edb6bd37006180c3c5ba88b88e09af7923e2175"
+  },
+  {
+   "path": "mdo_report.md",
+   "size_bytes": 4548,
+   "written_this_run": true,
+   "sha256": "50d632b60aacb01da6edfd6dfabdd3644ca49593d4680bc2e5157f95e232a7b0"
+  },
+  {
+   "path": "optimum/cg_envelope.png",
+   "size_bytes": 41096,
+   "written_this_run": true,
+   "sha256": "f15ac60ab871a98ae589d8947dd933164ed237c647eb6559a0e9c9309d77b168"
+  },
+  {
+   "path": "optimum/climb_ceiling.png",
+   "size_bytes": 30158,
+   "written_this_run": true,
+   "sha256": "95c6bdc80754864071c4722c61dcedd0f29c383081117a838f549e8f59c10b6a"
+  },
+  {
+   "path": "optimum/compliance_checklist.md",
+   "size_bytes": 4049,
+   "written_this_run": true,
+   "sha256": "f704406922309d2022b315448fb6ea1a7e439cd95addffc8674415b5a27c7cc3"
+  },
+  {
+   "path": "optimum/constraint_diagram.png",
+   "size_bytes": 59860,
+   "written_this_run": true,
+   "sha256": "f74edff12398dbc1dd542e29ce4a93dd2aac6facdceaf3a969f60cbd3cf48290"
+  },
+  {
+   "path": "optimum/drag_polar.png",
+   "size_bytes": 48790,
+   "written_this_run": true,
+   "sha256": "326d0d3bc4e82019b0bf24b3026578a3945cd6a8c9f7ab3c15d75bd8fbe9ba3b"
+  },
+  {
+   "path": "optimum/flutter_vg.png",
+   "size_bytes": 64333,
+   "written_this_run": true,
+   "sha256": "ba86c1192d44de81879c619d1d2bbb0a8bc71b37534447fa6322de284df614bd"
+  },
+  {
+   "path": "optimum/harness.dot",
+   "size_bytes": 642,
+   "written_this_run": true,
+   "sha256": "ec3335a0ed460ebfa3336d188333f83ccaa851c57ae24452293403a17ea9f504"
+  },
+  {
+   "path": "optimum/harness.net",
+   "size_bytes": 2128,
+   "written_this_run": true,
+   "sha256": "b68d1bf15a4401b7d7a1617c25222774fdd487b31dfabd5906fb6c94b36aacb7"
+  },
+  {
+   "path": "optimum/harness.wireviz.yml",
+   "size_bytes": 1170,
+   "written_this_run": true,
+   "sha256": "3ce36839a34af3238f5ddaa2bb5cac0350196bab114a80d5264d869552a952a0"
+  },
+  {
+   "path": "optimum/lowfi_polar.png",
+   "size_bytes": 68357,
+   "written_this_run": true,
+   "sha256": "28fa0672ab79a09f242eadf0db63ffd4c91a32476657e56e3b5757c337a37b54"
+  },
+  {
+   "path": "optimum/netlist.csv",
+   "size_bytes": 283,
+   "written_this_run": true,
+   "sha256": "eb1c9df1b68f8f4187a54eac63375ea8415ed0acacd2f198a03849d2cc9f909f"
+  },
+  {
+   "path": "optimum/payload_range.png",
+   "size_bytes": 36580,
+   "written_this_run": true,
+   "sha256": "fcad493a3afb8600e34b3d14bd291fa3bddd3500c565a34aa10a87a22d244844"
+  },
+  {
+   "path": "optimum/report.md",
+   "size_bytes": 48133,
+   "written_this_run": true,
+   "sha256": "784886f4b2e240e1e971a21958089308e234cd54f537f6ed7caa9be886bb1ff3"
+  },
+  {
+   "path": "optimum/result.json",
+   "size_bytes": 69247,
+   "written_this_run": true,
+   "sha256": "625c73772346193081e1f95d3d078163489c19d77b32bd409932a5d2a5c97561"
+  },
+  {
+   "path": "optimum/root_locus.png",
+   "size_bytes": 24290,
+   "written_this_run": true,
+   "sha256": "eb04b7f4384d9b6721009bf5ef5bbf81cad913274d9643de1a2cab79532ead44"
+  },
+  {
+   "path": "optimum/scissor.png",
+   "size_bytes": 44634,
+   "written_this_run": true,
+   "sha256": "63b339c22b3a469e122273868ba88f1e44c6a79e95247ca97437f488fece77bd"
+  },
+  {
+   "path": "optimum/verification_matrix.csv",
+   "size_bytes": 4377,
+   "written_this_run": true,
+   "sha256": "a0f2be13b04bb6e9e6048017d7876702ed209b98b21cc607d1d67b16d5f99ba8"
+  },
+  {
+   "path": "optimum/verification_matrix.json",
+   "size_bytes": 11864,
+   "written_this_run": true,
+   "sha256": "5155d1b4702781944032b01640655febef2f2bab5723a804d065b4a96a57480e"
+  },
+  {
+   "path": "optimum/verification_matrix.md",
+   "size_bytes": 3361,
+   "written_this_run": true,
+   "sha256": "9f8ee4810dd6b2620713c35c2134b59f66405ab33814b028ea31d3a36a13163a"
+  },
+  {
+   "path": "optimum/vn_diagram.png",
+   "size_bytes": 51383,
+   "written_this_run": true,
+   "sha256": "285b06ad532627d79e78d2f30ec68b549b389b72109f54d041cc623f63c93131"
+  },
+  {
+   "path": "optimum/wb_loading.png",
+   "size_bytes": 29966,
+   "written_this_run": true,
+   "sha256": "1ef93c8d68620d0bc5d8a1d83bd40730e9abd9b174aac209a8ffd8b92dbbf97c"
+  },
+  {
+   "path": "optimum/wing_box.png",
+   "size_bytes": 53779,
+   "written_this_run": true,
+   "sha256": "2eeab98acf9f613d958079247cdc5bbaf540b6c512b3495eb3207adc4999410d"
+  },
+  {
+   "path": "optimum/wing_loads.png",
+   "size_bytes": 98829,
+   "written_this_run": true,
+   "sha256": "90ab6184ccff4ef2b69388dbfe5dcbe15a9a9f037dab19d117e9dca5de7e8a48"
+  }
+ ]
+}

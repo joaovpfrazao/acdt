@@ -1,0 +1,15 @@
+{
+  "_comment": "PRESSUPOSTO L0 demo of barrier_search (Koopman 1946/1980; Washburn 2002). Crossing window 1.20 h matches the Nansei benchmark detection window (12 NM @ 10 kn) from examples/benchmarks/nansei_jcg — problem statement / reference only. Barrier length and sweep width here are PRESSUPOSTO placeholders for a choke-line patrol, NOT the Gabbiano radar's real sweep width (that Nansei sub-point remains open: needs a sourced datasheet W). Not a product study.",
+  "barrier_length_km": 80.0,
+  "speed_m_s": 40.0,
+  "sweep_width_km": 20.4,
+  "evader_speed_m_s": 5.144,
+  "crossing_window_h": 1.2,
+  "n_on_station": 1.0,
+  "endurance_h": 16.7,
+  "turnaround_h": 2.0,
+  "distance_km": 162.0,
+  "airspeed_m_s": 40.0,
+  "headwind_m_s": 10.0,
+  "reserve_h": 0.5
+}

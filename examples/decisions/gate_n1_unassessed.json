@@ -1,0 +1,20 @@
+{
+  "level": "N1",
+  "metrics": {
+    "CL_alpha": 5.0,
+    "baseline_CL_alpha": 5.0
+  },
+  "checks": [
+    {
+      "key": "hq:spiral",
+      "ok": null,
+      "message": "dihedral undeclared \u2014 spiral unassessed"
+    },
+    {
+      "key": "mtow",
+      "ok": true,
+      "message": "W0 ok"
+    }
+  ],
+  "source": "PRESSUPOSTO demo \u2014 missing metric + ok=null \u2260 pass"
+}

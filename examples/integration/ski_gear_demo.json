@@ -1,0 +1,148 @@
+{
+ "_comment": "PRESSUPOSTO L0 demo: same airframe with opt-in ski landing device. Requires gear.ski.length_m (Raymer Ch. 11); missing length \u2192 unassessed.",
+ "assembly": {
+  "components": [
+   {
+    "type": "body",
+    "name": "fuselage",
+    "role": "fuselage",
+    "pod": {
+     "length": 3.2,
+     "width": 0.36,
+     "height": 0.4,
+     "nose_frac": 0.22,
+     "tail_frac": 0.28,
+     "tail_scale": 0.35
+    },
+    "origin": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "type": "surface",
+    "name": "wing",
+    "role": "wing",
+    "origin": [
+     1.1,
+     0.0,
+     0.05
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.55,
+     "tip_chord": 0.35,
+     "span": 2.4,
+     "dihedral_deg": 2.0,
+     "tc_root": 0.14,
+     "tc_tip": 0.12
+    }
+   },
+   {
+    "type": "surface",
+    "name": "htail",
+    "role": "horizontal tail",
+    "origin": [
+     2.85,
+     0.0,
+     0.05
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.32,
+     "tip_chord": 0.22,
+     "span": 0.55,
+     "dihedral_deg": 0.0,
+     "tc_root": 0.1,
+     "tc_tip": 0.1
+    }
+   },
+   {
+    "type": "surface",
+    "name": "vtail",
+    "role": "fin",
+    "origin": [
+     2.85,
+     0.0,
+     0.05
+    ],
+    "panel": {
+     "root_chord": 0.35,
+     "tip_chord": 0.22,
+     "span": 0.45,
+     "dihedral_deg": 90.0,
+     "tc_root": 0.1,
+     "tc_tip": 0.1
+    }
+   },
+   {
+    "type": "disc",
+    "name": "prop",
+    "role": "propeller",
+    "origin": [
+     -0.12,
+     0.0,
+     0.0
+    ],
+    "diameter": 0.7,
+    "orientation": {
+     "yaw": 0.0
+    }
+   }
+  ]
+ },
+ "masses": [
+  {
+   "name": "engine",
+   "mass_kg": 8.0,
+   "position": [
+    0.25,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "avionics",
+   "mass_kg": 3.0,
+   "position": [
+    0.6,
+    0.0,
+    0.05
+   ]
+  },
+  {
+   "name": "battery",
+   "mass_kg": 6.0,
+   "position": [
+    1.2,
+    0.0,
+    -0.02
+   ]
+  }
+ ],
+ "flight": {
+  "W0_kg": 55.0,
+  "V_m_s": 32.0,
+  "altitude_m": 500.0,
+  "Wf_kg": 0.0,
+  "payload_kg": 5.0
+ },
+ "gear": {
+  "type": "ski",
+  "tipback_deg": 15.0,
+  "overturn_max_deg": 63.0,
+  "half_track": 0.6,
+  "ski": {
+   "length_m": 1.4,
+   "attach_x": 1.35,
+   "thickness_m": 0.06
+  },
+  "draw_legs": true,
+  "leg_diameter_m": 0.06
+ },
+ "options": {
+  "run_avl": false,
+  "static_margin_min": 0.05
+ }
+}

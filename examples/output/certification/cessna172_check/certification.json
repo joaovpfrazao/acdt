@@ -1,0 +1,120 @@
+{
+  "spec": "examples/cessna172_check.yaml",
+  "W0_kg": 1137.8001977766298,
+  "bases": [
+    "cs23"
+  ],
+  "rationale": [
+    "tripulado, 3 lugares de passageiros e MTOW 1138 kg ≤ 8 618 kg → CS-23 categoria normal, Nível 2, baixa velocidade (CS 23.2005)"
+  ],
+  "counts": {
+    "compliant": 6,
+    "needs-test": 14,
+    "non-compliant": 2,
+    "open": 31
+  },
+  "notes": [
+    "VNO ≈ VC de projeto = 136 kt EAS≈CAS (PRESSUPOSTO para o nível de desempenho)"
+  ],
+  "scheme": "ac23_1309_class_I",
+  "xlsx": "examples/output/certification/cessna172_check/compliance_matrix.xlsx",
+  "safety": {
+    "options": {
+      "standby_altimeter": true,
+      "standby_attitude": false
+    },
+    "meets": false,
+    "failure_conditions": [
+      {
+        "id": "FC-A1",
+        "name": "perda total de indicação de atitude (IFR)",
+        "severity": "catastrophic",
+        "target_per_fh": 1e-06,
+        "P_per_fh": 3.092258651888652e-07,
+        "status": "cumpre",
+        "single_point_failures": [],
+        "required": null
+      },
+      {
+        "id": "FC-A2",
+        "name": "perda da atitude primária",
+        "severity": "major",
+        "target_per_fh": 0.0001,
+        "P_per_fh": 0.0006497887957633965,
+        "status": "não cumpre",
+        "single_point_failures": [
+          "ai",
+          "vac"
+        ],
+        "required": {
+          "component": "attitude_indicator",
+          "mtbf_required_h": null,
+          "note": "inatingível só com attitude_indicator; todas as taxas da árvore teriam de baixar ×0.15 (MTBF ×6.5)",
+          "uniform_factor": 0.15385384666670512
+        }
+      },
+      {
+        "id": "FC-A3",
+        "name": "perda total de indicação de altitude",
+        "severity": "hazardous",
+        "target_per_fh": 1e-05,
+        "P_per_fh": 3.311797207198305e-08,
+        "status": "cumpre",
+        "single_point_failures": [],
+        "required": null
+      },
+      {
+        "id": "FC-A4",
+        "name": "perda total de indicação de velocidade",
+        "severity": "major",
+        "target_per_fh": 0.0001,
+        "P_per_fh": 6.879763333427585e-05,
+        "status": "cumpre",
+        "single_point_failures": [
+          "asi",
+          "pitot"
+        ],
+        "required": null
+      },
+      {
+        "id": "FC-A5",
+        "name": "perda total de indicação de rumo",
+        "severity": "major",
+        "target_per_fh": 0.0001,
+        "P_per_fh": null,
+        "status": "em aberto",
+        "single_point_failures": null,
+        "required": null
+      },
+      {
+        "id": "FC-A6",
+        "name": "perda de potência do motor (informativo — 23.2100/2405, não 1309)",
+        "severity": null,
+        "target_per_fh": null,
+        "P_per_fh": 0.00012699193584138634,
+        "status": "sem alvo",
+        "single_point_failures": [
+          "engine"
+        ],
+        "required": null
+      }
+    ],
+    "cumulative_catastrophic": null,
+    "selected": {
+      "options": {
+        "standby_altimeter": true,
+        "standby_attitude": false
+      },
+      "dm_kg": 0.37,
+      "dW0_kg": 0.7090393330523284,
+      "dcost": null,
+      "W0_resized_kg": 1138.50625108615,
+      "missing_inputs": [
+        "altimeter_cost"
+      ]
+    },
+    "reason": "NENHUM conjunto de opções cumpre — escolhido o com menos condições em incumprimento; requer componentes mais fiáveis (ver MTBF requerido)",
+    "growth_dW0_dm": 1.9163225217630497,
+    "baseline_n_fail": 2
+  }
+}

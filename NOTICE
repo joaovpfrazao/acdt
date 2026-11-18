@@ -1,0 +1,10 @@
+acdt — aircraft design tools
+Copyright 2026 João Frazão
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Third-party software used by, wrapped by or referenced from acdt (Python packages, external
+executables, reference codes and data sources) is not part of this distribution and remains under
+its own licence and copyright, as listed with its origin in THIRD_PARTY.md. GPL/LGPL tools (AVL,
+XFOIL, SU2, CalculiX, Gmsh, OpenFOAM, JSBSim, ...) are only ever run as separate executables or
+processes, never imported into the acdt process.

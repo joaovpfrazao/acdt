@@ -1,0 +1,13 @@
+{
+  "operating_cost": {
+    "flight_hours_per_year": 300,
+    "unit_price_from": "size",
+    "energy_kWh_per_h": 5.0,
+    "electricity_price_per_kWh": 0.20,
+    "profile": "elements",
+    "sources": {
+      "electricity_price_per_kWh": "EXAMPLE grid 0.20 USD/kWh illustrative"
+    }
+  },
+  "reference": "unit_price_from=size with no sized unit_cost → operating_cost unassessed (never silent zero)"
+}

@@ -1,0 +1,18 @@
+{
+  "operating_cost": {
+    "flight_hours_per_year": 300,
+    "energy_kWh_per_h": 5.0,
+    "electricity_price_per_kWh": 0.20,
+    "profile": "elements",
+    "eastlake": {
+      "W_airframe_kg": 12.0,
+      "V_H_kt": 45.0,
+      "N": 50
+    },
+    "sources": {
+      "electricity_price_per_kWh": "EXAMPLE grid 0.20 USD/kWh illustrative (not a tariff quote)",
+      "eastlake": "Gudmundsson 2014 Ch. 2 CER for illustrative UAV airframe — outside GA database (confidence low)"
+    }
+  },
+  "reference": "Opt-in morph DOC attach via Eastlake unit CER + energy rate; cost_per_fh only when status=ok; prune set-based. Eastlake GA CER on UAV is outside database — PRESSUPOSTO comparative only."
+}

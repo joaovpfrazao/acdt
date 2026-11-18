@@ -1,0 +1,15 @@
+# heavy / regenerable solver files (re-run `acdt hifi` to recreate)
+*.su2
+*.dat
+*.frd
+*.sta
+*.cvg
+*.12d
+*.inp
+*.bdf
+*.stl
+*.vtu
+*.vtk
+*.csv
+*.log
+*.msh

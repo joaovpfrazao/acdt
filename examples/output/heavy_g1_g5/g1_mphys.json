@@ -1,0 +1,44 @@
+{
+  "item": "G1",
+  "acceptance": "mpirun -np 4 of the MPhys supersonic_panel optimization converges as that example README",
+  "met": true,
+  "image": "mdolab/public:u22-gcc-ompi-stable",
+  "runner": "udocker 1.3.17, execmode P1 (PRoot). Docker Desktop is not installed. newuidmap is not installed, so rootless Docker/Podman was not used.",
+  "container": "acdtg1",
+  "environment": "The image PATH is the stock Ubuntu PATH until /home/mdolabuser/.bashrc_mdolab is sourced. After that: Python 3.11.14 (pyenv), OpenMPI 4.1.6, mpirun on PATH.",
+  "imports": {
+    "adflow": true,
+    "tacs": true,
+    "pygeo": true,
+    "pyhyp": true,
+    "idwarp": true,
+    "mphys": "2.0.0"
+  },
+  "mpi_hello_np4": true,
+  "mpi_notes": "mpirun -np 4 python (mpi4py) printed ranks 0-3. MCA: btl=tcp,self, btl_vader_single_copy_mechanism=none, interfaces limited to lo. OMP/MKL/OPENBLAS threads = 1.",
+  "example": {
+    "path_in_image": "/home/mdolabuser/repos/mphys/examples/aerostructural/supersonic_panel/as_opt_parallel.py",
+    "git": "8cab854 (v2.0.0)",
+    "physics": "piston theory plus a beam. Not an ADflow or TACS solve. HANDOFF §4b G1 allows this example or the rectangular-wing MACH tutorial.",
+    "name_alignment": "The v2.0.0 example publishes mesh coordinates as x_struct0 and x_aero0 and geometry inputs as x_<name>_in. The installed ScenarioAeroStructural connects x_*0_mesh to x_*0_geometry_input and the geometry output on to x_struct0 / x_aero. A work copy, not committed in acdt, renamed only those coordinates. The morph is still output = geometry_morph_param * input."
+  },
+  "result": {
+    "exit_mode": 0,
+    "iterations": 22,
+    "function_evaluations": 24,
+    "gradient_evaluations": 22,
+    "objective_scaled": 0.008732987583283886,
+    "readme_objective_scaled": 0.008732987524877025,
+    "mass": 8.73298758e-05,
+    "readme_mass": 8.73298752e-05,
+    "aoa_deg": [10.52590682, 18.2314054],
+    "readme_aoa_deg": [10.5259, 18.2314],
+    "geometry_morph_param": 0.1
+  },
+  "notes": [
+    "The final nonlinear block Gauss-Seidel on one scenario hit its 100-iteration cap at an absolute residual of about 2.6e-9. The optimizer had already reported success with the README figures.",
+    "After the optimization, the example's CaseReader looked for optimization_history.sql in the working directory. OpenMDAO 3.37 writes that file under the problem output directory, so the process then exited 1. The optimum above is from the driver print, before that read.",
+    "The rectangular-wing ADflow tutorial was not run. ADflow and TACS import in this image. That RANS case would contend with the RCS polar still running on this machine.",
+    "Assembly OML to pyGeo/pyHyp was not built. HANDOFF §4b G1 step 4 leaves that bridge to P6."
+  ]
+}

@@ -1,0 +1,103 @@
+connectors:
+  BAT:
+    pinlabels:
+    - +
+    - '-'
+    pn: XT90-class
+  ESC:
+    pinlabels:
+    - +
+    - '-'
+  PDB:
+    pinlabels:
+    - +
+    - '-'
+    - 5V
+    - GND
+    - SERVO+
+    - SERVO-
+    pn: power distribution board
+  AP:
+    pinlabels:
+    - 5V
+    - GND
+    pn: cubepilot_cube_orange_plus
+  SRV:
+    pinlabels:
+    - +
+    - '-'
+    pn: servo rail
+cables:
+  W1:
+    wirecount: 1
+    gauge: TBD
+    length: 0.4
+    colors:
+    - RD
+  W2:
+    wirecount: 1
+    gauge: TBD
+    length: 0.4
+    colors:
+    - BK
+  W3:
+    wirecount: 1
+    gauge: 22 AWG
+    length: 0.3
+    colors:
+    - RD
+  W4:
+    wirecount: 1
+    gauge: 22 AWG
+    length: 0.3
+    colors:
+    - BK
+  W5:
+    wirecount: 1
+    gauge: 10 AWG
+    length: 1.5
+    colors:
+    - RD
+  W6:
+    wirecount: 1
+    gauge: 10 AWG
+    length: 1.5
+    colors:
+    - BK
+connections:
+- - BAT:
+    - +
+  - W1:
+    - 1
+  - ESC:
+    - +
+- - BAT:
+    - '-'
+  - W2:
+    - 1
+  - ESC:
+    - '-'
+- - PDB:
+    - 5V
+  - W3:
+    - 1
+  - AP:
+    - 5V
+- - PDB:
+    - GND
+  - W4:
+    - 1
+  - AP:
+    - GND
+- - PDB:
+    - SERVO+
+  - W5:
+    - 1
+  - SRV:
+    - +
+- - PDB:
+    - SERVO-
+  - W6:
+    - 1
+  - SRV:
+    - '-'

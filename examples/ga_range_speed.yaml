@@ -1,0 +1,39 @@
+# Exemplo 2 — Avião ligeiro de viagem (GA, 2 lugares lado a lado, motor a pistão)
+# Mistura de requisitos: ALCANCE + VELOCIDADE (cruzeiro rápido e velocidade máxima), com pista curta.
+name: GA tourer 2 lugares
+description: Avião de viagem rápido, 2 ocupantes + bagagem, CS-23 nível 1, motor a pistão + hélice de passo fixo.
+aircraft_class: ga_single_engine
+requirements:
+  propulsion_type: piston_prop
+  regulatory_category: cs_23
+  crew_mass: {target: 85, unit: kg}
+  payload_mass: {target: 115, unit: kg}          # 1 passageiro + 30 kg bagagem
+  range: {min: 1300, unit: km}
+  cruise_speed: {min: 150, unit: kt, altitude: {value: 8000, unit: ft}}
+  max_speed: {min: 165, unit: kt, altitude: {value: 0, unit: m}}
+  stall_speed: {max: 55, unit: kt}
+  takeoff_ground_roll: {max: 350, unit: m}
+  landing_distance: {max: 500, unit: m}
+  climb_rate: {min: 1000, unit: ft/min}
+  service_ceiling: {min: 16000, unit: ft}
+assumptions:
+  weights:
+    method: components            # Raymer Ch. 15 por componentes; Raymer Table 3.1 só como valor inicial
+    components:
+      material: metal
+      engine_kW_per_kg: 1.1       # PRESSUPOSTO: motor a pistão seco ≈1.1 kW/kg (IO-360: 134 kW / 122 kg, TCDS 1E10)
+      avionics_uninstalled_kg: 15 # PRESSUPOSTO
+  aero:
+    AR: 8
+    taper: 0.5
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 23015
+    clmax_airfoil: 1.6
+    flap: {kind: slotted, flapped_area_ratio: 0.6}
+    roughness: smooth_paint
+    laminar: {wing: 0.20, htail: 0.20, vtail: 0.20, fuselage: 0.05}
+    extra_drag_areas_m2: {fixed_gear_faired: 0.12, cooling_and_misc: 0.06}
+  geometry: {}
+  propulsion:
+    eta_cruise: 0.82

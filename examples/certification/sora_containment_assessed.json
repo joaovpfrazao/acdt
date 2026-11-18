@@ -1,0 +1,23 @@
+{
+  "label": "SORA 2.5 passo #8 — requisito e conformidade avaliados (taxas/evidência EXAMPLE, não dados reais de fornecedor)",
+  "span_m": 5.37,
+  "v_max_m_s": 48.5,
+  "population": "<50",
+  "aec": 10,
+  "mitigations": {},
+  "mtow_kg": 136.0,
+  "vlos": false,
+  "containment": {
+    "adjacent_population_density_per_km2": 20,
+    "outdoor_assembly": "<40k",
+    "sheltering": false,
+    "claimed_robustness": "low",
+    "p_exit_operational_volume_per_fh": 5.0e-4,
+    "sources": {
+      "claimed_robustness": "EXAMPLE declaração de conformidade ilustrativa (PRESSUPOSTO) — substituir por evidência do operador/projetista",
+      "p_exit_operational_volume_per_fh": "EXAMPLE / PRESSUPOSTO 5e-4 /FH ilustrativo, não é um ensaio nem uma taxa de fornecedor (2026-11-10)"
+    },
+    "evidence": "EXAMPLE: terminação de voo ao sair do volume operacional (Critério #2) declarada; não é um DVR"
+  },
+  "reference": "EASA AMC1 Article 11 SORA 2.5 § S.4.8 Tabela 11 + Anexo E § E.4; unassessed≠pass"
+}

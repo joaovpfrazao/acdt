@@ -1,0 +1,445 @@
+{
+ "case": "uav150_flying_wing_tailless",
+ "date": "2026-11-15",
+ "branch": "h1-gci-v2",
+ "solver": "SU2 8.5.0 Harrier, RANS, Spalart-Allmaras, OpenMP, 6 threads",
+ "scope": "Meia asa de estibordo, controlos alinhados (sem deflexão), sem fuselagem, trem ou hélice. A espessura é a NACA simétrica do t/c declarado (naca_yt). A curvatura da designação NACA 4415 não entra no loft nem no AVL.",
+ "previous_invalid": "h1_wing_gci.json de 13 nov 2026, torção do loft trocada. Não foi reescrito.",
+ "decision": "nao_aplicar",
+ "applied_to_l1_l2": false,
+ "band": [
+  0.7,
+  1.5
+ ],
+ "avl": {
+  "alpha_deg": 9.52057,
+  "CL": 0.50293,
+  "Cmtot": 0.02886,
+  "CDtot": 0.01611,
+  "CDff": 0.0145358,
+  "Xref": 0.98016,
+  "Sref": 3.186,
+  "Cref": 0.72709,
+  "Bref": 4.3819,
+  "source": "AVL 3.x external process, symmetric wing, YDUPLICATE"
+ },
+ "levels": {
+  "coarse": {
+   "counts": {
+    "n_chord": 49,
+    "n_span": 33,
+    "n_tip": 9,
+    "n_layers": 49,
+    "n_wrap": 97
+   },
+   "cells": 190464,
+   "yplus_target": 2.0,
+   "s0_m": 2.0281793804387614e-05,
+   "points": 197225,
+   "n_hex": 190464,
+   "n_prism": 0,
+   "min_hex_volume_m3": 1.710935938681508e-11,
+   "sliver": false,
+   "reject_below": 0.0,
+   "watertight": true,
+   "winding_ok": true,
+   "unmarked_boundary": 0,
+   "wall_s": 4434.0,
+   "wall_detail": {
+    "selected_s": 4434.0,
+    "first_run_s": 4434.0,
+    "continuation_s": 2002.0,
+    "selected_is": "primeira corrida, 8000 iterações, rms -7,230"
+   },
+   "iters": 7999.0,
+   "rms_rho": -7.229655971,
+   "residual_criterion": -8.0,
+   "residual_met": false,
+   "CL": 0.4170208795,
+   "CD": 0.03110908415,
+   "CMy": 0.03191435401,
+   "CMz": 0.05052501958,
+   "CL_drift": 0.0008816167680639843,
+   "CD_drift": 0.0017420654281781061,
+   "CMy_drift": 0.0017398857574431978,
+   "endpoint_shift": {
+    "CL": 0.002378325040197346,
+    "CD": 0.003450289615806683,
+    "CMy": 0.002265399762669352
+   },
+   "RefForce_N": 1466.281591,
+   "pyhyp": {
+    "grid_ratio_printed": 1.338944834902004,
+    "integrated_march_m": 72.70860799131671,
+    "mean_euclidean_march_m": 59.054512276050616,
+    "final_layer": 49,
+    "smoothing_source": "pyHyp 2.6.3 examples/m6/runM6.py"
+   },
+   "geometry_pode_correr": true,
+   "history_used_for_gci": "history_8000.csv",
+   "run_8000": {
+    "iters": 7999.0,
+    "rms_rho": -7.229655971,
+    "CL": 0.4170208795,
+    "CD": 0.03110908415,
+    "CMy": 0.03191435401,
+    "residual_met": false
+   },
+   "run_continuation": {
+    "iters": 3999.0,
+    "rms_rho": -6.25207435,
+    "CL": 0.4160290683,
+    "CD": 0.0310017488,
+    "CMy": 0.03198665278,
+    "residual_met": false
+   },
+   "continuation": {
+    "restart": "o restart binário do SU2 8.5 reinicia Inner_Iter em 0 com a solução carregada",
+    "cfl_max": 100.0,
+    "history_used_for_gci": "history_8000.csv",
+    "why": "O GCI usa o histórico com rms[Rho] mais baixo. O drift é a variação relativa nas últimas 10 % desse histórico. endpoint_shift é a diferença relativa face ao outro final e não substitui o drift.",
+    "cfl_200_probe": "interrompida cerca do iter 100: rms[Rho] passou de -7,17 para -5,55 com o CL quase parado. O CFL máximo voltou a 100."
+   }
+  },
+  "medium": {
+   "counts": {
+    "n_chord": 69,
+    "n_span": 47,
+    "n_tip": 9,
+    "n_layers": 69,
+    "n_wrap": 137
+   },
+   "cells": 512448,
+   "yplus_target": 1.4142135623730951,
+   "s0_m": 1.4341393933709789e-05,
+   "points": 525297,
+   "n_hex": 512448,
+   "n_prism": 0,
+   "min_hex_volume_m3": 3.2554056935436054e-12,
+   "sliver": false,
+   "reject_below": 0.0,
+   "watertight": true,
+   "winding_ok": true,
+   "unmarked_boundary": 0,
+   "wall_s": 3811.0,
+   "wall_detail": {
+    "selected_s": 3811.0,
+    "first_run_s": 11371.0,
+    "continuation_s": 3811.0,
+    "selected_is": "continuação com CFL 100, parou em rms -8,001 ao iter 2674"
+   },
+   "iters": 2674.0,
+   "rms_rho": -8.00073644,
+   "residual_criterion": -8.0,
+   "residual_met": true,
+   "CL": 0.4167961716,
+   "CD": 0.02751247793,
+   "CMy": 0.03214902914,
+   "CMz": 0.05449473446,
+   "CL_drift": 0.00015753983475413926,
+   "CD_drift": 0.0004525764648200797,
+   "CMy_drift": 0.00033977853428888624,
+   "endpoint_shift": {
+    "CL": 0.0023461142888619034,
+    "CD": 0.007305865933730398,
+    "CMy": 0.004507781842305613
+   },
+   "RefForce_N": 1466.281591,
+   "pyhyp": {
+    "grid_ratio_printed": 1.2278844305090115,
+    "integrated_march_m": 72.70860799131671,
+    "mean_euclidean_march_m": 62.76515417511653,
+    "final_layer": 69,
+    "smoothing_source": "pyHyp 2.6.3 examples/m6/runM6.py"
+   },
+   "geometry_pode_correr": true,
+   "history_used_for_gci": "history.csv",
+   "run_8000": {
+    "iters": 7999.0,
+    "rms_rho": -7.695000469,
+    "CL": 0.4177763226,
+    "CD": 0.02771495971,
+    "CMy": 0.03200475867,
+    "residual_met": false
+   },
+   "run_continuation": {
+    "iters": 2674.0,
+    "rms_rho": -8.00073644,
+    "CL": 0.4167961716,
+    "CD": 0.02751247793,
+    "CMy": 0.03214902914,
+    "residual_met": true
+   },
+   "continuation": {
+    "restart": "o restart binário do SU2 8.5 reinicia Inner_Iter em 0 com a solução carregada",
+    "cfl_max": 100.0,
+    "history_used_for_gci": "history.csv",
+    "why": "O GCI usa o histórico com rms[Rho] mais baixo. O drift é a variação relativa nas últimas 10 % desse histórico. endpoint_shift é a diferença relativa face ao outro final e não substitui o drift."
+   }
+  },
+  "fine": {
+   "counts": {
+    "n_chord": 97,
+    "n_span": 66,
+    "n_tip": 12,
+    "n_layers": 98,
+    "n_wrap": 194
+   },
+   "cells": 1451702,
+   "yplus_target": 1.0,
+   "s0_m": 1.0140896902193807e-05,
+   "points": 1477252,
+   "n_hex": 1451702,
+   "n_prism": 0,
+   "min_hex_volume_m3": -1.0213312839715216e-13,
+   "sliver": true,
+   "reject_below": -1e-12,
+   "watertight": true,
+   "winding_ok": true,
+   "unmarked_boundary": 0,
+   "wall_s": 17231.0,
+   "wall_detail": {
+    "selected_s": 17231.0,
+    "first_run_s": 32407.0,
+    "continuation_s": 17231.0,
+    "selected_is": "continuação de 4500 iterações; rms -7,968, critério -8 não cumprido"
+   },
+   "iters": 4499.0,
+   "rms_rho": -7.96778477,
+   "residual_criterion": -8.0,
+   "residual_met": false,
+   "CL": 0.4187873045,
+   "CD": 0.02505278645,
+   "CMy": 0.03165714399,
+   "CMz": 0.05767885884,
+   "CL_drift": 0.00021110692480412387,
+   "CD_drift": 0.0008561893920586384,
+   "CMy_drift": 0.0004084272417020157,
+   "endpoint_shift": {
+    "CL": 0.004041411168274286,
+    "CD": 0.016946775446930712,
+    "CMy": 0.008219050497063927
+   },
+   "RefForce_N": 1466.281591,
+   "pyhyp": {
+    "grid_ratio_printed": 1.1542691903538254,
+    "integrated_march_m": 72.70860799131671,
+    "mean_euclidean_march_m": 65.41710346666201,
+    "final_layer": 98,
+    "smoothing_source": "pyHyp 2.6.3 examples/m6/runM6.py"
+   },
+   "geometry_pode_correr": true,
+   "history_used_for_gci": "history.csv",
+   "run_8000": {
+    "iters": 7999.0,
+    "rms_rho": -7.776191009,
+    "CL": 0.420486664,
+    "CD": 0.02548466942,
+    "CMy": 0.03139907342,
+    "residual_met": false
+   },
+   "run_continuation": {
+    "iters": 4499.0,
+    "rms_rho": -7.96778477,
+    "CL": 0.4187873045,
+    "CD": 0.02505278645,
+    "CMy": 0.03165714399,
+    "residual_met": false
+   },
+   "continuation": {
+    "restart": "o restart binário do SU2 8.5 reinicia Inner_Iter em 0 com a solução carregada",
+    "cfl_max": 100.0,
+    "history_used_for_gci": "history.csv",
+    "why": "O GCI usa o histórico com rms[Rho] mais baixo. O drift é a variação relativa nas últimas 10 % desse histórico. endpoint_shift é a diferença relativa face ao outro final e não substitui o drift."
+   }
+  }
+ },
+ "gci": {
+  "CL": {
+   "f": [
+    0.4187873045,
+    0.4167961716,
+    0.4170208795
+   ],
+   "h": [
+    0.008831629503011681,
+    0.012496356291956473,
+    0.01738050401642828
+   ],
+   "r21": 1.4149547699770557,
+   "r32": 1.3908457481814587,
+   "p": 6.021652593110914,
+   "oscillatory": true,
+   "f_ext": null,
+   "e_ext_fine": 0.0006705493398456177,
+   "gci_fine": null,
+   "u_osc": 0.0023772603402785644,
+   "h_definition": "(1/N)**(1/3)",
+   "dimension": 3,
+   "iter_drift": [
+    0.00021110692480412387,
+    0.00015753983475413926,
+    0.0008816167680639843
+   ],
+   "iterative_ok": false,
+   "method": "Celik et al., ASME JFE 130 (2008) 078001, Fs=1.25"
+  },
+  "CD": {
+   "f": [
+    0.02505278645,
+    0.02751247793,
+    0.03110908415
+   ],
+   "h": [
+    0.008831629503011681,
+    0.012496356291956473,
+    0.01738050401642828
+   ],
+   "r21": 1.4149547699770557,
+   "r32": 1.3908457481814587,
+   "p": 1.2747826779566394,
+   "oscillatory": false,
+   "f_ext": 0.020633279089369988,
+   "e_ext_fine": 0.21419316539497046,
+   "gci_fine": 0.220509770911631,
+   "h_definition": "(1/N)**(1/3)",
+   "dimension": 3,
+   "iter_drift": [
+    0.0008561893920586384,
+    0.0004525764648200797,
+    0.0017420654281781061
+   ],
+   "iterative_ok": true,
+   "method": "Celik et al., ASME JFE 130 (2008) 078001, Fs=1.25"
+  },
+  "CMy": {
+   "f": [
+    0.03165714399,
+    0.03214902914,
+    0.03191435401
+   ],
+   "h": [
+    0.008831629503011681,
+    0.012496356291956473,
+    0.01738050401642828
+   ],
+   "r21": 1.4149547699770557,
+   "r32": 1.3908457481814587,
+   "p": 2.0638423315138708,
+   "oscillatory": true,
+   "f_ext": null,
+   "e_ext_fine": 0.015064561818065028,
+   "gci_fine": null,
+   "u_osc": 0.007768943878124032,
+   "h_definition": "(1/N)**(1/3)",
+   "dimension": 3,
+   "iter_drift": [
+    0.0004084272417020157,
+    0.00033977853428888624,
+    0.0017398857574431978
+   ],
+   "iterative_ok": false,
+   "method": "Celik et al., ASME JFE 130 (2008) 078001, Fs=1.25"
+  }
+ },
+ "comparisons": {
+  "CL": {
+   "quantity": "CL",
+   "hifi": 0.4187873045,
+   "lowfi": 0.50293,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": 0.8326950162050385,
+   "reason": "GCI oscilatório ou erro iterativo não pequeno face à diferença fino–médio",
+   "valid": false
+  },
+  "CMy": {
+   "quantity": "CMy",
+   "hifi": 0.03165714399,
+   "lowfi": 0.02886,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": 1.096921136174636,
+   "reason": "GCI oscilatório ou erro iterativo não pequeno face à diferença fino–médio",
+   "valid": false
+  },
+  "CD": {
+   "quantity": "CD",
+   "hifi": 0.02505278645,
+   "lowfi": 0.01611,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": null,
+   "reason": "CD do AVL é invíscido (CDtot); o SU2 é RANS-SA. Não é a mesma grandeza. O GCI do CD fica no registo. k_CD contra o AVL não calibra.",
+   "valid": false
+  }
+ },
+ "factors": [
+  {
+   "name": "CL",
+   "value": 0.8326950162050385,
+   "valid": false,
+   "invalid_reason": "GCI oscilatório ou erro iterativo não pequeno face à diferença fino–médio",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+  },
+  {
+   "name": "CMy",
+   "value": 1.096921136174636,
+   "valid": false,
+   "invalid_reason": "GCI oscilatório ou erro iterativo não pequeno face à diferença fino–médio",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+  },
+  {
+   "name": "CD",
+   "value": null,
+   "valid": false,
+   "invalid_reason": "CD do AVL é invíscido (CDtot); o SU2 é RANS-SA. Não é a mesma grandeza. O GCI do CD fica no registo. k_CD contra o AVL não calibra.",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+  }
+ ],
+ "fine_sliver": {
+  "n_nonpositive": 1,
+  "min_volume_m3": -1.0213312839715216e-13,
+  "where": "faixa do bordo de fuga, j perto da ponta, camada k=1",
+  "pyhyp_layer_volumes": "positivos em todas as camadas impressas",
+  "floor_m3": -1e-12,
+  "note": "Um hex com volume -1,02e-13 m³. O piso -1e-12 m³ deixa passar esta lasca e continua a recusar uma célula de parede invertida. pyHyp 2.6.3 imprimiu volume mínimo positivo. É a mesma classe da malha fina de 13 nov, em que o volume nodal chegou a -1,38e-14 e o auditor deu positivo."
+ },
+ "pressupostos": [
+  "PRESSUPOSTO: a espessura é naca_yt do t/c declarado 0,15/0,12. A linha média do NACA 4415 não é construída.",
+  "PRESSUPOSTO: o α é o do AVL deste PC para o CL alvo, com o mesmo Xref. O AVL do Linux não entra na comparação.",
+  "PRESSUPOSTO: REF_AREA = S/2. O CL da meia asa é o CL do avião. Não há corpo, trem nem hélice.",
+  "PRESSUPOSTO: o erro iterativo é a variação relativa do coeficiente nas últimas 10 % do histórico publicado. Em cada malha publica-se o final com rms[Rho] mais baixo.",
+  "A malha fina não cumpriu rms -8: depois de 8000 iterações (-7,776) e de mais 4500 com CFL 100 ficou em -7,968. Não se correu outra continuação."
+ ]
+}

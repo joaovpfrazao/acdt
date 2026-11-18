@@ -1,0 +1,551 @@
+{
+ "objective": "W0",
+ "solver": "nlbgs",
+ "first_lofi": {
+  "objective": "W0",
+  "solver": "nlbgs",
+  "baseline": {
+   "ws": 175.63022131053395,
+   "pw": 5.154696386938151,
+   "AR": 14.0,
+   "W0": 23.419987359233485,
+   "We": 11.507005560501778,
+   "Wf": 7.730903181376518,
+   "E_Wh": 1765.7001093267356,
+   "S": 1.307699878317015,
+   "span": 4.278761303980184,
+   "CD0": 0.0231581356765985,
+   "K": 0.025217919297638655,
+   "n_lim": 5.018679246682071,
+   "m_box": 3.669957393031362,
+   "m_wing": 4.50895265526097,
+   "SM_aft": 0.10000000000000014,
+   "g_trim": -0.6467131807829565,
+   "x_apex_frac": 0.33241160935816233,
+   "g_stall_speed": -2.4656920198928844e-06,
+   "g_span": 0.018752691423853385,
+   "g_mtow": -0.0632005056306606
+  },
+  "optimum": {
+   "ws": 175.63065436163686,
+   "pw": 5.281996767743286,
+   "AR": 9.8,
+   "W0": 22.431820595222607,
+   "We": 10.16830147232934,
+   "Wf": 7.894862224239991,
+   "E_Wh": 1803.1475450424673,
+   "S": 1.2525206049021473,
+   "span": 3.503527069685224,
+   "CD0": 0.02320121206142067,
+   "K": 0.03111741103618122,
+   "n_lim": 4.710992447320108,
+   "m_box": 3.407426118180191,
+   "m_wing": 3.3442960761480194,
+   "SM_aft": 0.10000000000000026,
+   "g_trim": -0.6512581097381094,
+   "x_apex_frac": 0.32075708120109947,
+   "g_stall_speed": 0.0,
+   "g_span": -0.16582688817018487,
+   "g_mtow": -0.10272717619109573
+  },
+  "driver": {
+   "success": true,
+   "message": "",
+   "iterations": 0,
+   "time_s": 19.069220066070557,
+   "n_driver_iters": 4
+  },
+  "active_constraints": [
+   "g_stall_speed"
+  ],
+  "bounds": {
+   "ws": [
+    122.94115491737377,
+    228.31928770369416
+   ],
+   "pw": [
+    3.6082976382020666,
+    6.70112418523241
+   ],
+   "AR": [
+    9.799999999999999,
+    16.0
+   ]
+  },
+  "calibration": "\u03b2 = CD0_lowfi/CD0_manual = 1.089, K_lowfi/K_manual = 0.730 no ponto base; CLmax limpo 1.292 (XFOIL)",
+  "consistency": {
+   "W0": {
+    "G": 2.142249803357389,
+    "a": 0.1820786173551889,
+    "c": {
+     "ws": 1.5523391236980238e-06,
+     "AR": -0.044423400149009196
+    },
+    "hifi": 23.41998729094672,
+    "grad_hifi": {
+     "ws": -0.08346417433122053,
+     "AR": 0.3104021152568771
+    },
+    "after": 23.419987359277073,
+    "grad_after": {
+     "ws": -0.08322180982049199,
+     "AR": 0.30922195142078057
+    }
+   }
+  },
+  "W0_cap": null,
+  "design_vars": [
+   "ws",
+   "AR"
+  ],
+  "constraint_keys": [
+   "g_stall_speed",
+   "g_span",
+   "g_mtow",
+   "g_trim"
+  ]
+ },
+ "last_lofi": {
+  "objective": "W0",
+  "solver": "nlbgs",
+  "baseline": {
+   "ws": 176.22253911791904,
+   "pw": 5.260791018003419,
+   "AR": 11.27,
+   "W0": 21.71128675002795,
+   "We": 9.92981376288791,
+   "Wf": 7.63925277015039,
+   "E_Wh": 1744.7676079973112,
+   "S": 1.2082165611339133,
+   "span": 3.6900678373139977,
+   "CD0": 0.023614237282144256,
+   "K": 0.02995944914921323,
+   "n_lim": 4.849153926384264,
+   "m_box": 3.3168820453378514,
+   "m_wing": 3.532415542190903,
+   "SM_aft": 0.09999999999999976,
+   "g_trim": -0.6451722520256412,
+   "x_apex_frac": 0.3455457820572751,
+   "g_stall_speed": -0.008550547749054949,
+   "g_span": -0.12141241968714345,
+   "g_mtow": -0.1315485299988821
+  },
+  "optimum": {
+   "ws": 177.74233342681697,
+   "pw": 5.301753109945696,
+   "AR": 10.42475,
+   "W0": 21.50091594934439,
+   "We": 9.628891584567967,
+   "Wf": 7.687671878601634,
+   "E_Wh": 1755.8262932608675,
+   "S": 1.186278774053544,
+   "span": 3.5166261743043696,
+   "CD0": 0.023732655610864253,
+   "K": 0.03145588739721073,
+   "n_lim": 4.758667181864287,
+   "m_box": 3.234921410396564,
+   "m_wing": 3.278265445936863,
+   "SM_aft": 0.10000000000000003,
+   "g_trim": -0.6462196371367912,
+   "x_apex_frac": 0.34275812619232654,
+   "g_stall_speed": -5.476730180475897e-13,
+   "g_span": -0.16270805373705488,
+   "g_mtow": -0.1399633620262244
+  },
+  "driver": {
+   "success": true,
+   "message": "",
+   "iterations": 0,
+   "time_s": 10.998346090316772,
+   "n_driver_iters": 3
+  },
+  "active_constraints": [
+   "g_stall_speed"
+  ],
+  "bounds": {
+   "ws": [
+    163.00584868407512,
+    189.43922955176296
+   ],
+   "pw": [
+    4.866271850535022,
+    5.655397015486646
+   ],
+   "AR": [
+    10.42475,
+    12.11525
+   ]
+  },
+  "calibration": "\u03b2 = CD0_lowfi/CD0_manual = 1.083, K_lowfi/K_manual = 0.768 no ponto base; CLmax limpo 1.312 (XFOIL)",
+  "consistency": {
+   "W0": {
+    "G": 2.0266230017507127,
+    "a": 0.14222021698964957,
+    "c": {
+     "ws": -0.0006064181196729023,
+     "AR": -0.05093629102895788
+    },
+    "hifi": 21.71128672469305,
+    "grad_hifi": {
+     "ws": -0.06033686183438534,
+     "AR": 0.17070337178679615
+    },
+    "after": 21.711286750081648,
+    "grad_after": {
+     "ws": -0.060175472702690705,
+     "AR": 0.16994397931844427
+    }
+   }
+  },
+  "W0_cap": null,
+  "design_vars": [
+   "ws",
+   "AR"
+  ],
+  "constraint_keys": [
+   "g_stall_speed",
+   "g_span",
+   "g_mtow",
+   "g_trim"
+  ]
+ },
+ "trust_region": [
+  {
+   "iter": 1,
+   "delta": 0.3,
+   "x_k": {
+    "ws": 175.63022131053395,
+    "pw": 5.154710911717238,
+    "AR": 14
+   },
+   "x_trial": {
+    "ws": 175.63065436163686,
+    "pw": 5.281996767743286,
+    "AR": 9.8
+   },
+   "predicted": 0.22972022338660777,
+   "lofi_success": true,
+   "actual": 0.21636009642242782,
+   "rho": 0.9418417465940927,
+   "f_hifi": 22.744714182728544,
+   "viol_hifi": 0.0,
+   "new_failures": [],
+   "accepted": true,
+   "W0_hifi": 22.744714182728544,
+   "hq_aeroel_status": {
+    "enabled": false,
+    "active": [],
+    "violated": [],
+    "unassessed": [],
+    "values": {},
+    "violation": 0.0
+   },
+   "discrete": {
+    "accepted": false,
+    "from": {
+     "motor_id": null,
+     "esc_id": null,
+     "cell_id": null
+    },
+    "to": {
+     "motor_id": "outrunner_63xx_170kv_class",
+     "esc_id": "esc_80a_12s_class",
+     "cell_id": "liion_21700_high_energy_class"
+    },
+    "phi": 1.02212188928
+   },
+   "delta_next": 0.6
+  },
+  {
+   "iter": 2,
+   "delta": 0.6,
+   "x_k": {
+    "ws": 175.63065436163686,
+    "pw": 5.358617633869627,
+    "AR": 9.8
+   },
+   "x_trial": {
+    "ws": 176.22253911791267,
+    "pw": 5.285080282310349,
+    "AR": 15.68
+   },
+   "predicted": 0.2140093283461666,
+   "lofi_success": true,
+   "actual": -0.8575754400688892,
+   "rho": -4.007187194577495,
+   "f_hifi": 23.660559213397853,
+   "viol_hifi": 0.08184701656171245,
+   "new_failures": [
+    "wing_span"
+   ],
+   "accepted": false,
+   "W0_hifi": 23.660559213397853,
+   "hq_aeroel_status": {
+    "enabled": false,
+    "active": [],
+    "violated": [],
+    "unassessed": [],
+    "values": {},
+    "violation": 0.0
+   },
+   "discrete": {
+    "accepted": false,
+    "from": {
+     "motor_id": null,
+     "esc_id": null,
+     "cell_id": null
+    },
+    "to": {
+     "motor_id": "outrunner_63xx_170kv_class",
+     "esc_id": "esc_80a_12s_class",
+     "cell_id": "liion_pouch_high_energy_class"
+    },
+    "phi": 1.8287422430295717
+   },
+   "delta_next": 0.3
+  },
+  {
+   "iter": 3,
+   "delta": 0.3,
+   "x_k": {
+    "ws": 175.63065436163686,
+    "pw": 5.358617633869627,
+    "AR": 9.8
+   },
+   "x_trial": {
+    "ws": 176.22253911791907,
+    "pw": 5.2946772086953064,
+    "AR": 12.740000000000002
+   },
+   "predicted": 0.10875964271714575,
+   "lofi_success": true,
+   "actual": -0.008831361850135444,
+   "rho": -0.08120072509895435,
+   "f_hifi": 22.951544565020466,
+   "viol_hifi": 0.0,
+   "new_failures": [],
+   "accepted": false,
+   "W0_hifi": 22.951544565020466,
+   "hq_aeroel_status": {
+    "enabled": false,
+    "active": [],
+    "violated": [],
+    "unassessed": [],
+    "values": {},
+    "violation": 0.0
+   },
+   "discrete": {
+    "accepted": false,
+    "from": {
+     "motor_id": null,
+     "esc_id": null,
+     "cell_id": null
+    },
+    "to": {
+     "motor_id": "outrunner_63xx_170kv_class",
+     "esc_id": "esc_80a_12s_class",
+     "cell_id": "liion_pouch_high_energy_class"
+    },
+    "phi": 0.9799981648108179
+   },
+   "delta_next": 0.15
+  },
+  {
+   "iter": 4,
+   "delta": 0.15,
+   "x_k": {
+    "ws": 175.63065436163686,
+    "pw": 5.358617633869627,
+    "AR": 9.8
+   },
+   "x_trial": {
+    "ws": 176.22253911791904,
+    "pw": 5.319603153153848,
+    "AR": 11.27
+   },
+   "predicted": 0.05662248181061707,
+   "lofi_success": true,
+   "actual": 0.008006821890917393,
+   "rho": 0.141407116659024,
+   "f_hifi": 22.557194515802383,
+   "viol_hifi": 0.0,
+   "new_failures": [],
+   "accepted": true,
+   "W0_hifi": 22.557194515802383,
+   "hq_aeroel_status": {
+    "enabled": false,
+    "active": [],
+    "violated": [],
+    "unassessed": [],
+    "values": {},
+    "violation": 0.0
+   },
+   "discrete": {
+    "accepted": true,
+    "from": {
+     "motor_id": null,
+     "esc_id": null,
+     "cell_id": null
+    },
+    "to": {
+     "motor_id": "outrunner_50xx_200kv_class",
+     "esc_id": "esc_80a_12s_class",
+     "cell_id": "liion_pouch_high_energy_class"
+    },
+    "phi": 0.9270409268362758
+   },
+   "delta_next": 0.075
+  },
+  {
+   "iter": 5,
+   "delta": 0.075,
+   "x_k": {
+    "ws": 176.22253911791904,
+    "pw": 5.260834433010834,
+    "AR": 11.27
+   },
+   "x_trial": {
+    "ws": 177.74233342681697,
+    "pw": 5.301753109945696,
+    "AR": 10.42475
+   },
+   "predicted": 0.008982532657687692,
+   "lofi_success": true,
+   "actual": 0.0036422900622884447,
+   "rho": 0.4054858691965004,
+   "f_hifi": 21.62598433772431,
+   "viol_hifi": 0.0,
+   "new_failures": [],
+   "accepted": true,
+   "W0_hifi": 21.62598433772431,
+   "hq_aeroel_status": {
+    "enabled": false,
+    "active": [],
+    "violated": [],
+    "unassessed": [],
+    "values": {},
+    "violation": 0.0
+   },
+   "discrete": {
+    "accepted": false,
+    "from": {
+     "motor_id": null,
+     "esc_id": null,
+     "cell_id": null
+    },
+    "to": {
+     "motor_id": "outrunner_63xx_170kv_class",
+     "esc_id": "esc_80a_12s_class",
+     "cell_id": "liion_21700_high_energy_class"
+    },
+    "phi": 1.0143990922555668
+   },
+   "delta_next": 0.075
+  },
+  {
+   "iter": 6,
+   "delta": 0.075,
+   "x_k": {
+    "ws": 177.74233342681697,
+    "pw": 5.333865305241048,
+    "AR": 10.4247
+   },
+   "x_trial": {
+    "ws": 176.50124426083795,
+    "pw": 5.297446319809403,
+    "AR": 11.206552499999999
+   },
+   "predicted": -0.0022978764190141727,
+   "lofi_success": true,
+   "status": "convergiu (modelo n\u00e3o prev\u00ea melhoria)"
+  }
+ ],
+ "W0_cap": null,
+ "global_bounds": {
+  "ws": [
+   105.37813278632036,
+   245.88230983474753
+  ],
+  "pw": [
+   3.092826547030343,
+   8.247537458747582
+  ],
+  "AR": [
+   5.0,
+   16.0
+  ]
+ },
+ "merit": "\u03c6 = f/|f0| + 10\u00b7viola\u00e7\u00e3o",
+ "consistency_order": 1,
+ "hq_aeroel_constraints": false,
+ "hq_aeroel_keys": null,
+ "hq_aeroel_status": {
+  "enabled": false,
+  "active": [],
+  "violated": [],
+  "unassessed": [],
+  "values": {},
+  "violation": 0.0
+ },
+ "improved": true,
+ "pipeline": {
+  "baseline": {
+   "W0 [kg]": 23.41998729094672,
+   "We [kg]": 11.689005934427339,
+   "Wf/bateria [kg]": 7.730981356408102,
+   "W/S [N/m\u00b2]": 175.63022131053395,
+   "P/W [W/N | -]": 5.154710911717238,
+   "AR": 14,
+   "S [m\u00b2]": 1.3076998745032464,
+   "b [m]": 4.278761297740907,
+   "CD0": 0.023158135707140252,
+   "(L/D)max": 20.690147262065032,
+   "energia bateria [Wh]": 1765.7179641178998,
+   "P_SL [kW]": 1.1838907973069088,
+   "caix\u00e3o da asa [kg]": 3.62419789431497,
+   "asa (pesos) [kg]": 4.658130277911866,
+   "alcance (segmentos) [km]": 214.0020624204114,
+   "autonomia (segmentos) [h]": 2.768927157633831,
+   "margem divergence vs 1.2 V_D": 7.657492058040203,
+   "margem reversal vs 1.2 V_D": Infinity,
+   "margem flutter vs 1.2 V_D": 2.930822059424506,
+   "vi\u00e1vel (dimensionamento)": false,
+   "verificado (fase 2/3)": false,
+   "falhas": "wing_span, hq:CAP"
+  },
+  "optimum": {
+   "W0 [kg]": 21.62598433772431,
+   "We [kg]": 9.793690262199554,
+   "Wf/bateria [kg]": 7.8322940754361765,
+   "W/S [N/m\u00b2]": 177.74233342681697,
+   "P/W [W/N | -]": 5.333865305241048,
+   "AR": 10.4247,
+   "S [m\u00b2]": 1.193179223073858,
+   "b [m]": 3.526830793613162,
+   "CD0": 0.023814745921510116,
+   "(L/D)max": 17.94827096451139,
+   "energia bateria [Wh]": 1788.8572888341885,
+   "P_SL [kW]": 1.1311979360788171,
+   "caix\u00e3o da asa [kg]": 3.235891592817566,
+   "asa (pesos) [kg]": 3.4070411126107802,
+   "alcance (segmentos) [km]": 212.36923820059457,
+   "autonomia (segmentos) [h]": 2.7325015464011697,
+   "margem divergence vs 1.2 V_D": 10.139956585061958,
+   "margem reversal vs 1.2 V_D": Infinity,
+   "margem flutter vs 1.2 V_D": Infinity,
+   "vi\u00e1vel (dimensionamento)": false,
+   "verificado (fase 2/3)": false,
+   "falhas": "hq:CAP"
+  }
+ },
+ "x_baseline": {
+  "ws": 175.63022131053395,
+  "pw": 5.154710911717238,
+  "AR": 14
+ },
+ "x_optimum": {
+  "ws": 177.74233342681697,
+  "pw": 5.333865305241048,
+  "AR": 10.4247
+ }
+}

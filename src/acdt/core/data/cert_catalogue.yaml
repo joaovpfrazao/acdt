@@ -1,0 +1,162 @@
+# Certification requirement catalogue (acdt.core.certification).
+# IMPORTANT: titles are short identifiers; "p" is an acdt paraphrase in Portuguese (NOT the official text — always
+# read the official source at "url"). Only a design-relevant subset of each code is catalogued.
+# Fields: id, t (title), p (paraphrase), moc (means of compliance: analysis | test | inspection | similarity |
+# declaration), ev (acdt evidence keys, see certification/evidence.py), when (applicability expression over the
+# basis context: level, perf_level, occupants, seaplane, icing, pressurized, multiengine, retractable, ifr,
+# propulsion, mtow_kg, fuel, uav), param (evidence parameters).
+bases:
+  cs23:
+    name: "EASA CS-23 Amdt 6 / 14 CFR Part 23 Amdt 23-64 (baseada em desempenho)"
+    url: "https://www.easa.europa.eu/en/document-library/certification-specifications/group/cs-23-normal-utility-aerobatic-and-commuter-aeroplanes"
+    url_alt: "https://www.ecfr.gov/current/title-14/chapter-I/subchapter-C/part-23"
+    moc_note: "Meios de conformidade aceites: normas ASTM referidas em ASTM F3264 (verificar a revisão em vigor e a aceitação pela EASA/FAA)."
+    items:
+      - {id: "23.2005", t: "Certification of normal category airplanes", p: "Define nível de certificação (lugares de passageiros) e nível de desempenho (VNO/VMO ≤ 250 KCAS e MMO ≤ 0,6 → baixa velocidade).", moc: [declaration], ev: [cert_level]}
+      - {id: "23.2010", t: "Accepted means of compliance", p: "Os meios de conformidade (p.ex. normas ASTM) têm de ser aceites pela autoridade.", moc: [declaration], ev: []}
+      - {id: "23.2100", t: "Weight and center of gravity", p: "Determinar limites de peso e CG para operação segura.", moc: [analysis, inspection], ev: [wb_cg], mocref: "ASTM F3082"}
+      - {id: "23.2105", t: "Performance data", p: "Dados de desempenho para condições padrão e críticas de peso/altitude/temperatura.", moc: [analysis, test], ev: [perf_data], mocref: "ASTM F3179"}
+      - {id: "23.2110", t: "Stall speed", p: "Determinar a velocidade de perda (ou mínima em voo estável) em cada configuração, com potência de ralenti.", moc: [analysis, test], ev: [stall_speed], mocref: "ASTM F3179"}
+      - {id: "23.2115", t: "Takeoff performance", p: "Determinar corrida e distância até 15 m (50 ft), considerando margens de perda e gradientes.", moc: [analysis, test], ev: [takeoff], mocref: "ASTM F3179"}
+      - {id: "23.2120", t: "Climb requirements", p: "Gradiente mínimo com todos os motores na configuração de subida inicial: 8,3 % (níveis 1–2 baixa velocidade, terrestres) ou 4 % (alta velocidade/nível 3); requisitos OEI para multimotores.", moc: [analysis, test], ev: [climb_gradient], param: {min_gradient_low: 0.083, min_gradient_high: 0.04}, mocref: "ASTM F3179"}
+      - {id: "23.2125", t: "Climb information", p: "Determinar e publicar o desempenho de subida (e OEI se multimotor).", moc: [analysis, test], ev: [climb_rate]}
+      - {id: "23.2130", t: "Landing", p: "Determinar distância de aterragem desde 15 m e as velocidades/procedimentos de aproximação.", moc: [analysis, test], ev: [landing], mocref: "ASTM F3179"}
+      - {id: "23.2135", t: "Controllability", p: "Controlável e manobrável em todo o envelope, cargas, fases de voo e falhas prováveis, sem perícia excecional.", moc: [analysis, test], ev: [controllability], mocref: "ASTM F3173"}
+      - {id: "23.2140", t: "Trim", p: "Equilíbrio (trim) em voo estabilizado sem esforço excessivo.", moc: [analysis, test], ev: [trim], mocref: "ASTM F3173"}
+      - {id: "23.2145", t: "Stability", p: "Estabilidade estática longitudinal, lateral e direcional e estabilidade dinâmica (período curto e rolamento holandês).", moc: [analysis, test], ev: [static_stability, dynamic_stability], mocref: "ASTM F3173"}
+      - {id: "23.2150", t: "Stall characteristics, stall warning, and spins", p: "Perda controlável com aviso claro; sem tendência a sair inadvertidamente de voo controlado.", moc: [test], ev: [], mocref: "ASTM F3173"}
+      - {id: "23.2155", t: "Ground and water handling characteristics", p: "Controlável no solo/água, incluindo vento cruzado demonstrado.", moc: [test], ev: []}
+      - {id: "23.2160", t: "Vibration, buffeting, and high-speed characteristics", p: "Sem vibração/buffeting excessivos até VD/MD; características de alta velocidade seguras.", moc: [test], ev: []}
+      - {id: "23.2165", t: "Performance and flight characteristics requirements for flight in icing conditions", p: "Só se for pedida certificação em gelo: desempenho e qualidades de voo em gelo.", moc: [analysis, test], ev: [], when: "icing"}
+      - {id: "23.2200", t: "Structural design envelope", p: "Definir o envelope estrutural (velocidades, fatores de carga, pesos, CG, altitudes).", moc: [analysis], ev: [vn_envelope], mocref: "ASTM F3116"}
+      - {id: "23.2210", t: "Structural design loads", p: "Determinar cargas aplicadas, distribuições e interações sistemas/estrutura.", moc: [analysis], ev: [span_load], mocref: "ASTM F3116"}
+      - {id: "23.2215", t: "Flight load conditions", p: "Cargas de rajada, manobras simétricas/assimétricas e tração assimétrica por falha de motor.", moc: [analysis], ev: [manoeuvre_load_factor, gust_load_factor], param: {formula: astm_f3116}, mocref: "ASTM F3116"}
+      - {id: "23.2220", t: "Ground and water load conditions", p: "Cargas de aterragem, rolagem e (hidroaviões) de água.", moc: [analysis, test], ev: [ground_loads], mocref: "ASTM F3116"}
+      - {id: "23.2230", t: "Limit and ultimate loads", p: "Cargas últimas = limite × 1,5 salvo indicação.", moc: [analysis], ev: [ultimate_factor]}
+      - {id: "23.2235", t: "Structural strength", p: "Suportar cargas limite sem deformação permanente prejudicial e últimas sem rotura.", moc: [analysis, test], ev: [structural_strength], mocref: "ASTM F3114"}
+      - {id: "23.2240", t: "Structural durability", p: "Programas de fadiga/tolerância ao dano e inspeções para evitar falha catastrófica.", moc: [analysis, test], ev: [], mocref: "ASTM F3114"}
+      - {id: "23.2245", t: "Aeroelasticity", p: "Livre de flutter, inversão de comandos e divergência até além do envelope; tolerâncias definidas.", moc: [analysis, test], ev: [aeroelasticity], mocref: "ASTM F3093"}
+      - {id: "23.2250", t: "Design and construction principles", p: "Projeto e construção adequados; partes críticas identificadas.", moc: [inspection, analysis], ev: []}
+      - {id: "23.2260", t: "Materials and processes", p: "Materiais e processos com propriedades estabelecidas (valores de projeto estatísticos).", moc: [analysis, test], ev: [materials]}
+      - {id: "23.2265", t: "Special factors of safety", p: "Fatores especiais (fundição, apoio, ligações) quando os valores são incertos.", moc: [analysis], ev: []}
+      - {id: "23.2270", t: "Emergency conditions", p: "Proteção dos ocupantes numa aterragem de emergência (cargas de inércia, condições dinâmicas).", moc: [analysis, test], ev: [], when: "occupants"}
+      - {id: "23.2300", t: "Flight control systems", p: "Sistemas de comando operam com facilidade e precisão; batentes, travamentos, compensadores.", moc: [analysis, test, inspection], ev: [control_surfaces], mocref: "ASTM F3232"}
+      - {id: "23.2305", t: "Landing gear systems", p: "Trem de aterragem absorve energias de aterragem; travamento e travões.", moc: [analysis, test], ev: [landing_gear]}
+      - {id: "23.2310", t: "Buoyancy for seaplanes and amphibians", p: "Flutuabilidade de reserva para hidroaviões.", moc: [analysis, test], ev: [], when: "seaplane"}
+      - {id: "23.2315", t: "Means of egress and emergency exits", p: "Saídas que permitem evacuação rápida.", moc: [inspection, test], ev: [], when: "occupants"}
+      - {id: "23.2320", t: "Occupant physical environment", p: "Visibilidade, ventilação, ruído, CO; ambiente adequado.", moc: [test, inspection], ev: [], when: "occupants"}
+      - {id: "23.2325", t: "Fire protection", p: "Minimizar riscos de incêndio na cabine/compartimentos.", moc: [inspection, test], ev: []}
+      - {id: "23.2330", t: "Fire protection in designated fire zones", p: "Zonas de fogo designadas: isolamento, deteção, extinção conforme nível.", moc: [analysis, test], ev: [], when: "propulsion != 'electric'"}
+      - {id: "23.2335", t: "Lightning protection", p: "Proteção contra relâmpago (se IFR / níveis superiores).", moc: [analysis, test], ev: [], when: "ifr"}
+      - {id: "23.2400", t: "Powerplant installation", p: "Instalação do grupo propulsor certificada e dentro dos limites.", moc: [analysis, test], ev: [propulsion], mocref: "ASTM F3062"}
+      - {id: "23.2405", t: "Automatic power or thrust control systems", p: "Só se existir controlo automático de potência.", moc: [analysis, test], ev: [], when: "False"}
+      - {id: "23.2410", t: "Powerplant installation hazard assessment", p: "Avaliação de perigos da instalação propulsora (falhas e efeitos).", moc: [analysis], ev: [safety_assessment], param: {fcs: [FC-A6, FC-U2]}, mocref: "ASTM F3062"}
+      - {id: "23.2425", t: "Powerplant operational characteristics", p: "Funcionamento sem problemas em todo o envelope; arranque em voo quando aplicável.", moc: [test], ev: []}
+      - {id: "23.2430", t: "Fuel systems", p: "Alimentação de combustível em todas as condições; combustível inutilizável determinado.", moc: [analysis, test], ev: [], when: "fuel"}
+      - {id: "23.2435", t: "Powerplant induction and exhaust systems", p: "Admissão e escape adequados (gelo no carburador, gases).", moc: [analysis, test], ev: [], when: "propulsion != 'electric'"}
+      - {id: "23.2440", t: "Powerplant fire protection", p: "Proteção contra incêndio do grupo propulsor.", moc: [analysis, test], ev: [], when: "propulsion != 'electric'"}
+      - {id: "23.2500", t: "Airplane level systems requirements", p: "Requisitos gerais de sistemas e equipamentos instalados.", moc: [analysis], ev: []}
+      - {id: "23.2505", t: "Function and installation", p: "Equipamento instalado funciona como pretendido.", moc: [test, inspection], ev: []}
+      - {id: "23.2510", t: "Equipment, systems, and installations", p: "Avaliação de segurança (equivalente 1309): relação inversa probabilidade–severidade; nenhuma falha única catastrófica.", moc: [analysis, test], ev: [safety_assessment], mocref: "ASTM F3230 / AC 23.1309-1E"}
+      - {id: "23.2515", t: "Electrical and electronic system lightning protection", p: "Funções críticas protegidas contra efeitos indiretos de relâmpago (IFR).", moc: [analysis, test], ev: [], when: "ifr"}
+      - {id: "23.2520", t: "High-intensity Radiated Fields (HIRF) protection", p: "Funções críticas protegidas contra HIRF.", moc: [analysis, test], ev: []}
+      - {id: "23.2525", t: "System power generation, storage, and distribution", p: "Geração/armazenamento/distribuição de energia elétrica adequados, incluindo falhas.", moc: [analysis, test], ev: [electrical], mocref: "ASTM F3061"}
+      - {id: "23.2530", t: "External and cockpit lighting", p: "Iluminação exterior/cabine adequada.", moc: [inspection, test], ev: []}
+      - {id: "23.2535", t: "Safety equipment", p: "Equipamento de segurança acessível e identificado.", moc: [inspection], ev: [], when: "occupants"}
+      - {id: "23.2540", t: "Flight in icing conditions", p: "Sistemas de proteção contra gelo (se certificação em gelo).", moc: [analysis, test], ev: [], when: "icing"}
+      - {id: "23.2545", t: "Pressurized systems elements", p: "Elementos pressurizados com margens adequadas.", moc: [analysis, test], ev: [], when: "pressurized"}
+      - {id: "23.2550", t: "Equipment containing high-energy rotors", p: "Contenção/segurança de rotores de alta energia.", moc: [analysis], ev: [], when: "False"}
+      - {id: "23.2600", t: "Flightcrew interface", p: "Interface com a tripulação sem carga excessiva; controlos e visibilidade.", moc: [test, inspection], ev: [], when: "occupants"}
+      - {id: "23.2605", t: "Installation and operation information", p: "Informação de instalação e operação dos equipamentos.", moc: [inspection], ev: []}
+      - {id: "23.2610", t: "Instrument markings, control markings, and placards", p: "Marcações e letreiros.", moc: [inspection], ev: []}
+      - {id: "23.2615", t: "Flight, navigation, and powerplant instruments", p: "Instrumentos de voo, navegação e motor necessários.", moc: [inspection, analysis], ev: [safety_assessment], param: {fcs: [FC-A1, FC-A2, FC-A3, FC-A4, FC-A5]}}
+      - {id: "23.2620", t: "Airplane flight manual", p: "Manual de voo com limitações, procedimentos e desempenho.", moc: [inspection], ev: []}
+
+  cs25:
+    name: "EASA CS-25 (subconjunto de projeto preliminar; para futuros jatos)"
+    url: "https://www.easa.europa.eu/en/document-library/certification-specifications/group/cs-25-large-aeroplanes"
+    url_alt: "https://www.ecfr.gov/current/title-14/chapter-I/subchapter-C/part-25"
+    items:
+      - {id: "25.25", t: "Weight limits", p: "Pesos máximos e mínimos estabelecidos.", moc: [analysis, inspection], ev: [wb_cg]}
+      - {id: "25.103", t: "Stall speed", p: "Velocidade de perda de referência VSR determinada.", moc: [analysis, test], ev: [stall_speed]}
+      - {id: "25.113", t: "Takeoff distance and takeoff run", p: "Distâncias de descolagem (OEI e todos os motores, ×1,15).", moc: [analysis, test], ev: [takeoff]}
+      - {id: "25.121", t: "Climb: one-engine-inoperative", p: "Gradientes mínimos OEI por segmento (dependem do nº de motores).", moc: [analysis, test], ev: [], when: "multiengine"}
+      - {id: "25.125", t: "Landing", p: "Distância de aterragem desde 15 m.", moc: [analysis, test], ev: [landing]}
+      - {id: "25.143", t: "Controllability and maneuverability - General", p: "Controlável e manobrável em todas as fases.", moc: [analysis, test], ev: [controllability]}
+      - {id: "25.161", t: "Trim", p: "Trim nas condições especificadas.", moc: [analysis, test], ev: [trim]}
+      - {id: "25.171", t: "Stability - General", p: "Estabilidade longitudinal, direcional e lateral.", moc: [analysis, test], ev: [static_stability]}
+      - {id: "25.181", t: "Dynamic stability", p: "Oscilações de período curto e rolamento holandês amortecidas.", moc: [analysis, test], ev: [dynamic_stability]}
+      - {id: "25.201", t: "Stall demonstration", p: "Demonstração de perda.", moc: [test], ev: []}
+      - {id: "25.303", t: "Factor of safety", p: "Fator de segurança 1,5.", moc: [analysis], ev: [ultimate_factor]}
+      - {id: "25.305", t: "Strength and deformation", p: "Limite sem deformação permanente; último sem rotura (3 s).", moc: [analysis, test], ev: [structural_strength]}
+      - {id: "25.333", t: "Flight maneuvering envelope", p: "Envelope de manobra (V-n).", moc: [analysis], ev: [vn_envelope]}
+      - {id: "25.337", t: "Limit maneuvering load factors", p: "n positivo ≥ 2,1 + 24000/(W[lb] + 10000), entre 2,5 e 3,8; negativo ≥ −1.", moc: [analysis], ev: [manoeuvre_load_factor], param: {formula: cs25_337}}
+      - {id: "25.341", t: "Gust and turbulence loads", p: "Rajadas discretas e turbulência contínua.", moc: [analysis], ev: [gust_load_factor]}
+      - {id: "25.571", t: "Damage-tolerance and fatigue evaluation of structure", p: "Tolerância ao dano e fadiga.", moc: [analysis, test], ev: []}
+      - {id: "25.629", t: "Aeroelastic stability requirements", p: "Livre de instabilidades aeroelásticas até VD/MD com margem (1,15 VD).", moc: [analysis, test], ev: [aeroelasticity]}
+      - {id: "25.1309", t: "Equipment, systems and installations", p: "Relação inversa probabilidade–severidade (AMC 25.1309: 1e-3/1e-5/1e-7/1e-9 por h); DAL por ARP4754A.", moc: [analysis, test], ev: [safety_assessment]}
+
+  stanag4671:
+    name: "STANAG 4671 Ed. 1 (USAR) — UAV de asa fixa 150–20 000 kg"
+    url: "https://nso.nato.int"
+    url_alt: "https://everyspec.com/NATO/NATO-STANAG/STANAG_4671_ED-1_40024/"
+    items:
+      - {id: "USAR.1", t: "Applicability", p: "Aplica-se a UAV de asa fixa com MTOW entre 150 e 20 000 kg (outros pesos por decisão da autoridade).", moc: [declaration], ev: [cert_level]}
+      - {id: "USAR.25", t: "Weight Limits", p: "Pesos máximo e mínimo estabelecidos.", moc: [analysis, inspection], ev: [wb_cg]}
+      - {id: "USAR.49", t: "Stalling Speed", p: "VS0/VS1 determinadas com ralenti, CG mais desfavorável e peso relevante.", moc: [analysis, test], ev: [stall_speed]}
+      - {id: "USAR.53", t: "Take-off Performance", p: "Distância de descolagem determinada.", moc: [analysis, test], ev: [takeoff]}
+      - {id: "USAR.65", t: "Climb: All Engines Operating", p: "Gradiente estável ao nível do mar ≥ 5 % com potência máx. contínua, flaps de descolagem, V ≥ 1,3 VS1 (monomotor).", moc: [analysis, test], ev: [climb_gradient], param: {min_gradient: 0.05}}
+      - {id: "USAR.71", t: "Glide", p: "Desempenho de planeio (motor parado) determinado.", moc: [analysis, test], ev: [glide]}
+      - {id: "USAR.75", t: "Landing Distance", p: "Distância de aterragem determinada.", moc: [analysis, test], ev: [landing]}
+      - {id: "USAR.143", t: "General (controllability)", p: "Controlável e manobrável em todas as fases, incluindo transições e falhas prováveis.", moc: [analysis, test], ev: [controllability]}
+      - {id: "USAR.161", t: "Trim", p: "Trim nas condições de voo especificadas.", moc: [analysis, test], ev: [trim]}
+      - {id: "USAR.171", t: "General (stability)", p: "Estabilidade longitudinal, direcional e lateral (com o sistema de comando de voo).", moc: [analysis, test], ev: [static_stability, dynamic_stability]}
+      - {id: "USAR.201", t: "Wings Level Stall", p: "Comportamento em perda com asas niveladas.", moc: [test], ev: []}
+      - {id: "USAR.251", t: "Vibration and Buffeting", p: "Sem vibração/buffeting excessivos.", moc: [test], ev: []}
+      - {id: "USAR.301", t: "Loads", p: "Cargas limite e últimas; distribuição de cargas.", moc: [analysis], ev: [span_load]}
+      - {id: "USAR.303", t: "Factor of Safety", p: "FS ≥ 1,5 para estrutura cuja falha seja perigosa ou pior; ≥ 1,25 restante (justificar).", moc: [analysis], ev: [ultimate_factor]}
+      - {id: "USAR.305", t: "Strength and Deformation", p: "Suporta cargas de prova sem deformação permanente e últimas sem rotura.", moc: [analysis, test], ev: [structural_strength]}
+      - {id: "USAR.333", t: "Flight Envelope", p: "Envelope V-n de manobra e rajada.", moc: [analysis], ev: [vn_envelope]}
+      - {id: "USAR.337", t: "Limit Manoeuvring Load Factors", p: "n positivo mínimo = min(2,1 + 10900/(W[kg] + 4536); 3,8); negativo ≥ 0,4 × positivo.", moc: [analysis], ev: [manoeuvre_load_factor], param: {formula: usar337}}
+      - {id: "USAR.341", t: "Gust Load Factors", p: "Fatores de carga de rajada (ver AMC.341).", moc: [analysis], ev: [gust_load_factor]}
+      - {id: "USAR.471", t: "General (ground loads)", p: "Cargas no solo/lançamento e recuperação.", moc: [analysis, test], ev: [ground_loads]}
+      - {id: "USAR.573", t: "Damage tolerance and fatigue evaluation of structure", p: "Avaliação de fadiga/tolerância ao dano.", moc: [analysis, test], ev: []}
+      - {id: "USAR.613", t: "Material strength properties and design values", p: "Valores de projeto dos materiais com base estatística.", moc: [analysis, test], ev: [materials]}
+      - {id: "USAR.629", t: "Flutter", p: "Livre de flutter, inversão e divergência no envelope V-n; tolerâncias e frequências por ensaio.", moc: [analysis, test], ev: [aeroelasticity]}
+      - {id: "USAR.671", t: "General (control systems)", p: "Comandos operam com facilidade, suavidade e precisão.", moc: [analysis, test], ev: [control_surfaces]}
+      - {id: "USAR.903", t: "Engines and auxiliary power units", p: "Motor qualificado/aceite pela autoridade.", moc: [analysis, test], ev: [propulsion]}
+      - {id: "USAR.951", t: "General (fuel system)", p: "Sistema de combustível alimenta o motor em todas as condições.", moc: [analysis, test], ev: [], when: "fuel"}
+      - {id: "USAR.1309", t: "Equipment, systems and installations", p: "Avaliação de segurança: catastrófica < 1e-6/h, perigosa < 1e-5, maior < 1e-4, menor < 1e-3; nenhuma falha única catastrófica.", moc: [analysis, test], ev: [safety_assessment]}
+      - {id: "USAR.1351", t: "General (electrical)", p: "Sistema elétrico com capacidade e proteção adequadas.", moc: [analysis, test], ev: [electrical]}
+      - {id: "USAR.1353", t: "Storage battery or emergency power supply design and installation", p: "Bateria/alimentação de emergência.", moc: [analysis, test], ev: [electrical]}
+      - {id: "USAR.U1412", t: "Emergency recovery capability", p: "Capacidade de recuperação de emergência (p.ex. rota pré-programada para área de aterragem forçada).", moc: [analysis, test], ev: []}
+      - {id: "USAR.U1490", t: "General (flight termination)", p: "Sistema de terminação de voo, se instalado.", moc: [analysis, test], ev: []}
+      - {id: "USAR.U1601", t: "General (C2 data link)", p: "Ligação de comando e controlo adequada.", moc: [analysis, test], ev: []}
+      - {id: "USAR.U1613", t: "Command and control data link loss strategy", p: "Estratégia definida para perda da ligação C2.", moc: [analysis, test], ev: []}
+      - {id: "USAR.U1701", t: "General (UCS)", p: "Estação de controlo (UCS) adequada.", moc: [analysis, test, inspection], ev: []}
+
+  stanag4703:
+    name: "STANAG 4703 Ed. 1 (AEP-83) — UAS ligeiros de asa fixa < 150 kg"
+    url: "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/391827/20140916-STANAG-4703_AEP-83_A__1_.pdf"
+    items:
+      - {id: "UL.1", t: "Structural design criteria", p: "Identificar critérios, normas e práticas de projeto estrutural.", moc: [declaration], ev: [vn_envelope]}
+      - {id: "UL.2", t: "Margin beyond operating envelope", p: "Definir e justificar margem positiva além do envelope de operação (fator de segurança).", moc: [analysis], ev: [ultimate_factor]}
+      - {id: "UL.5", t: "Flight loads", p: "Cargas de voo determinadas.", moc: [analysis], ev: [span_load, manoeuvre_load_factor], param: {formula: none}}
+      - {id: "UL.6", t: "Ground loads", p: "Cargas no solo / lançamento / recuperação.", moc: [analysis, test], ev: []}
+      - {id: "UL.7", t: "Structural dynamic load response", p: "Resposta dinâmica monitorizada em ensaios.", moc: [test], ev: []}
+      - {id: "UL.8", t: "Aeroservoelastic effects", p: "Efeitos aero(servo)elásticos considerados.", moc: [analysis, test], ev: [aeroelasticity]}
+      - {id: "UL.9", t: "Material allowables", p: "Valores admissíveis dos materiais identificados.", moc: [analysis], ev: [materials]}
+      - {id: "UL.11", t: "Fatigue", p: "Fadiga considerada.", moc: [analysis, test], ev: []}
+      - {id: "UL.16", t: "Engine", p: "Motor adequado e ensaiado.", moc: [test], ev: [propulsion]}
+      - {id: "UL.19", t: "Fuel system", p: "Sistema de combustível.", moc: [analysis, test], ev: [], when: "fuel"}
+      - {id: "UL.20", t: "Electric power subsystem", p: "Subsistema de energia elétrica.", moc: [analysis, test], ev: [electrical]}
+      - {id: "UL.30", t: "System safety assessment", p: "Avaliação de segurança do sistema UAS; probabilidade cumulativa catastrófica (Anexo G).", moc: [analysis], ev: [safety_assessment]}
+      - {id: "UL.41", t: "Stalling speeds", p: "Velocidades de perda determinadas.", moc: [analysis, test], ev: [stall_speed]}
+      - {id: "UL.42", t: "Takeoff / launch", p: "Desempenho de descolagem/lançamento.", moc: [analysis, test], ev: [takeoff]}
+      - {id: "UL.43", t: "Climb and descent", p: "Desempenho de subida e descida.", moc: [analysis, test], ev: [climb_rate]}
+      - {id: "UL.45", t: "Glide", p: "Desempenho de planeio.", moc: [analysis, test], ev: [glide]}
+      - {id: "UL.46", t: "Landing", p: "Aterragem/recuperação.", moc: [analysis, test], ev: [landing]}
+      - {id: "UL.47", t: "Controllability and Manoeuvrability", p: "Controlável e manobrável.", moc: [analysis, test], ev: [controllability]}
+      - {id: "UL.48", t: "Trim", p: "Trim.", moc: [analysis, test], ev: [trim]}
+      - {id: "UL.50", t: "Stability", p: "Estabilidade (Anexo H).", moc: [analysis, test], ev: [static_stability, dynamic_stability]}
+      - {id: "UL.53", t: "Emergency recovery capability", p: "Recuperação de emergência.", moc: [analysis, test], ev: []}

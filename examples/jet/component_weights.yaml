@@ -1,0 +1,151 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# All new component inputs are PRESSUPOSTO, not A320 data or fitted OEW.
+# Crew/payload/all fuel stay OUTSIDE; dry tanks in fuel_system_dry, engines TOTAL.
+mass_kg: 70000
+wing_area_m2: 122.6
+aspect_ratio: 9.48
+weights:
+  mode: components
+  conventional_metal_transport: true
+  configuration_description: 'PRESSUPOSTO: illustrative conventional metal tube-and-wing
+    transport, NOT a fitted A320 model'
+  ultimate_n: 3.75
+  items:
+  - name: wing_structure
+    covers:
+    - wing_structure
+    method: raymer_transport_wing
+    inputs:
+      root_thickness_ratio: 0.14
+      taper_ratio: 0.3
+      sweep_quarter_chord_deg: 25
+      control_area_m2: 25
+    source: 'PRESSUPOSTO: illustrative explicit geometry/load/radii; no published
+      aircraft weight validation'
+  - name: horizontal_tail_structure
+    covers:
+    - horizontal_tail_structure
+    method: raymer_transport_htail
+    inputs:
+      area_m2: 32
+      aspect_ratio: 4.5
+      sweep_quarter_chord_deg: 30
+      tail_arm_m: 15
+      pitch_radius_m: 4.5
+      fuselage_width_m: 3.5
+      elevator_area_m2: 8
+      all_moving: false
+    source: 'PRESSUPOSTO: illustrative explicit geometry/load/radii; no published
+      aircraft weight validation'
+  - name: vertical_tail_structure
+    covers:
+    - vertical_tail_structure
+    method: raymer_transport_vtail
+    inputs:
+      area_m2: 25
+      aspect_ratio: 1.8
+      sweep_quarter_chord_deg: 35
+      tail_arm_m: 14
+      yaw_radius_m: 14
+      root_thickness_ratio: 0.12
+      tail_height_ratio: 0
+    source: 'PRESSUPOSTO: illustrative explicit geometry/load/radii; no published
+      aircraft weight validation'
+  - name: fuselage_structure
+    covers:
+    - fuselage_structure
+    method: supplied
+    mass_kg: 10000
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: landing_gear
+    covers:
+    - landing_gear
+    method: supplied
+    mass_kg: 2500
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: nacelles_pylons
+    covers:
+    - nacelles_pylons
+    method: supplied
+    mass_kg: 1600
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: engines_dry
+    covers:
+    - engines_dry
+    method: supplied
+    mass_kg: 5000
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: propulsion_accessories
+    covers:
+    - propulsion_accessories
+    method: supplied
+    mass_kg: 800
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: apu_installed
+    covers:
+    - apu_installed
+    method: supplied
+    mass_kg: 400
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: flight_controls
+    covers:
+    - flight_controls
+    method: supplied
+    mass_kg: 900
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: hydraulics
+    covers:
+    - hydraulics
+    method: supplied
+    mass_kg: 500
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: electrical_avionics
+    covers:
+    - electrical_avionics
+    method: supplied
+    mass_kg: 1000
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: environmental_antiice
+    covers:
+    - environmental_antiice
+    method: supplied
+    mass_kg: 1000
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: furnishings_interiors
+    covers:
+    - furnishings_interiors
+    method: supplied
+    mass_kg: 5000
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: fuel_system_dry
+    covers:
+    - fuel_system_dry
+    method: supplied
+    mass_kg: 700
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: operating_items_noncrew_nonfuel
+    covers:
+    - operating_items_noncrew_nonfuel
+    method: supplied
+    mass_kg: 400
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'
+  - name: other_empty_items
+    covers:
+    - other_empty_items
+    method: supplied
+    mass_kg: 300
+    source: 'PRESSUPOSTO: illustrative TOTAL group mass, not per engine; not OEW-fitted
+      or published reference data'

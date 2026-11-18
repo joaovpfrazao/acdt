@@ -1,0 +1,22 @@
+{
+  "architectures": [
+    {
+      "id": "A0001",
+      "choices": {
+        "propulsion_kind": "electric",
+        "landing_gear": "none",
+        "launch_recovery": "catapult",
+        "energy": "battery"
+      }
+    },
+    {
+      "id": "A0002",
+      "choices": {
+        "propulsion_kind": "electric",
+        "landing_gear": "tricycle",
+        "launch_recovery": "runway",
+        "energy": "battery"
+      }
+    }
+  ]
+}

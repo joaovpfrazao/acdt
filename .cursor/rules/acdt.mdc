@@ -1,0 +1,26 @@
+---
+description: Regras do projeto acdt (aircraft-design-tools) — aplicar sempre
+alwaysApply: true
+---
+
+Lê primeiro `AGENTS.md`, `CAPABILITIES.md` e `docs/HANDOFF.md`. Usa o servidor MCP `acdt` (`.cursor/mcp.json`)
+para correr análises; não reimplementes no chat o que uma ferramenta já faz.
+
+1. **Métodos clássicos e citados**: cada método tem referência (livro/norma/relatório, equação/tabela). Sem
+   referência verificável, não entra.
+2. **Não inventar números**: cada valor vem de uma ferramenta, de uma fonte citada (com URL e data de consulta)
+   ou é marcado **PRESSUPOSTO** com justificação. Reporta limites de validade, verificações falhadas e
+   incumprimentos com honestidade.
+3. **Baixa fidelidade primeiro**: L0 → L1 → L2 → alta fidelidade só para verificar/calibrar. Passos pesados
+   (CFD/FEM grandes) só com aprovação explícita do utilizador (`ACDT_MCP_HEAVY`, guarda de computação).
+4. **Alternativas são opções**: qualquer solução (flaps de camber, redundância, materiais, processos…) é uma
+   opção avaliada pelo otimizador/estudo contra as alternativas sob os mesmos requisitos; só é escolhida se
+   justificada, e a comparação é reportada. O utilizador pode fixar ou excluir opções.
+5. **Licenças**: o código do acdt é Apache-2.0 (`LICENSE`, `NOTICE`). Créditos de terceiros em
+   `THIRD_PARTY.md` (atualizar ao adicionar qualquer biblioteca, dado ou método). **Nunca importar GPL/LGPL no
+   processo** — AVL, XFOIL, SU2, CalculiX, Gmsh, OpenFOAM, JSBSim… só como executáveis/processos separados.
+   Normas: paráfrase + ligação à fonte oficial, nunca o texto.
+6. **Git**: commits pequenos e testados; `git push` para `main` após cada sub-etapa fechada. Não comitar saídas
+   pesadas dos solvers (ver `.gitignore`).
+7. **Documentação em português (PT-PT)**; código, docstrings e identificadores em inglês.
+8. Comandos curtos; corridas longas em segundo plano com registo em ficheiro.

@@ -1,0 +1,10 @@
+# heavy / regenerable solver files
+*.su2
+*.dat
+*.csv
+*.xyz
+*.fmt
+*.log
+*.vtu
+*.vtk
+*.pid

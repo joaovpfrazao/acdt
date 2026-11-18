@@ -1,0 +1,17 @@
+{
+  "label": "SIMP pedido sem fração de volume nem fonte da densidade → unassessed (nunca massa zero silenciosa, nunca unassessed=pass)",
+  "masses": {
+    "ribs": 0.60528384,
+    "ideal": 10.60528384,
+    "nonoptimum": 2.65132096,
+    "total": 13.2566048
+  },
+  "ribs": {
+    "y": [0.0, 1.0],
+    "w_m": [0.40, 0.32],
+    "h_m": [0.15, 0.12],
+    "t_m": [0.001, 0.0008],
+    "dV_N": [500.0, 350.0],
+    "p_crush_N_m": [3000.0, 2200.0]
+  }
+}

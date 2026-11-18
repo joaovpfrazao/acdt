@@ -1,0 +1,1307 @@
+{
+ "cost_metric": "bottom_up",
+ "N": 820,
+ "year": 2025,
+ "points": [
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 649.0716614155922,
+   "AR": 6.5,
+   "pw": 11.518725257714772,
+   "W0": 1208.2871908187597,
+   "We": 757.1319147162083,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 730062.0322789135,
+   "costs": {
+    "bottom_up": 730062.0322789135,
+    "eastlake": 292012.1994823426,
+    "dapca4": 827080.1620121334
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 649.0716614155922,
+   "AR": 7.32,
+   "pw": 11.262163319823607,
+   "W0": 1228.9221107525132,
+   "We": 777.2406324757051,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 746454.9706498218,
+   "costs": {
+    "bottom_up": 746454.9706498218,
+    "eastlake": 296202.13545591634,
+    "dapca4": 843504.2552328336
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 649.0716614155922,
+   "AR": 8.5,
+   "pw": 10.921029846746867,
+   "W0": 1266.9830582540783,
+   "We": 813.1443732937043,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 766028.9997567497,
+   "costs": {
+    "bottom_up": 766028.9997567497,
+    "eastlake": 304043.490817579,
+    "dapca4": 873083.7892311533
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 730.2056190925413,
+   "AR": 6.5,
+   "pw": 11.59609502028099,
+   "W0": 1172.0375334095813,
+   "We": 725.7805798699926,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 701364.7686937357,
+   "costs": {
+    "bottom_up": 701364.7686937357,
+    "eastlake": 283981.32791285485,
+    "dapca4": 799886.5981741195
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 730.2056190925413,
+   "AR": 7.32,
+   "pw": 11.339219585032856,
+   "W0": 1187.2401135617122,
+   "We": 741.2068688480756,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 715790.2365475935,
+   "costs": {
+    "bottom_up": 715790.2365475935,
+    "eastlake": 287013.4483855779,
+    "dapca4": 812361.3643497312
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 730.2056190925413,
+   "AR": 8.5,
+   "pw": 11.006336466402965,
+   "W0": 1216.0841140115392,
+   "We": 769.0588852392581,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 732463.168081212,
+   "costs": {
+    "bottom_up": 732463.168081212,
+    "eastlake": 292937.4976398053,
+    "dapca4": 835267.0756354086
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 811.3395767694902,
+   "AR": 6.5,
+   "pw": 11.704925070824745,
+   "W0": 1145.8459797278397,
+   "We": 702.63973101041,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 678696.2889662447,
+   "costs": {
+    "bottom_up": 678696.2889662447,
+    "eastlake": 278203.3620276554,
+    "dapca4": 779892.5021035953
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 811.3395767694902,
+   "AR": 7.32,
+   "pw": 11.437029003360092,
+   "W0": 1158.3288275933755,
+   "We": 715.8053885794884,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 691930.7371598823,
+   "costs": {
+    "bottom_up": 691930.7371598823,
+    "eastlake": 280642.3213025076,
+    "dapca4": 790427.176297947
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 811.3395767694902,
+   "AR": 8.5,
+   "pw": 11.115914232237987,
+   "W0": 1178.7738707914182,
+   "We": 736.3140523934736,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 706081.6875337675,
+   "costs": {
+    "bottom_up": 706081.6875337675,
+    "eastlake": 284770.1616162608,
+    "dapca4": 807126.0270175058
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 649.0716614155922,
+   "AR": 6.5,
+   "pw": 11.842536335383683,
+   "W0": 1145.625242090867,
+   "We": 701.1066958453687,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 954179.8963515509,
+   "costs": {
+    "bottom_up": 954179.8963515509,
+    "eastlake": 360657.6701709785,
+    "dapca4": 779099.7748156829
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 649.0716614155922,
+   "AR": 7.32,
+   "pw": 11.597773564896768,
+   "W0": 1162.089851861741,
+   "We": 717.3800842821752,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 974993.4702840078,
+   "costs": {
+    "bottom_up": 974993.4702840078,
+    "eastlake": 365473.89811325446,
+    "dapca4": 792485.2987805137
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 649.0716614155922,
+   "AR": 8.5,
+   "pw": 11.283477005841004,
+   "W0": 1190.9899160593222,
+   "We": 744.9452354094865,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 999689.2748282822,
+   "costs": {
+    "bottom_up": 999689.2748282822,
+    "eastlake": 373925.99741198827,
+    "dapca4": 815401.1140016738
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 730.2056190925413,
+   "AR": 6.5,
+   "pw": 11.89482822777185,
+   "W0": 1117.3245671601364,
+   "We": 676.8159850222797,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 918000.145693207,
+   "costs": {
+    "bottom_up": 918000.145693207,
+    "eastlake": 352095.78630611545,
+    "dapca4": 757703.1953215206
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 730.2056190925413,
+   "AR": 7.32,
+   "pw": 11.65179717048971,
+   "W0": 1128.7816909643996,
+   "We": 688.7869563788814,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 936203.317260314,
+   "costs": {
+    "bottom_up": 936203.317260314,
+    "eastlake": 355443.3326023479,
+    "dapca4": 767382.574801288
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 730.2056190925413,
+   "AR": 8.5,
+   "pw": 11.337781569808303,
+   "W0": 1151.5088896354498,
+   "We": 711.0285253926808,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 957792.3498910017,
+   "costs": {
+    "bottom_up": 957792.3498910017,
+    "eastlake": 362131.2487954448,
+    "dapca4": 785800.7636347313
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 811.3395767694902,
+   "AR": 6.5,
+   "pw": 11.984191971945451,
+   "W0": 1096.7415233984698,
+   "We": 658.685157542817,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 877979.5105111272,
+   "costs": {
+    "bottom_up": 877979.5105111272,
+    "eastlake": 345851.03199021483,
+    "dapca4": 741843.3727570864
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 811.3395767694902,
+   "AR": 7.32,
+   "pw": 11.728699408115876,
+   "W0": 1106.1415081642913,
+   "We": 668.9893507455173,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 905965.3925361341,
+   "costs": {
+    "bottom_up": 905965.3925361341,
+    "eastlake": 348591.8846377451,
+    "dapca4": 750052.4514415059
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 811.3395767694902,
+   "AR": 8.5,
+   "pw": 11.42289486759835,
+   "W0": 1122.210411076355,
+   "We": 685.4519481958994,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 924465.266803266,
+   "costs": {
+    "bottom_up": 924465.266803266,
+    "eastlake": 353319.1205350265,
+    "dapca4": 763495.6740852069
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  }
+ ],
+ "pareto": [
+  {
+   "option": "compósito (tecido CF/epóxi, infusão)",
+   "ws": 730.2056190925413,
+   "AR": 6.5,
+   "pw": 11.89482822777185,
+   "W0": 1117.3245671601364,
+   "We": 676.8159850222797,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 918000.145693207,
+   "costs": {
+    "bottom_up": 918000.145693207,
+    "eastlake": 352095.78630611545,
+    "dapca4": 757703.1953215206
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "metal (Al 2024-T3, chapa rebitada / CNC)",
+   "ws": 730.2056190925413,
+   "AR": 6.5,
+   "pw": 11.59609502028099,
+   "W0": 1172.0375334095813,
+   "We": 725.7805798699926,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 701364.7686937357,
+   "costs": {
+    "bottom_up": 701364.7686937357,
+    "eastlake": 283981.32791285485,
+    "dapca4": 799886.5981741195
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing spar": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "wing rib": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "htail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "htail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail skin": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "vtail spar": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "vtail rib": [
+     "cnc_machining",
+     "al2024_t3"
+    ],
+    "fuselage shell": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ],
+    "fuselage frame": [
+     "sheet_metal_riveted",
+     "al2024_t3"
+    ]
+   }
+  }
+ ],
+ "notes": [
+  "L0 handbook-aero MDA per point (no low-fi calibration); cost from the manufacturing study at N",
+  "material choice → structural mass change (Ashby) fed back into the W0 closure",
+  "infeasible = a sizing constraint violated (g > 0) or a part without a feasible, fully specified process"
+ ],
+ "plot": "examples/output/cessna172_manufacturing/pareto_w0_cost.png"
+}

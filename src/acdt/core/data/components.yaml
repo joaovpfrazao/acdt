@@ -1,0 +1,42 @@
+# acdt example component database
+# ==============================================================================
+# EXAMPLE DATA — NOT A SUPPLIER CATALOGUE.
+# * Entries named "class" are GENERIC, representative values of a product class
+#   (order-of-magnitude, for first-cut selection only).
+# * Entries with a manufacturer name list publicly advertised features; masses and
+#   ratings are APPROXIMATE and must be checked against the current datasheet at
+#   the given URL before any design decision.
+# Units: mass kg, power W, voltage V (nominal max), current A, torque N*m, kv rpm/V.
+# ==============================================================================
+motors:
+  - {id: outrunner_35xx_800kv_class, kind: brushless_outrunner, kv: 800, p_max: 900, v_max: 16.8, i_max: 55, mass: 0.150, eta_max: 0.85, source: generic class}
+  - {id: outrunner_41xx_500kv_class, kind: brushless_outrunner, kv: 500, p_max: 1500, v_max: 25.2, i_max: 60, mass: 0.260, eta_max: 0.86, source: generic class}
+  - {id: outrunner_41xx_300kv_class, kind: brushless_outrunner, kv: 300, p_max: 1800, v_max: 50.4, i_max: 40, mass: 0.330, eta_max: 0.87, source: generic class}
+  - {id: outrunner_41xx_400kv_class, kind: brushless_outrunner, kv: 400, p_max: 1600, v_max: 33.6, i_max: 55, mass: 0.300, eta_max: 0.86, source: generic class}
+  - {id: outrunner_50xx_270kv_class, kind: brushless_outrunner, kv: 270, p_max: 2800, v_max: 50.4, i_max: 60, mass: 0.520, eta_max: 0.88, source: generic class}
+  - {id: outrunner_50xx_200kv_class, kind: brushless_outrunner, kv: 200, p_max: 2600, v_max: 50.4, i_max: 55, mass: 0.540, eta_max: 0.88, source: generic class}
+  - {id: outrunner_63xx_170kv_class, kind: brushless_outrunner, kv: 170, p_max: 4500, v_max: 50.4, i_max: 90, mass: 0.900, eta_max: 0.89, source: generic class}
+  - {id: outrunner_80xx_100kv_class, kind: brushless_outrunner, kv: 100, p_max: 7000, v_max: 67.2, i_max: 110, mass: 1.500, eta_max: 0.90, source: generic class}
+escs:
+  - {id: esc_60a_6s_class, i_cont: 60, v_max: 25.2, mass: 0.060, source: generic class}
+  - {id: esc_80a_12s_class, i_cont: 80, v_max: 50.4, mass: 0.150, source: generic class}
+  - {id: esc_120a_12s_class, i_cont: 120, v_max: 50.4, mass: 0.230, source: generic class}
+  - {id: esc_200a_14s_class, i_cont: 200, v_max: 58.8, mass: 0.400, source: generic class}
+cells:
+  # Li-ion cylindrical / Li-polymer pouch classes. v_nom per cell, capacity Ah, i_cont continuous A.
+  - {id: liion_21700_high_energy_class, chemistry: li_ion, v_nom: 3.6, v_max: 4.2, capacity_ah: 5.0, i_cont: 10, mass: 0.070, source: generic class (e.g. 5 Ah 21700 high-energy cells)}
+  - {id: liion_21700_high_power_class, chemistry: li_ion, v_nom: 3.6, v_max: 4.2, capacity_ah: 4.5, i_cont: 45, mass: 0.070, source: generic class (e.g. 4.5 Ah 45 A 21700 cells)}
+  - {id: lipo_pouch_16ah_class, chemistry: li_po, v_nom: 3.7, v_max: 4.2, capacity_ah: 16.0, i_cont: 160, mass: 0.330, source: generic class (10C LiPo pouch)}
+  - {id: liion_pouch_high_energy_class, chemistry: li_ion, v_nom: 3.7, v_max: 4.2, capacity_ah: 20.0, i_cont: 40, mass: 0.270, source: generic class (~270 Wh/kg pouch)}
+servos:
+  - {id: servo_micro_2kgcm_class, torque: 0.20, v_max: 6.0, mass: 0.012, i_stall: 0.8, source: generic class}
+  - {id: servo_mini_8kgcm_class, torque: 0.78, v_max: 8.4, mass: 0.025, i_stall: 1.5, source: generic class}
+  - {id: servo_standard_20kgcm_class, torque: 1.96, v_max: 8.4, mass: 0.060, i_stall: 3.0, source: generic class}
+  - {id: servo_hv_35kgcm_class, torque: 3.43, v_max: 8.4, mass: 0.075, i_stall: 4.5, source: generic class}
+  - {id: servo_industrial_60kgcm_class, torque: 5.88, v_max: 28.0, mass: 0.180, i_stall: 3.0, source: generic class (CAN/RS485 UAV servo)}
+autopilots:
+  # Features as advertised by the manufacturers; masses approximate — verify.
+  - {id: holybro_pixhawk_6x, imu: 3, baro: 2, can: 2, ethernet: true, firmware: [px4, ardupilot], mass: 0.080, power_w: 2.5, url: "https://holybro.com/products/pixhawk-6x", source: manufacturer page (approx.)}
+  - {id: holybro_pixhawk_6c, imu: 2, baro: 1, can: 2, ethernet: false, firmware: [px4, ardupilot], mass: 0.060, power_w: 2.0, url: "https://holybro.com/products/pixhawk-6c", source: manufacturer page (approx.)}
+  - {id: cubepilot_cube_orange_plus, imu: 3, baro: 2, can: 2, ethernet: false, firmware: [px4, ardupilot], mass: 0.075, power_w: 2.5, url: "https://docs.cubepilot.org/user-guides/autopilot/the-cube-module-overview", source: manufacturer docs (approx.)}
+  - {id: generic_f7_fc_class, imu: 1, baro: 1, can: 0, ethernet: false, firmware: [ardupilot], mass: 0.010, power_w: 1.0, source: generic class (hobby F7 flight controller)}

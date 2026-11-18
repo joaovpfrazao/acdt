@@ -1,0 +1,392 @@
+{
+ "rows": [
+  {
+   "option": "none",
+   "converged": true,
+   "feasible": false,
+   "W0": 32.60046098349817,
+   "We": 16.609045647353724,
+   "Wf_or_battery": 11.991415334870439,
+   "S": 2.380220216591255,
+   "P_sl_kW": 1.5698653127577336,
+   "W/S": 134.31585383375608,
+   "LD_max": 22.84626946977315,
+   "CL_LDmax": 0.8984395750006969,
+   "CLmax_landing": 1.2975859201197195,
+   "unit_cost": NaN,
+   "active": [
+    "RC 3.0 m/s @ 0 m",
+    "Perda 13.0 m/s"
+   ],
+   "failed": [
+    "wing_span",
+    "mtow"
+   ],
+   "flap_system_kg": 0,
+   "V_max": 35.08046715964308,
+   "V_loiter": 22.0,
+   "P_loiter_W": 370.2980890836976,
+   "endurance_h": 2.809842132041467,
+   "range_km": 214.60196633697316
+  },
+  {
+   "option": "plain",
+   "converged": true,
+   "feasible": false,
+   "W0": 22.86745659165788,
+   "We": 10.193711021868713,
+   "Wf_or_battery": 8.673745569584105,
+   "S": 1.277612654748366,
+   "P_sl_kW": 1.157525952388082,
+   "W/S": 175.52514242178498,
+   "LD_max": 20.57658392008475,
+   "CL_LDmax": 0.962859115400136,
+   "CLmax_landing": 1.695695622565452,
+   "unit_cost": NaN,
+   "active": [
+    "RC 3.0 m/s @ 0 m",
+    "Perda 13.0 m/s"
+   ],
+   "failed": [
+    "wing_span"
+   ],
+   "flap_system_kg": 0,
+   "V_max": 36.908788136750196,
+   "V_loiter": 22.0,
+   "P_loiter_W": 262.0909228365234,
+   "endurance_h": 2.7683730301979215,
+   "range_km": 213.93430102571162
+  },
+  {
+   "option": "camber",
+   "converged": true,
+   "feasible": true,
+   "W0": 22.014633372651552,
+   "We": 9.597786682055164,
+   "Wf_or_battery": 8.416846690279515,
+   "S": 1.1679915384418933,
+   "P_sl_kW": 1.1260719038521134,
+   "W/S": 184.83850033015773,
+   "LD_max": 20.201533822306196,
+   "CL_LDmax": 0.9808860638478609,
+   "CLmax_landing": 1.7856604347216816,
+   "unit_cost": NaN,
+   "active": [
+    "RC 3.0 m/s @ 0 m",
+    "Perda 13.0 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 37.28287019584167,
+   "V_loiter": 22.0,
+   "P_loiter_W": 253.70074221109724,
+   "endurance_h": 2.761649095374466,
+   "range_km": 213.80616091824453,
+   "camber": {
+    "kind": "camber",
+    "flapped_area_ratio": 0.6107920961068599,
+    "flap_area_m2": 0.14268,
+    "dCLmax": 0.10917297925814008,
+    "delta_max_deg": 15.0,
+    "dCD_min": -0.001134455523014191,
+    "CL_at_dCD_min": 0.0,
+    "dcm0_per_deg": -0.00258,
+    "schedule": [
+     {
+      "CL": 0.0,
+      "delta_deg": -10.0,
+      "dCD": -0.001134455523014191
+     },
+     {
+      "CL": 0.10437216127926541,
+      "delta_deg": -7.5,
+      "dCD": -0.0007655492242665715
+     },
+     {
+      "CL": 0.20874432255853081,
+      "delta_deg": -7.5,
+      "dCD": -0.00040321488969490216
+     },
+     {
+      "CL": 0.3131164838377962,
+      "delta_deg": -5.0,
+      "dCD": -0.0001244688497900882
+     },
+     {
+      "CL": 0.41748864511706163,
+      "delta_deg": -5.0,
+      "dCD": -0.00010267981332268196
+     },
+     {
+      "CL": 0.521860806396327,
+      "delta_deg": -5.0,
+      "dCD": -9.19543163040814e-05
+     },
+     {
+      "CL": 0.6262329676755924,
+      "delta_deg": -5.0,
+      "dCD": -8.174719530241461e-05
+     },
+     {
+      "CL": 0.7306051289548579,
+      "delta_deg": -5.0,
+      "dCD": -7.634358688904119e-05
+     },
+     {
+      "CL": 0.8349772902341233,
+      "delta_deg": -2.5,
+      "dCD": -6.484963520627339e-05
+     },
+     {
+      "CL": 0.9393494515133887,
+      "delta_deg": -2.5,
+      "dCD": -5.919307483772452e-05
+     },
+     {
+      "CL": 1.043721612792654,
+      "delta_deg": -2.5,
+      "dCD": -4.985038003350216e-05
+     },
+     {
+      "CL": 1.1480937740719195,
+      "delta_deg": -2.5,
+      "dCD": -3.5664162094501175e-05
+     }
+    ],
+    "section_source": "XFOIL 6.99",
+    "notes": [
+     "camber flap camber: c_f/c 0.20, \u03b7 0.00\u20130.65, S_flapped/S 0.61; polars XFOIL 6.99 at Re 4.5e+05 (cruise) and 2.8e+05 (stall); span loading AVL 3.40 (VLM), 2 \u00e2ngulos",
+     "\u0394cm0 -0.0026/\u00b0 de flap (sec\u00e7\u00e3o) \u2014 arrasto de compensa\u00e7\u00e3o n\u00e3o inclu\u00eddo (limita\u00e7\u00e3o)"
+    ]
+   }
+  },
+  {
+   "option": "flaperon",
+   "converged": true,
+   "feasible": true,
+   "W0": 20.51116295732465,
+   "We": 8.562739324832808,
+   "Wf_or_battery": 7.948423632196672,
+   "S": 0.9736009638713445,
+   "P_sl_kW": 1.07150726517077,
+   "W/S": 206.59983266206788,
+   "LD_max": 19.693967919632826,
+   "CL_LDmax": 1.0458181735010248,
+   "CLmax_landing": 1.9958632286793985,
+   "unit_cost": NaN,
+   "active": [
+    "RC 3.0 m/s @ 0 m",
+    "Perda 13.0 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 37.66840329757267,
+   "V_loiter": 22.0,
+   "P_loiter_W": 238.36953942678377,
+   "endurance_h": 2.752615840815062,
+   "range_km": 213.71557064760808,
+   "camber": {
+    "kind": "flaperon",
+    "flapped_area_ratio": 0.8670903494622628,
+    "flap_area_m2": 0.16884000000000002,
+    "dCLmax": 0.15498372906288477,
+    "delta_max_deg": 15.0,
+    "dCD_min": -0.0017036369538969847,
+    "CL_at_dCD_min": 0.0,
+    "dcm0_per_deg": -0.0061066666666666665,
+    "schedule": [
+     {
+      "CL": 0.0,
+      "delta_deg": -10.0,
+      "dCD": -0.0017036369538969847
+     },
+     {
+      "CL": 0.10458247177312487,
+      "delta_deg": -7.5,
+      "dCD": -0.0011148265517609453
+     },
+     {
+      "CL": 0.20916494354624973,
+      "delta_deg": -7.5,
+      "dCD": -0.0005996951540432723
+     },
+     {
+      "CL": 0.3137474153193746,
+      "delta_deg": -5.0,
+      "dCD": -0.00020055569645412491
+     },
+     {
+      "CL": 0.41832988709249946,
+      "delta_deg": -5.0,
+      "dCD": -0.00014963512804093656
+     },
+     {
+      "CL": 0.5229123588656244,
+      "delta_deg": -5.0,
+      "dCD": -0.00013422287313794888
+     },
+     {
+      "CL": 0.6274948306387492,
+      "delta_deg": -5.0,
+      "dCD": -0.0001201869491084497
+     },
+     {
+      "CL": 0.7320773024118741,
+      "delta_deg": -5.0,
+      "dCD": -0.00010274943671948347
+     },
+     {
+      "CL": 0.8366597741849989,
+      "delta_deg": -2.5,
+      "dCD": -8.974120438967754e-05
+     },
+     {
+      "CL": 0.9412422459581238,
+      "delta_deg": -2.5,
+      "dCD": -8.28451398307487e-05
+     },
+     {
+      "CL": 1.0458247177312487,
+      "delta_deg": -2.5,
+      "dCD": -7.369496478512563e-05
+     },
+     {
+      "CL": 1.1504071895043735,
+      "delta_deg": -2.5,
+      "dCD": -4.898206398938667e-05
+     }
+    ],
+    "section_source": "XFOIL 6.99",
+    "notes": [
+     "camber flap flaperon: c_f/c 0.20, \u03b7 0.00\u20130.95, S_flapped/S 0.87; polars XFOIL 6.99 at Re 4e+05 (cruise) and 2.8e+05 (stall); span loading AVL 3.40 (VLM), 2 \u00e2ngulos",
+     "\u0394cm0 -0.0061/\u00b0 de flap (sec\u00e7\u00e3o) \u2014 arrasto de compensa\u00e7\u00e3o n\u00e3o inclu\u00eddo (limita\u00e7\u00e3o)"
+    ]
+   }
+  },
+  {
+   "option": "plain_same_area",
+   "converged": true,
+   "feasible": true,
+   "W0": 22.056612774790338,
+   "We": 9.611282025720483,
+   "Wf_or_battery": 8.445330749065423,
+   "S": 1.1701364760853443,
+   "P_sl_kW": 1.1285312526734201,
+   "W/S": 184.85149902473566,
+   "LD_max": 20.183547598644516,
+   "CL_LDmax": 0.9833689570267703,
+   "CLmax_landing": 1.7857850736954943,
+   "unit_cost": NaN,
+   "active": [
+    "RC 3.0 m/s @ 0 m",
+    "Perda 13.0 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 37.2836366556394,
+   "V_loiter": 22.0,
+   "P_loiter_W": 254.64660829783276,
+   "endurance_h": 2.761713510913846,
+   "range_km": 213.7955954408972
+  },
+  {
+   "option": "droop_flaperon",
+   "converged": true,
+   "feasible": true,
+   "W0": 20.550804568490722,
+   "We": 8.574563912857272,
+   "Wf_or_battery": 7.976240654539781,
+   "S": 0.9755809761795089,
+   "P_sl_kW": 1.0739576116937777,
+   "W/S": 206.57900527214335,
+   "LD_max": 19.67274441527878,
+   "CL_LDmax": 1.047739555032235,
+   "CLmax_landing": 1.9957000782992496,
+   "unit_cost": NaN,
+   "active": [
+    "RC 3.0 m/s @ 0 m",
+    "Perda 13.0 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 37.66815954737325,
+   "V_loiter": 22.0,
+   "P_loiter_W": 239.3083087787202,
+   "endurance_h": 2.749818812918014,
+   "range_km": 213.48281570563148
+  }
+ ],
+ "selected": "droop_flaperon",
+ "objective": "W0",
+ "objective_key": "W0",
+ "justified": false,
+ "min_gain": 0.01,
+ "deltas": {
+  "camber": {
+   "W0": 1.4638288041608298,
+   "We": 1.0232227691978917,
+   "Wf_or_battery": 0.44060603573973367,
+   "S": 0.1924105622623844,
+   "P_sl_kW": 0.05211429215833574,
+   "LD_max": 0.5287894070274177,
+   "unit_cost": NaN,
+   "V_max": -0.3852893515315827,
+   "endurance_h": 0.01183028245645179,
+   "range_km": 0.3233452126130487,
+   "P_loiter_W": 14.392433432377032,
+   "vs": "droop_flaperon"
+  },
+  "flaperon": {
+   "W0": -0.03964161116607201,
+   "We": -0.011824588024463623,
+   "Wf_or_battery": -0.027817022343109343,
+   "S": -0.0019800123081643584,
+   "P_sl_kW": -0.002450346523007685,
+   "LD_max": 0.021223504354047407,
+   "unit_cost": NaN,
+   "V_max": 0.00024375019941658138,
+   "endurance_h": 0.0027970278970479434,
+   "range_km": 0.2327549419765944,
+   "P_loiter_W": -0.9387693519364291,
+   "vs": "droop_flaperon"
+  },
+  "plain_same_area": {
+   "W0": 1.5058082062996156,
+   "We": 1.0367181128632108,
+   "Wf_or_battery": 0.469090094525642,
+   "S": 0.19455549990583543,
+   "P_sl_kW": 0.05457364097964246,
+   "LD_max": 0.5108031833657378,
+   "unit_cost": NaN,
+   "V_max": -0.3845228917338517,
+   "endurance_h": 0.011894697995832093,
+   "range_km": 0.3127797352657069,
+   "P_loiter_W": 15.338299519112553,
+   "vs": "droop_flaperon"
+  },
+  "droop_flaperon": {
+   "W0": 0.03964161116607201,
+   "We": 0.011824588024463623,
+   "Wf_or_battery": 0.027817022343109343,
+   "S": 0.0019800123081643584,
+   "P_sl_kW": 0.002450346523007685,
+   "LD_max": -0.021223504354047407,
+   "unit_cost": NaN,
+   "V_max": -0.00024375019941658138,
+   "endurance_h": -0.0027970278970479434,
+   "range_km": -0.2327549419765944,
+   "P_loiter_W": 0.9387693519364291,
+   "vs": "flaperon"
+  }
+ },
+ "notes": [
+  "plain_same_area: flap simples (Raymer plain) com a mesma \u00e1rea que camber (S_flapped/S 0.61) \u2014 isola o ganho do escalonamento de camber do ganho de \u00e1rea de flap",
+  "droop_flaperon: flap simples (Raymer plain) com a mesma \u00e1rea que flaperon (S_flapped/S 0.87) \u2014 isola o ganho do escalonamento de camber do ganho de \u00e1rea de flap; flaperon desca\u00eddo s\u00f3 na aterragem, sem camber em cruzeiro",
+  "flaperon melhora W0 s\u00f3 0.19 % (< 1.0 %): n\u00e3o justificado; escolhido droop_flaperon"
+ ],
+ "files": {
+  "camber_camber": "examples/output/flap_options/uav_endurance/camber_camber.png",
+  "camber_flaperon": "examples/output/flap_options/uav_endurance/camber_flaperon.png",
+  "design_point_shift": "examples/output/flap_options/uav_endurance/design_point_shift.png"
+ }
+}

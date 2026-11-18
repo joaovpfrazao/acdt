@@ -1,0 +1,55 @@
+# Fase 7 — UAV de 150 kg (gasolina) em compósito, série pequena: escolha de material/processo por peça.
+# Uso: acdt manufacture examples/manufacturing/uav_composite_batch.yaml --pareto
+# Dois laminados de tecido de carbono/epóxi do MESMO estudo (Suranaree J. Sci. Technol., artigo 12583):
+#   infusão a vácuo (VARI): Vf 45 %, ρ 1452.5 kg/m³, E 35.63 GPa, Ftu 268.3 MPa, vazios 1.2–1.5 %
+#   laminação manual:       Vf 23 %, ρ 1191 kg/m³, vazios 9.6–10.6 % — E e Ftu ESCALADOS por Vf (23/45, regra das
+#                           misturas, PRESSUPOSTO: o artigo não dá E/Ftu da laminação manual no excerto consultado)
+# Preços (retalho, Aircraft Spruce 2026-10-28): tecido 282 3K $142.5/kg; Aeropoxy PR2032/PH3660 ≈ $34.3/kg.
+mission: ../uav_gasoline_150kg.yaml
+manufacturing:
+  year: 2025
+  N: 50
+  configuration: conventional    # configuração convencional, mas não tripulado → CERs fora da base (assinalado automaticamente)
+  materials:
+    cf_fabric_vari:
+      kind: composite
+      rho: 1452.5
+      E: 35.63e9
+      Ftu: 268.3e6
+      t_min: 0.00025
+      processes: [vacuum_infusion]
+      price:                    # Wf = 0.45·1.76/1.4525 = 0.545 → 0.545·142.5 + 0.455·34.3
+        usd_per_kg: 93.3
+        year: 2026
+        provenance: {source_url: "https://www.aircraftspruce.com/catalog/cmpages/bigraphite.php",
+                     retrieved: "2026-10-28", source_type: distributor,
+                     notes: "resina: https://www.aircraftspruce.com/catalog/cmpages/aeropoxy.php"}
+    cf_fabric_handlayup:
+      kind: composite
+      rho: 1191.0
+      E: 18.21e9                # 35.63 × 23/45 (PRESSUPOSTO, regra das misturas)
+      Ftu: 137.1e6              # 268.3 × 23/45 (PRESSUPOSTO)
+      t_min: 0.00025
+      processes: [wet_layup]
+      price:                    # Wf = 0.23·1.76/1.191 = 0.340 → 0.340·142.5 + 0.660·34.3
+        usd_per_kg: 71.1
+        year: 2026
+        provenance: {source_url: "https://www.aircraftspruce.com/catalog/cmpages/bigraphite.php",
+                     retrieved: "2026-10-28", source_type: distributor,
+                     notes: "resina: https://www.aircraftspruce.com/catalog/cmpages/aeropoxy.php"}
+  groups: {default: cf_fabric_vari}
+  choices:
+    "*": {materials: [cf_fabric_vari, cf_fabric_handlayup], processes: [vacuum_infusion, wet_layup]}
+  labour_calibration: eastlake  # FOPV (peças de asa de transporte) sobrestima peças pequenas: horas absolutas do
+                                #   Eastlake, ranking relativo dos modelos de processo (ver relatório)
+  tooling: eastlake             # sem cotações de moldes: pool do Eastlake repartido por área (assinalado)
+pareto:
+  cost_metric: bottom_up
+  ws_factors: [0.8, 0.9, 1.0]
+  options:                      # mesma estrutura dimensionada em compósito; muda o laminado/processo de todas as peças
+    infusão (VARI):
+      weights_material: composite
+      manufacturing: {choices: {"*": {materials: [cf_fabric_vari], processes: [vacuum_infusion]}}}
+    laminação manual:           # laminado mais leve por m³ mas menos rígido → peças mais pesadas (Ashby) → W0 sobe
+      weights_material: composite
+      manufacturing: {choices: {"*": {materials: [cf_fabric_handlayup], processes: [wet_layup]}}}

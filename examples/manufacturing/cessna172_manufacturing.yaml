@@ -1,0 +1,47 @@
+# Fase 7 — fabrico e custo do C172S (validação contra dados públicos).
+# Uso: acdt manufacture examples/cessna172_check.yaml --config examples/manufacturing/cessna172_manufacturing.yaml
+# Preços: pesquisados na web com proveniência (URL + data); preços de RETALHO (um OEM paga menos).
+mission: ../cessna172_check.yaml
+manufacturing:
+  year: 2025                     # USD 2025 (CPI-U média anual, BLS)
+  N: 820                         # 5 anos de produção a 164/ano (GAMA 2024 Annual Report: 164 C172 entregues)
+  configuration: conventional    # asa alta escorada, monomotor a pistão: dentro da base do Eastlake (GA) → L0 confiança média
+  materials:
+    al2024_t3:
+      base: al2024_t3
+      price:                     # 2024-T3 Alclad 0.032" 4'x12' = $289.00, 0.461 lb/ft² → 10.04 kg → $28.8/kg
+        usd_per_kg: 28.8
+        year: 2026
+        provenance: {source_url: "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+                     retrieved: "2026-10-28", source_type: distributor}
+    cf_fabric_vari:              # laminado tecido de carbono/epóxi por infusão a vácuo (VARI)
+      kind: composite
+      rho: 1452.5                # Suranaree J. Sci. Technol. (artigo 12583): VARI Vf 45 %, vazios 1.2–1.5 %
+      E: 35.63e9
+      Ftu: 268.3e6
+      t_min: 0.00025
+      price:                     # Wf = 0.45·1.76/1.4525 = 0.545 (ρf T300 1.76) → 0.545·142.5 + 0.455·34.3
+        usd_per_kg: 93.3         # tecido 282 3K $32.55/yd (5.8 oz/yd², 50") = $142.5/kg; Aeropoxy PR2032/PH3660
+        year: 2026               # 5 gal + 2 gal ≈ $34.3/kg (densidade do endurecedor = resina, PRESSUPOSTO)
+        provenance: {source_url: "https://www.aircraftspruce.com/catalog/cmpages/bigraphite.php",
+                     retrieved: "2026-10-28", source_type: distributor,
+                     notes: "resina: https://www.aircraftspruce.com/catalog/cmpages/aeropoxy.php; propriedades: https://ph04.tci-thaijo.org/index.php/SUJST/article/view/12583"}
+  groups: {default: al2024_t3}
+  process_inputs:
+    cnc_machining:
+      prices:                    # chapa grossa 0.250" 4'x12' = $1968, 3.6 lb/ft² → $25.1/kg
+        al2024_t3: {usd_per_kg: 25.1, year: 2026,
+                    provenance: {source_url: "https://www.aircraftspruce.com/catalog/mepages/alumsheet_2024t3.php",
+                                 retrieved: "2026-10-28", source_type: distributor}}
+  tooling: eastlake
+  validation: {price_usd: 499000, year: 2025,
+               source: "fliegermagazin 2025-05-05: Cessna 172 Skyhawk list price USD 499,000"}
+pareto:
+  cost_metric: bottom_up
+  ws_factors: [0.8, 0.9, 1.0]    # o W/S base viola a perda no modelo handbook (sem calibração low-fi)
+  AR_values: [6.5, 7.32, 8.5]
+  options:
+    metal (Al 2024-T3, chapa rebitada / CNC): {weights_material: metal}
+    compósito (tecido CF/epóxi, infusão):
+      weights_material: composite
+      manufacturing: {groups: {default: cf_fabric_vari}}

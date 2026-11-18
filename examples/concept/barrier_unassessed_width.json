@@ -1,0 +1,8 @@
+{
+  "_comment": "Same geometry without sweep_width_km → POD metric unassessed (unknown ≠ zero). Documents that inventing Gabbiano W is forbidden.",
+  "barrier_length_km": 80.0,
+  "speed_m_s": 40.0,
+  "evader_speed_m_s": 5.144,
+  "crossing_window_h": 1.2,
+  "n_on_station": 1.0
+}

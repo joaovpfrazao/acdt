@@ -1,0 +1,121 @@
+# G5 run (HANDOFF §4b). Same mission as examples/uav_gasoline_150kg.yaml, with the illustrative
+# flying-wing assembly attached. Uniform scaling: the optimiser may change W/S, not the drawing AR.
+# This file is the optimisation problem for that run. It is not a product study.
+name: UAV gasolina 150 kg — asa voadora com winglets/trem opt-in
+description: >
+  UAV de asa fixa com motor a gasolina de 2 tempos e hélice propulsora, trem triciclo fixo,
+  descolagem/aterragem em pista. Payload EO/IR + SAR ligeiro. Valores ilustrativos.
+  Opt-in P1 (9 nov 2026): montagem examples/integration/flying_wing_pusher_closed.json
+  (fuselagem alongada PRESSUPOSTO) com options.flying_wing.size_winglets → c_vt Raymer Eq. 6.29
+  e place_gear → triciclo (Raymer Ch. 11 / 14 CFR 23.925). O exemplo sem a flag
+  (uav150_flying_wing.yaml) permanece inalterado. PRESSUPOSTO ilustrativo — não valida uma aeronave real.
+aircraft_class: uav_tactical_recce_ucav
+requirements:
+  propulsion_type: piston_prop
+  regulatory_category: easa_specific
+  payload_mass: {target: 30, unit: kg}
+  endurance: {min: 10, unit: h}
+  cruise_speed: {target: 45, unit: m/s}
+  cruise_altitude: {target: 3000, unit: m}
+  stall_speed: {max: 26, unit: m/s}
+  climb_rate: {min: 3.0, unit: m/s}
+  service_ceiling: {min: 5000, unit: m}
+  takeoff_ground_roll: {max: 300, unit: m}
+assumptions:
+  weights:
+    method: components
+    initial_class: uav_tactical_recce_ucav
+    components:
+      material: composite
+      structural_category: utility
+      landing_gear: tricycle
+      main_gear_length_m: 0.35
+      nose_gear_length_m: 0.30
+      engine_kW_per_kg: 0.9
+      avionics_uninstalled_kg: 6
+      n_tanks: 1
+      items:
+        - {name: gerador/alternador + regulador, mass_kg: 2.0, group: equipment}
+        - {name: servos (6) + cablagem de sinal, mass_kg: 2.5, group: equipment}
+        - {name: suporte do payload + amortecimento, mass_kg: 1.5}
+        - {name: bateria de backup (avionics), mass_kg: 1.5, group: equipment}
+      growth_allowance: 0.05
+  aero:
+    fidelity: lowfi
+    AR: 16
+    taper: 0.6
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 4415
+    clmax_airfoil: 1.5
+    flap: {kind: plain, flapped_area_ratio: 0.5}
+    roughness: smooth_molded_composite
+    laminar: {wing: 0.30, htail: 0.30, vtail: 0.30, fuselage: 0.10}
+    extra_drag_areas_m2: {fixed_gear: 0.03, gimbal_eo_ir: 0.012, antennas_misc: 0.004}
+  geometry:
+    # Explicit dihedral matches the drawn wing in flying_wing_pusher.json (2°); required for
+    # hq:spiral to be assessed (Etkin & Reid / Nelson via AVL Clβ). Unknown≠pass.
+    dihedral_deg: 2.0
+    # The fixed-type model still carries a horizontal tail (the scissor is written for one).
+    # The body is the centerbody: narrower than the 0.40 m pod, so the fuselage Cnβ
+    # (Raymer Eq. 16.47) is smaller.
+    fuselage_length_m: 3.4
+    fuselage_diameter_m: 0.34
+    c_ht: 0.55
+    # Fixed-type vertical volume (Raymer Eq. 6.29). The drawn winglets are only about 0.03;
+    # 0.03 left the dutch roll unstable. Since hq:* read the assembly, this volume only feeds the
+    # fixed-type record (res.dynamics['fixed_type']) and the fixed-type weights.
+    c_vt: 0.10
+    # At constant c_VT, C_nr grows with l_VT/b (Nelson: C_nr = −2 V_v (l_v/b) C_Lα_v) while
+    # C_nβ stays with the volume. 0.50 L left ζ_d = 0.063, under the Table VI floor of 0.08.
+    tail_arm_fraction: 0.80
+  stability:
+    stations:
+      # Pusher, not Roskam's tractor station (Part V Table 8.1, 8 % L). The engine mass is at the
+      # propeller, aft on the centerbody. PRESSUPOSTO: 72 % L. Avionics stay forward so the
+      # component pitch inertia (Roskam Part V Ch. 10) is not a single point.
+      engine_installed: [L, 0.72]
+      propeller: [L, 0.92]
+      motor_esc: [L, 0.70]
+      avionics: [L, 0.12]
+      electrical: [L, 0.16]
+      harness: [L, 0.20]
+      # Payload and fuel on the fixed-mass CG (Raymer 2018 Sec. 15.1): a tank at 30 % MAC would
+      # sit ahead of the pusher and widen the CG travel past the Raymer Ch. 11 nose-load band.
+      fuel: [balance, 0]
+  propulsion:
+    eta_cruise: 0.78
+  assembly:
+    file: ../integration/flying_wing_pusher_closed.json
+    options:
+      scaling: uniform
+      close_on: nominal
+      check_pessimistic: true
+      K_source: avl
+      static_margin_min: 0.05
+      # Wing station for 10 % minimum static margin (Raymer Sec. 16.3). The gasoline engine
+      # mass sits on the pusher disc, aft of the as-drawn neutral point.
+      flying_wing:
+        size_winglets: true
+        # Tip winglets: c_VT is Raymer Eq. 6.29 directional volume. Dutch-roll ζ also needs
+        # C_nr ∝ (l_v/b) (Nelson); tip fins have short arms so the PRESSUPOSTO target is raised
+        # above the 0.10 fixed-type volume. hq:* remain the MIL-F-8785C judge.
+        c_vt: 0.22
+        place_gear: true
+        # Raymer Ch. 11 8–15 % nose band is empty for this CG travel vs 15° tip-back
+        # (b_min > b_max). PRESSUPOSTO wider band so placement is assessable; residual noted
+        # in the flying_wing report. extend_fuselage alone cannot fix an empty tip-back band.
+        gear:
+          tipback_deg: 15.0
+          nose_fraction: [0.05, 0.22]
+        extend_fuselage_for_gear: false
+      balance:
+        static_margin: 0.10
+certification:
+  safety:
+    t_flight_h: 10
+    baseline: {backup_battery: true}
+    unit: {battery_kg: 1.5}
+  sora:
+    population: "<50"
+    aec: 5

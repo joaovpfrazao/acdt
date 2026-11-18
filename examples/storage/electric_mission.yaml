@@ -1,0 +1,28 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative study; no published aircraft/pack/tank data claimed.
+name: electric_mission
+aircraft:
+  source: PRESSUPOSTO analytic electric candidate, terminal energy includes chain
+    losses
+  mass_kg: 20
+  S_m2: 1.2
+  CD0: 0.03
+  K: 0.04
+  CLmax: 1.4
+  propulsion:
+    kind: electric
+    P_sl_W: 8000
+    eta_cruise: 0.7
+    eta_takeoff: 0.55
+    eta_tot: 0.7
+    n_engines: 1
+    P_systems_W: 0
+    battery_Wh: 800
+pointmass_dt: 2
+initial:
+  altitude_m: 300
+segments:
+- type: cruise
+  time_min: 2
+  speed_m_s: 25
+  altitude_m: 300

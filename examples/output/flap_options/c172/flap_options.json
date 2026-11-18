@@ -1,0 +1,243 @@
+{
+ "rows": [
+  {
+   "option": "none",
+   "converged": true,
+   "feasible": true,
+   "W0": 1273.0719207095146,
+   "We": 827.4948151092175,
+   "Wf_or_battery": 183.57710557912336,
+   "S": 21.736609374684214,
+   "P_sl_kW": 125.93248700534548,
+   "W/S": 574.3568620120789,
+   "LD_max": 13.803242059063,
+   "CL_LDmax": 0.7744651711247992,
+   "CLmax_landing": 1.5378524711590986,
+   "unit_cost": 258995.80360998618,
+   "active": [
+    "Cruzeiro 63 m/s @ 2438 m",
+    "Perda 24.7 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 61.7757571375044,
+   "endurance_h": 5.939573914290523,
+   "range_km": 1296.2129113645033
+  },
+  {
+   "option": "plain",
+   "converged": true,
+   "feasible": true,
+   "W0": 1137.8001977766298,
+   "We": 709.9149848358564,
+   "Wf_or_battery": 165.88521292705116,
+   "S": 13.759259044801318,
+   "P_sl_kW": 114.60255019399501,
+   "W/S": 810.9454348664243,
+   "LD_max": 11.805107720124658,
+   "CL_LDmax": 0.9014489722784768,
+   "CLmax_landing": 2.1713198540957936,
+   "unit_cost": 233262.58293488307,
+   "active": [
+    "Cruzeiro 63 m/s @ 2438 m",
+    "Perda 24.7 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 61.9520756887603,
+   "endurance_h": 5.904199700628606,
+   "range_km": 1296.8164944169157
+  },
+  {
+   "option": "camber",
+   "converged": true,
+   "feasible": true,
+   "W0": 1160.7828346383812,
+   "We": 730.2295086170515,
+   "Wf_or_battery": 168.5533259881226,
+   "S": 15.129509600420295,
+   "P_sl_kW": 116.14508605682973,
+   "W/S": 752.3965604932927,
+   "LD_max": 12.219299368733118,
+   "CL_LDmax": 0.8970125900094603,
+   "CLmax_landing": 2.0145574537128788,
+   "unit_cost": 243541.97369022452,
+   "active": [
+    "Cruzeiro 63 m/s @ 2438 m",
+    "Perda 24.7 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 62.05262632891095,
+   "endurance_h": 5.919112427443234,
+   "range_km": 1297.3846560199909,
+   "camber": {
+    "kind": "camber",
+    "flapped_area_ratio": 0.5996132211880792,
+    "flap_area_m2": 1.9078400000000002,
+    "dCLmax": 0.12671026590146486,
+    "delta_max_deg": 15.0,
+    "dCD_min": -0.00047338449141616555,
+    "CL_at_dCD_min": 1.455430862647276,
+    "dcm0_per_deg": -0.008913333333333332,
+    "schedule": [
+     {
+      "CL": 0.0,
+      "delta_deg": -2.5,
+      "dCD": -2.507704446239843e-06
+     },
+     {
+      "CL": 0.12386645639551286,
+      "delta_deg": -2.5,
+      "dCD": -7.53588602690125e-06
+     },
+     {
+      "CL": 0.24773291279102572,
+      "delta_deg": -2.5,
+      "dCD": -6.285231443524509e-06
+     },
+     {
+      "CL": 0.3715993691865386,
+      "delta_deg": -2.5,
+      "dCD": -7.442874916362114e-06
+     },
+     {
+      "CL": 0.49546582558205143,
+      "delta_deg": -2.5,
+      "dCD": -3.5192763909781837e-06
+     },
+     {
+      "CL": 0.6193322819775643,
+      "delta_deg": -2.5,
+      "dCD": -2.1902692978828874e-06
+     },
+     {
+      "CL": 0.7431987383730772,
+      "delta_deg": -2.5,
+      "dCD": -6.648921966898377e-06
+     },
+     {
+      "CL": 0.86706519476859,
+      "delta_deg": 0.0,
+      "dCD": 0.0
+     },
+     {
+      "CL": 0.9909316511641029,
+      "delta_deg": 5.0,
+      "dCD": -0.00031418263216635424
+     },
+     {
+      "CL": 1.1147981075596158,
+      "delta_deg": 5.0,
+      "dCD": -0.00034652307040551194
+     },
+     {
+      "CL": 1.2386645639551286,
+      "delta_deg": 5.0,
+      "dCD": -0.0003351712176274535
+     },
+     {
+      "CL": 1.3625310203506413,
+      "delta_deg": 5.0,
+      "dCD": -0.0003935596950645666
+     }
+    ],
+    "section_source": "XFOIL 6.99",
+    "notes": [
+     "camber flap camber: c_f/c 0.20, \u03b7 0.00\u20130.65, S_flapped/S 0.60; polars XFOIL 6.99 at Re 5e+06 (cruise) and 2.2e+06 (stall); span loading AVL 3.40 (VLM), 2 \u00e2ngulos",
+     "\u0394cm0 -0.0089/\u00b0 de flap (sec\u00e7\u00e3o) \u2014 arrasto de compensa\u00e7\u00e3o n\u00e3o inclu\u00eddo (limita\u00e7\u00e3o)"
+    ]
+   }
+  },
+  {
+   "option": "plain_same_area",
+   "converged": true,
+   "feasible": true,
+   "W0": 1160.7165410346215,
+   "We": 730.1501713161533,
+   "Wf_or_battery": 168.56636971492318,
+   "S": 15.126356214430048,
+   "P_sl_kW": 116.16365006817675,
+   "W/S": 752.5104331655504,
+   "LD_max": 12.210563475820264,
+   "CL_LDmax": 0.8713078338002196,
+   "CLmax_landing": 2.014868233732725,
+   "unit_cost": 237666.4761844107,
+   "active": [
+    "Cruzeiro 63 m/s @ 2438 m",
+    "Perda 24.7 m/s"
+   ],
+   "failed": [],
+   "flap_system_kg": 0,
+   "V_max": 62.05468667485319,
+   "endurance_h": 5.91566661857735,
+   "range_km": 1297.375210066666
+  }
+ ],
+ "selected": "plain",
+ "objective": "W0",
+ "objective_key": "W0",
+ "justified": true,
+ "min_gain": 0.01,
+ "deltas": {
+  "none": {
+   "W0": 135.2717229328848,
+   "We": 117.57983027336104,
+   "Wf_or_battery": 17.691892652072198,
+   "S": 7.977350329882896,
+   "P_sl_kW": 11.329936811350464,
+   "LD_max": 1.9981343389383426,
+   "unit_cost": 25733.220675103104,
+   "V_max": -0.17631855125590334,
+   "endurance_h": 0.03537421366191662,
+   "range_km": -0.6035830524124322,
+   "vs": "plain"
+  },
+  "plain": {
+   "W0": -22.916343257991684,
+   "We": -20.235186480296875,
+   "Wf_or_battery": -2.681156787872027,
+   "S": -1.36709716962873,
+   "P_sl_kW": -1.5610998741817355,
+   "LD_max": -0.40545575569560555,
+   "unit_cost": -4403.893249527639,
+   "V_max": -0.1026109860928841,
+   "endurance_h": -0.011466917948744104,
+   "range_km": -0.5587156497504111,
+   "vs": "plain_same_area"
+  },
+  "camber": {
+   "W0": 22.982636861751416,
+   "We": 20.31452378119502,
+   "Wf_or_battery": 2.6681130610714376,
+   "S": 1.370250555618977,
+   "P_sl_kW": 1.5425358628347112,
+   "LD_max": 0.41419164860846003,
+   "unit_cost": 10279.390755341446,
+   "V_max": 0.10055064015064374,
+   "endurance_h": 0.014912726814627852,
+   "range_km": 0.5681616030751684,
+   "vs": "plain"
+  },
+  "plain_same_area": {
+   "W0": 22.916343257991684,
+   "We": 20.235186480296875,
+   "Wf_or_battery": 2.681156787872027,
+   "S": 1.36709716962873,
+   "P_sl_kW": 1.5610998741817355,
+   "LD_max": 0.40545575569560555,
+   "unit_cost": 4403.893249527639,
+   "V_max": 0.1026109860928841,
+   "endurance_h": 0.011466917948744104,
+   "range_km": 0.5587156497504111,
+   "vs": "plain"
+  }
+ },
+ "notes": [
+  "plain_same_area: flap simples (Raymer plain) com a mesma \u00e1rea que camber (S_flapped/S 0.60) \u2014 isola o ganho do escalonamento de camber do ganho de \u00e1rea de flap"
+ ],
+ "files": {
+  "camber_camber": "examples/output/flap_options/c172/camber_camber.png",
+  "design_point_shift": "examples/output/flap_options/c172/design_point_shift.png"
+ }
+}

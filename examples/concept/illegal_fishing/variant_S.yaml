@@ -1,0 +1,151 @@
+# Estudo conceptual "pesca ilegal" — variante S
+# payload 3.0 kg = IMSAR NSP-2 2.1 kg + Trillium HD25 0.39 kg (trilliumeng.com) + 0.5 kg suportes (PRESSUPOSTO)
+# systems_power_W 90 = 30 (exemplo base) + NSP-2 ≤56 W (imsar.com) arredondado — PRESSUPOSTO
+name: 'Pesca ilegal — S: elétrico 25 kg, NSP-2 + HD25 (lançado de navio)'
+description: 'Variante S (derivada de uav_endurance_payload): catapulta/rede a partir
+  de um navio.'
+aircraft_class: uav_small
+requirements:
+  propulsion_type: electric
+  regulatory_category: easa_specific
+  payload_mass:
+    target: 3.0
+    unit: kg
+  endurance:
+    min: 2.5
+    unit: h
+  cruise_speed:
+    target: 22
+    unit: m/s
+  cruise_altitude:
+    target: 600
+    unit: m
+  stall_speed:
+    max: 13
+    unit: m/s
+  climb_rate:
+    min: 3.0
+    unit: m/s
+  service_ceiling:
+    min: 3000
+    unit: m
+  wing_span:
+    max: 4.2
+    unit: m
+  mtow:
+    max: 25
+    unit: kg
+assumptions:
+  weights:
+    method: components
+    initial_class: uav_small
+    components:
+      material: composite
+      structural_category: utility
+      landing_gear: none
+      min_areal_density_kg_m2: 0.9
+      propeller_mass_kg: 0.08
+      items:
+      - name: paraquedas de recuperação + ejetor
+        mass_kg: 1.0
+      - name: suporte/amortecimento do gimbal
+        mass_kg: 0.3
+      - name: datalink C2 + antenas
+        mass_kg: 0.25
+        group: equipment
+      - name: GNSS + bússola (x2)
+        mass_kg: 0.1
+        group: equipment
+      - name: pitot/ADS-B
+        mass_kg: 0.1
+        group: equipment
+      - name: cablagem de sinal + conectores
+        mass_kg: 0.3
+        group: equipment
+      - name: ferragens/fixações/pintura
+        mass_kg: 0.4
+      growth_allowance: 0.1
+  aero:
+    fidelity: lowfi
+    AR: 14
+    taper: 0.6
+    tc_root: 0.13
+    tc_tip: 0.11
+    airfoil: NACA 4412
+    clmax_airfoil: 1.45
+    flap:
+      kind: plain
+      flapped_area_ratio: 0.5
+    roughness: smooth_molded_composite
+    laminar:
+      wing: 0.3
+      htail: 0.3
+      vtail: 0.3
+      fuselage: 0.1
+    extra_drag_areas_m2:
+      gimbal_eo_ir: 0.006
+      antennas_pitot: 0.002
+    cfe: 0.0055
+    swet_sref: 3.5
+  propulsion:
+    battery_Wh_kg: 200
+    eta_total: 0.62
+    dod: 0.85
+    energy_reserve: 0.2
+    eta_cruise: 0.8
+    eta_climb: 0.75
+    systems_power_W: 90
+  geometry:
+    fuselage_length_m: 1.8
+    fuselage_diameter_m: 0.22
+    c_ht: 0.5
+    c_vt: 0.03
+    tail_arm_fraction: 0.55
+  constraints:
+    ws_initial_psf: 6
+systems:
+  bus_cells_series: 8
+  cell_chemistry: li_ion
+  n_motors: 1
+  pack_overhead: 1.2
+  propeller:
+    blades: 2
+    D_max_m: 0.56
+    cp_static: 0.05
+    J_cruise: 0.7
+    tip_mach_limit: 0.6
+  motor:
+    power_margin: 1.2
+    kv_tolerance: 0.3
+    load_ratio: 0.85
+    eta_motor: 0.85
+  servos:
+    v_bus: 8.4
+    Ch_alpha: -0.25
+    Ch_delta: -0.6
+    alpha_deg: 8
+    delta_deg: 25
+    factor_of_safety: 1.5
+  autopilot:
+    min_imu: 3
+    min_baro: 2
+    min_can: 1
+    firmware: ardupilot
+  loads:
+  - name: GNSS + compass (x2)
+    power_w: 1.5
+  - name: C2 datalink radio
+    power_w: 6
+    peak_w: 10
+  - name: payload EO/IR gimbal
+    power_w: 15
+    peak_w: 30
+    bus: payload
+  - name: airspeed + ADS-B out
+    power_w: 2
+  harness:
+    battery_to_esc_m: 0.4
+    pdb_to_autopilot_m: 0.3
+    pdb_to_servo_rail_m: 1.5
+    max_drop_fraction: 0.03
+  close_loop: true

@@ -1,0 +1,131 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Todos os valores novos são PRESSUPOSTOS ilustrativos, não dados publicados.
+# Opt-in L0 thermal / CG / spatial / FOV closure on the common electric path.
+schema_version: '1.0'
+model: prop
+onboard:
+  schema_version: '1.0'
+  source: 'PRESSUPOSTO: exemplo de fecho térmico/CG/espacial/FOV; substituir por dados do fornecedor'
+  items:
+  - id: instrument
+    role: payload
+    mass_kg: 1.0
+    mass_accounting: incremental
+    volume_m3: 0.002
+    heat_W: 20
+    source: 'PRESSUPOSTO: payload EO/IR stub'
+  - id: avionics
+    role: equipment
+    mass_kg: 0.8
+    mass_accounting: incremental
+    volume_m3: 0.0015
+    heat_W: 15
+    source: 'PRESSUPOSTO: flight computer + radio'
+  loads:
+  - id: instrument_load
+    item_id: instrument
+    source_id: bus
+    power_W: 50
+    peak_W: 100
+    duty: 0.5
+    source: 'PRESSUPOSTO'
+  - id: avionics_load
+    item_id: avionics
+    source_id: bus
+    power_W: 30
+    peak_W: 40
+    duty: 1.0
+    source: 'PRESSUPOSTO'
+  sources:
+  - id: bus
+    kind: main_battery
+    delivery_efficiency: 0.9
+    continuous_W: 1000
+    peak_W: 1000
+    source: 'PRESSUPOSTO'
+aircraft:
+  name: PRESSUPOSTO common electric with closure
+  aircraft_class: uav_small
+  requirements:
+    propulsion_type: electric
+    payload_mass: {target: 4, unit: kg}
+    endurance: {min: 0.5, unit: h}
+    cruise_speed: {target: 22, unit: m/s}
+    cruise_altitude: {target: 300, unit: m}
+    stall_speed: {max: 13, unit: m/s}
+    climb_rate: {min: 2, unit: m/s}
+  assumptions:
+    aero: {fidelity: handbook}
+    weights: {method: statistical, initial_class: uav_small}
+    propulsion: {systems_power_W: 0}
+    geometry: {fuselage_length_m: 1.8, fuselage_diameter_m: 0.22}
+closure:
+  schema_version: '1.0'
+  source: 'PRESSUPOSTO: open primitives for L0 screening; not CAD or certified envelope'
+  thermal:
+    heat_mode: declared_plus_conversion
+    source: 'PRESSUPOSTO: declared item heat + distribution I²R/conversion from delivery_efficiency'
+    sinks:
+    - id: ram_scoop
+      kind: ram_air
+      mass_flow_kg_s: 0.004
+      cp_J_kgK: 1004
+      delta_T_K: 15
+      source: 'PRESSUPOSTO: Q=mdot*cp*dT screening (Incropera & DeWitt identity)'
+    - id: skin_capacity
+      kind: capacity
+      available_W: 10
+      source: 'PRESSUPOSTO: residual conduction/radiation budget'
+  cg:
+    source: 'PRESSUPOSTO: remainder base mass at empty CG; envelope is design band not certified'
+    base:
+      # filled by runner after sizing OR use explicit remainder — example uses a fixed
+      # PRESSUPOSTO remainder that the check_examples script reconciles; for the YAML
+      # standalone demo we set a placeholder overwritten in tests when coupling to MTOW.
+      mass_kg: 17.531  # PRESSUPOSTO remainder ≈ MTOW(19.331) − items(1.8); re-check if aircraft changes
+      cg_m: [0.55, 0.0, 0.0]
+      source: 'PRESSUPOSTO: airframe+propulsion remainder (update to MTOW − onboard items)'
+    placements:
+      instrument: {position_m: [0.35, 0.0, -0.05], cg_offset_m: [0, 0, 0]}
+      avionics: {position_m: [0.70, 0.0, 0.02], cg_offset_m: [0, 0, 0]}
+    envelope:
+      x_m: {min: 0.45, max: 0.70}
+  spatial:
+    source: 'PRESSUPOSTO: open bay boxes, not a closed payload catalog'
+    bays:
+    - id: nose_bay
+      box: {lo: [0.20, -0.08, -0.10], hi: [0.50, 0.08, 0.05]}
+      max_packing_fraction: 0.6
+      source: 'PRESSUPOSTO'
+    - id: mid_bay
+      box: {lo: [0.55, -0.08, -0.08], hi: [0.90, 0.08, 0.08]}
+      max_packing_fraction: 0.5
+      source: 'PRESSUPOSTO'
+    placements:
+      instrument: {size_m: [0.18, 0.12, 0.10], position_m: [0.35, 0.0, -0.05], bay: nose_bay}
+      avionics: {size_m: [0.15, 0.10, 0.08], position_m: [0.70, 0.0, 0.02], bay: mid_bay}
+  fov:
+    source: 'PRESSUPOSTO: look-down sensor vs landing-gear/sphere blocker primitives'
+    sensors:
+    - item_id: instrument
+      name: look_down
+      position_m: [0.35, 0.0, -0.05]
+      aperture_offset_m: [0.0, 0.0, -0.05]
+      az_deg: [-40, 40]
+      el_deg: [-70, -15]
+      step_deg: 10
+      max_blocked_frac: 0.15
+      source: 'PRESSUPOSTO'
+    blockers:
+    - id: nose_gear
+      kind: box
+      # forward of look-down aperture (x=0.35,z=-0.10) so baseline FOV clears
+      box: {lo: [0.05, -0.03, -0.25], hi: [0.12, 0.03, -0.08]}
+      opacity: 1.0
+      source: 'PRESSUPOSTO'
+    - id: prop_spinner
+      kind: sphere
+      center: [0.05, 0.0, 0.0]
+      radius_m: 0.08
+      opacity: 1.0
+      source: 'PRESSUPOSTO'

@@ -1,0 +1,82 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Illustrative PRESSUPOSTO study only; never flight planning or certification data.
+configuration_id: illustrative-transport-candidate-A
+aircraft_class: jet_transport
+payload_kg: 15000
+crew_kg: 800
+mass_bounds_kg:
+- 40000
+- 110000
+mtow_limit_kg: 78000
+wing_area_m2: 122.6
+aspect_ratio: 9.48
+mach: 0.79
+altitude_m: 11277.6
+range_m: 5000000
+thrust_sl_N: 120000
+n_engines: 2
+cd0: 0.02
+oswald: 0.82
+reserve_fraction: 0.06
+wave:
+  thickness_ratio: 0.12
+  sweep_deg: 25
+  technology_factor: 0.95
+assumption_sources:
+  payload_kg: 'PRESSUPOSTO: study mission payload, not a published A320 number'
+  crew_kg: 'PRESSUPOSTO: crew outside statistical We'
+  range_m: 'PRESSUPOSTO: design mission, no real-aircraft range validation'
+  mtow_limit_kg: 'PRESSUPOSTO: study constraint, not regulatory compliance'
+  geometry_and_engine_class: Public class context in examples/jet/a320_ref.json; not
+    a matched certified configuration
+  cd0: 'PRESSUPOSTO: clean baseline polar, fixed during the solve'
+  oswald: 'PRESSUPOSTO: fixed efficiency, no geometry-dependent structural mass'
+  wave: 'PRESSUPOSTO: equivalent supercritical strip, half-chord sweep'
+performance:
+  ground:
+    altitude_m: 0
+    liftoff_speed_m_s: 80
+    cl_max: 2.0
+    cl_ground: 0.6
+    mu_roll: 0.02
+    oswald: 0.8
+    delta_cd_flaps: 0.015
+    delta_cd_gear: 0.015
+    thrust_factor: 1.0
+    obstacle_height_m: 10.668
+    max_ground_run_m: 1800
+  climb_points:
+  - name: gear-up-takeoff-screen
+    altitude_m: 0
+    speed_m_s: 80
+    mass_fraction: 1.0
+    cl_max: 2
+    oswald: 0.8
+    delta_cd_flaps: 0.015
+    delta_cd_gear: 0
+    delta_cd_windmilling: 0.003
+    delta_cd_oei_trim: 0.002
+    thrust_factor: 1.0
+    min_oei_gradient: 0.024
+    reference_clause: 25.121(b)
+  - name: final-takeoff-screen
+    altitude_m: 450
+    speed_m_s: 95
+    mass_fraction: 0.99
+    cl_max: 1.5
+    oswald: 0.82
+    delta_cd_flaps: 0
+    delta_cd_gear: 0
+    delta_cd_windmilling: 0.003
+    delta_cd_oei_trim: 0.002
+    thrust_factor: 0.9
+    min_oei_gradient: 0.012
+    reference_clause: 25.121(c)
+  assumption_sources:
+    all_settings: PRESSUPOSTO illustrative engineering study; NOT a calibrated A320
+      config or validated VLOF/V2/VFTO
+    mu_roll: ERAU public textbook dry pavement approximate .02, consulted 2026-11-07
+    drag_increments: PRESSUPOSTO .015 flap/gear, .003 windmilling, .002 OEI trim;
+      no supplier data
+    thrust_factor: PRESSUPOSTO 1 takeoff, .9 final point; no validated max-continuous
+      deck

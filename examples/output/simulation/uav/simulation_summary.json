@@ -1,0 +1,454 @@
+{
+ "controls": {
+  "layout_sized": {
+   "aileron_span_fraction": 0.15,
+   "aileron_cf_c": 0.25,
+   "flap_cf_c": 0.25,
+   "elevator_cf_c": 0.19999999999999996,
+   "rudder_cf_c": 0.19999999999999996
+  },
+  "layout_current": {
+   "aileron_span_fraction": 0.35,
+   "aileron_cf_c": 0.25,
+   "flap_cf_c": 0.25,
+   "elevator_cf_c": 0.30000000000000004,
+   "rudder_cf_c": 0.35
+  },
+  "files": {
+   "controls_json": "examples/output/simulation/uav/controls/controls.json",
+   "roll": "examples/output/simulation/uav/controls/controls_roll.png",
+   "trim": "examples/output/simulation/uav/controls/controls_trim.png"
+  }
+ },
+ "segments": [
+  {
+   "segment": "takeoff",
+   "type": "takeoff",
+   "t_min": 0.033333333333333354,
+   "dist_km": 0.037286362503444324,
+   "used_Wh": 0.17079264645951378,
+   "h0_m": 15.24,
+   "h1_m": 15.175535928065354,
+   "extrapolated_min": 0.0,
+   "V_target_m_s": 0.0,
+   "Va_mean_m_s": 19.176382707462174,
+   "nz_max": 1.1260901436518378,
+   "nz_min": 0.7795891714235234,
+   "alpha_max_deg": 0.4457135311023306,
+   "stall_time_s": 0.0,
+   "beta_max_deg": 11.438011681610098,
+   "de_max_deg": 1.8224845204691564,
+   "de_sat_pct": 0.0,
+   "da_max_deg": 14.94113294241235,
+   "da_sat_pct": 0.0,
+   "dr_max_deg": 23.950680153298663,
+   "dr_sat_pct": 0.0,
+   "throttle_sat_pct": 0.0,
+   "aft_clearance": {
+    "status": "nao_avaliado",
+    "note": "sem amostras com o trem principal perto do solo"
+   },
+   "notes": [
+    "sem trem: lançamento (catapulta/mão) a 1.3 V_S,TO = 18.9 m/s, 15.2 m (PRESSUPOSTO)"
+   ],
+   "quasi_steady_Wh": null,
+   "k_energy": null
+  },
+  {
+   "segment": "climb",
+   "type": "climb",
+   "t_min": 1.5159999999999774,
+   "dist_km": 1.5586847195100302,
+   "used_Wh": 39.37180096794193,
+   "h0_m": 15.175535928065354,
+   "h1_m": 297.11416507708174,
+   "extrapolated_min": 0.0,
+   "V_target_m_s": 17.892310693381766,
+   "Va_mean_m_s": 17.99061073787466,
+   "nz_max": 1.6608870572626544,
+   "nz_min": 0.24831715021829873,
+   "alpha_max_deg": 12.361603562321983,
+   "stall_time_s": 0.0,
+   "beta_max_deg": 3.785420055550618,
+   "de_max_deg": 25.0,
+   "de_sat_pct": 0.10989010989010989,
+   "da_max_deg": 6.771132296581649,
+   "da_sat_pct": 0.0,
+   "dr_max_deg": 9.2257348594148,
+   "dr_sat_pct": 0.0,
+   "throttle_sat_pct": 99.67032967032966,
+   "notes": [],
+   "quasi_steady_Wh": 37.469476466238994,
+   "k_energy": 1.0507699781558726
+  },
+  {
+   "segment": "waypoints",
+   "type": "waypoints",
+   "t_min": 5.988999999998,
+   "dist_km": 7.5512358570381135,
+   "used_Wh": 43.279939112190334,
+   "h0_m": 297.11416507708174,
+   "h1_m": 296.9787800020973,
+   "extrapolated_min": 0.0,
+   "V_target_m_s": 19.64838400189386,
+   "Va_mean_m_s": 19.80461552904435,
+   "nz_max": 1.6796318512157695,
+   "nz_min": 0.3509793144306349,
+   "alpha_max_deg": 9.85508472981082,
+   "stall_time_s": 0.0,
+   "beta_max_deg": 4.062526973220965,
+   "de_max_deg": 8.43510457145843,
+   "de_sat_pct": 0.0,
+   "da_max_deg": 25.0,
+   "da_sat_pct": 0.13915947676036738,
+   "dr_max_deg": 9.993852448814959,
+   "dr_sat_pct": 0.0,
+   "throttle_sat_pct": 1.5864180350681882,
+   "n_waypoints": 3,
+   "cross_track_rms_m": 21.85812919054125,
+   "notes": [],
+   "quasi_steady_Wh": 39.111049495857216,
+   "k_energy": 1.106591095612883
+  },
+  {
+   "segment": "loiter",
+   "type": "loiter",
+   "t_min": 120.00000000000364,
+   "dist_km": 130.4003331490588,
+   "used_Wh": 782.8833286169706,
+   "h0_m": 296.9787800020973,
+   "h1_m": 296.88460162046175,
+   "extrapolated_min": 118.83300000000091,
+   "V_target_m_s": 19.64838400189386,
+   "Va_mean_m_s": 19.91528815853578,
+   "nz_max": 1.8438427852374635,
+   "nz_min": 0.30207902389739233,
+   "alpha_max_deg": 12.306402664465017,
+   "stall_time_s": 0.0,
+   "beta_max_deg": 4.687196757903681,
+   "de_max_deg": 15.746821734407536,
+   "de_sat_pct": 0.0,
+   "da_max_deg": 25.0,
+   "da_sat_pct": 0.5698005698005698,
+   "dr_max_deg": 12.662082403879728,
+   "dr_sat_pct": 0.0,
+   "throttle_sat_pct": 2.9914529914529915,
+   "radius_m": 122.29528519856449,
+   "radial_err_rms_m": 0.37621968051167876,
+   "notes": [
+    "n=1.15 pede φ=30° > 25° disponível — raio dimensionado com o limite"
+   ],
+   "quasi_steady_Wh": 812.734149246258,
+   "k_energy": 0.9632711131223274
+  },
+  {
+   "segment": "descent",
+   "type": "descent",
+   "t_min": 3.6516666667463746,
+   "dist_km": 4.825736355751578,
+   "used_Wh": 2.36550438809118,
+   "h0_m": 296.88460162046175,
+   "h1_m": 59.937547057893156,
+   "extrapolated_min": 0.0,
+   "V_target_m_s": 19.64838400189386,
+   "Va_mean_m_s": 20.00405407648415,
+   "nz_max": 1.990690580617641,
+   "nz_min": -0.44408578134198007,
+   "alpha_max_deg": 15.263119059761847,
+   "stall_time_s": 2.4000000000000004,
+   "beta_max_deg": 3.92532016719546,
+   "de_max_deg": 25.0,
+   "de_sat_pct": 0.8215426745778184,
+   "da_max_deg": 22.64790054373702,
+   "da_sat_pct": 0.0,
+   "dr_max_deg": 9.09069621107658,
+   "dr_sat_pct": 0.0,
+   "throttle_sat_pct": 0.0,
+   "vertical_speed_cmd_m_s": 4.881948416184772,
+   "mode_final": "hold",
+   "notes": [],
+   "quasi_steady_Wh": 2.1796997407384597,
+   "k_energy": 1.0852432304688773
+  },
+  {
+   "segment": "landing",
+   "type": "landing",
+   "t_min": 1.5406666667002962,
+   "dist_km": 2.0382060163407294,
+   "used_Wh": 2.344079715185799,
+   "h0_m": 59.937547057893156,
+   "h1_m": 0.046794809005086604,
+   "extrapolated_min": 0.0,
+   "V_target_m_s": 19.369219571514027,
+   "Va_mean_m_s": 19.684177158613032,
+   "nz_max": 2.413763487653842,
+   "nz_min": -0.7709173112390497,
+   "alpha_max_deg": 10.336497383837447,
+   "stall_time_s": 0.4,
+   "beta_max_deg": 34.533165197611346,
+   "de_max_deg": 25.0,
+   "de_sat_pct": 0.10822510822510822,
+   "da_max_deg": 5.3259369630621425,
+   "da_sat_pct": 0.0,
+   "dr_max_deg": 7.333641164917263,
+   "dr_sat_pct": 0.0,
+   "throttle_sat_pct": 0.0,
+   "V_REF_m_s": 19.369219571514027,
+   "glide_deg": 2.0,
+   "h_flare_m": 1.834754259014853,
+   "flare_tau_s": 2.7142298239570466,
+   "sink_at_touchdown_m_s": 0.7979991837320904,
+   "V_touchdown_m_s": 22.11291264075292,
+   "air_distance_from_15m_m": 438.0628319446483,
+   "ground_roll_m": 151.6053522037246,
+   "touchdown": {
+    "crab_at_flare_deg": -11.383369926863141,
+    "residual_crab_deg": -5.021013359013612,
+    "drift_m_s": 0.10993869936749334,
+    "phi_td_deg": -0.6906944355981595,
+    "track_vs_runway_deg": 0.2554077322339302,
+    "beta_td_deg": 0.4170618096892145,
+    "decrab": false,
+    "main_side_N": {},
+    "main_vertical_peak_N": {},
+    "W_N": 229.67652393762427,
+    "limit_23_485": {
+     "inboard_N": 114.83826196881213,
+     "outboard_N": 75.79325289941602,
+     "source": "14 CFR 23.485(c) (pré-Amdt 23-64; Amdt 23-45): 0,5 W para dentro num lado, 0,33 W para fora no outro, vertical 1,33"
+    },
+    "bumper_contacts_N": {
+     "skid_F": 145.87491870750705,
+     "skid_L": 70.08877053721926,
+     "skid_R": 67.34422990262992,
+     "tail_strike": 12.27557167869407
+    },
+    "side_load_ok": null,
+    "side_load_status": "nao_avaliado",
+    "side_load_note": "sem contacto do trem principal registado na janela do toque (h < 5 m, ≤ 3 s após o toque) — 23.485 não avaliado (não avaliado ≠ passa)",
+    "other_contacts_N": {
+     "skid_F": 145.87491870750705,
+     "skid_L": 70.08877053721926,
+     "skid_R": 67.34422990262992,
+     "tail_strike": 12.27557167869407
+    },
+    "aft_strike_ok": true,
+    "issue": "contacto de para-choques (não-patim) no toque: skid_F, skid_L, skid_R, tail_strike"
+   },
+   "total_from_15m_m": 589.6681841483729,
+   "aft_clearance": {
+    "status": "nao_avaliado",
+    "note": "sem amostras com o trem principal perto do solo"
+   },
+   "notes": [
+    "aproximação: 1x acima de V_REF+3 m/s em ralenti — rampa de 2.0° mais íngreme do que o planeio em ralenti; desacelerou por picada e re-ancorou a rampa (considerar flaps/travões aerodinâmicos ou rampa menor)"
+   ],
+   "quasi_steady_Wh": null,
+   "k_energy": null
+  }
+ ],
+ "total_time_min": 132.73066666678162,
+ "total_dist_km": 146.4114824602027,
+ "total_used_Wh": 870.4154454468394,
+ "unit": "Wh",
+ "aborted": null,
+ "notes": [],
+ "history_columns": [
+  "t",
+  "N",
+  "E",
+  "h",
+  "Va",
+  "Vg",
+  "hdot",
+  "alpha",
+  "beta",
+  "phi",
+  "theta",
+  "psi",
+  "p",
+  "q",
+  "r",
+  "n_z",
+  "n_y",
+  "de",
+  "da",
+  "dr",
+  "throttle",
+  "flap",
+  "brake",
+  "used",
+  "m",
+  "T",
+  "flow",
+  "CL",
+  "stall_sigma",
+  "gear_load",
+  "wN",
+  "wE",
+  "wD",
+  "seg"
+ ],
+ "aft_clearance": {
+  "status": "nao_avaliado",
+  "issue": "sem ponto traseiro (aft_*/tail_strike) ou sem trem principal"
+ },
+ "quasi_steady": {
+  "rows": [
+   {
+    "segment": "takeoff",
+    "dyn": 0.17079264645951378,
+    "qs": null,
+    "k": null
+   },
+   {
+    "segment": "climb",
+    "dyn": 39.37180096794193,
+    "qs": 37.469476466238994,
+    "k": 1.0507699781558726
+   },
+   {
+    "segment": "waypoints",
+    "dyn": 43.279939112190334,
+    "qs": 39.111049495857216,
+    "k": 1.106591095612883
+   },
+   {
+    "segment": "loiter",
+    "dyn": 782.8833286169706,
+    "qs": 812.734149246258,
+    "k": 0.9632711131223274
+   },
+   {
+    "segment": "descent",
+    "dyn": 2.36550438809118,
+    "qs": 2.1796997407384597,
+    "k": 1.0852432304688773
+   },
+   {
+    "segment": "landing",
+    "dyn": 2.344079715185799,
+    "qs": null,
+    "k": null
+   }
+  ],
+  "k_energy_airborne": 0.9735345476910656,
+  "note": "k = consumo 6-DOF / consumo quase-estacionário com o mesmo modelo (segmentos em voo; descolagem/aterragem não comparados)"
+ },
+ "name": "UAV endurance",
+ "handling_qualities": {
+  "V": 19.64838400189386,
+  "h": 297.11416507708174,
+  "modes": {
+   "phugoid": {
+    "wn": 0.5827991821393479,
+    "zeta": 0.050841066667290026,
+    "period_s": 10.79500745572352
+   },
+   "short_period": {
+    "wn": 7.887070396530799,
+    "zeta": 0.6736015935470305,
+    "period_s": 1.0778643200596678
+   },
+   "dutch_roll": {
+    "wn": 3.44083075904235,
+    "zeta": 0.21314438199059033,
+    "period_s": 1.869014995358513
+   },
+   "spiral": {
+    "lambda": 0.07975456618156598,
+    "T_half_s": Infinity,
+    "T2_s": 8.691003082907564
+   },
+   "roll": {
+    "lambda": -13.509469612871005,
+    "tau_s": 0.07402215102858373
+   }
+  },
+  "n_alpha": 7.354098042925483,
+  "CAP": 8.458668768996558,
+  "levels": [
+   {
+    "key": "short_period",
+    "modo": "período curto ζ",
+    "valor": 0.6736015935470305,
+    "nível": 1,
+    "limite N1": "0.30–2.00",
+    "ref": "MIL-F-8785C Table IV"
+   },
+   {
+    "key": "CAP",
+    "modo": "CAP = ω²/(n/α) [1/(g s²)]",
+    "valor": 8.458668768996558,
+    "nível": 2,
+    "limite N1": "0.085–3.6",
+    "ref": "MIL-F-8785C Figs. 1–3"
+   },
+   {
+    "key": "phugoid",
+    "modo": "fugóide ζ",
+    "valor": 0.050841066667290026,
+    "nível": 1,
+    "limite N1": "≥ 0.04",
+    "ref": "MIL-F-8785C 3.2.1.2"
+   },
+   {
+    "key": "dutch_roll",
+    "modo": "rolamento holandês ζ / ζω / ω",
+    "valor": "0.213 / 0.733 / 3.44",
+    "nível": 1,
+    "limite N1": "0.08 / 0.15 / 0.4",
+    "ref": "MIL-F-8785C Table VI"
+   },
+   {
+    "key": "roll",
+    "modo": "rolamento τ_R [s]",
+    "valor": 0.07402215102858373,
+    "nível": 1,
+    "limite N1": "≤ 1.4",
+    "ref": "MIL-F-8785C Table VII"
+   },
+   {
+    "key": "spiral",
+    "modo": "espiral T2 [s] (∞ = estável)",
+    "valor": 8.691003082907564,
+    "nível": 2,
+    "limite N1": "≥ 20",
+    "ref": "MIL-F-8785C Table VIII"
+   }
+  ]
+ },
+ "files": {
+  "time_history": "examples/output/simulation/uav/mission/mission_time_history.png",
+  "trajectory_3d": "examples/output/simulation/uav/mission/mission_trajectory_3d.png",
+  "ground_track": "examples/output/simulation/uav/mission/mission_ground_track.png",
+  "history_csv": "examples/output/simulation/uav/mission/mission_history.csv",
+  "summary_json": "examples/output/simulation/uav/mission/mission_summary.json",
+  "flight_model_json": "examples/output/simulation/uav/flight_model.json"
+ },
+ "jsbsim": {
+  "V_m_s": 19.64838400189386,
+  "h_m": 300.0,
+  "trim_ours": {
+   "alpha_deg": 4.088716870416867,
+   "delta_e_deg": -3.161808958138824,
+   "throttle": 0.23617653158108873,
+   "residual": 7.907399056040768e-10
+  },
+  "trim_jsbsim": {
+   "alpha_deg": 4.087469345691192,
+   "delta_e_deg": -3.160582346403285,
+   "throttle": 0.23628517838095123,
+   "residual": 1.6610876889143634e-12
+  },
+  "input": "doublet de profundor (longitudinal)",
+  "nrms": {
+   "alpha": 0.012109609053524538,
+   "q": 0.014789890721878099,
+   "theta": 0.006031349325387966,
+   "V": 0.0021054084197397625,
+   "h": 0.002349803758357437
+  },
+  "plot": "examples/output/simulation/uav/jsbsim_pitch.png"
+ }
+}

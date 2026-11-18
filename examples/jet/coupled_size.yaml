@@ -1,0 +1,34 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO: ONE illustrative transport candidate, not a selected architecture
+# or a certified A320 variant. Geometry/engine class public context: a320_ref.json.
+configuration_id: illustrative-transport-candidate-A
+# Statistical method applicability, not a closed list of design alternatives:
+aircraft_class: jet_transport
+payload_kg: 15000  # PRESSUPOSTO mission requirement, not published A320 payload
+crew_kg: 800      # PRESSUPOSTO, separate from statistical We
+mass_bounds_kg: [40000, 110000]  # explicit numerical search interval, not a target MTOW
+mtow_limit_kg: 78000  # PRESSUPOSTO study constraint, not a certification check
+wing_area_m2: 122.6
+aspect_ratio: 9.48
+mach: 0.79
+altitude_m: 11277.6
+range_m: 5000000  # PRESSUPOSTO design mission (not a public range validation)
+thrust_sl_N: 120000  # per engine, uninstalled SLS [N]
+n_engines: 2
+cd0: 0.020     # PRESSUPOSTO fixed clean polar baseline
+oswald: 0.82   # PRESSUPOSTO
+reserve_fraction: 0.06  # Raymer Eq. 3.11 convention: extra fuel / trip burn
+wave:
+  thickness_ratio: 0.12  # PRESSUPOSTO representative strip
+  sweep_deg: 25         # PRESSUPOSTO half-chord sweep
+  technology_factor: 0.95  # PRESSUPOSTO supercritical
+# All controls remain visible in output with user/default provenance.
+assumption_sources:
+  payload_kg: "PRESSUPOSTO: study mission payload, not a published A320 number"
+  crew_kg: "PRESSUPOSTO: crew outside statistical We"
+  range_m: "PRESSUPOSTO: design mission, no real-aircraft range validation"
+  mtow_limit_kg: "PRESSUPOSTO: study constraint, not regulatory compliance"
+  geometry_and_engine_class: "Public class context in examples/jet/a320_ref.json; not a matched certified configuration"
+  cd0: "PRESSUPOSTO: clean baseline polar, fixed during the solve"
+  oswald: "PRESSUPOSTO: fixed efficiency, no geometry-dependent structural mass"
+  wave: "PRESSUPOSTO: equivalent supercritical strip, half-chord sweep"

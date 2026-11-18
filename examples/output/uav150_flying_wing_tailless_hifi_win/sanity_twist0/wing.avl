@@ -1,0 +1,28 @@
+h1_tailless_wing
+#Mach
+0.136954
+#IYsym IZsym Zsym
+0 0 0.0
+#Sref Cref Bref
+3.18600 0.72698 4.38250
+#Xref Yref Zref
+0.98070 0.00000 0.00000
+#CDp
+0.0
+#============================================================
+SURFACE
+wing
+#Nchord Cspace Nspan Sspace
+12 1.0 40 1.0
+YDUPLICATE
+0.0
+SECTION
+#Xle Yle Zle Chord Ainc
+0.28840 0.00000 0.00000 1.03825 0.000
+NACA
+0013
+SECTION
+#Xle Yle Zle Chord Ainc
+1.45384 2.19053 0.07650 0.41530 0.000
+NACA
+0010

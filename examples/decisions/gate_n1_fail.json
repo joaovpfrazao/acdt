@@ -1,0 +1,22 @@
+{
+  "level": "N1",
+  "metrics": {
+    "radar_mass_kg": 30.0,
+    "CL_alpha": 5.0,
+    "baseline_CL_alpha": 5.0,
+    "endurance_h": 8.0
+  },
+  "checks": [
+    {
+      "key": "mtow",
+      "ok": true,
+      "message": "W0 ok"
+    },
+    {
+      "key": "perf:endurance",
+      "ok": false,
+      "message": "8 h < 10 h required"
+    }
+  ],
+  "source": "PRESSUPOSTO demo \u2014 radar 30 kg triggers seed condition >25"
+}

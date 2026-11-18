@@ -1,0 +1,24 @@
+{
+ "decks": [
+  {
+   "bdf": "nastran/wing_sol145_sym.bdf",
+   "grids": 8712,
+   "elements": 2896,
+   "masses": 36,
+   "caero_boxes": 160,
+   "sym_xz": 1,
+   "xref_ok": true,
+   "run": "nastran wing_sol145_sym.bdf   # MSC or Simcenter (NX) Nastran with the aeroelastic option"
+  },
+  {
+   "bdf": "nastran/wing_sol145_anti.bdf",
+   "grids": 8712,
+   "elements": 2896,
+   "masses": 36,
+   "caero_boxes": 160,
+   "sym_xz": -1,
+   "xref_ok": true,
+   "run": "nastran wing_sol145_anti.bdf   # MSC or Simcenter (NX) Nastran with the aeroelastic option"
+  }
+ ]
+}

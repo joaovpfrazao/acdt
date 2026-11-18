@@ -1,0 +1,64 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative field screening — NOT AFM distances or CS-25 compliance.
+configuration_id: illustrative-transport-field-screen
+aircraft_class: jet_transport
+payload_kg: 15000
+crew_kg: 800
+mass_bounds_kg: [40000, 110000]
+mtow_limit_kg: 78000
+wing_area_m2: 122.6
+aspect_ratio: 9.48
+mach: 0.79
+altitude_m: 11277.6
+range_m: 5000000
+thrust_sl_N: 120000
+n_engines: 2
+cd0: 0.02
+oswald: 0.82
+reserve_fraction: 0.06
+wave: {thickness_ratio: 0.12, sweep_deg: 25, technology_factor: 0.95}
+assumption_sources:
+  all: PRESSUPOSTO illustrative engineering study; not a calibrated A320 takeoff
+performance:
+  ground:
+    altitude_m: 0
+    liftoff_speed_m_s: 80
+    cl_max: 2.0
+    cl_ground: 0.6
+    mu_roll: 0.02
+    oswald: 0.8
+    delta_cd_flaps: 0.015
+    delta_cd_gear: 0.015
+    thrust_factor: 1.0
+    obstacle_height_m: 10.668
+    max_ground_run_m: 1800
+  field:
+    v2_m_s: 85
+    vmc_m_s: 55
+    vr_m_s: 78
+    mu_brake: 0.40
+    recognition_delay_s: 2.0
+    delta_cd_spoiler: 0.05
+    thrust_reverse_factor: 0.0
+    oei_delta_cd_windmilling: 0.003
+    oei_delta_cd_trim: 0.002
+    screen_height_m: 10.668
+    max_field_length_m: 2500
+    v1_search_points: 21
+    source: 'PRESSUPOSTO: screening BFL construction (Krenkel/Salzman/Roskam/Torenbeek); mu_brake~Raymer dry; no reverse credit'
+  climb_points:
+  - name: gear-up-takeoff-screen
+    altitude_m: 0
+    speed_m_s: 85
+    mass_fraction: 1.0
+    cl_max: 2
+    oswald: 0.8
+    delta_cd_flaps: 0.015
+    delta_cd_gear: 0
+    delta_cd_windmilling: 0.003
+    delta_cd_oei_trim: 0.002
+    thrust_factor: 1.0
+    min_oei_gradient: 0.024
+    reference_clause: 25.121(b)
+  assumption_sources:
+    all_settings: PRESSUPOSTO illustrative; NOT certified V speeds or AFM

@@ -1,0 +1,12 @@
+{
+  "label": "Passo #8 pedido mas densidade adjacente / ajuntamentos em falta → requisito unassessed (nunca low/pass silencioso)",
+  "span_m": 5.37,
+  "v_max_m_s": 48.5,
+  "population": "<50",
+  "aec": 10,
+  "mtow_kg": 136.0,
+  "containment": {
+    "sheltering": false
+  },
+  "reference": "EASA AMC1 Article 11 § S.4.8.3(c)–(d); unassessed≠pass"
+}

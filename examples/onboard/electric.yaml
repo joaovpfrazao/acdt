@@ -1,0 +1,66 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Todos os valores novos são PRESSUPOSTOS ilustrativos, não dados publicados.
+schema_version: '1.0'
+model: prop
+onboard:
+  schema_version: '1.0'
+  source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+    não é uma referência de aeronave'
+  items:
+  - id: instrument
+    role: payload
+    mass_kg: 1
+    mass_accounting: incremental
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  loads:
+  - id: instrument_load
+    item_id: instrument
+    source_id: bus
+    power_W: 50
+    peak_W: 100
+    duty: 0.5
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  sources:
+  - id: bus
+    kind: main_battery
+    delivery_efficiency: 0.9
+    continuous_W: 1000
+    peak_W: 1000
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+aircraft:
+  name: PRESSUPOSTO common electric
+  aircraft_class: uav_small
+  requirements:
+    propulsion_type: electric
+    payload_mass:
+      target: 4
+      unit: kg
+    endurance:
+      min: 0.5
+      unit: h
+    cruise_speed:
+      target: 22
+      unit: m/s
+    cruise_altitude:
+      target: 300
+      unit: m
+    stall_speed:
+      max: 13
+      unit: m/s
+    climb_rate:
+      min: 2
+      unit: m/s
+  assumptions:
+    aero:
+      fidelity: handbook
+    weights:
+      method: statistical
+      initial_class: uav_small
+    propulsion:
+      systems_power_W: 0
+    geometry:
+      fuselage_length_m: 1.8
+      fuselage_diameter_m: 0.22

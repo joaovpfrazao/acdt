@@ -1,0 +1,101 @@
+# Estudo conceptual "pesca ilegal" — variante L (escrita pela IA no estudo; ver report.md)
+# payload 14.3 kg = IMSAR NSP-7 10.9 kg (datasheet, radartutorial.eu, 2026-10-29) + Trillium HD45-LV-CZ 1.35 kg
+#   (trilliumeng.com, 2026-10-29) + 2.0 kg suportes/radome/processamento (PRESSUPOSTO)
+# endurance 16 h: PRESSUPOSTO (2 aeronaves por estação com trânsito ~1 h; ver persistent_coverage no estudo)
+# Restante: igual a examples/uav_gasoline_150kg.yaml (mesmos PRESSUPOSTOS).
+name: 'Pesca ilegal — L: gasolina, radar NSP-7 + EO/IR HD45'
+description: Variante L do estudo conceptual de vigilância de pesca ilegal (derivada
+  de uav_gasoline_150kg).
+aircraft_class: uav_tactical_recce_ucav
+requirements:
+  propulsion_type: piston_prop
+  regulatory_category: easa_specific
+  payload_mass:
+    target: 14.3
+    unit: kg
+  endurance:
+    min: 16
+    unit: h
+  cruise_speed:
+    target: 45
+    unit: m/s
+  cruise_altitude:
+    target: 3000
+    unit: m
+  stall_speed:
+    max: 26
+    unit: m/s
+  climb_rate:
+    min: 3.0
+    unit: m/s
+  service_ceiling:
+    min: 5000
+    unit: m
+  takeoff_ground_roll:
+    max: 300
+    unit: m
+assumptions:
+  weights:
+    method: components
+    initial_class: uav_tactical_recce_ucav
+    components:
+      material: composite
+      structural_category: utility
+      landing_gear: tricycle
+      main_gear_length_m: 0.35
+      nose_gear_length_m: 0.3
+      engine_kW_per_kg: 0.9
+      avionics_uninstalled_kg: 6
+      n_tanks: 1
+      items:
+      - name: gerador/alternador + regulador
+        mass_kg: 2.0
+        group: equipment
+      - name: servos (6) + cablagem de sinal
+        mass_kg: 2.5
+        group: equipment
+      - name: suporte do payload + amortecimento
+        mass_kg: 1.5
+      - name: bateria de backup (avionics)
+        mass_kg: 1.5
+        group: equipment
+      growth_allowance: 0.05
+  aero:
+    fidelity: lowfi
+    AR: 16
+    taper: 0.6
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 4415
+    clmax_airfoil: 1.5
+    flap:
+      kind: plain
+      flapped_area_ratio: 0.5
+    roughness: smooth_molded_composite
+    laminar:
+      wing: 0.3
+      htail: 0.3
+      vtail: 0.3
+      fuselage: 0.1
+    extra_drag_areas_m2:
+      fixed_gear: 0.03
+      gimbal_eo_ir: 0.012
+      antennas_misc: 0.004
+  geometry:
+    fuselage_length_m: 3.2
+    fuselage_diameter_m: 0.4
+    c_ht: 0.5
+    c_vt: 0.03
+    tail_arm_fraction: 0.55
+  propulsion:
+    eta_cruise: 0.78
+certification:
+  safety:
+    t_flight_h: 16
+    baseline:
+      backup_battery: true
+    unit:
+      battery_kg: 1.5
+  sora:
+    population: <50
+    aec: 5

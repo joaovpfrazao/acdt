@@ -1,0 +1,10 @@
+{
+  "label": "Número de Kv sem R, I0 nem source → unassessed (nunca η=0.85 silenciosa)",
+  "deck": {
+    "kv_rpm_per_V": 500
+  },
+  "operating": {
+    "V_V": 22.0,
+    "rpm": 8000
+  }
+}

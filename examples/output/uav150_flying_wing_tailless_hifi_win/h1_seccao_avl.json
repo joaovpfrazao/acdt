@@ -1,0 +1,53 @@
+{
+  "case": "uav150_flying_wing_tailless",
+  "date": "2026-11-14",
+  "branch": "h1-seccao",
+  "solver": "AVL 3.x, processo externo. Sem SU2 e sem pyHyp.",
+  "scope": "O loft e o AVL da asa passam a usar o t/c declarado 0,15/0,12, espessura NACA simétrica. A linha média do NACA 4415 não é construída. Não se refez malha RANS, polar, CLmax, split nem charneira.",
+  "decision": "nao_aplicar",
+  "applied_to_l1_l2": false,
+  "eligible": false,
+  "valid": false,
+  "band": [0.7, 1.5],
+  "band_note": "H1_RATIO_BAND continua [0,7, 1,5]. calibration.RATIO_BAND continua [0,2, 5]. Isto não é um factor: é o alinhamento da espessura. Um α não calibra a polar.",
+  "camber": "lacuna",
+  "camber_note": "NACA 4415: 4 % da corda de curvatura máxima a 0,4 c. Os dígitos lêem-se; a linha média não é construída. Desconhecida não é zero. O caixão estrutural continua a ler a designação por camber_from_name; o OML e o AVL da montagem não recebem essa linha.",
+  "pressupostos": [
+    "PRESSUPOSTO: a espessura do loft é naca_yt do t/c declarado (Abbott & von Doenhoff 1959, Eq. 6.2, bordo de fuga fechado), não o dígito 15 da designação quando os dois diferem.",
+    "PRESSUPOSTO: entre a raiz e a ponta o t/c varia linearmente na fracção do comprimento do bordo de ataque.",
+    "PRESSUPOSTO: o AVL recebe NACA 00xx. A palavra NACA define a linha média (Drela & Youngren, AVL 3.40, avl_doc.txt); 00xx é plana. CLAF não é escrito. A estimativa do guia CLaf = 1 + 0,77 t/c não entra: o mesmo texto diz que a viscosidade baixa o 0,77, e não há dado de secção."
+  ],
+  "cards": {
+    "before": ["0013", "0010"],
+    "h1_two_sections": ["0015", "0012"],
+    "json_three_sections": ["0015", "0014", "0012"],
+    "middle_tc": 0.135,
+    "middle_note": "n_sections = 3 no JSON, η = 0,5, t/c = 0,135. round(13,5) = 14, por isso o cartão do meio é 0014. O t/c guardado continua 0,135. O H1 tem n_sections = 2."
+  },
+  "frozen_header": {
+    "Sref_m2": 3.186,
+    "Cref_m": 0.727118,
+    "Bref_m": 4.38168,
+    "Xref_m": 0.9801559793360929,
+    "Mach": 0.1369538125677505,
+    "Mach_card": 0.137,
+    "why": "O mesmo cabeçalho nos dois ficheiros. A envergadura da malha muda com a espessura e não entra nesta comparação."
+  },
+  "alpha_fixed_deg": 9.52057,
+  "CL_target": 0.502927759275556,
+  "avl_0013_0010": {"Alpha": 9.52057, "CLtot": 0.50293, "Cmtot": 0.02886, "CDtot": 0.01611},
+  "avl_0015_0012": {"Alpha": 9.52057, "CLtot": 0.50293, "Cmtot": 0.02886, "CDtot": 0.01611},
+  "delta_at_fixed_alpha": {"CLtot": 0.0, "Cmtot": 0.0, "CDtot": 0.0},
+  "delta_at_CL_target": {"Alpha_deg": 0.0, "CLtot": 0.0, "Cmtot": 0.0},
+  "printed_precision": "Os dois st.txt coincidem no dígito impresso. ΔCL = 0 não avalia a curvatura nem o efeito viscoso da espessura: sem CLAF o vórtice não vê o t/c.",
+  "mesh_reference_quantities": {
+    "S_m2": 3.186,
+    "Bref_old_m": 4.381683559273171,
+    "Bref_new_m": 4.381874564811488,
+    "Cref_old_m": 0.7271177749149211,
+    "Cref_new_m": 0.7270860799131671,
+    "note": "S não muda. Bref sobe 0,191 mm porque o diedro dá à espessura uma componente y. Cref = S/b desce 0,032 mm. A área de planta não usa t/c."
+  },
+  "out_of_scope": "flying_wing_pusher.json, flying_wing_pusher_closed.json e os winglets ficam em t/c 0,13/0,10. O escritor AVL do tipo fixo, que leva os dígitos com curvatura, não foi alterado.",
+  "gci": "As malhas coarse/medium/fine e o GCI de 13 nov continuam inválidos. Não foram reescritas."
+}

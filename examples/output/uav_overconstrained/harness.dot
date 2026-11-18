@@ -1,0 +1,14 @@
+graph "UAV ISR — caso sobre-restringido (demonstração de inviabilidade) power harness" {
+  rankdir=LR; node [shape=record];
+  "BAT" [label="BAT|{<+> +|<-> -}"];
+  "ESC" [label="ESC|{<+> +|<-> -}"];
+  "PDB" [label="PDB|{<+> +|<-> -|<5V> 5V|<GND> GND|<SERVO+> SERVO+|<SERVO-> SERVO-}"];
+  "AP" [label="AP|{<5V> 5V|<GND> GND}"];
+  "SRV" [label="SRV|{<+> +|<-> -}"];
+  "BAT":"+" -- "ESC":"+" [label="W1 VBAT ?AWG"];
+  "BAT":"-" -- "ESC":"-" [label="W2 GND ?AWG"];
+  "PDB":"5V" -- "AP":"5V" [label="W3 5V_AV 22AWG"];
+  "PDB":"GND" -- "AP":"GND" [label="W4 GND_AV 22AWG"];
+  "PDB":"SERVO+" -- "SRV":"+" [label="W5 VSERVO 10AWG"];
+  "PDB":"SERVO-" -- "SRV":"-" [label="W6 GND_SRV 10AWG"];
+}

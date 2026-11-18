@@ -1,0 +1,14 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative study; no published aircraft/pack/tank data claimed.
+storage:
+  fuel:
+    loaded_mass_kg: 80
+    unusable_mass_kg: 2
+    density_kg_m3: 720
+    tank_internal_volume_m3: 0.12
+    fill_fraction: 0.95
+    tank_external_volume_m3: 0.13
+    available_volume_m3: 0.14
+  assumption_sources:
+    '*': 'PRESSUPOSTO: net allocated envelope, density at assumed condition, no supplier
+      data; tank dry mass unknown'

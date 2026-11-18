@@ -1,0 +1,6 @@
+{
+  "step": "../cessna172_check_hifi/geometry/cessna172_check.step",
+  "step_wing": "../cessna172_check_hifi/geometry/cessna172_check_wing.step",
+  "vsp_version": "OpenVSP 3.55.0",
+  "note": "STEP da corrida de referência já no repositório. Este PC não tem ACDT_VSP_PYTHON, por isso o passo geometry não foi repetido."
+}

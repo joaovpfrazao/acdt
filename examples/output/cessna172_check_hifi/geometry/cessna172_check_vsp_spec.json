@@ -1,0 +1,55 @@
+{
+ "out_stem": "/workspace/aircraft-design-tools/examples/output/cessna172_check_hifi/geometry/cessna172_check",
+ "fuselage": {
+  "length": 8.093092351859605,
+  "diameter": 1.1561560502656578,
+  "x": -1.1906587753348665
+ },
+ "wing": {
+  "semispan": 5.0442905136981,
+  "c_root": 1.6214370021530375,
+  "c_tip": 1.135005901507126,
+  "sweep_c4_deg": 0.0,
+  "dihedral_deg": 3.0000000000000004,
+  "x": 0.0,
+  "z": 0.5294349150682378,
+  "incidence_deg": 0.0,
+  "airfoil": "2412",
+  "tc": [
+   0.12,
+   0.12
+  ],
+  "tess_w": 33,
+  "tess_u": 24
+ },
+ "htail": {
+  "semispan": 1.6706777918654412,
+  "c_root": 1.0441736199159006,
+  "c_tip": 0.6265041719495403,
+  "sweep_c4_deg": 0.0,
+  "x": 5.000171256675047,
+  "z": 0.0,
+  "airfoil": "0012",
+  "tc": [
+   0.1,
+   0.1
+  ],
+  "tess_w": 33,
+  "tess_u": 10
+ },
+ "vtail": {
+  "semispan": 1.3165347929542461,
+  "c_root": 1.1702531492926633,
+  "c_tip": 0.5851265746463317,
+  "sweep_c4_deg": 20.0,
+  "x": 5.033665438180448,
+  "z": 0.0,
+  "airfoil": "0010",
+  "tc": [
+   0.1,
+   0.1
+  ],
+  "tess_w": 33,
+  "tess_u": 8
+ }
+}

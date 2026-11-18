@@ -1,0 +1,27 @@
+{
+  "level": "N1",
+  "metrics": {
+    "radar_mass_kg": 18.0,
+    "CL_alpha": 5.1,
+    "baseline_CL_alpha": 5.0,
+    "endurance_h": 12.0
+  },
+  "checks": [
+    {
+      "key": "mtow",
+      "ok": true,
+      "message": "W0 within limit"
+    },
+    {
+      "key": "hq:dutch_roll",
+      "ok": true,
+      "message": "twin-boom within band"
+    },
+    {
+      "key": "perf:endurance",
+      "ok": true,
+      "message": "12 h \u2265 10 h"
+    }
+  ],
+  "source": "PRESSUPOSTO demo \u2014 not a datasheet"
+}

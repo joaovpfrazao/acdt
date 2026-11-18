@@ -1,0 +1,10 @@
+{
+  "label": "BEMT pedido sem polar nem diâmetro → unassessed (nunca estatística Raymer no lugar)",
+  "P_shaft_W": 1000.0,
+  "V_cruise_m_s": 22.0,
+  "propeller": {
+    "method": "bemt",
+    "rpm_rated": 8000,
+    "blades": 2
+  }
+}

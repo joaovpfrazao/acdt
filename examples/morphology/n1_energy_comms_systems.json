@@ -1,0 +1,162 @@
+{
+  "hybrid_templates": {
+    "hybrid_series": {
+      "architecture": "series",
+      "mass_kg": 25.0,
+      "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real",
+      "hotel_power_W": 50.0,
+      "aero": {
+        "LD": 12.0,
+        "eta_prop": 0.75,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "engine": {
+        "rated_power_W": 1500.0,
+        "bsfc_kg_per_kWh": 0.6,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "generator": {
+        "efficiency": 0.9,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "motor": {
+        "rated_power_W": 2000.0,
+        "efficiency": 0.9,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "battery": {
+        "capacity_Wh": 300.0,
+        "soc_initial": 0.9,
+        "soc_min": 0.2,
+        "soc_max": 0.95,
+        "c_rate_max": 8.0,
+        "charge_efficiency": 0.95,
+        "discharge_efficiency": 0.95,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "fuel": {
+        "capacity_kg": 3.0,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "dispatch": {
+        "rule": "thermostat",
+        "soc_on": 0.5,
+        "soc_off": 0.8,
+        "generator_setpoint_W": 1200.0,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "phases": {
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real",
+        "taxi_out": {
+          "duration_h": 0.05,
+          "shaft_power_W": 100.0
+        },
+        "takeoff": {
+          "duration_h": 0.01,
+          "shaft_power_W": 1800.0
+        },
+        "climb": {
+          "altitude_m": 300.0,
+          "rate_m_s": 2.0,
+          "speed_m_s": 25.0
+        },
+        "descent": {
+          "altitude_m": 300.0,
+          "rate_m_s": 2.0,
+          "speed_m_s": 25.0
+        },
+        "landing": {
+          "duration_h": 0.01,
+          "shaft_power_W": 300.0
+        },
+        "taxi_in": {
+          "duration_h": 0.05,
+          "shaft_power_W": 100.0
+        }
+      }
+    },
+    "hybrid": {
+      "architecture": "series",
+      "mass_kg": 25.0,
+      "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real",
+      "hotel_power_W": 50.0,
+      "aero": {
+        "LD": 12.0,
+        "eta_prop": 0.75,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "engine": {
+        "rated_power_W": 1500.0,
+        "bsfc_kg_per_kWh": 0.6,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "generator": {
+        "efficiency": 0.9,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "motor": {
+        "rated_power_W": 2000.0,
+        "efficiency": 0.9,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "battery": {
+        "capacity_Wh": 300.0,
+        "soc_initial": 0.9,
+        "soc_min": 0.2,
+        "soc_max": 0.95,
+        "c_rate_max": 8.0,
+        "charge_efficiency": 0.95,
+        "discharge_efficiency": 0.95,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "fuel": {
+        "capacity_kg": 3.0,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "dispatch": {
+        "rule": "thermostat",
+        "soc_on": 0.5,
+        "soc_off": 0.8,
+        "generator_setpoint_W": 1200.0,
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real"
+      },
+      "phases": {
+        "source": "PRESSUPOSTO: componentes/regra híbridos ilustrativos (potências, BSFC, eficiências, SOC), substituir por dados do fornecedor; não valida uma aeronave real",
+        "taxi_out": {
+          "duration_h": 0.05,
+          "shaft_power_W": 100.0
+        },
+        "takeoff": {
+          "duration_h": 0.01,
+          "shaft_power_W": 1800.0
+        },
+        "climb": {
+          "altitude_m": 300.0,
+          "rate_m_s": 2.0,
+          "speed_m_s": 25.0
+        },
+        "descent": {
+          "altitude_m": 300.0,
+          "rate_m_s": 2.0,
+          "speed_m_s": 25.0
+        },
+        "landing": {
+          "duration_h": 0.01,
+          "shaft_power_W": 300.0
+        },
+        "taxi_in": {
+          "duration_h": 0.05,
+          "shaft_power_W": 100.0
+        }
+      }
+    }
+  },
+  "link_catalog": {},
+  "mission_context": {
+    "distance_km": 40.0,
+    "speed_m_s": 28.0,
+    "station_h": 1.5,
+    "reserve_h": 0.0
+  },
+  "source": "PRESSUPOSTO hybrid block from examples/fleet/hybrid_dispatch.yaml (illustrative)"
+}

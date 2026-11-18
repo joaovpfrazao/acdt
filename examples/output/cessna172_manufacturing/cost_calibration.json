@@ -1,0 +1,30 @@
+{
+ "design": "Cessna 172S (verifica\u00e7\u00e3o)",
+ "kind": "cost",
+ "factors": {
+  "k_cost_L0_eastlake": {
+   "group": "cost_L0",
+   "value": 2.4629891829730948,
+   "hifi": 691875.4209188921,
+   "lowfi": 280908.83455838956,
+   "hifi_level": "L1",
+   "independent": true,
+   "what": "unit cost L1 bottom-up / eastlake CER (same design, N, USD year)"
+  },
+  "k_cost_L0_dapca4": {
+   "group": "cost_L0",
+   "value": 0.8718246650506807,
+   "hifi": 691875.4209188921,
+   "lowfi": 793594.6855537429,
+   "hifi_level": "L1",
+   "independent": true,
+   "what": "unit cost L1 bottom-up / dapca4 CER (same design, N, USD year)"
+  }
+ },
+ "sources": {
+  "year": 2025,
+  "N": 820,
+  "l1_labour_calibration": 1.0
+ },
+ "note": "ratios higher/lower fidelity of the same design; applied only if the group is listed in manufacturing.cost_calibration.apply (cost_L0, cost_L1)"
+}

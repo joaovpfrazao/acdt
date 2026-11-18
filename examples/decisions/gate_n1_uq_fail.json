@@ -1,0 +1,96 @@
+{
+  "level": "N1",
+  "metrics": {
+    "CL_alpha": 5.1,
+    "baseline_CL_alpha": 5.0
+  },
+  "checks": [
+    {
+      "key": "mtow",
+      "ok": true,
+      "message": "ok"
+    }
+  ],
+  "uq": {
+    "kind": "monte_carlo",
+    "status": "ok",
+    "n": 80,
+    "n_ok": 80,
+    "n_failed": 0,
+    "method": "LHS (McKay et al. 1979; Helton & Davis 2003)",
+    "method_key": "lhs",
+    "seed": 3,
+    "inputs": [
+      {
+        "name": "x1",
+        "dist": "uniform",
+        "low": 0,
+        "high": 1
+      },
+      {
+        "name": "x2",
+        "dist": "uniform",
+        "low": 0,
+        "high": 1
+      }
+    ],
+    "percentiles": [
+      5,
+      50,
+      95
+    ],
+    "summaries": {
+      "radar_mass_kg": {
+        "status": "ok",
+        "n": 80,
+        "mean": 20.000357886298517,
+        "std": 2.905042651494192,
+        "min": 15.070872234306615,
+        "max": 24.99565392760467,
+        "spread": 9.924781693298057,
+        "p5": 15.509197766270686,
+        "p50": 20.030211599295967,
+        "p95": 24.426439417540536
+      },
+      "W0_kg": {
+        "status": "ok",
+        "n": 80,
+        "mean": 120.01345217339242,
+        "std": 11.626176757656655,
+        "min": 100.32603678686772,
+        "max": 139.92607321047373,
+        "spread": 39.600036423606014,
+        "p5": 102.44929675727481,
+        "p50": 120.10894129345304,
+        "p95": 137.69857250697092
+      }
+    },
+    "gate_metrics": {
+      "radar_mass_kg": 20.030211599295967,
+      "radar_mass_kg_mean": 20.000357886298517,
+      "radar_mass_kg_std": 2.905042651494192,
+      "radar_mass_kg_p5": 15.509197766270686,
+      "radar_mass_kg_p50": 20.030211599295967,
+      "radar_mass_kg_p95": 24.426439417540536,
+      "W0_kg": 120.10894129345304,
+      "W0_kg_mean": 120.01345217339242,
+      "W0_kg_std": 11.626176757656655,
+      "W0_kg_p5": 102.44929675727481,
+      "W0_kg_p50": 120.10894129345304,
+      "W0_kg_p95": 137.69857250697092
+    },
+    "samples": null,
+    "reference": "McKay, Beckman & Conover, Technometrics 21 (1979) 239\u2013245 (LHS); Helton & Davis, Reliab. Eng. Syst. Saf. 81 (2003) 23\u201369 (LHS for UQ); Saltelli et al., Global Sensitivity Analysis. The Primer, Wiley 2008; DESIGN_WORKFLOW \u00a75",
+    "note": "gate_metrics uses p50 as the nominal point for each metric; also exposes {metric}_p5/_p95/_mean/_std for condition/interval checks. Failed evaluations are excluded \u2014 never filled with zero.",
+    "interval_checks": [
+      {
+        "metric": "radar_mass_kg",
+        "use": "p95",
+        "op": "<=",
+        "value": 18.0
+      }
+    ]
+  },
+  "require_uq": true,
+  "source": "PRESSUPOSTO gate+UQ demo"
+}

@@ -1,0 +1,2043 @@
+{
+  "acdt_version": "0.1.0",
+  "name": "UAV ISR el\u00e9trico 25 kg",
+  "feasible": false,
+  "requirements": [
+    {
+      "key": "propulsion_type",
+      "sense": "target",
+      "value_si": "electric",
+      "raw": "electric",
+      "unit": "",
+      "params": {}
+    },
+    {
+      "key": "regulatory_category",
+      "sense": "target",
+      "value_si": "easa_specific",
+      "raw": "easa_specific",
+      "unit": "",
+      "params": {}
+    },
+    {
+      "key": "payload_mass",
+      "sense": "target",
+      "value_si": 4.0,
+      "raw": 4.0,
+      "unit": "kg",
+      "params": {}
+    },
+    {
+      "key": "endurance",
+      "sense": "min",
+      "value_si": 9000.0,
+      "raw": 2.5,
+      "unit": "h",
+      "params": {}
+    },
+    {
+      "key": "cruise_speed",
+      "sense": "target",
+      "value_si": 22.0,
+      "raw": 22,
+      "unit": "m/s",
+      "params": {}
+    },
+    {
+      "key": "cruise_altitude",
+      "sense": "target",
+      "value_si": 600.0,
+      "raw": 600,
+      "unit": "m",
+      "params": {}
+    },
+    {
+      "key": "stall_speed",
+      "sense": "max",
+      "value_si": 13.0,
+      "raw": 13,
+      "unit": "m/s",
+      "params": {}
+    },
+    {
+      "key": "climb_rate",
+      "sense": "min",
+      "value_si": 3.0,
+      "raw": 3.0,
+      "unit": "m/s",
+      "params": {}
+    },
+    {
+      "key": "service_ceiling",
+      "sense": "min",
+      "value_si": 3000.0,
+      "raw": 3000,
+      "unit": "m",
+      "params": {}
+    },
+    {
+      "key": "wing_span",
+      "sense": "max",
+      "value_si": 4.2,
+      "raw": 4.2,
+      "unit": "m",
+      "params": {}
+    },
+    {
+      "key": "mtow",
+      "sense": "max",
+      "value_si": 25.0,
+      "raw": 25,
+      "unit": "kg",
+      "params": {}
+    }
+  ],
+  "weights": {
+    "W0_kg": 21.62598433772431,
+    "We_kg": 9.793690262199554,
+    "Wfuel_or_battery_kg": 7.8322940754361765,
+    "payload_kg": 4.0,
+    "crew_kg": 0.0,
+    "We_W0": 0.45286679714807093,
+    "Wf_W0": 0.362170523807027,
+    "battery_energy_Wh": 1788.8572888341885
+  },
+  "design_point": {
+    "W_S_N_m2": 177.74233342681697,
+    "W_S_kg_m2": 18.124673912785404,
+    "metric": "P/W",
+    "value": 5.333865305241048,
+    "active_constraints": [
+      "RC 3.0 m/s @ 0 m",
+      "Perda 13.0 m/s"
+    ],
+    "P_SL_W": 1131.197936078817,
+    "T_SL_N": null
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Valor inicial estat\u00edstico We/W0 = 0.65 n\u00e3o fecha (We/W0 + Wf/W0 > 0.98); itera\u00e7\u00e3o por componentes reiniciada com We/W0 = 0.30."
+    },
+    {
+      "severity": "info",
+      "message": "Nz das equa\u00e7\u00f5es de massa = 1.5 \u00d7 n_lim do diagrama V-n (5.07, rajada; stanag_4671)"
+    },
+    {
+      "severity": "warning",
+      "message": "n_lim = 5.07 est\u00e1 acima da linha de perda mesmo a VD (n = 3.20 com CLmax quase-est\u00e1tico): valor CONSERVATIVO mantido (a perda din\u00e2mica numa rajada pode exced\u00ea-lo); VC baixo face a VS1 \u2014 rever VC/CLmax antes de dimensionar"
+    },
+    {
+      "severity": "info",
+      "message": "Massa do caix\u00e3o da asa (Megson/Bruhn) = 3.24 kg vs Raymer Eq. 15.46 3.41 kg (raz\u00e3o 0.95); usado: Raymer"
+    },
+    {
+      "severity": "warning",
+      "message": "Massa da fuselagem L1 / Raymer Eq. 15.49 = 1.50 (1.7 kg vs 1.2 kg)."
+    },
+    {
+      "severity": "info",
+      "message": "Energia de descolagem + subida no dimensionamento = 94.8 Wh (modelo de segmentos: 1 min \u00e0 pot\u00eancia de descolagem + subida integrada a V_y \u2014 o mesmo da verifica\u00e7\u00e3o; Hepperle s\u00f3 energia potencial daria 57.0 Wh)"
+    },
+    {
+      "severity": "info",
+      "message": "Sem trem de aterragem (landing_gear: none) \u2014 lan\u00e7amento/recupera\u00e7\u00e3o como itens do utilizador."
+    },
+    {
+      "severity": "info",
+      "message": "W0 = 22 kg est\u00e1 abaixo da base de dados das equa\u00e7\u00f5es GA de Raymer (~1000\u20138000 lb): extrapola\u00e7\u00e3o \u2014 calibrar com dados pr\u00f3prios (calibration)."
+    },
+    {
+      "severity": "warning",
+      "message": "We/W0 por componentes = 0.453 fora da banda estat\u00edstica [0.77, 0.90] (\u00b115 %) \u2014 rever itens em falta (recupera\u00e7\u00e3o, suportes, pintura, cablagem de sinal) ou calibrar com dados pr\u00f3prios."
+    },
+    {
+      "severity": "error",
+      "message": "Infeasible: fixed W/S 177.7 N/m\u00b2 above the W/S limit 176.5"
+    }
+  ],
+  "checks": [
+    {
+      "key": "regulatory_category",
+      "ok": null,
+      "message": "easa_specific: no numeric limit"
+    },
+    {
+      "key": "wing_span",
+      "ok": true,
+      "message": "b = 3.53 m vs max 4.20 m"
+    },
+    {
+      "key": "mtow",
+      "ok": true,
+      "message": "W0 = 21.6 kg vs max 25.0 kg"
+    },
+    {
+      "key": "static_margin",
+      "ok": true,
+      "message": "SM no CG traseiro 10.0 % (alvo 10 %; dianteiro 10.0 %) \u2014 posicionamento da asa por bisse\u00e7\u00e3o"
+    },
+    {
+      "key": "trim",
+      "ok": true,
+      "message": "CLmax limpo (CG dianteiro): \u03b4e -10.8\u00b0; cruzeiro (CG dianteiro): \u03b4e -7.4\u00b0"
+    },
+    {
+      "key": "hq:scissor",
+      "ok": true,
+      "message": "S_h/S atual 0.174 vs m\u00ednimo 0.174 (estabilidade 0.174 no CG traseiro, controlo 0.107 a CLmax no CG dianteiro; dimensionante: estabilidade)"
+    },
+    {
+      "key": "hq:short_period",
+      "ok": true,
+      "message": "per\u00edodo curto \u03b6 = 0.764 \u2192 N\u00edvel 1 (N1: 0.30\u20132.00; MIL-F-8785C Table IV, Classe I, Cat. B) \u2014 UAV: indicativo"
+    },
+    {
+      "key": "hq:CAP",
+      "ok": false,
+      "message": "CAP = \u03c9\u00b2/(n/\u03b1) [1/(g s\u00b2)] = 9.02 \u2192 N\u00edvel 2 (N1: 0.085\u20133.6; MIL-F-8785C Figs. 1\u20133, Classe I, Cat. B) \u2014 UAV: indicativo"
+    },
+    {
+      "key": "hq:phugoid",
+      "ok": true,
+      "message": "fug\u00f3ide \u03b6 = 0.0705 \u2192 N\u00edvel 1 (N1: \u2265 0.04; MIL-F-8785C 3.2.1.2, Classe I, Cat. B) \u2014 UAV: indicativo"
+    },
+    {
+      "key": "hq:dutch_roll",
+      "ok": true,
+      "message": "rolamento holand\u00eas \u03b6 / \u03b6\u03c9 / \u03c9 = 0.196 / 0.798 / 4.06 \u2192 N\u00edvel 1 (N1: 0.08 / 0.15 / 0.4; MIL-F-8785C Table VI, Classe I, Cat. B) \u2014 UAV: indicativo"
+    },
+    {
+      "key": "hq:roll",
+      "ok": true,
+      "message": "rolamento \u03c4_R [s] = 0.0602 \u2192 N\u00edvel 1 (N1: \u2264 1.4; MIL-F-8785C Table VII, Classe I, Cat. B) \u2014 UAV: indicativo"
+    },
+    {
+      "key": "hq:spiral",
+      "ok": null,
+      "message": "espiral unassessed: declare assumptions.geometry.dihedral_deg (current TrapezoidalWing default \u0393=3\u00b0 is PRESSUPOSTO only; Cl\u03b2/spiral need an explicit dihedral \u2014 Etkin & Reid 1996 Ch. 6 / MIL-F-8785C Table VIII)"
+    },
+    {
+      "key": "wb:envelope",
+      "ok": true,
+      "message": "Todos os 3 carregamentos dentro dos limites conceptuais; extremos 0.758 m (vazio, 18 kg) e 0.758 m (vazio, 18 kg)."
+    },
+    {
+      "key": "aeroel:divergence",
+      "ok": true,
+      "message": "diverg\u00eancia torsional V = 357.1 m/s EAS vs 32.1 (= 1.2 V_D); margem +1014 %"
+    },
+    {
+      "key": "aeroel:reversal",
+      "ok": true,
+      "message": "invers\u00e3o de aileron: n\u00e3o ocorre (V \u2192 \u221e) vs 32.1 m/s EAS"
+    },
+    {
+      "key": "aeroel:flutter",
+      "ok": true,
+      "message": "flutter bin\u00e1rio: n\u00e3o ocorre (V \u2192 \u221e) vs 32.1 m/s EAS"
+    },
+    {
+      "key": "aeroel:aeer45",
+      "ok": true,
+      "message": "AEER-45 / 23.629(d): F = 0.000859 vs F_max = 0.056 (balanceamento do aileron n\u00e3o avaliado)"
+    },
+    {
+      "key": "perf:endurance",
+      "ok": true,
+      "message": "tempo em espera (segmentos): 2.5 h vs requerido \u2265 2.5 (miss\u00e3o por segmentos \u2014 verifica\u00e7\u00e3o, n\u00e3o altera a viabilidade do dimensionamento)"
+    },
+    {
+      "key": "perf:service_ceiling",
+      "ok": true,
+      "message": "teto de servi\u00e7o (Anderson) > 9000 m (n\u00e3o atingido): 9000 m vs requerido \u2265 3000 (miss\u00e3o por segmentos \u2014 verifica\u00e7\u00e3o, n\u00e3o altera a viabilidade do dimensionamento)"
+    },
+    {
+      "key": "perf:climb_rate",
+      "ok": true,
+      "message": "ROC m\u00e1x. ao n\u00edvel do mar: 3 m/s vs requerido \u2265 3 (miss\u00e3o por segmentos \u2014 verifica\u00e7\u00e3o, n\u00e3o altera a viabilidade do dimensionamento)"
+    }
+  ],
+  "onboard_bridge": null,
+  "mda_history": [
+    {
+      "iter": 1,
+      "W0": 12.554611153988578,
+      "We/W0 usado": 0.3,
+      "We": 3.766383346196573,
+      "Wf": 4.788227807734784,
+      "E descolagem+subida [Wh]": 59.79382767429781,
+      "n_lim (V-n)": 4.965844570111685,
+      "asa Raymer [kg]": 1.6120074832039457,
+      "asa caix\u00e3o [kg]": 1.858496689884431,
+      "We_comp": 7.276393400237426,
+      "We_comp/W0": 0.5795793522386975,
+      "CD0": 0.029468437606182223,
+      "W/S": 177.74233342681697,
+      "P/W": 5.392275291821957,
+      "L/D_max": 14.393178642928428,
+      "aero": "manual"
+    },
+    {
+      "iter": 2,
+      "W0": 20.224583285978202,
+      "We/W0 usado": 0.3597796452638005,
+      "We": 7.276393400237427,
+      "Wf": 8.948189885484636,
+      "E descolagem+subida [Wh]": 90.78711458174641,
+      "n_lim (V-n)": 4.783919261780765,
+      "asa Raymer [kg]": 3.101295251133027,
+      "asa caix\u00e3o [kg]": 3.018373596080577,
+      "We_comp": 9.370076715358799,
+      "We_comp/W0": 0.4633013488023319,
+      "CD0": 0.022579793800211398,
+      "W/S": 177.74233342681697,
+      "P/W": 5.661300882526299,
+      "L/D_max": 16.44278148007086,
+      "aero": "manual"
+    },
+    {
+      "iter": 3,
+      "W0": 21.59747636675437,
+      "We/W0 usado": 0.433850536805422,
+      "We": 9.370076715358799,
+      "Wf": 8.227399651242917,
+      "E descolagem+subida [Wh]": 96.89994413761777,
+      "n_lim (V-n)": 4.756796259765672,
+      "asa Raymer [kg]": 3.3052004372428607,
+      "asa caix\u00e3o [kg]": 3.2260056368843095,
+      "We_comp": 9.66561147481164,
+      "We_comp/W0": 0.44753430033567254,
+      "CD0": 0.02186860154612834,
+      "W/S": 177.74233342681697,
+      "P/W": 5.479940332070729,
+      "L/D_max": 16.70801148625546,
+      "aero": "manual"
+    },
+    {
+      "iter": 4,
+      "W0": 21.852746891355405,
+      "We/W0 usado": 0.44230647629178377,
+      "We": 9.66561147481164,
+      "Wf": 8.187135415313607,
+      "E descolagem+subida [Wh]": 98.00790920298003,
+      "n_lim (V-n)": 4.751891021389491,
+      "asa Raymer [kg]": 3.3446942842644027,
+      "asa caix\u00e3o [kg]": 3.264447274553147,
+      "We_comp": 9.72273949785265,
+      "We_comp/W0": 0.4449207024723656,
+      "CD0": 0.021746408484700854,
+      "W/S": 177.74233342681697,
+      "P/W": 5.461216440646928,
+      "L/D_max": 16.75488688553961,
+      "aero": "manual"
+    },
+    {
+      "iter": 5,
+      "W0": 21.905650084146814,
+      "We/W0 usado": 0.4438461976934904,
+      "We": 9.72273949785265,
+      "Wf": 8.182910585565585,
+      "E descolagem+subida [Wh]": 98.23594543674935,
+      "n_lim (V-n)": 4.750879627504227,
+      "asa Raymer [kg]": 3.353106963390765,
+      "asa caix\u00e3o [kg]": 3.272931517820075,
+      "We_comp": 9.73487230336357,
+      "We_comp/W0": 0.4444000641829264,
+      "CD0": 0.02172144849991817,
+      "W/S": 177.74233342681697,
+      "P/W": 5.457999406713031,
+      "L/D_max": 16.764510591168865,
+      "aero": "manual"
+    },
+    {
+      "iter": 6,
+      "W0": 21.917134985153247,
+      "We/W0 usado": 0.4441671920147415,
+      "We": 9.73487230336357,
+      "Wf": 8.18226268160039,
+      "E descolagem+subida [Wh]": 98.28534721456448,
+      "n_lim (V-n)": 4.750660294568695,
+      "asa Raymer [kg]": 3.354951139025516,
+      "asa caix\u00e3o [kg]": 3.2746611342101213,
+      "We_comp": 9.73752898328861,
+      "We_comp/W0": 0.4442884067595902,
+      "CD0": 0.0217160461260585,
+      "W/S": 177.74233342681697,
+      "P/W": 5.457342273508433,
+      "L/D_max": 16.766595743346812,
+      "aero": "manual"
+    },
+    {
+      "iter": 7,
+      "W0": 21.919666052122952,
+      "We/W0 usado": 0.4442371047138064,
+      "We": 9.73752898328861,
+      "Wf": 8.18213706779867,
+      "E descolagem+subida [Wh]": 98.2962278939888,
+      "n_lim (V-n)": 4.750611968685904,
+      "asa Raymer [kg]": 3.3553587662014177,
+      "asa caix\u00e3o [kg]": 3.2750423053115796,
+      "We_comp": 9.738115995966941,
+      "We_comp/W0": 0.4442638848972697,
+      "CD0": 0.021714856316975062,
+      "W/S": 177.74233342681697,
+      "P/W": 5.457200042682662,
+      "L/D_max": 16.767055078061397,
+      "aero": "manual"
+    },
+    {
+      "iter": 8,
+      "W0": 21.920226322125487,
+      "We/W0 usado": 0.4442525297349525,
+      "We": 9.738115995966941,
+      "Wf": 8.182110325899535,
+      "E descolagem+subida [Wh]": 98.29863600261736,
+      "n_lim (V-n)": 4.7506012719472945,
+      "asa Raymer [kg]": 3.355449073990828,
+      "asa caix\u00e3o [kg]": 3.2751266799224825,
+      "We_comp": 9.73824603244343,
+      "We_comp/W0": 0.4442584619947101,
+      "CD0": 0.021714592982056587,
+      "W/S": 177.74233342681697,
+      "P/W": 5.457168718021904,
+      "L/D_max": 16.767156745582852,
+      "aero": "manual"
+    },
+    {
+      "iter": 9,
+      "W0": 21.92035049746466,
+      "We/W0 usado": 0.4442559453403708,
+      "We": 9.73824603244343,
+      "Wf": 8.182104464095046,
+      "E descolagem+subida [Wh]": 98.29916969830137,
+      "n_lim (V-n)": 4.750598901204364,
+      "asa Raymer [kg]": 3.3554690941081993,
+      "asa caix\u00e3o [kg]": 3.2751453802495387,
+      "We_comp": 9.73827485908302,
+      "We_comp/W0": 0.4442572604032661,
+      "CD0": 0.021714534619731683,
+      "W/S": 177.74233342681697,
+      "P/W": 5.457161785080223,
+      "L/D_max": 16.767179278177014,
+      "aero": "manual"
+    },
+    {
+      "iter": 10,
+      "W0": 21.92037802820456,
+      "We/W0 usado": 0.44425670244157994,
+      "We": 9.73827485908302,
+      "Wf": 8.18210316825365,
+      "E descolagem+subida [Wh]": 95.79330515587712,
+      "n_lim (V-n)": 5.067898267798934,
+      "asa Raymer [kg]": 3.355473533019529,
+      "asa caix\u00e3o [kg]": 3.281551081896011,
+      "We_comp": 9.738281250549633,
+      "We_comp/W0": 0.44425699401805757,
+      "CD0": 0.023661769832742915,
+      "W/S": 177.74233342681697,
+      "P/W": 5.457160248547972,
+      "L/D_max": 17.99815138692586,
+      "aero": "lowfi"
+    },
+    {
+      "iter": 11,
+      "W0": 21.499282505568598,
+      "We/W0 usado": 0.4529584300325971,
+      "We": 9.738281250549633,
+      "Wf": 7.761001254541238,
+      "E descolagem+subida [Wh]": 94.29385914059392,
+      "n_lim (V-n)": 5.0737480718192085,
+      "asa Raymer [kg]": 3.380644792006611,
+      "asa caix\u00e3o [kg]": 3.2167828678081216,
+      "We_comp": 9.757828489522948,
+      "We_comp/W0": 0.453867634280146,
+      "CD0": 0.02388032118209276,
+      "W/S": 177.74233342681697,
+      "P/W": 5.331693848781353,
+      "L/D_max": 17.92789342207268,
+      "aero": "lowfi"
+    },
+    {
+      "iter": 12,
+      "W0": 21.58743502208195,
+      "We/W0 usado": 0.4520142610523942,
+      "We": 9.757828489522948,
+      "Wf": 7.829606531763321,
+      "E descolagem+subida [Wh]": 94.65164087443658,
+      "n_lim (V-n)": 5.073133705085446,
+      "asa Raymer [kg]": 3.3998740499983104,
+      "asa caix\u00e3o [kg]": 3.230084536258328,
+      "We_comp": 9.784530821753245,
+      "We_comp/W0": 0.45325119967909916,
+      "CD0": 0.023835486227359905,
+      "W/S": 177.74233342681697,
+      "P/W": 5.3347342470789245,
+      "L/D_max": 17.941208583601505,
+      "aero": "lowfi"
+    },
+    {
+      "iter": 13,
+      "W0": 21.61665452570933,
+      "We/W0 usado": 0.45263853433546863,
+      "We": 9.784530821753245,
+      "Wf": 7.832123703586567,
+      "E descolagem+subida [Wh]": 94.77272620307349,
+      "n_lim (V-n)": 5.072389477449254,
+      "asa Raymer [kg]": 3.4054160798566264,
+      "asa caix\u00e3o [kg]": 3.234487644799253,
+      "We_comp": 9.792335312563829,
+      "We_comp/W0": 0.45299957497666965,
+      "CD0": 0.02381422234382852,
+      "W/S": 177.74233342681697,
+      "P/W": 5.333969497954907,
+      "L/D_max": 17.948812548084188,
+      "aero": "lowfi"
+    },
+    {
+      "iter": 14,
+      "W0": 21.622683472167314,
+      "We/W0 usado": 0.4528732673337474,
+      "We": 9.792335312563829,
+      "Wf": 7.830348158606252,
+      "E descolagem+subida [Wh]": 94.80363468942535,
+      "n_lim (V-n)": 5.072497559082592,
+      "asa Raymer [kg]": 3.40635656104204,
+      "asa caix\u00e3o [kg]": 3.2354030185532707,
+      "We_comp": 9.793690262199554,
+      "We_comp/W0": 0.4529359306769661,
+      "CD0": 0.023818006502939387,
+      "W/S": 177.74233342681697,
+      "P/W": 5.333650417228828,
+      "L/D_max": 17.94700125995537,
+      "aero": "lowfi"
+    },
+    {
+      "iter": 15,
+      "W0": 21.62598433772431,
+      "We/W0 usado": 0.45286679714807093,
+      "We": 9.793690262199554,
+      "Wf": 7.8322940754361765,
+      "E descolagem+subida [Wh]": 94.81637908621995,
+      "n_lim (V-n)": 5.072014895973944,
+      "asa Raymer [kg]": 3.4070411126107802,
+      "asa caix\u00e3o [kg]": 3.235891592817566,
+      "We_comp": 9.794645528794057,
+      "We_comp/W0": 0.45291096931520025,
+      "CD0": 0.023814745921510116,
+      "W/S": 177.74233342681697,
+      "P/W": 5.333865305241048,
+      "L/D_max": 17.94827096451139,
+      "aero": "lowfi"
+    }
+  ],
+  "weight_initial_source": "Raymer 6th ed. Table 3.1 (We/W0 = A W0^C, W0 in lb) 'uav_small'",
+  "weight_cross_check": [
+    {
+      "class": "uav_small",
+      "We/W0": 0.7692599558641176,
+      "We_kg": 16.6360037571559,
+      "source": "Raymer 6th ed. Table 3.1 (We/W0 = A W0^C, W0 in lb) 'uav_small'",
+      "in_range": null
+    },
+    {
+      "class": "uav_tactical_recce_ucav",
+      "We/W0": 0.8998846590791627,
+      "We_kg": 19.460891543004355,
+      "source": "Raymer 6th ed. Table 3.1 (We/W0 = A W0^C, W0 in lb) 'uav_tactical_recce_ucav'",
+      "in_range": null
+    },
+    {
+      "class": "nicolai_uav_prop_endurance_lt12h",
+      "We/W0": 1.0665202776042961,
+      "We_kg": 23.064550819335892,
+      "source": "Nicolai & Carichner (AIAA 2010) Table 5.1 (We = A W0^B, lb) 'nicolai_uav_prop_endurance_lt12h'",
+      "in_range": null
+    },
+    {
+      "class": "nicolai_uav_prop_endurance_gt12h",
+      "We/W0": 0.8121209453317115,
+      "We_kg": 17.562914844081455,
+      "source": "Nicolai & Carichner (AIAA 2010) Table 5.1 (We = A W0^B, lb) 'nicolai_uav_prop_endurance_gt12h'",
+      "in_range": null
+    }
+  ],
+  "weight_breakdown": {
+    "W0_kg": 21.62598433772431,
+    "We_kg": 9.794645528794057,
+    "Nz_ultimate": 7.608746338623888,
+    "groups_kg": {
+      "structure": 5.085025132417684,
+      "propulsion": 0.77,
+      "equipment": 1.3491980755769128,
+      "user_items": 1.7000000000000002,
+      "allowance": 0.8904223207994596
+    },
+    "notes": [
+      "Sem trem de aterragem (landing_gear: none) \u2014 lan\u00e7amento/recupera\u00e7\u00e3o como itens do utilizador.",
+      "W0 = 22 kg est\u00e1 abaixo da base de dados das equa\u00e7\u00f5es GA de Raymer (~1000\u20138000 lb): extrapola\u00e7\u00e3o \u2014 calibrar com dados pr\u00f3prios (calibration)."
+    ],
+    "items": [
+      {
+        "key": "wing",
+        "group": "structure",
+        "name": "asa",
+        "mass": 3.4070411126107802,
+        "method": "Raymer Eq. 15.46; composite x0.875 (Raymer Table 15.4)"
+      },
+      {
+        "key": "htail",
+        "group": "structure",
+        "name": "empenagem horizontal",
+        "mass": 0.3800501860725373,
+        "method": "minimum gauge: Swet 0.422 m\u00b2 x 0.9 kg/m\u00b2 (user layup) > Raymer Eq. 15.47"
+      },
+      {
+        "key": "vtail",
+        "group": "structure",
+        "name": "empenagem vertical",
+        "mass": 0.23286323312818571,
+        "method": "minimum gauge: Swet 0.259 m\u00b2 x 0.9 kg/m\u00b2 (user layup) > Raymer Eq. 15.48"
+      },
+      {
+        "key": "fuselage",
+        "group": "structure",
+        "name": "fuselagem",
+        "mass": 1.0650706006061803,
+        "method": "Raymer Eq. 15.49 (unpressurized); composite x0.925 (Raymer Table 15.4)"
+      },
+      {
+        "key": "motor_esc",
+        "group": "propulsion",
+        "name": "motor(es) + ESC(s)",
+        "mass": 0.6900000000000001,
+        "method": "selected components (Phase 1E database)"
+      },
+      {
+        "key": "propeller",
+        "group": "propulsion",
+        "name": "h\u00e9lice(s)",
+        "mass": 0.08,
+        "method": "user (datasheet)"
+      },
+      {
+        "key": "flight_controls",
+        "group": "equipment",
+        "name": "comandos (hastes/charneiras)",
+        "mass": 0.06423946852112321,
+        "method": "Raymer Eq. 15.54"
+      },
+      {
+        "key": "servos",
+        "group": "equipment",
+        "name": "servos",
+        "mass": 0.16999999999999998,
+        "method": "selected components (Phase 1E)"
+      },
+      {
+        "key": "avionics",
+        "group": "equipment",
+        "name": "autopiloto + avi\u00f3nica + extras",
+        "mass": 0.075,
+        "method": "selected components / user list"
+      },
+      {
+        "key": "harness",
+        "group": "equipment",
+        "name": "cablagem de pot\u00eancia",
+        "mass": 0.2899586070557896,
+        "method": "sized wire gauges x length x \u03c1Cu (IEC 60028) x1.3 insulation + 5 connectors x 0.01 kg (ASSUMPTIONS)"
+      },
+      {
+        "key": "item:paraquedas de recupera\u00e7\u00e3o + ejetor",
+        "group": "user_items",
+        "name": "paraquedas de recupera\u00e7\u00e3o + ejetor",
+        "mass": 1.0,
+        "method": "user-listed item"
+      },
+      {
+        "key": "item:suporte/amortecimento do gimbal",
+        "group": "user_items",
+        "name": "suporte/amortecimento do gimbal",
+        "mass": 0.3,
+        "method": "user-listed item"
+      },
+      {
+        "key": "item:datalink C2 + antenas",
+        "group": "equipment",
+        "name": "datalink C2 + antenas",
+        "mass": 0.25,
+        "method": "user-listed item"
+      },
+      {
+        "key": "item:GNSS + b\u00fassola (x2)",
+        "group": "equipment",
+        "name": "GNSS + b\u00fassola (x2)",
+        "mass": 0.1,
+        "method": "user-listed item"
+      },
+      {
+        "key": "item:pitot/ADS-B",
+        "group": "equipment",
+        "name": "pitot/ADS-B",
+        "mass": 0.1,
+        "method": "user-listed item"
+      },
+      {
+        "key": "item:cablagem de sinal + conectores",
+        "group": "equipment",
+        "name": "cablagem de sinal + conectores",
+        "mass": 0.3,
+        "method": "user-listed item"
+      },
+      {
+        "key": "item:ferragens/fixa\u00e7\u00f5es/pintura",
+        "group": "user_items",
+        "name": "ferragens/fixa\u00e7\u00f5es/pintura",
+        "mass": 0.4,
+        "method": "user-listed item"
+      },
+      {
+        "key": "growth",
+        "group": "allowance",
+        "name": "margem de crescimento/integra\u00e7\u00e3o",
+        "mass": 0.8904223207994596,
+        "method": "10% of the build-up (ASSUMPTION, labelled)"
+      }
+    ]
+  },
+  "geometry": {
+    "wing": {
+      "S_m2": 1.193179223073858,
+      "AR": 10.4247,
+      "span_m": 3.526830793613162,
+      "taper": 0.6,
+      "c_root_m": 0.4228935597203231,
+      "c_tip_m": 0.25373613583219384,
+      "MAC_m": 0.34536307377159714,
+      "y_MAC_m": 0.8082320568696829,
+      "sweep_c4_deg": 0.0,
+      "sweep_LE_deg": 1.3737757311969887,
+      "t/c": 0.12
+    },
+    "fuselage": {
+      "length_m": 1.8,
+      "diameter_m": 0.22
+    },
+    "htail": {
+      "S_m2": 0.20812123436423927,
+      "arm_m": 0.9900000000000001
+    },
+    "vtail": {
+      "S_m2": 0.12751943109807,
+      "arm_m": 0.9900000000000001
+    },
+    "wing_box": {
+      "front_spar_xc": 0.2,
+      "rear_spar_xc": 0.65,
+      "rib_pitch": null,
+      "skin_thickness": 0.001,
+      "spar_cap_area": 5e-05,
+      "material": "al2024_t3"
+    }
+  },
+  "aero": {
+    "CD0": 0.023814745921510116,
+    "K": 0.032587333212252746,
+    "LD_max": 17.94827096451139,
+    "CL_alpha_per_rad": 4.888318352043442,
+    "CLmax_clean": 1.3001200738987324,
+    "CLmax_takeoff": 1.3640960591189861,
+    "CLmax_landing": 1.7051200738987324,
+    "cruise_speed_m_s": 22.0,
+    "cruise_altitude_m": 600.0,
+    "elastic_correction": {
+      "applied": false,
+      "CLa_rigid_per_rad": 4.969650011047065,
+      "CLa_flex_per_rad": 4.979251742991041,
+      "CDi_rigid": 0.012765515784731002,
+      "CDi_flex": 0.012761777750981576,
+      "K_ratio": 0.9997071772255456,
+      "xac_w_mac": 0.25,
+      "tip_twist_deg": -0.022261391149720824,
+      "tip_deflection_m": 0.007291320209264702,
+      "stations": [
+        {
+          "y_m": 0.0,
+          "twist_deg": 0.0,
+          "deflection_m": 0.0
+        },
+        {
+          "y_m": 0.22042692460082264,
+          "twist_deg": -0.002033164631313178,
+          "deflection_m": 5.474088625827328e-05
+        },
+        {
+          "y_m": 0.4408538492016453,
+          "twist_deg": -0.005691030063205855,
+          "deflection_m": 0.0004203648562542883
+        },
+        {
+          "y_m": 0.6612807738024679,
+          "twist_deg": -0.009274623426209494,
+          "deflection_m": 0.0011004870238962156
+        },
+        {
+          "y_m": 0.8817076984032906,
+          "twist_deg": -0.012734859424952638,
+          "deflection_m": 0.0020496996136981373
+        },
+        {
+          "y_m": 1.1021346230041131,
+          "twist_deg": -0.0159859550538233,
+          "deflection_m": 0.0032108131853338683
+        },
+        {
+          "y_m": 1.3225615476049357,
+          "twist_deg": -0.01888590784168482,
+          "deflection_m": 0.004514930243457355
+        },
+        {
+          "y_m": 1.5429884722057585,
+          "twist_deg": -0.0211771401665537,
+          "deflection_m": 0.005892330796870955
+        },
+        {
+          "y_m": 1.763415396806581,
+          "twist_deg": -0.022261391149720824,
+          "deflection_m": 0.007291320209264702
+        }
+      ],
+      "notes": [
+        "Linha sustentadora de Glauert (Anderson \u00a75.3) com a\u2080 = 0,95\u00b72\u03c0 (Raymer \u00a712.4.1) e \u03b1_L0 = 0. A tor\u00e7\u00e3o el\u00e1stica entra no \u00e2ngulo local. Sem NeuralFoil neste caminho."
+      ]
+    }
+  },
+  "systems": {
+    "propeller": {
+      "D": 0.56,
+      "rpm_max": 4168.521446626759,
+      "rpm_cruise": 3367.3469387755104,
+      "J_cruise": 0.7,
+      "tip_mach_max": 0.35918187487677417,
+      "note": "limited by geometric D_max (0.560 m)",
+      "method": "raymer",
+      "status": "ok",
+      "eta_cruise": null,
+      "CT_cruise": null,
+      "CP_cruise": null,
+      "unassessed_terms": [],
+      "notes": [],
+      "polar_source": "",
+      "pitch_m": null,
+      "c075_D": null,
+      "rpm_static": null,
+      "P_shaft_cruise_W": null,
+      "T_cruise_N": null
+    },
+    "motor": {
+      "id": "outrunner_50xx_200kv_class",
+      "kind": "brushless_outrunner",
+      "kv": 200,
+      "p_max": 2600,
+      "v_max": 50.4,
+      "i_max": 55,
+      "mass": 0.54,
+      "eta_max": 0.88,
+      "source": "generic class"
+    },
+    "esc": {
+      "id": "esc_80a_12s_class",
+      "i_cont": 80,
+      "v_max": 50.4,
+      "mass": 0.15,
+      "source": "generic class"
+    },
+    "battery": {
+      "cell": {
+        "id": "liion_pouch_high_energy_class",
+        "chemistry": "li_ion",
+        "v_nom": 3.7,
+        "v_max": 4.2,
+        "capacity_ah": 20.0,
+        "i_cont": 40,
+        "mass": 0.27,
+        "source": "generic class (~270 Wh/kg pouch)"
+      },
+      "S": 8,
+      "P": 4,
+      "energy_nom_J": 8524800.0,
+      "capacity_ah": 80.0,
+      "v_nom": 29.6,
+      "v_max": 33.6,
+      "mass": 10.368,
+      "c_rate_peak": 0.7323228662526534,
+      "current_ok": true,
+      "specific_energy_Wh_kg": 228.39506172839506,
+      "limiting": "energy"
+    },
+    "servos": [
+      {
+        "surface": "aileron (each)",
+        "hinge_moment_Nm": 0.4645780521819748,
+        "torque_req_Nm": 0.6968670782729622,
+        "servo": "servo_mini_8kgcm_class",
+        "n": 2
+      },
+      {
+        "surface": "elevator",
+        "hinge_moment_Nm": 0.8158931770252029,
+        "torque_req_Nm": 1.2238397655378044,
+        "servo": "servo_standard_20kgcm_class",
+        "n": 1
+      },
+      {
+        "surface": "rudder",
+        "hinge_moment_Nm": 0.6491529757418426,
+        "torque_req_Nm": 0.9737294636127639,
+        "servo": "servo_standard_20kgcm_class",
+        "n": 1
+      }
+    ],
+    "autopilot": {
+      "id": "cubepilot_cube_orange_plus",
+      "imu": 3,
+      "baro": 2,
+      "can": 2,
+      "ethernet": false,
+      "firmware": [
+        "px4",
+        "ardupilot"
+      ],
+      "mass": 0.075,
+      "power_w": 2.5,
+      "url": "https://docs.cubepilot.org/user-guides/autopilot/the-cube-module-overview",
+      "source": "manufacturer docs (approx.)"
+    },
+    "power_avg_W": 31.0,
+    "masses": [
+      {
+        "name": "motor(s)",
+        "mass_kg": 0.54
+      },
+      {
+        "name": "ESC(s)",
+        "mass_kg": 0.15
+      },
+      {
+        "name": "servo aileron (each)",
+        "mass_kg": 0.05
+      },
+      {
+        "name": "servo elevator",
+        "mass_kg": 0.06
+      },
+      {
+        "name": "servo rudder",
+        "mass_kg": 0.06
+      },
+      {
+        "name": "autopilot cubepilot_cube_orange_plus",
+        "mass_kg": 0.075
+      },
+      {
+        "name": "battery",
+        "mass_kg": 10.368
+      }
+    ],
+    "messages": [],
+    "closure_history": [
+      {
+        "iter": 1,
+        "W0": 22.00392856530563,
+        "We": 8.970185815924124,
+        "systems_kg": 0.935,
+        "battery_Wh_kg": 200,
+        "pack_Wh_kg": 228.39506172839506,
+        "systems_power_W": 30,
+        "budget_W": 31.0,
+        "battery_mass_alloc": 9.033742748373502,
+        "battery_mass_sel": 10.368
+      },
+      {
+        "iter": 2,
+        "W0": 21.62598433772431,
+        "We": 9.793690262199554,
+        "systems_kg": 0.935,
+        "battery_Wh_kg": 228.39506172839506,
+        "pack_Wh_kg": 228.39506172839506,
+        "systems_power_W": 31.0,
+        "budget_W": 31.0,
+        "battery_mass_alloc": 7.8322940754361765,
+        "battery_mass_sel": 10.368
+      },
+      {
+        "iter": 3,
+        "W0": 21.62598433772431,
+        "We": 9.793690262199554,
+        "systems_kg": 0.935,
+        "battery_Wh_kg": 228.39506172839506,
+        "pack_Wh_kg": 228.39506172839506,
+        "systems_power_W": 31.0,
+        "budget_W": 31.0,
+        "battery_mass_alloc": 7.8322940754361765,
+        "battery_mass_sel": 10.368
+      }
+    ],
+    "pinned_ok": true
+  },
+  "aero_lowfi": {
+    "CD0": 0.023814745921510116,
+    "K": 0.032587333212252746,
+    "e_eff": 0.9369960069723209,
+    "e_inv_AVL": 0.97685,
+    "e_fuselage_factor": 0.9922177333164192,
+    "clmax_airfoil": 1.4445778598874803,
+    "clmax_Re": 336872.2606437127,
+    "cm0_airfoil": -0.09766103919183747,
+    "cruise_Re": 496079.8791246421,
+    "CDp_wing_cruise": 0.009953967189997179,
+    "wing_CD0_handbook": 0.008058630832643313,
+    "fit_rms": 0.000267246530360564,
+    "airfoil_source": "XFOIL 6.99 (Ncrit 9, xtr \u2264 0.30)",
+    "span_source": "AVL 3.40 (VLM), 2 \u00e2ngulos",
+    "AVL_CLalpha": 5.4294913061084635,
+    "notes": [
+      "perfil NACA 4412: Re cruzeiro 4.96e+05 (xtr = 0.30), clmax a Re_stall 3.37e+05 (transi\u00e7\u00e3o livre, Ncrit 9)"
+    ]
+  },
+  "structures": {
+    "vn": {
+      "regulation": "stanag_4671",
+      "category": "utility",
+      "VS1_EAS_m_s": 14.940002158486852,
+      "VA_EAS_m_s": 21.37121509058867,
+      "VC_EAS_m_s": 21.37121509058867,
+      "VD_EAS_m_s": 26.714018863235836,
+      "n_manoeuvre_pos": 4.4,
+      "n_manoeuvre_neg": -1.7600000000000002,
+      "n_gust_VC": [
+        5.072014895973944,
+        -3.072014895973944
+      ],
+      "n_gust_VD": [
+        3.545009309983715,
+        -1.545009309983715
+      ],
+      "mu_g": 16.723069582237994,
+      "Kg": 0.668222074012716,
+      "n_limit_pos": 5.072014895973944,
+      "n_limit_neg": -3.072014895973944,
+      "governing": "rajada",
+      "n_ultimate": 7.608022343960917
+    },
+    "condition": "n = 5.07 (rajada), q a VD = 26.7 m/s EAS",
+    "load_source": "Schrenk (NACA TM 948)",
+    "root_shear_N": 452.959708118418,
+    "root_moment_Nm": 349.89513869195537,
+    "root_torque_Nm": 7.882784476536985,
+    "wing_box_mass_kg": {
+      "caps": 0.10976934860746684,
+      "box_skins": 1.3412308491205736,
+      "core": 0.16320349109326798,
+      "webs": 0.08730845654150643,
+      "web_uprights": 0.0,
+      "LE_TE_skins": 0.84944620444303,
+      "ribs": 0.03775492444820833,
+      "ideal": 2.588713274254053,
+      "nonoptimum": 0.6471783185635133,
+      "total": 3.235891592817566
+    },
+    "wing_mass_raymer_kg": 3.4070411126107802,
+    "box_over_raymer": 0.9497659364427029,
+    "skin_buckling": {
+      "sigma_cr": 1497411.5797051156,
+      "tau_cr": 2002787.987855592,
+      "applied_tau": 1446410.8447304922,
+      "ok": true,
+      "note": "dimensionado \u00e0 encurvadura (Fase 3)"
+    },
+    "notes": [
+      "Revestimentos em sandu\u00edche: n\u00facleo PVC/PMI foam (ASSUMPTION) \u03c1 = 75 kg/m\u00b3, E_c = 70 MPa, G_c = 30 MPa (PRESSUPOSTO); n\u00facleo na raiz 2.0 mm, m\u00e1x. 2.0 mm; intera\u00e7\u00e3o R_c + R_s\u00b2 \u2264 1 (Bruhn C5)",
+      "Enrugamento das faces \u03c3_wr = 0.5 (E_f E_c G_c)^(1/3) = 251 MPa (Hoff & Mautner) \u2192 OK",
+      "Almas: n\u00facleo sandu\u00edche onde \u03c4 > \u03c4_cr (m\u00e1x. 2.0 mm)",
+      "allowables are ASSUMPTIONS (knock-down for environment/damage)",
+      "20 nervuras (passo 0.21 m)",
+      "fator n\u00e3o-\u00f3timo 1.25 (PRESSUPOSTO)",
+      "superf\u00edcies de comando, flaps e carenagens N\u00c3O inclu\u00eddos (secund\u00e1rios)",
+      "Eixo el\u00e1stico = centro de corte da sec\u00e7\u00e3o real (Megson, multic\u00e9lula, com bordo de ataque D): x_sc/c raiz 0.339 (meio do caix\u00e3o 0.425); EI/GJ da sec\u00e7\u00e3o idealizada no contorno do perfil"
+    ],
+    "box_method": "buckling",
+    "strength_box_mass_kg": 3.031887228950981,
+    "masses": {
+      "wing_box_kg": 3.235891592817566,
+      "fuselage_kg": 1.7316966140499614,
+      "htail_kg": 0.2479111667760786,
+      "vtail_kg": 0.15293845909040632,
+      "fuselage_raymer_kg": 1.1514082831435606,
+      "fuselage_over_raymer": 1.5039813760259784,
+      "structural_cg_m": 0.7864359709000409,
+      "fuselage_breakdown_kg": {
+        "skin_kg": 1.2417927973866636,
+        "longerons_kg": 0.0558,
+        "frames_kg": 0.022764765766075036,
+        "floor_kg": 0.051789375,
+        "bulkheads_kg": 0.029460285109038285,
+        "nonoptimum_kg": 0.33008939078818467
+      }
+    },
+    "deflections": {
+      "k_EI": 1.0,
+      "k_GJ": 1.0,
+      "wing_y_clamp_m": 0.11,
+      "fuselage_tail_m": 0.0001195136274742441,
+      "fuselage_fin_twist_deg": 0.008162790497863653,
+      "wing_tip_m": 0.030846223660735864,
+      "wing_tip_twist_deg": 0.06065175970849494,
+      "wing_stations": [
+        {
+          "y_m": 0.0,
+          "deflection_m": 0.0,
+          "twist_deg": 0.0
+        },
+        {
+          "y_m": 0.22042692460082264,
+          "deflection_m": 0.00023223276303903327,
+          "twist_deg": 0.0068338475810752275
+        },
+        {
+          "y_m": 0.4408538492016453,
+          "deflection_m": 0.0017821038375551107,
+          "twist_deg": 0.018962543700480727
+        },
+        {
+          "y_m": 0.6612807738024679,
+          "deflection_m": 0.004662058994801553,
+          "twist_deg": 0.03040385987696876
+        },
+        {
+          "y_m": 0.8817076984032906,
+          "deflection_m": 0.008677371292041089,
+          "twist_deg": 0.04072777180262182
+        },
+        {
+          "y_m": 1.1021346230041131,
+          "deflection_m": 0.013585532950289962,
+          "twist_deg": 0.049432792368197136
+        },
+        {
+          "y_m": 1.3225615476049357,
+          "deflection_m": 0.019097686191171276,
+          "twist_deg": 0.05594260313396605
+        },
+        {
+          "y_m": 1.5429884722057585,
+          "deflection_m": 0.02492362506497706,
+          "twist_deg": 0.059706699777462305
+        },
+        {
+          "y_m": 1.763415396806581,
+          "deflection_m": 0.030846223660735864,
+          "twist_deg": 0.06065175970849494
+        }
+      ],
+      "cruise_tip_twist_deg": -0.022261391149720824,
+      "cruise_tip_m": 0.007291320209264702
+    }
+  },
+  "structures_avl_loading": {
+    "vn": {
+      "regulation": "stanag_4671",
+      "category": "utility",
+      "VS1_EAS_m_s": 14.940002158486852,
+      "VA_EAS_m_s": 21.37121509058867,
+      "VC_EAS_m_s": 21.37121509058867,
+      "VD_EAS_m_s": 26.714018863235836,
+      "n_manoeuvre_pos": 4.4,
+      "n_manoeuvre_neg": -1.7600000000000002,
+      "n_gust_VC": [
+        5.072014895973944,
+        -3.072014895973944
+      ],
+      "n_gust_VD": [
+        3.545009309983715,
+        -1.545009309983715
+      ],
+      "mu_g": 16.723069582237994,
+      "Kg": 0.668222074012716,
+      "n_limit_pos": 5.072014895973944,
+      "n_limit_neg": -3.072014895973944,
+      "governing": "rajada",
+      "n_ultimate": 7.608022343960917
+    },
+    "condition": "n = 5.07 (rajada), q a VD = 26.7 m/s EAS",
+    "load_source": "AVL strip loading (c\u00b7cl shape)",
+    "root_shear_N": 453.1003344392227,
+    "root_moment_Nm": 344.5875225004687,
+    "root_torque_Nm": 7.9287965574843104,
+    "wing_box_mass_kg": {
+      "caps": 0.10734015289581711,
+      "box_skins": 1.3412308491205736,
+      "core": 0.16154236189364485,
+      "webs": 0.08730845654150643,
+      "web_uprights": 0.0,
+      "LE_TE_skins": 0.84944620444303,
+      "ribs": 0.03775492444820833,
+      "ideal": 2.5846229493427804,
+      "nonoptimum": 0.6461557373356951,
+      "total": 3.2307786866784753
+    },
+    "wing_mass_raymer_kg": 3.4070411126107802,
+    "box_over_raymer": 0.9482652483177003,
+    "skin_buckling": {
+      "sigma_cr": 1497411.5797051156,
+      "tau_cr": 2002787.987855592,
+      "applied_tau": 1454853.5939987134,
+      "ok": true,
+      "note": "dimensionado \u00e0 encurvadura (Fase 3)"
+    },
+    "notes": [
+      "Revestimentos em sandu\u00edche: n\u00facleo PVC/PMI foam (ASSUMPTION) \u03c1 = 75 kg/m\u00b3, E_c = 70 MPa, G_c = 30 MPa (PRESSUPOSTO); n\u00facleo na raiz 2.0 mm, m\u00e1x. 2.0 mm; intera\u00e7\u00e3o R_c + R_s\u00b2 \u2264 1 (Bruhn C5)",
+      "Enrugamento das faces \u03c3_wr = 0.5 (E_f E_c G_c)^(1/3) = 251 MPa (Hoff & Mautner) \u2192 OK",
+      "Almas: n\u00facleo sandu\u00edche onde \u03c4 > \u03c4_cr (m\u00e1x. 2.0 mm)",
+      "allowables are ASSUMPTIONS (knock-down for environment/damage)",
+      "20 nervuras (passo 0.21 m)",
+      "fator n\u00e3o-\u00f3timo 1.25 (PRESSUPOSTO)",
+      "superf\u00edcies de comando, flaps e carenagens N\u00c3O inclu\u00eddos (secund\u00e1rios)",
+      "Eixo el\u00e1stico = centro de corte da sec\u00e7\u00e3o real (Megson, multic\u00e9lula, com bordo de ataque D): x_sc/c raiz 0.338 (meio do caix\u00e3o 0.425); EI/GJ da sec\u00e7\u00e3o idealizada no contorno do perfil"
+    ],
+    "box_method": "buckling",
+    "strength_box_mass_kg": 3.028850734311419
+  },
+  "avl_cruise_trim": {
+    "alpha_deg": 3.2148,
+    "CL": 0.63537,
+    "CDi": 0.0126966,
+    "e": 0.9706,
+    "Cm": 0.0,
+    "x_ref": 0.14023,
+    "Xnp": 0.186972,
+    "derivatives": {
+      "CLa": 5.450788,
+      "CYb": -0.24004,
+      "Clb": -0.077146,
+      "Cma": -0.737731,
+      "Cnb": 0.06718,
+      "CLq": 8.052487,
+      "Cmq": -10.694401,
+      "Clp": -0.556378,
+      "Cnp": -0.055744,
+      "Clr": 0.167678,
+      "Cnr": -0.055147,
+      "CYr": 0.187033,
+      "CYp": -0.017463,
+      "CYq": -0.0
+    },
+    "controls_per_rad": {
+      "flap": {
+        "CL": 1.9577394901825098,
+        "CY": -0.0,
+        "Cl": -0.0,
+        "Cm": 0.12043572853649906,
+        "Cn": -0.0,
+        "CD": 0.07270834420210147
+      },
+      "aileron": {
+        "CL": 0.0,
+        "CY": -0.03156997451170836,
+        "Cl": -0.2585758529425405,
+        "Cm": -0.0,
+        "Cn": -0.003151267873219528,
+        "CD": 0.0
+      },
+      "elevator": {
+        "CL": 0.4584235318841716,
+        "CY": 0.0,
+        "Cl": -0.0,
+        "Cm": -1.2101441590958117,
+        "Cn": -0.0,
+        "CD": 0.011860226359208042
+      },
+      "rudder": {
+        "CL": -0.0,
+        "CY": -0.17738773337250288,
+        "Cl": -0.008823550045014679,
+        "Cm": 0.0,
+        "Cn": 0.058441695103343974,
+        "CD": 0.0
+      }
+    },
+    "deflections_deg": {
+      "flap": 0.0,
+      "aileron": 0.0,
+      "elevator": -2.91467,
+      "rudder": 0.0
+    }
+  },
+  "stability": {
+    "x_wing_apex_m": 0.617951857690413,
+    "placement": "asa posicionada para SM = 10% no CG mais recuado (\u00e1pice a 34.3% L)",
+    "xbar_np": 0.4499096490333429,
+    "xbar_np_no_fuselage": 0.4745420094254254,
+    "xbar_np_avl": 0.4852556374444718,
+    "fuselage_ac_shift": -0.026725844918172745,
+    "deps_dalpha": 0.2985217911823042,
+    "SM_fwd": 0.09999999999999998,
+    "SM_aft": 0.09999999999999998,
+    "cg_range_mac": [
+      0.34990964903334293,
+      0.34990964903334293
+    ],
+    "Vh": 0.5,
+    "Vv": 0.03,
+    "Vh_class": null,
+    "Vv_class": null,
+    "controls": {
+      "handbook_per_rad": {
+        "CLde": 0.39133035028808605,
+        "Cmde": -1.1217674274042977,
+        "Clda_magnitude": 0.3572968088337993,
+        "Cndr": -0.061250397713561264,
+        "tau_e": 0.6607459491435452,
+        "tau_a": 0.6089977810442292,
+        "tau_r": 0.7066615946086059
+      },
+      "avl_per_rad": {
+        "CLde": 0.4584235318841716,
+        "Cmde_about_ref": -1.2101441590958117,
+        "Clda_magnitude": 0.2585758529425405,
+        "Cndr": 0.058441695103343974,
+        "Cnb": 0.06718,
+        "Clb": -0.077146,
+        "Cmq": -10.694401
+      }
+    },
+    "trim": {
+      "CLmax limpo (CG dianteiro)": {
+        "CL": 1.3001200738987324,
+        "delta_e_deg": -10.825762994125974,
+        "xbar_cg": 0.34990964903334293,
+        "x_cg_m": 0.7581803511100906,
+        "ok": true
+      },
+      "cruzeiro (CG dianteiro)": {
+        "CL": 0.6353694859862974,
+        "delta_e_deg": -7.430459994077677,
+        "xbar_cg": 0.34990964903334293,
+        "x_cg_m": 0.7581803511100906,
+        "ok": true
+      }
+    },
+    "cases": [
+      {
+        "name": "vazio + bateria",
+        "mass": 17.626939604230234,
+        "x_cg": 0.7581803511100906,
+        "xbar_cg": 0.34990964903334293,
+        "SM": 0.09999999999999998
+      },
+      {
+        "name": "MTOW",
+        "mass": 21.626939604230234,
+        "x_cg": 0.7581803511100906,
+        "xbar_cg": 0.34990964903334293,
+        "SM": 0.09999999999999998
+      }
+    ],
+    "notes": [
+      "Cl\u03b4a comparado em m\u00f3dulo (conven\u00e7\u00f5es de sinal do aileron diferem entre AVL e Nelson).",
+      "Esta\u00e7\u00f5es de estrutura: PRESSUPOSTOS (Roskam Part V Table 8.1, valores t\u00edpicos). Tripula\u00e7\u00e3o, carga e bateria, se a miss\u00e3o n\u00e3o as der, ficam no CG da massa fixa (Raymer 2018 Sec. 15.1: a esta\u00e7\u00e3o que n\u00e3o desloca o balan\u00e7o). Um UAV sem massa de tripula\u00e7\u00e3o n\u00e3o leva tripula\u00e7\u00e3o. O combust\u00edvel de asa fica a 30 % da CMA. Substituir em assumptions.stability.stations."
+    ]
+  },
+  "weight_balance": {
+    "evaluated": true,
+    "within_limits": true,
+    "summary": "Todos os 3 carregamentos dentro dos limites conceptuais; extremos 0.758 m (vazio, 18 kg) e 0.758 m (vazio, 18 kg).",
+    "x_forward_m": 0.7479134609354364,
+    "x_aft_m": 0.7581803511100906,
+    "x_min_m": 0.7581803511100905,
+    "x_max_m": 0.7581803511100905,
+    "forward_limit": [
+      [
+        0.0,
+        0.7479134609354364
+      ]
+    ],
+    "aft_limit": [
+      [
+        0.0,
+        0.7581803511100906
+      ]
+    ],
+    "x_mac_le_m": 0.6373344791775946,
+    "mac_m": 0.34536307377159714,
+    "x_mac_le_report_m": null,
+    "mac_report_m": null,
+    "most_forward": {
+      "name": "vazio",
+      "mass_kg": 17.626939604230234,
+      "x_m": 0.7581803511100905,
+      "x_mac_percent": 34.99096490333426
+    },
+    "most_aft": {
+      "name": "vazio",
+      "mass_kg": 17.626939604230234,
+      "x_m": 0.7581803511100905,
+      "x_mac_percent": 34.99096490333426
+    },
+    "points": [
+      {
+        "name": "vazio",
+        "mass_kg": 17.626939604230234,
+        "x_m": 0.7581803511100905,
+        "x_mac_percent": 34.99096490333426,
+        "kind": "vertex"
+      },
+      {
+        "name": "payload",
+        "mass_kg": 21.626939604230234,
+        "x_m": 0.7581803511100905,
+        "x_mac_percent": 34.99096490333426,
+        "kind": "vertex"
+      },
+      {
+        "name": "payload",
+        "mass_kg": 21.62598433772431,
+        "x_m": 0.7581803511100905,
+        "x_mac_percent": 34.99096490333426,
+        "kind": "vertex"
+      }
+    ],
+    "paths": [],
+    "items": [
+      {
+        "name": "wing",
+        "x_m": 0.7754797086862334,
+        "mass_min_kg": 3.4070411126107802,
+        "mass_max_kg": 3.4070411126107802,
+        "kind": "fixed"
+      },
+      {
+        "name": "htail",
+        "x_m": 1.7486032946040473,
+        "mass_min_kg": 0.3800501860725373,
+        "mass_max_kg": 0.3800501860725373,
+        "kind": "fixed"
+      },
+      {
+        "name": "vtail",
+        "x_m": 1.75903055138812,
+        "mass_min_kg": 0.23286323312818571,
+        "mass_max_kg": 0.23286323312818571,
+        "kind": "fixed"
+      },
+      {
+        "name": "fuselage",
+        "x_m": 0.756,
+        "mass_min_kg": 1.0650706006061803,
+        "mass_max_kg": 1.0650706006061803,
+        "kind": "fixed"
+      },
+      {
+        "name": "motor_esc",
+        "x_m": 0.07200000000000001,
+        "mass_min_kg": 0.6900000000000001,
+        "mass_max_kg": 0.6900000000000001,
+        "kind": "fixed"
+      },
+      {
+        "name": "propeller",
+        "x_m": 0.0,
+        "mass_min_kg": 0.08,
+        "mass_max_kg": 0.08,
+        "kind": "fixed"
+      },
+      {
+        "name": "flight_controls",
+        "x_m": 0.9,
+        "mass_min_kg": 0.06423946852112321,
+        "mass_max_kg": 0.06423946852112321,
+        "kind": "fixed"
+      },
+      {
+        "name": "servos",
+        "x_m": 0.8445523234405529,
+        "mass_min_kg": 0.16999999999999998,
+        "mass_max_kg": 0.16999999999999998,
+        "kind": "fixed"
+      },
+      {
+        "name": "avionics",
+        "x_m": 0.45,
+        "mass_min_kg": 0.075,
+        "mass_max_kg": 0.075,
+        "kind": "fixed"
+      },
+      {
+        "name": "harness",
+        "x_m": 0.63,
+        "mass_min_kg": 0.2899586070557896,
+        "mass_max_kg": 0.2899586070557896,
+        "kind": "fixed"
+      },
+      {
+        "name": "item:paraquedas de recupera\u00e7\u00e3o + ejetor",
+        "x_m": 0.7200000000000001,
+        "mass_min_kg": 1.0,
+        "mass_max_kg": 1.0,
+        "kind": "fixed"
+      },
+      {
+        "name": "item:suporte/amortecimento do gimbal",
+        "x_m": 0.7200000000000001,
+        "mass_min_kg": 0.3,
+        "mass_max_kg": 0.3,
+        "kind": "fixed"
+      },
+      {
+        "name": "item:datalink C2 + antenas",
+        "x_m": 0.7200000000000001,
+        "mass_min_kg": 0.25,
+        "mass_max_kg": 0.25,
+        "kind": "fixed"
+      },
+      {
+        "name": "item:GNSS + b\u00fassola (x2)",
+        "x_m": 0.7200000000000001,
+        "mass_min_kg": 0.1,
+        "mass_max_kg": 0.1,
+        "kind": "fixed"
+      },
+      {
+        "name": "item:pitot/ADS-B",
+        "x_m": 0.7200000000000001,
+        "mass_min_kg": 0.1,
+        "mass_max_kg": 0.1,
+        "kind": "fixed"
+      },
+      {
+        "name": "item:cablagem de sinal + conectores",
+        "x_m": 0.7200000000000001,
+        "mass_min_kg": 0.3,
+        "mass_max_kg": 0.3,
+        "kind": "fixed"
+      },
+      {
+        "name": "item:ferragens/fixa\u00e7\u00f5es/pintura",
+        "x_m": 0.7200000000000001,
+        "mass_min_kg": 0.4,
+        "mass_max_kg": 0.4,
+        "kind": "fixed"
+      },
+      {
+        "name": "growth",
+        "x_m": 0.756,
+        "mass_min_kg": 0.8904223207994596,
+        "mass_max_kg": 0.8904223207994596,
+        "kind": "fixed"
+      },
+      {
+        "name": "payload",
+        "x_m": 0.7581803511100906,
+        "mass_min_kg": 0.0,
+        "mass_max_kg": 4.0,
+        "kind": "variable"
+      },
+      {
+        "name": "bateria",
+        "x_m": 0.7581803511100906,
+        "mass_min_kg": 7.8322940754361765,
+        "mass_max_kg": 7.8322940754361765,
+        "kind": "fixed"
+      }
+    ],
+    "notes": [
+      "Limite dianteiro conceptual: dimensiona \u00abflare com flaps\u00bb a 0.748 m. Casos: limpo a 0.684 m (CL 1.30, Cm0 -0.0819), flare com flaps a 0.748 m (CL 1.71, Cm0 -0.2732). Nelson 1998 Cap. 2, |\u03b4e| = 25\u00b0. Cm0 da asa = -0.0819 (Raymer Eq. 16.13, cm0 do perfil) Cm0,f = -0.0212 entra no flare (Multhopp, Nelson 1998 Cap. 2; k2\u2212k1 da tabela de Lamb em Tuckerman, NACA Report 139; \u03b10 = -3.98\u00b0. Largura constante igual a D e i_f = 0, PRESSUPOSTO \u2014 fuselagem de revolu\u00e7\u00e3o, Torenbeek App. F, sem segmentar nariz e cauda) \u0394Cm do flap = -0.1700 entra no flare (Glauert 1926, b_C\u00b7\u03b4\u00b7S_f/S; \u03b4 = 30\u00b0 (PRESSUPOSTO, omiss\u00e3o de flightsim/controls.py \u2014 substituir em assumptions.aero.flap.landing_deg); c_f/c = 0.25 (PRESSUPOSTO, omiss\u00e3o de flightsim/controls.py \u2014 substituir em assumptions.aero.flap.cf_c); S_f/S = 0.500; corda da parte com flap igual \u00e0 CMA, PRESSUPOSTO). Efeito de solo no flare: CL\u03b1 da cauda \u00d7 1.010 (\u03c6 = 0.969 = 1 \u2212 exp[\u22122.48 (2h/b)^0.768], Torenbeek 1982, citado por Phillips e Hunsaker, Journal of Aircraft, Vol. 50, No. 4, 2013, Eq. (4); h/b = 0.778, h = 0.710 m, trem + 0.5 D, omiss\u00e3o 0.60 m (PRESSUPOSTO, weights_detailed.DEFAULT_MAIN_GEAR_LENGTH_M); PRESSUPOSTO: o centro aerodin\u00e2mico da cauda est\u00e1 \u00e0 altura do eixo da fuselagem). 1/CL\u03b1 = 1/a0 + \u03c6/(\u03c0 AR), a0 = 0.95\u00b72\u03c0, e = 1 (PRESSUPOSTO). O quociente multiplica o CL\u03b1 livre e n\u00e3o substitui o declive de Helmbold. O CLmax n\u00e3o aumenta e o d\u03b5/d\u03b1 do ponto neutro n\u00e3o \u00e9 reduzido: essa redu\u00e7\u00e3o \u00e9 a penaliza\u00e7\u00e3o de rota\u00e7\u00e3o, n\u00e3o um al\u00edvio do flare. Na tesoura, \u03c6 repete-se em cada S_h/S porque a envergadura muda com a \u00e1rea. O flare fica em efeito de solo s\u00f3 neste declive. O fator de Hoerner e Borst n\u00e3o \u00e9 usado como CL\u03b1.",
+      "Limite traseiro conceptual: ponto neutro menos a margem est\u00e1tica alvo (Raymer Cap. 16).",
+      "Esta\u00e7\u00f5es de CG: as da estabilidade. Estrutura: Roskam Parte V, Tabela 8.1 (PRESSUPOSTO). Tripula\u00e7\u00e3o, carga e bateria, se a miss\u00e3o n\u00e3o as der, ficam no CG da massa fixa (Raymer 2018 Sec. 15.1); combust\u00edvel de asa a 30 % da CMA. Substituir em assumptions.stability.stations, weight_balance.loading ou extra_items. O combust\u00edvel arde na esta\u00e7\u00e3o do tanque; n\u00e3o h\u00e1 combust\u00edvel inutiliz\u00e1vel separado.",
+      "A tripula\u00e7\u00e3o, quando existe, vai em todos os carregamentos."
+    ]
+  },
+  "landing_gear": {
+    "kind": "none",
+    "geometry_ok": null,
+    "load_factor_ok": null,
+    "geometry_summary": "sem trem",
+    "load_summary": "sem trem; 14 CFR 23.473 n\u00e3o aplicado",
+    "x_nose_m": null,
+    "x_main_m": null,
+    "x_tail_m": null,
+    "track_m": null,
+    "h_cg_m": null,
+    "tipback_deg": null,
+    "overturn_deg": null,
+    "nose_fraction_fwd": null,
+    "nose_fraction_aft": null,
+    "rotation_deg": null,
+    "descent_ft_s": null,
+    "descent_m_s": null,
+    "wing_loading_psf": null,
+    "landing_weight_kg": null,
+    "n_inertia": null,
+    "n_gear": null,
+    "stroke_m": null,
+    "stroke_no_lift_m": null,
+    "eta": null,
+    "wing_lift_fraction": null,
+    "notes": [
+      "Sem trem de aterragem (landing_gear: none) \u2014 lan\u00e7amento e recupera\u00e7\u00e3o ficam por analisar."
+    ],
+    "checks": []
+  },
+  "performance": {
+    "range_km": 212.36923820059457,
+    "endurance_h": 2.7325015464011697,
+    "segments": [
+      {
+        "segmento": "descolagem",
+        "t [min]": 1.0,
+        "dist [km]": 0.0,
+        "consumo [Wh]": 16.72470066783197,
+        "h [m]": "0\u21920",
+        "V [m/s]": 0.0,
+        "nota": "1 min pot\u00eancia de descolagem (PRESSUPOSTO)"
+      },
+      {
+        "segmento": "subida (V_y)",
+        "t [min]": 3.348258016262323,
+        "dist [km]": 3.600275621887734,
+        "consumo [Wh]": 78.09167841838797,
+        "h [m]": "0\u2192600",
+        "V [m/s]": 18.16833157851945,
+        "nota": "pot\u00eancia de subida, integrado (V m\u00e9dio)"
+      },
+      {
+        "segmento": "espera (loiter)",
+        "t [min]": 150.0,
+        "dist [km]": 198.0,
+        "consumo [Wh]": 1172.1908066830592,
+        "h [m]": "600\u2192600",
+        "V [m/s]": 22.0,
+        "nota": "estendido at\u00e9 esgotar o or\u00e7amento"
+      },
+      {
+        "segmento": "descida (L/D m\u00e1x, ralenti) + aterragem",
+        "t [min]": 9.60183476780786,
+        "dist [km]": 10.768962578706834,
+        "consumo [Wh]": 0.0,
+        "h [m]": "600\u21920",
+        "V [m/s]": 18.692543038427083,
+        "nota": "planado, energia \u2248 0"
+      }
+    ],
+    "required_mission_segments": [
+      {
+        "segmento": "descolagem",
+        "t [min]": 1.0,
+        "dist [km]": 0.0,
+        "consumo [Wh]": 16.72470066783197,
+        "h [m]": "0\u21920",
+        "V [m/s]": 0.0,
+        "nota": "1 min pot\u00eancia de descolagem (PRESSUPOSTO)"
+      },
+      {
+        "segmento": "subida (V_y)",
+        "t [min]": 3.348258016262323,
+        "dist [km]": 3.600275621887734,
+        "consumo [Wh]": 78.09167841838797,
+        "h [m]": "0\u2192600",
+        "V [m/s]": 18.16833157851945,
+        "nota": "pot\u00eancia de subida, integrado (V m\u00e9dio)"
+      },
+      {
+        "segmento": "espera (loiter)",
+        "t [min]": 150.0,
+        "dist [km]": 198.0,
+        "consumo [Wh]": 1172.1908066830592,
+        "h [m]": "600\u2192600",
+        "V [m/s]": 22.0,
+        "nota": ""
+      },
+      {
+        "segmento": "descida (L/D m\u00e1x, ralenti) + aterragem",
+        "t [min]": 9.60183476780786,
+        "dist [km]": 10.768962578706834,
+        "consumo [Wh]": 0.0,
+        "h [m]": "600\u21920",
+        "V [m/s]": 18.692543038427083,
+        "nota": "planado, energia \u2248 0"
+      }
+    ],
+    "required_mission_budget_used_fraction": 0.9999210323446839,
+    "envelope": {
+      "service_ceiling": null,
+      "absolute_ceiling": null,
+      "roc_sl": 3.000037738215951
+    },
+    "takeoff": {
+      "ground_roll": 62.10528243291973,
+      "transition": 15.564185626791721,
+      "climb": 131.86871034799273,
+      "total_50ft": 209.53817840770418,
+      "V_TO": 16.043997918973872,
+      "gamma_climb_deg": 6.229024713710488,
+      "T_N": 55.397562554937494
+    },
+    "landing": {
+      "approach": 287.36361933731723,
+      "flare": 6.870518699089956,
+      "free_roll": 45.00740779019383,
+      "braking": 34.25722340326053,
+      "ground_roll": 79.26463119345436,
+      "total_50ft": 373.4987692298616,
+      "V_TD": 15.002469263397943,
+      "mu_brake": 0.4,
+      "gamma_deg": 3.0
+    },
+    "payload_range": {
+      "points": [
+        {
+          "ponto": "O",
+          "payload_kg": 4.0,
+          "massa_kg": 21.62598433763573,
+          "range_km": 0.0,
+          "endurance_h": 0.0
+        },
+        {
+          "ponto": "A",
+          "payload_kg": 4.0,
+          "massa_kg": 21.62598433763573,
+          "range_km": 212.3692382005641,
+          "endurance_h": 2.7325015464011524
+        },
+        {
+          "ponto": "B (projeto)",
+          "payload_kg": 4.0,
+          "massa_kg": 21.62598433763573,
+          "range_km": 212.3692382005641,
+          "endurance_h": 2.7325015464011524
+        },
+        {
+          "ponto": "D (sem payload)",
+          "payload_kg": 0.0,
+          "massa_kg": 17.62598433763573,
+          "range_km": 239.7594264841636,
+          "endurance_h": 3.096778697957249
+        }
+      ],
+      "note": "el\u00e9trico: massa de bateria fixa; menos payload \u2192 menor massa \u2192 mais alcance",
+      "V": 22.0,
+      "h": 600.0
+    },
+    "budget": "E_nom 1789 Wh \u00d7 DoD 0.85 / (1 + reserva 0.2)",
+    "requirements": [
+      {
+        "requisito": "endurance",
+        "grandeza": "tempo em espera (segmentos)",
+        "obtido": 2.5,
+        "requerido": 2.5,
+        "unidade": "h",
+        "ok": true
+      },
+      {
+        "requisito": "service_ceiling",
+        "grandeza": "teto de servi\u00e7o (Anderson) > 9000 m (n\u00e3o atingido)",
+        "obtido": 9000.0,
+        "requerido": 3000.0,
+        "unidade": "m",
+        "ok": true
+      },
+      {
+        "requisito": "climb_rate",
+        "grandeza": "ROC m\u00e1x. ao n\u00edvel do mar",
+        "obtido": 3.000037738215951,
+        "requerido": 3.0,
+        "unidade": "m/s",
+        "ok": true
+      }
+    ],
+    "notes": [
+      "Os resultados de segmentos usam a mesma polar e reservas do dimensionamento; diferen\u00e7as face aos requisitos v\u00eam da subida/descida integradas vs. fra\u00e7\u00f5es hist\u00f3ricas (Raymer Table 3.2)."
+    ]
+  },
+  "verified_segment_mission": false,
+  "aeroelasticity": {
+    "VD_eas": 26.714018863235836,
+    "V_divergence_eas": 357.11161241876806,
+    "V_reversal_eas": null,
+    "V_flutter_eas": null,
+    "f_flutter_Hz": null,
+    "f_bending_Hz": 18.273385505797403,
+    "f_torsion_Hz": 106.98570703535025,
+    "aeer45": {
+      "F": 0.0008588811792915285,
+      "F_max": 0.05600725760112023,
+      "V_crit_eas": 215.72219925369313,
+      "ok": true,
+      "applicable": true,
+      "not_applicable_because": [],
+      "aileron_balance": "n\u00e3o avaliado \u2014 crit\u00e9rios K/I de equil\u00edbrio de massa do aileron exigem a in\u00e9rcia do aileron (Fase 4: dados de detalhe)"
+    },
+    "margins": {
+      "divergence": {
+        "V_eas": 357.11161241876806,
+        "V_required": 32.056822635883,
+        "margin": 10.139956585061958,
+        "ok": true
+      },
+      "reversal": {
+        "V_eas": null,
+        "V_required": 32.056822635883,
+        "margin": null,
+        "ok": true
+      },
+      "flutter": {
+        "V_eas": null,
+        "V_required": 32.056822635883,
+        "margin": null,
+        "ok": true
+      }
+    },
+    "static_aerostructural": {
+      "points": {
+        "cruise": {
+          "flex": {
+            "alpha_deg": 7.152164345737142,
+            "CL": 0.6353694859544079,
+            "CDi": 0.012025494810079118,
+            "tip_deflection_m": 0.006613123408739411,
+            "tip_twist_deg": 0.04043959240997471,
+            "failure": -0.8996968056776408,
+            "struct_mass": 2.3113874343759586,
+            "_tip_dz": 0.006682683135405554,
+            "CLalpha_per_rad": 5.065795977885484,
+            "L_Di": 52.83520520268951
+          },
+          "rigid": {
+            "alpha_deg": 7.176106090385678,
+            "CL": 0.6353694859431653,
+            "CDi": 0.012021399661094284,
+            "tip_deflection_m": 6.605262145001846e-07,
+            "tip_twist_deg": 4.040080697227016e-06,
+            "failure": -0.8997598462183357,
+            "struct_mass": 2.3113874343759586,
+            "_tip_dz": 6.674755163005571e-07,
+            "CLalpha_per_rad": 5.047066272777784,
+            "L_Di": 52.85320377455356
+          }
+        },
+        "manobra (n_lim, V_D EAS, n\u00edvel do mar)": {
+          "flex": {
+            "alpha_deg": 23.71143391940263,
+            "CL": 2.062466237950133,
+            "CDi": 0.12631777743519024,
+            "tip_deflection_m": 0.031633756206955695,
+            "tip_twist_deg": 0.1919524473812201,
+            "failure": -0.5370187350257392,
+            "struct_mass": 2.3113874343759586,
+            "_tip_dz": 0.031963931045733744,
+            "CLalpha_per_rad": 4.729796407803158,
+            "L_Di": 16.327600752857776
+          },
+          "rigid": {
+            "alpha_deg": 23.897062323608043,
+            "CL": 2.0624662376221754,
+            "CDi": 0.12607641403294934,
+            "tip_deflection_m": 3.1549558880807904e-06,
+            "tip_twist_deg": 1.916174048409106e-05,
+            "failure": -0.537607295694928,
+            "struct_mass": 2.3113874343759586,
+            "_tip_dz": 3.187915803395294e-06,
+            "CLalpha_per_rad": 4.669077602944675,
+            "L_Di": 16.35885866077347
+          }
+        }
+      },
+      "notes": [
+        "ponto de manobra: CL = 2.06 > CLmax limpo 1.30 (n_lim de rajada acima da linha de perda) \u2014 caso de carga v\u00e1lido para a deforma\u00e7\u00e3o (VLM linear), \u03b1 n\u00e3o f\u00edsico",
+        "OpenAeroStruct VLM (sem viscoso/onda: s\u00f3 arrasto induzido) + FEM de caix\u00e3o 'wingbox' acoplados por NLBGS; r\u00edgido = E, G \u00d7 10\u2074",
+        "sec\u00e7\u00e3o do caix\u00e3o: NACA-4 entre longarinas; espessuras de alma/revestimento do caix\u00e3o acdt (5 pontos de controlo); revestimento \u00fanico equivalente que reproduz EI(y) do caix\u00e3o acdt e G ajustado para GJ (PRESSUPOSTO)",
+        "sem al\u00edvio de peso estrutural nem de combust\u00edvel na asa (conservativo para a deforma\u00e7\u00e3o)",
+        "\u00edndice de falha OAS (von Mises/KS, \u03c3_adm = \u03c3_cap/1.5) na manobra: -0.537 (< 0 = OK) \u2014 crit\u00e9rio de resist\u00eancia do OAS sobre o revestimento equivalente \u2014 INDICATIVO (o dimensionamento \u00e9 o do caix\u00e3o acdt)"
+      ],
+      "K_ratio": 1.000340654923743,
+      "K_rigid": 0.032587333212252746,
+      "K_flex": 0.03259843424776315
+    },
+    "flexible_performance": {
+      "r\u00edgido": {
+        "range_km": 212.36923820059457,
+        "endurance_h": 2.7325015464011697,
+        "K": 0.032587333212252746
+      },
+      "flex\u00edvel": {
+        "range_km": 212.14763006725778,
+        "endurance_h": 2.7296862971237963,
+        "K": 0.03259843424776315
+      }
+    },
+    "notes": [
+      "massa da asa 3.41 kg distribu\u00edda \u221d corda; CG da sec\u00e7\u00e3o a 0.50 c; eixo el\u00e1stico a 0.339 c (centro de corte da sec\u00e7\u00e3o, m\u00e9dia), e = 0.089 c atr\u00e1s do c.a.; a_w = 6.283/rad (2D, teoria das faixas \u2014 sem corre\u00e7\u00e3o 3D/compressibilidade)",
+      "encastramento na parede da fuselagem y0 = 0.110 m; EI/GJ do caix\u00e3o buckling",
+      "requisito: livre de flutter/diverg\u00eancia/invers\u00e3o at\u00e9 1.2 V_D = 32.1 m/s EAS (14 CFR 23.629(c) legado; CS/14 CFR 23.2245 'suficientemente al\u00e9m'; STANAG 4671 USAR.629 \u2014 verificar)",
+      "flutter: modelo bin\u00e1rio de modos assumidos (W&C Cap. 11), aerodin\u00e2mica quase-estacion\u00e1ria \u2014 ESTIMATIVA; a an\u00e1lise racional exige modos FEM + DLM (Fase 4)",
+      "UAV (STANAG 4671): AEER-45 \u00e9 um crit\u00e9rio FAA para avia\u00e7\u00e3o geral \u2014 informativo"
+    ]
+  },
+  "dynamics": {
+    "scissor": {
+      "cg_range": [
+        0.34990964903334293,
+        0.34990964903334293
+      ],
+      "Sh_S_current": 0.17442579483413995,
+      "Sh_S_required": 0.17443992434507163,
+      "Sh_S_stability": 0.17443992434507163,
+      "Sh_S_control": 0.1069338552050778,
+      "binding": "estabilidade",
+      "ok": true,
+      "notes": [
+        "linha de controlo: o x\u0304 mais \u00e0 r\u00e9 entre o CLmax limpo 1.30 (Cm0 asa -0.0819) e o flare com flaps (CLmax aterragem 1.71, Cm0 -0.2732), \u03b4e = \u221225\u00b0, \u03c4_e = 0.661. Cm0 da asa = -0.0819 (Raymer Eq. 16.13, cm0 do perfil) Cm0,f = -0.0212 entra no flare (Multhopp, Nelson 1998 Cap. 2; k2\u2212k1 da tabela de Lamb em Tuckerman, NACA Report 139; \u03b10 = -3.98\u00b0. Largura constante igual a D e i_f = 0, PRESSUPOSTO \u2014 fuselagem de revolu\u00e7\u00e3o, Torenbeek App. F, sem segmentar nariz e cauda) \u0394Cm do flap = -0.1700 entra no flare (Glauert 1926, b_C\u00b7\u03b4\u00b7S_f/S; \u03b4 = 30\u00b0 (PRESSUPOSTO, omiss\u00e3o de flightsim/controls.py \u2014 substituir em assumptions.aero.flap.landing_deg); c_f/c = 0.25 (PRESSUPOSTO, omiss\u00e3o de flightsim/controls.py \u2014 substituir em assumptions.aero.flap.cf_c); S_f/S = 0.500; corda da parte com flap igual \u00e0 CMA, PRESSUPOSTO). Efeito de solo no flare: CL\u03b1 da cauda \u00d7 1.010 (\u03c6 = 0.969 = 1 \u2212 exp[\u22122.48 (2h/b)^0.768], Torenbeek 1982, citado por Phillips e Hunsaker, Journal of Aircraft, Vol. 50, No. 4, 2013, Eq. (4); h/b = 0.778, h = 0.710 m, trem + 0.5 D, omiss\u00e3o 0.60 m (PRESSUPOSTO, weights_detailed.DEFAULT_MAIN_GEAR_LENGTH_M); PRESSUPOSTO: o centro aerodin\u00e2mico da cauda est\u00e1 \u00e0 altura do eixo da fuselagem). 1/CL\u03b1 = 1/a0 + \u03c6/(\u03c0 AR), a0 = 0.95\u00b72\u03c0, e = 1 (PRESSUPOSTO). O quociente multiplica o CL\u03b1 livre e n\u00e3o substitui o declive de Helmbold. O CLmax n\u00e3o aumenta e o d\u03b5/d\u03b1 do ponto neutro n\u00e3o \u00e9 reduzido: essa redu\u00e7\u00e3o \u00e9 a penaliza\u00e7\u00e3o de rota\u00e7\u00e3o, n\u00e3o um al\u00edvio do flare. Na tesoura, \u03c6 repete-se em cada S_h/S porque a envergadura muda com a \u00e1rea. O flare fica em efeito de solo s\u00f3 neste declive. O fator de Hoerner e Borst n\u00e3o \u00e9 usado como CL\u03b1.",
+        "massa da cauda n\u00e3o realimentada (posi\u00e7\u00e3o da asa e bra\u00e7o fixos)",
+        "gama de CG: a mesma do trim (extremos dos casos de carregamento)"
+      ]
+    },
+    "modes": {
+      "longitudinal": {
+        "eig": [
+          "(-6.624963401850183+5.60135985869596j)",
+          "(-6.624963401850183-5.60135985869596j)",
+          "(-0.03517662395316471+0.4978628132230409j)",
+          "(-0.03517662395316471-0.4978628132230409j)"
+        ],
+        "phugoid": {
+          "wn": 0.4991039727983568,
+          "zeta": 0.07047955109621304,
+          "period_s": 12.620314553127189,
+          "eig": "(-0.03517662395316471+0.4978628132230409j)"
+        },
+        "short_period": {
+          "wn": 8.675561788291567,
+          "zeta": 0.7636350894061008,
+          "period_s": 1.121724985661314,
+          "eig": "(-6.624963401850183+5.60135985869596j)"
+        },
+        "n_alpha": 8.347171922661223,
+        "CAP": 9.01687098814048
+      },
+      "lateral": {
+        "eig": [
+          "(-16.604367328172785+0j)",
+          "(-0.7976999614034141+3.9810712038426552j)",
+          "(-0.7976999614034141-3.9810712038426552j)",
+          "(0.05298595485744665+0j)"
+        ],
+        "dutch_roll": {
+          "wn": 4.0602035858424905,
+          "zeta": 0.1964679712576264,
+          "period_s": 1.5782649908685025,
+          "eig": "(-0.7976999614034141+3.9810712038426552j)"
+        },
+        "spiral": {
+          "lambda": 0.05298595485744665,
+          "T2_s": 13.08171537957158,
+          "T_half_s": null,
+          "stable": false
+        },
+        "roll": {
+          "lambda": -16.604367328172785,
+          "tau_s": 0.06022511910485687
+        }
+      },
+      "inertia": {
+        "m": 21.626939604230234,
+        "x_cg": 0.7581803511100906,
+        "m_sel": 21.626939604230234,
+        "x_sel": 0.7581803511100906,
+        "Ixx": 3.125920423767916,
+        "Iyy": 1.2959245571029008,
+        "Izz": 4.397097430428776,
+        "Rx": 0.21559406288278352,
+        "Ry": 0.2719880457722177,
+        "Rz": 0.3385919279810898
+      },
+      "source": "AVL",
+      "derivatives": {
+        "CLa": 5.303772602700455,
+        "Cma": -0.5303772602700454,
+        "Cmad": -2.9055853970841676,
+        "Cmq": -10.694401,
+        "CL": 0.6353975516308188,
+        "CD": 0.03697123154363819,
+        "Cnb_fus": -0.017796913605311007,
+        "Cnb_total": 0.049383086394688996,
+        "Clb": -0.077146,
+        "Clp": -0.556378,
+        "Cnr": -0.055147,
+        "CYb": -0.24004
+      },
+      "u0": 22.0,
+      "notes": [
+        "derivadas de taxa e laterais: AVL (sem fuselagem) + Cn\u03b2 da fuselagem (Raymer 16.47) -0.0178",
+        "Cm\u03b1 = \u2212CL\u03b1\u00b7SM no CG de MTOW (ponto neutro de manual com fuselagem)",
+        "in\u00e9rcias por soma de componentes (Roskam Parte V) \u2014 PRESSUPOSTOS de esta\u00e7\u00f5es"
+      ]
+    },
+    "handling_qualities": [
+      {
+        "key": "short_period",
+        "modo": "per\u00edodo curto \u03b6",
+        "valor": 0.7636350894061008,
+        "n\u00edvel": 1,
+        "limite N1": "0.30\u20132.00",
+        "ref": "MIL-F-8785C Table IV"
+      },
+      {
+        "key": "CAP",
+        "modo": "CAP = \u03c9\u00b2/(n/\u03b1) [1/(g s\u00b2)]",
+        "valor": 9.01687098814048,
+        "n\u00edvel": 2,
+        "limite N1": "0.085\u20133.6",
+        "ref": "MIL-F-8785C Figs. 1\u20133"
+      },
+      {
+        "key": "phugoid",
+        "modo": "fug\u00f3ide \u03b6",
+        "valor": 0.07047955109621304,
+        "n\u00edvel": 1,
+        "limite N1": "\u2265 0.04",
+        "ref": "MIL-F-8785C 3.2.1.2"
+      },
+      {
+        "key": "dutch_roll",
+        "modo": "rolamento holand\u00eas \u03b6 / \u03b6\u03c9 / \u03c9",
+        "valor": "0.196 / 0.798 / 4.06",
+        "n\u00edvel": 1,
+        "limite N1": "0.08 / 0.15 / 0.4",
+        "ref": "MIL-F-8785C Table VI"
+      },
+      {
+        "key": "roll",
+        "modo": "rolamento \u03c4_R [s]",
+        "valor": 0.06022511910485687,
+        "n\u00edvel": 1,
+        "limite N1": "\u2264 1.4",
+        "ref": "MIL-F-8785C Table VII"
+      },
+      {
+        "key": "spiral",
+        "modo": "espiral T2 [s] (\u221e = est\u00e1vel)",
+        "valor": 13.08171537957158,
+        "n\u00edvel": 2,
+        "limite N1": "\u2265 20",
+        "ref": "MIL-F-8785C Table VIII"
+      }
+    ],
+    "hq_category": "B"
+  },
+  "wing_box_comparison_kg": {
+    "strength_box": 3.031887228950981,
+    "buckling_box": 3.235891592817566,
+    "raymer_15_46": 3.4070411126107802
+  }
+}

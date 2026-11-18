@@ -1,0 +1,147 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO: shorter sample so common pointmass completes within sized fuel.
+schema_version: '1.0'
+source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+  do fornecedor; não valida uma aeronave real'
+mission:
+  envelope:
+    distance_km:
+    - 200
+    - 200
+    speed_m_s:
+    - 230
+    - 230
+    on_station_h:
+    - 0.25
+    - 0.25
+    payload_kg:
+    - 15100
+    - 15100
+  samples:
+  - id: transporte-rápido
+    distance_km: 200
+    speed_m_s: 230
+    on_station_h: 0.25
+    payload_kg: 15100
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+operations:
+  availability: 0.9
+  n_stations: 1
+  handoff_overlap_h: 0
+  reserve_h: 0
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  common_sim:
+    enabled: true
+    source: 'PRESSUPOSTO: opt-in common pointmass judge for jet; not AFM'
+    phases:
+    - transit_out
+    - station
+    - transit_back
+    pointmass_dt: 10
+    altitude_m: 11277.6
+    speed_m_s: 230
+candidates:
+- id: jato-transport
+  architecture: jato-transport — opção fornecida, não preseleção automática
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 2
+    turnaround_h:
+    - 0.1
+    - 0.3
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: jet
+    onboard:
+      schema_version: '1.0'
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+      items:
+      - id: instrument
+        role: payload
+        mass_kg: 100
+        mass_accounting: incremental
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      - id: power_unit
+        role: equipment
+        mass_kg: 30
+        mass_accounting: incremental
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      loads:
+      - id: instrument_load
+        item_id: instrument
+        source_id: bus
+        power_W: 3000
+        peak_W: 5000
+        duty: 0.5
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      sources:
+      - id: bus
+        kind: generator
+        item_id: power_unit
+        delivery_efficiency: 0.9
+        continuous_W: 10000
+        peak_W: 10000
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+        fuel_kg_kWh_terminal: 0.4
+        thrust_penalty_N_per_W_terminal: 0.03
+    aircraft:
+      configuration_id: illustrative-transport-candidate-A
+      aircraft_class: jet_transport
+      payload_kg: 15000
+      crew_kg: 800
+      mass_bounds_kg:
+      - 40000
+      - 110000
+      mtow_limit_kg: 78000
+      wing_area_m2: 122.6
+      aspect_ratio: 9.48
+      mach: 0.79
+      altitude_m: 11277.6
+      range_m: 5000000
+      thrust_sl_N: 120000
+      n_engines: 2
+      cd0: 0.02
+      oswald: 0.82
+      reserve_fraction: 0.06
+      wave:
+        thickness_ratio: 0.12
+        sweep_deg: 25
+        technology_factor: 0.95
+      assumption_sources:
+        payload_kg: 'PRESSUPOSTO: study mission payload, not a published A320 number'
+        crew_kg: 'PRESSUPOSTO: crew outside statistical We'
+        range_m: 'PRESSUPOSTO: design mission, no real-aircraft range validation'
+        mtow_limit_kg: 'PRESSUPOSTO: study constraint, not regulatory compliance'
+        geometry_and_engine_class: Public class context in examples/jet/a320_ref.json;
+          not a matched certified configuration
+        cd0: 'PRESSUPOSTO: clean baseline polar, fixed during the solve'
+        oswald: 'PRESSUPOSTO: fixed efficiency, no geometry-dependent structural mass'
+        wave: 'PRESSUPOSTO: equivalent supercritical strip, half-chord sweep'
+    duration:
+      precruise_s: 300
+      postcruise_s: 180
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+  turnaround:
+    method: supplied
+    duration_h: 0.5
+    activity: 'reabastecimento/serviço: tempo total agregado assumido'
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+objectives:
+  fleet_required: min
+  fleet_mtow_kg: min

@@ -1,0 +1,78 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Todos os valores novos são PRESSUPOSTOS ilustrativos, não dados publicados.
+schema_version: '1.0'
+model: prop
+onboard:
+  schema_version: '1.0'
+  source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+    não é uma referência de aeronave'
+  items:
+  - id: instrument
+    role: payload
+    mass_kg: 1
+    mass_accounting: incremental
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  - id: power_unit
+    role: equipment
+    mass_kg: 0.5
+    mass_accounting: incremental
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  loads:
+  - id: instrument_load
+    item_id: instrument
+    source_id: bus
+    power_W: 50
+    peak_W: 100
+    duty: 0.5
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  sources:
+  - id: bus
+    kind: generator
+    item_id: power_unit
+    delivery_efficiency: 0.9
+    continuous_W: 10000
+    peak_W: 10000
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+    generator_efficiency: 0.8
+    bsfc_kg_kWh_shaft: 0.3
+    shaft_limit_W: 1000
+aircraft:
+  name: PRESSUPOSTO common thermal
+  aircraft_class: ga_single_engine
+  requirements:
+    propulsion_type: piston_prop
+    payload_mass:
+      target: 185
+      unit: kg
+    endurance:
+      min: 2
+      unit: h
+    cruise_speed:
+      target: 50
+      unit: m/s
+    cruise_altitude:
+      target: 300
+      unit: m
+    stall_speed:
+      max: 25
+      unit: m/s
+    climb_rate:
+      min: 2
+      unit: m/s
+  assumptions:
+    aero:
+      fidelity: handbook
+    weights:
+      method: statistical
+      initial_class: ga_single_engine
+    propulsion:
+      systems_power_W: 0
+duration:
+  precruise_s: 300
+  postcruise_s: 180
+  source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+    não é uma referência de aeronave'

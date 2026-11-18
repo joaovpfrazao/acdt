@@ -1,0 +1,74 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Baseline twin of prop_size_radar_hotel.yaml without onboard (fuel must be lower).
+name: UAV gasoline baseline (no hotel)
+description: 'Same class as uav_gasoline_150kg with an explicit onboard radar load
+  that must change fuel burn. Do not treat the 400 W / BSFC figures as a published
+  radar.
+
+  '
+aircraft_class: uav_tactical_recce_ucav
+requirements:
+  propulsion_type: piston_prop
+  regulatory_category: easa_specific
+  payload_mass:
+    target: 30
+    unit: kg
+  endurance:
+    min: 10
+    unit: h
+  cruise_speed:
+    target: 45
+    unit: m/s
+  cruise_altitude:
+    target: 3000
+    unit: m
+  stall_speed:
+    max: 26
+    unit: m/s
+  climb_rate:
+    min: 3.0
+    unit: m/s
+  takeoff_ground_roll:
+    max: 300
+    unit: m
+assumptions:
+  weights:
+    method: components
+    initial_class: uav_tactical_recce_ucav
+    components:
+      material: composite
+      structural_category: utility
+      landing_gear: tricycle
+      main_gear_length_m: 0.35
+      nose_gear_length_m: 0.3
+      engine_kW_per_kg: 0.9
+      avionics_uninstalled_kg: 6
+      n_tanks: 1
+      items:
+      - name: servos (6) + cablagem de sinal
+        mass_kg: 2.5
+        group: equipment
+      - name: bateria de backup (avionics)
+        mass_kg: 1.5
+        group: equipment
+      growth_allowance: 0.05
+  aero:
+    fidelity: handbook
+    AR: 16
+    taper: 0.6
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 4415
+    clmax_airfoil: 1.5
+    flap:
+      kind: plain
+      flapped_area_ratio: 0.5
+    roughness: smooth_molded_composite
+  geometry:
+    fuselage_length_m: 3.2
+    fuselage_diameter_m: 0.4
+    c_ht: 0.55
+    c_vt: 0.03
+    tail_arm_fraction: 0.55
+  propulsion:
+    eta_cruise: 0.78

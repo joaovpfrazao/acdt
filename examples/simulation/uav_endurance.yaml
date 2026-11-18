@@ -1,0 +1,18 @@
+# Missão de patrulha/endurance do UAV (usar com examples/uav_endurance_payload.yaml):
+#   acdt simulate examples/uav_endurance_payload.yaml examples/simulation/uav_endurance.yaml -o output/uav_sim
+#
+# Vento 4 m/s de oeste, turbulência Dryden ligeira (MIL-F-8785C via Beard & McLain Tab. 4.1) e uma rajada
+# 1−cos (CS 25.341) a t = 200 s. Valores do vento e da rajada: escolhas de projeto do caso de teste.
+# O UAV tem L/D alto: em ralenti planeia a menos de 3°, por isso a aproximação usa glide_deg 2 (escolha de projeto).
+mission:
+  name: UAV endurance
+  dt: 0.02
+  extrapolate_after_s: 60
+  wind: {speed_m_s: 4, from_deg: 270, turbulence: {intensity: light, seed: 3}, gusts: [{t: 200, amplitude_m_s: 3, gradient_m: 20}]}
+  segments:
+    - {type: takeoff}
+    - {type: climb, to_altitude_m: 300}
+    - {type: waypoints, points_km: [[3, 0], [3, 3], [0, 3]]}
+    - {type: loiter, time_min: 120, load_factor: 1.15}
+    - {type: descent, to_altitude_m: 60}
+    - {type: landing, flap: 0, glide_deg: 2}

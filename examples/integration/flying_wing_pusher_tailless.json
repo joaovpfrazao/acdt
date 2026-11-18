@@ -1,0 +1,120 @@
+{
+  "_comment": "PRESSUPOSTO tailless drawing (no vertical surface) derived from flying_wing_pusher_closed.json with the winglets removed, for options.flying_wing.yaw_control: split_aileron (examples/heavy/uav150_flying_wing_tailless.yaml). Yaw by split ailerons + active SAS. Not a product study. 11 nov 2026 (tailless pitch trim): tip washout -4 -> -10 deg (Cm0 > 0 to trim at a 5 % static margin; AVL linear trim, cross-checked with the Panknin twist formula, assembly/tailless_trim.py). 14 nov 2026: panel t/c is the yaml 0.15/0.12 (symmetric NACA thickness in the loft and in the assembly AVL). The NACA 4415 mean line is not built.",
+  "assembly": {
+    "components": [
+      {
+        "type": "body",
+        "name": "centerbody",
+        "role": "fuselage",
+        "pod": {
+          "length": 2.4,
+          "width": 0.34,
+          "height": 0.22,
+          "nose_frac": 0.3,
+          "tail_frac": 0.35,
+          "tail_scale": 0.35
+        },
+        "origin": [
+          -1.0999999999999999,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "type": "surface",
+        "name": "wing",
+        "role": "wing",
+        "origin": [
+          0.25,
+          0.0,
+          0.0
+        ],
+        "mirror": true,
+        "airfoil": "NACA 4415",
+        "panel": {
+          "root_chord": 0.9,
+          "tip_chord": 0.36,
+          "span": 1.9,
+          "sweep_le_deg": 28.0,
+          "dihedral_deg": 2.0,
+          "tc_root": 0.15,
+          "tc_tip": 0.12,
+          "twist_tip_deg": -10.0,
+          "n_sections": 3
+        }
+      },
+      {
+        "type": "disc",
+        "name": "prop",
+        "role": "propeller",
+        "origin": [
+          1.36,
+          0,
+          0
+        ],
+        "diameter": 0.45
+      }
+    ]
+  },
+  "masses": [
+    {
+      "name": "motor_esc",
+      "group": "propulsion",
+      "mass_kg": 2.2,
+      "position": [
+        1.25,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "battery",
+      "group": "equipment",
+      "mass_kg": 6.0,
+      "position": [
+        0.66,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "avionics",
+      "group": "equipment",
+      "mass_kg": 1.5,
+      "position": [
+        0.5,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "camera",
+      "group": "payload",
+      "mass_kg": 3.0,
+      "position": [
+        0.45,
+        0,
+        -0.04
+      ]
+    }
+  ],
+  "gear": {
+    "type": "tricycle",
+    "tipback_deg": 15.0,
+    "nose_fraction": [
+      0.08,
+      0.15
+    ],
+    "overturn_max_deg": 63.0,
+    "rotation_min_deg": 10.0
+  },
+  "material": "composite",
+  "flight": {
+    "W0_kg": 140.0,
+    "V_m_s": 45.0,
+    "altitude_m": 3000.0,
+    "Wf_kg": 25.0,
+    "payload_kg": 30.0,
+    "n_limit": 4.4
+  }
+}

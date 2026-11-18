@@ -1,0 +1,90 @@
+# Opt-in: onboard radar/payload hotel → fuel via acdt size (same run_pipeline).
+# Power/BSFC are PRESSUPOSTO illustrations — NOT a Gabbiano or other datasheet value.
+# Replace power_W / bsfc / η with sourced numbers; without them the bridge refuses (unassessed).
+name: UAV gasoline + radar hotel (PRESSUPOSTO demo)
+description: >
+  Same class as uav_gasoline_150kg with an explicit onboard radar load that must change fuel burn.
+  Do not treat the 400 W / BSFC figures as a published radar.
+aircraft_class: uav_tactical_recce_ucav
+requirements:
+  propulsion_type: piston_prop
+  regulatory_category: easa_specific
+  payload_mass: {target: 30, unit: kg}
+  endurance: {min: 10, unit: h}
+  cruise_speed: {target: 45, unit: m/s}
+  cruise_altitude: {target: 3000, unit: m}
+  stall_speed: {max: 26, unit: m/s}
+  climb_rate: {min: 3.0, unit: m/s}
+  takeoff_ground_roll: {max: 300, unit: m}
+assumptions:
+  weights:
+    method: components
+    initial_class: uav_tactical_recce_ucav
+    components:
+      material: composite
+      structural_category: utility
+      landing_gear: tricycle
+      main_gear_length_m: 0.35
+      nose_gear_length_m: 0.30
+      engine_kW_per_kg: 0.9
+      avionics_uninstalled_kg: 6
+      n_tanks: 1
+      items:
+        - {name: servos (6) + cablagem de sinal, mass_kg: 2.5, group: equipment}
+        - {name: bateria de backup (avionics), mass_kg: 1.5, group: equipment}
+      growth_allowance: 0.05
+  aero:
+    fidelity: handbook
+    AR: 16
+    taper: 0.6
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 4415
+    clmax_airfoil: 1.5
+    flap: {kind: plain, flapped_area_ratio: 0.5}
+    roughness: smooth_molded_composite
+  geometry:
+    fuselage_length_m: 3.2
+    fuselage_diameter_m: 0.40
+    c_ht: 0.55
+    c_vt: 0.03
+    tail_arm_fraction: 0.55
+  propulsion:
+    eta_cruise: 0.78
+onboard:
+  schema_version: '1.0'
+  source: 'PRESSUPOSTO demo — replace radar power/BSFC with a sourced datasheet; not Gabbiano'
+  items:
+  - id: radar
+    role: payload
+    mass_kg: 12.0
+    mass_accounting: incremental
+    source: 'PRESSUPOSTO mass for demo (not a published radar MTOW entry)'
+  - id: alternator
+    role: equipment
+    mass_kg: 2.0
+    mass_accounting: incremental
+    source: 'PRESSUPOSTO alternator mass'
+  loads:
+  - id: radar_load
+    item_id: radar
+    source_id: bus
+    power_W: 400
+    peak_W: 600
+    duty: 1.0
+    source: 'PRESSUPOSTO continuous hotel — replace with datasheet average draw'
+  sources:
+  - id: bus
+    kind: generator
+    item_id: alternator
+    delivery_efficiency: 0.9
+    continuous_W: 1000
+    peak_W: 1000
+    generator_efficiency: 0.75
+    bsfc_kg_kWh_shaft: 0.35
+    shaft_limit_W: 1500
+    source: 'PRESSUPOSTO generator η and BSFC — replace with engine/alternator data'
+duration:
+  precruise_s: 600
+  postcruise_s: 300
+  source: 'PRESSUPOSTO taxi/egress hotel durations'

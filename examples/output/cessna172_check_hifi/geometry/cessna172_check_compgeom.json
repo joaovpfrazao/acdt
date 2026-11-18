@@ -1,0 +1,35 @@
+{
+ "components": [
+  {
+   "name": "Fuselage",
+   "wet_area": 20.767081866825663,
+   "theo_area": 21.640034438447866,
+   "volume": 5.113868091605607
+  },
+  {
+   "name": "Wing",
+   "wet_area": 27.84533448707345,
+   "theo_area": 28.567490536867155,
+   "volume": 1.5679710664071485
+  },
+  {
+   "name": "Htail",
+   "wet_area": 4.572066559744839,
+   "theo_area": 5.712687707663879,
+   "volume": 0.1326176331175149
+  },
+  {
+   "name": "Vtail",
+   "wet_area": 1.806061929819325,
+   "theo_area": 2.4636909786192076,
+   "volume": 0.05367616051083077
+  },
+  {
+   "name": "MeshGeom",
+   "wet_area": 0.0,
+   "theo_area": 58.383903661597756,
+   "volume": 0.0
+  }
+ ],
+ "version": "OpenVSP 3.55.0"
+}

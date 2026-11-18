@@ -1,0 +1,173 @@
+{
+ "case": "uav150_flying_wing_tailless",
+ "date": "2026-11-15",
+ "branch": "h1-curvatura",
+ "solver": "SU2 8.5.0 Harrier, RANS, Spalart-Allmaras, OpenMP, 6 threads",
+ "scope": "Meia asa de estibordo, controlos alinhados, sem fuselagem, trem ou hélice. Opt-in da linha média NACA de 4 dígitos (Abbott e von Doenhoff 1959, Eq. 6.4–6.6), t/c declarado 0,15/0,12: cartões AVL 4415 na raiz e 4412 na ponta. O exemplo e o scaled_wing continuam simétricos.",
+ "mesh": "wing.su2",
+ "alpha_deg": 9.52057,
+ "alpha_note": "O mesmo α da malha grossa simétrica do GCI v2, para o delta ser a secção.",
+ "decision": "nao_aplicar",
+ "applied_to_l1_l2": false,
+ "valid": false,
+ "band": [
+  0.7,
+  1.5
+ ],
+ "decision_reason": "Uma malha e um α. Não há GCI. Um só ponto não calibra L1/L2, mesmo com a razão dentro de [0,7, 1,5]. O CD do RANS não é o CDtot invíscido do AVL. SU2 com curvatura sobre SU2 simétrico é um delta de geometria, não um factor.",
+ "example_yaml_changed": false,
+ "cards": {
+  "root": "4415",
+  "tip": "4412"
+ },
+ "camber": {
+  "m": 0.04,
+  "p": 0.4,
+  "state": "construida"
+ },
+ "reference": {
+  "Sref_m2": 3.186,
+  "Bref_m": 4.381478155532754,
+  "Cref_m": 0.7271518622035916,
+  "x_ref_m": 0.9801559793360929,
+  "REF_AREA_m2": 1.593,
+  "Mach": 0.1369538125677505,
+  "Re_Cref": 1756379.8467831356,
+  "symmetric_coarse_Cref_m": 0.727086,
+  "symmetric_coarse_Re": 1756221.0,
+  "cref_note": "A curvatura muda a envergadura da malha (o diedro dá à espessura uma componente y) e portanto Cref = S/b. A área de referência do SU2 mantém-se S/2."
+ },
+ "avl_same_alpha": {
+  "alpha_deg": 9.52057,
+  "CLtot": 0.81407,
+  "Cmtot": -0.07963,
+  "CDtot": 0.03893,
+  "CDff": 0.0360921,
+  "Sref": 3.186,
+  "Cref": 0.72715,
+  "Bref": 4.3815,
+  "Xref": 0.98016,
+  "cards": "4415/4412",
+  "source": "AVL deste PC, cartões com a linha média"
+ },
+ "avl_trim_same_CL": {
+  "alpha_deg": 5.1714,
+  "CL": 0.50293,
+  "Cmtot": -0.07409,
+  "CDtot": 0.01579,
+  "CDff": 0.0143684,
+  "note": "Equilíbrio AVL ao CL alvo. O RANS não correu neste α."
+ },
+ "mesh_audit": {
+  "cells": 190464,
+  "n_hex": 190464,
+  "min_volume": 1.785384599204856e-11,
+  "watertight": true,
+  "sliver": false,
+  "reject_below": -1e-12,
+  "mean_march_m": 59.073688703537414,
+  "geometry_pode_correr": true,
+  "counts": {
+   "n_wrap": 97,
+   "n_span": 33,
+   "n_layers": 49,
+   "yplus": 2
+  }
+ },
+ "published": {
+  "which": "history_8000",
+  "rule": "O ponto publicado é o final do histórico cujo rms[Rho] final é o mais baixo. É a mesma regra do registo da grossa do GCI v2. O menor rms interior fica ao lado e não substitui esse final.",
+  "iters": 7999.0,
+  "rms_rho": -6.673349024,
+  "CL": 0.7303382364,
+  "CD": 0.05173198513,
+  "CMy": -0.07298108505,
+  "CMz": 0.1033095751,
+  "RefForce_N": 1466.281242,
+  "residual_criterion": -8.0,
+  "residual_met": false,
+  "wall_s": 4134.0
+ },
+ "run_8000": {
+  "iters": 7999.0,
+  "rms_rho": -6.673349024,
+  "CL": 0.7303382364,
+  "CD": 0.05173198513,
+  "CMy": -0.07298108505,
+  "CMz": 0.1033095751,
+  "RefForce_N": 1466.281242,
+  "wall_s": 4134.0,
+  "residual_met": false,
+  "CL_drift": 0.002023037856107607,
+  "CD_drift": 0.0031782464869041464,
+  "CMy_drift": 0.005079916251532804,
+  "best_rms": {
+   "iters": 6921.0,
+   "rms_rho": -6.751248878,
+   "CL": 0.7324539382,
+   "CD": 0.05200100553,
+   "CMy": -0.07351383797,
+   "CMz": 0.1034825296,
+   "RefForce_N": 1466.281242
+  },
+  "n_rows": 8000,
+  "cfl_number_start": 5.0,
+  "iters_requested": 8000
+ },
+ "run_continuation": {
+  "iters": 3999.0,
+  "rms_rho": -6.643669327,
+  "CL": 0.727069805,
+  "CD": 0.05140986984,
+  "CMy": -0.07231558595,
+  "CMz": 0.1029798038,
+  "RefForce_N": 1466.281242,
+  "wall_s": 2038.0,
+  "residual_met": false,
+  "CL_drift": 8.725076954616843e-05,
+  "CD_drift": 7.79377581089418e-05,
+  "CMy_drift": 0.00011597610514836102,
+  "best_rms": {
+   "iters": 3267.0,
+   "rms_rho": -6.722517052,
+   "CL": 0.7272187313,
+   "CD": 0.05142547718,
+   "CMy": -0.07233804725,
+   "CMz": 0.1029977957,
+   "RefForce_N": 1466.281242
+  },
+  "n_rows": 4000,
+  "cfl_number_start": 100.0,
+  "iters_requested": 4000,
+  "note": "O restart do SU2 8.5 reinicia Inner_Iter em 0. CFL_NUMBER=100, o valor que na malha média e na fina simétricas aproximou o resíduo de -8. Aqui o final ficou pior do que o das 8000 iterações. Não se usou CFL 200."
+ },
+ "compare_symmetric_coarse": {
+  "source": "h1_wing_gci_v2.json levels.coarse, final das 8000 iterações",
+  "same_alpha_deg": 9.52057,
+  "symmetric": {
+   "rms_rho": -7.229655971,
+   "CL": 0.4170208795,
+   "CD": 0.03110908415,
+   "CMy": 0.03191435401,
+   "wall_s": 4434.0,
+   "cards": "0015/0012"
+  },
+  "delta_CL": 0.31331735689999995,
+  "delta_CD": 0.020622900979999997,
+  "delta_CMy": -0.10489543906000001,
+  "note": "Delta de geometria na mesma família de malha e no mesmo α. Não é razão de calibração."
+ },
+ "ratios_not_applied": {
+  "CL_su2_over_avl_camber": 0.8971442706401169,
+  "CMy_su2_over_avl_camber": 0.9165023866633178,
+  "same_sign_CMy": true,
+  "CD_same_quantity": false,
+  "gci": null,
+  "inside_band_CL_and_CMy": true
+ },
+ "pressupostos": [
+  "PRESSUPOSTO: a linha média de 4 dígitos encontra a corda nas pontas e uma só (m, p) vale em todas as secções.",
+  "PRESSUPOSTO: o erro iterativo é a variação relativa do coeficiente nas últimas 10 % do histórico de 8000 iterações.",
+  "A espessura continua naca_yt do t/c declarado; o dígito de espessura do cartão é o arredondamento desse t/c."
+ ]
+}

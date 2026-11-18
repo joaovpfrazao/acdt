@@ -1,0 +1,171 @@
+"""Mission specification: open requirement set + documented assumptions.
+
+YAML layout::
+
+    name: ...
+    aircraft_class: ga_single_engine      # Raymer Table 3.1 / 6.3 class (statistics)
+    requirements: {<key>: {min|max|target|objective: v, unit: u, <qualifiers>}}
+    assumptions: {weights: {...}, aero: {...}, propulsion: {...}, geometry: {...}, constraints: {...}}
+    systems: {...}                         # optional, acdt.core.systems stage
+
+Every assumption has a default; the report lists all values actually used so
+that each number is traceable (assumption vs. requirement vs. method output).
+"""
+from __future__ import annotations
+
+import copy
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import yaml
+
+from acdt.core.requirements import RequirementSet
+
+from . import requirement_types  # noqa: F401  (registers aircraft requirement types)
+
+DEFAULT_ASSUMPTIONS: dict = {
+    # method: "components" (statistical We/W0 only as the initial value, then component build-up,
+    # weights_detailed) or "statistical" (Phase-1 behaviour). initial_class: statistical class for the
+    # initial value (default: aircraft_class). components: options of weights_detailed.component_weights.
+    "weights": {"method": "components", "initial_class": None, "fixed_fraction": None, "A": None, "C": None,
+                "tech_factor": 1.0, "Kvs": 1.0, "fixed_mass_kg": 0.0, "components": {}},
+    "aero": {
+        "AR": 8.0, "taper": 0.5, "sweep_c4_deg": 0.0, "tc_root": 0.12, "tc_tip": 0.12, "xc_max_t": 0.30,
+        "airfoil": "NACA 23015", "clmax_airfoil": 1.5, "flap": {"kind": "plain", "flapped_area_ratio": 0.6},
+        "oswald": None, "cfe": 0.0055, "swet_sref": 4.0,
+        "laminar": {"wing": 0.10, "htail": 0.10, "vtail": 0.10, "fuselage": 0.0},
+        "roughness": "smooth_paint", "Q": {}, "lp_fraction": 0.05, "extra_drag_areas_m2": {},
+        "CL_ground": 0.5, "dCD0_takeoff": 0.01, "mu_roll": 0.04,
+        # Phase 2: "handbook" (Raymer Eq. 12.24 + Oswald) or "lowfi" (XFOIL/NeuralFoil section polars +
+        # AVL span loading, aero/lowfi.py); airfoil_solver: xfoil | neuralfoil
+        "fidelity": "handbook", "airfoil_solver": "xfoil",
+    },
+    "propulsion": {"eta_cruise": 0.80, "eta_climb": 0.75, "eta_takeoff": 0.55, "bsfc_lb_hp_h": None,
+                   "tsfc_1_h": 0.5, "battery_Wh_kg": 200.0, "eta_total": 0.70, "dod": 0.80,
+                   "energy_reserve": 0.20, "systems_power_W": 0.0, "n_engines": 1,
+                   # fixed-pitch propeller map (propeller.py): {type: fixed_pitch, rpm_rated, diameter_m | tip_mach,
+                   # pitch_m | auto, chord_075_over_D | static_rpm | auto, blades, airfoil}; None = constant etas
+                   "propeller": None},
+    "geometry": {"fuselage_length_m": None, "fuselage_diameter_m": None, "fuselage_fineness": 7.0,
+                 "fuselage_class": None, "tail_class": None, "c_ht": None, "c_vt": None,
+                 "tail_arm_fraction": 0.60, "ar_h": 4.0, "ar_v": 1.5,
+                 # dihedral_deg: explicit wing dihedral [deg] for AVL Clβ / spiral (Etkin & Reid /
+                 # Nelson). None → PRESSUPOSTO 3° on TrapezoidalWing (backward compatible); set null
+                 # deliberately to leave spiral unassessed. configuration: conventional (default) |
+                 # V | inverted_V | twin_boom — named shortcuts that assemble generic components
+                 # (assembly/shortcuts.py); never overwrite a supplied assumptions.assembly drawing.
+                 "dihedral_deg": None, "configuration": "conventional",
+                 "tail_dihedral_deg": None, "boom_span_fraction": 0.35, "pod_length_fraction": 0.55,
+                 "boom_width_m": None, "taper_v": 0.5},
+    "constraints": {"cruise_weight_fraction": 1.0, "landing_weight_fraction": 1.0, "approach_distance_ft": 600.0,
+                    "margin": 0.0, "ws_initial_psf": 17.0, "ws_min": 50.0, "ws_max": 3000.0, "default_cruise_altitude_m": 0.0,
+                    # criterion "fixed_ws": W/S [N/m²] (and optional P/W or T/W floor) given, e.g. by acdt optimize
+                    "ws_fixed": None, "value_fixed": None},
+    "mda": {"max_iter": 30, "tol": 1e-5, "tol_lowfi": 2e-4},
+    # Phase 2 — structures.py: V-n (CS-23 / STANAG 4671), Schrenk loads, box-beam wing
+    "structures": {"regulation": "auto", "load_factor_from_vn": True, "material": "auto",
+                   "nonoptimum_factor": 1.25, "VH_eas_m_s": None,
+                   "elastic_axis": "section", "le_cell": True,
+                   # L1 beam (structures_l1.py). Both default off: the size loop stays the rigid Raymer/Megson
+                   # path. flex (or aero.elastic) feeds cruise twist back into K. mass_in_loop replaces the
+                   # fuselage and tail group weights with the beam masses inside the MDA.
+                   "flex": False, "mass_in_loop": False,
+                   # Phase 5/6: freeze t/c, camber and geometric twist at the baseline (drawn washout)
+                   "wingbox": {"hold_section": False}},
+    # Phase 2 — stability.py (CG stations are ASSUMPTIONS until a layout exists)
+    "stability": {"target_static_margin": 0.10, "wing_apex_x_fraction": None, "stations": {},
+                  # inertias: components (sum) | roskam (Part V Eqs. 3.7–3.9, R̄ of roskam_reference or
+                  # radii_of_gyration {Rx, Ry, Rz} on the operating empty mass + useful load by components)
+                  "inertia_method": "components", "roskam_reference": None, "radii_of_gyration": None,
+                  "elevator_max_deg": 25.0, "use_avl": True,
+                  # Phase 3: dynamic modes + MIL-F-8785C level check (Class I; flight-phase category for cruise)
+                  "dynamics": True, "hq_category": "B", "hq_required_level": 1},
+    # Phase 2 — performance.py (segment mission, payload-range, field lengths, ceilings)
+    "performance": {"fuel_capacity_kg": None, "max_payload_kg": None, "mu_brake": 0.4,
+                    # approach angle [deg]: 3° = max. gradient 5.2 % of 14 CFR/CS 23.75(a)(1); steeper only if
+                    # demonstrated, limited and indicated (23.75(a)(2))
+                    "approach_angle_deg": 3.0},
+    # Phase 3 — aeroelasticity.py (strip model on the wing box; OpenAeroStruct static coupling if installed)
+    "aeroelasticity": {"enabled": True, "a_w": 6.283185307179586, "x_cg_chord": None, "margin_factor": 1.2,
+                       "static_aerostructural": True},
+    # Phase 3 — mdo.py (OpenMDAO). objective: None → from the requirement registry
+    "mdo": {"objective": None, "solver": "nlbgs", "trust_region_iterations": 8, "trust_region_radius": 0.3, "design_vars": ["ws", "AR"], "AR_bounds": [5.0, 16.0],
+            "ws_bounds_factor": [0.6, 1.4], "pw_bounds_factor": [0.6, 1.6], "maxiter": 60, "tol": 1e-6,
+            # Opt-in: hq:*/aeroel:* as real MDO inequalities in φ / OpenMDAO (default = filter-after only)
+            "hq_aeroel_constraints": False, "hq_aeroel_keys": None},
+    "cost": {},
+    # Phase 4 — hifi/calibration.py: factors L3 → L1/L2 (file = calibration.json of `acdt hifi`, and/or inline
+    # factors); apply: groups to apply ("aero", "flutter", "structures" → k_EI and k_GJ only); empty → reported only
+    "calibration": {"file": None, "apply": [], "factors": {}},
+    # Operational loading diagram (weight_balance.py). Limits default to the stability-stage
+    # aft (static margin) and forward (elevator at CLmax) CG. extra_items: [{name, x_m, mass_max_kg,
+    # mass_min_kg, kind, fuel_order}]. loading, when set, replaces lumped crew/payload/fuel/battery:
+    # [{name, mass_min_kg, mass_max_kg, kind, fuel_order, x_m | arm_in}]. arm_in is inches aft of the
+    # firewall. mass_max_kg null on kind fuel uses the sized fuel mass.
+    # forward_limit / aft_limit: [[mass_kg, x_m], ...] piecewise.
+    "weight_balance": {"crew_optional": False, "extra_items": [], "x_forward_m": None, "x_aft_m": None,
+                       "forward_limit": None, "aft_limit": None, "lemac_arm_in": None, "mac_in": None},
+    # Landing-gear layout and 14 CFR 23.473 landing load (landing_gear.py). Lengths and the gear
+    # load factor stay in weights.components, because the weight equations already use them.
+    "landing_gear": {"h_cg_m": None, "tipback_deg": 15.0, "overturn_max_deg": 63.0,
+                     "nose_fraction_min": 0.08, "nose_fraction_max": 0.15, "wing_lift_fraction": 2.0 / 3.0,
+                     "absorber": "oleo", "eta": None, "stroke_m": None, "tire_stroke_m": 0.0,
+                     "max_stroke_m": None, "rotation_min_deg": 10.0, "x_nose_m": None, "x_main_m": None,
+                     "x_tail_m": None, "track_m": None, "x_nose_min_m": 0.0, "x_main_max_m": None},
+    # Opt-in catapult launch / belly landing, first order (launch_recovery.py). None → not run. Example:
+    # {catapult: {accel_g: 10, rail_angle_deg: 10, stroke_max_m: 6, airframe_nx_limit_g: 12, payload_nx_limit_g: 15},
+    #  belly_landing: {mu_slide: 0.5, n_limit: 4.0}}. Missing limits → the check is unassessed, never a pass.
+    "launch_recovery": None,
+}
+
+
+def _merge(base: dict, over: dict) -> dict:
+    out = copy.deepcopy(base)
+    for k, v in (over or {}).items():
+        if isinstance(v, dict) and isinstance(out.get(k), dict) and k not in ("Q", "extra_drag_areas_m2"):
+            out[k] = _merge(out[k], v)
+        else:
+            out[k] = v
+    return out
+
+
+@dataclass
+class MissionSpec:
+    name: str
+    requirements: RequirementSet
+    aircraft_class: str = "ga_single_engine"
+    description: str = ""
+    assumptions: dict = field(default_factory=lambda: copy.deepcopy(DEFAULT_ASSUMPTIONS))
+    systems: dict | None = None
+    source: Path | None = None
+    # requisitos derivados/regulamentares e opções da matriz de verificação (acdt.core.verification; docs/REQUISITOS.md)
+    verification: dict | None = None
+
+    @classmethod
+    def from_dict(cls, d: dict, source: Path | None = None) -> "MissionSpec":
+        # Automatic close: top-level / assumptions.onboard → native hotel/extraction + incremental mass
+        # inside acdt size (MissionSpec / run_pipeline). No separate onboard_size call required for
+        # mass/fuel/energy coupling. Missing BSFC/η/model → raise unassessed (never free energy).
+        # Absent onboard → unchanged. Full CG/FOV/closure screens remain on `acdt onboard size`.
+        d_in = d
+        if isinstance(d, dict) and (d.get("onboard") or (d.get("assumptions") or {}).get("onboard")):
+            from .onboard_bridge import apply_onboard_to_size_dict
+            d_in, bridge = apply_onboard_to_size_dict(d)
+            if bridge.get("status") == "unassessed" and not bridge.get("applied"):
+                raise ValueError(f"onboard hotel unassessed: {bridge.get('reason')}")
+        else:
+            d_in = d
+        return cls(name=d_in.get("name", "unnamed"), description=d_in.get("description", ""),
+                   aircraft_class=d_in.get("aircraft_class", "ga_single_engine"),
+                   requirements=RequirementSet.from_dict(d_in.get("requirements", {}), domain="aircraft"),
+                   assumptions=_merge(DEFAULT_ASSUMPTIONS, d_in.get("assumptions", {})),
+                   systems=d_in.get("systems"), source=source, verification=d_in.get("verification"))
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> "MissionSpec":
+        p = Path(path)
+        return cls.from_dict(yaml.safe_load(p.read_text(encoding="utf-8")), p)
+
+    @property
+    def propulsion_kind(self) -> str:
+        return self.requirements.value("propulsion_type", "piston_prop")

@@ -1,0 +1,64 @@
+# N0 — patrulha em massa pontual, sem forma de avião (DESIGN_WORKFLOW P3).
+#   acdt simulate examples/simulation/n0_patrol.yaml --fidelity pointmass
+#
+# PRESSUPOSTO: os números do bloco aircraft não são uma aeronave real. Servem para o mesmo YAML
+# correr antes de haver dimensionamento. A subida em voo usa eta_cruise (Anderson), não eta_climb.
+# eta_tot/eta_cruise > 1 fica registado como PRESSUPOSTO inconsistente; o consumo usa a razão na mesma.
+# dt (se existir) é o passo do 6-DOF. pointmass_dt é o passo da massa pontual (omissão 1 s).
+#
+# Falhas (esquema, inativo neste exemplo para a patrulha chegar ao fim):
+#   failures:
+#     events:
+#       - {type: engine_out, t_s: 400, response: rtb}          # continue | rtb | divert
+#       - {type: sensor_loss, t_s: 500, response: continue}
+#       - {type: link_loss, segment: patrol, t_into_s: 60, response: continue}
+#       - {type: battery_degradation, t_s: 200, factor: 1.5, response: continue}
+#     # catalogue precisa de seed (um sorteio). Sem isto não há Monte Carlo.
+#     # catalogue:
+#     #   - {type: engine_out, t_s: 600, response: rtb, weight: 1}
+#     # seed: 1
+#     # divert_km: [1, 1]    # [norte_km, este_km], se a resposta for divert
+name: n0_patrol
+pointmass_dt: 2
+initial:
+  altitude_m: 0
+  heading_deg: 0
+wind:
+  speed_m_s: 3
+  from_deg: 0          # de norte: vento de proa no rumo norte
+aircraft:
+  source: "PRESSUPOSTO — números de exemplo, não uma aeronave real"
+  mass_kg: 15
+  S_m2: 0.8
+  CD0: 0.03
+  K: 0.045
+  CLmax: 1.2
+  propulsion:
+    kind: electric
+    P_sl_W: 800
+    eta_cruise: 0.70
+    eta_climb: 0.65
+    eta_takeoff: 0.55
+    eta_tot: 0.75
+    P_systems_W: 40
+    payload_power_W: 30
+    battery_Wh: 400      # já utilizável; não se volta a aplicar DoD
+    n_engines: 1
+sensor:
+  fov_cross_deg: 60
+  fov_along_deg: 40
+  h_target_m: 1
+  area_km2: 20
+  on_station_segments: [loiter, patrol, waypoints]
+  johnson:
+    target_dim_m: 4
+    task: detection
+    fov_deg: 40
+    pixels: 640
+  persistent:
+    turnaround_h: 0.5
+segments:
+  - {type: climb, to_altitude_m: 300, speed_m_s: 20}
+  - {type: waypoints, points_km: [[2, 0], [2, 2]], speed_m_s: 22}
+  - {type: patrol, time_min: 10, speed_m_s: 18, load_factor: 1.1}
+  - {type: descent, to_altitude_m: 0, vertical_speed_m_s: 2, speed_m_s: 20}

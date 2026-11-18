@@ -1,0 +1,21 @@
+# Missão de verificação do C172S (usar com examples/cessna172_check.yaml):
+#   acdt simulate examples/cessna172_check.yaml examples/simulation/c172_check.yaml -o output/c172_sim --jsbsim
+#
+# Referência (Cessna 172S POH / Information Manual, Rev. 5, 2004, "Performance – Specifications";
+# 2550 lb, nível do mar, ISA, pista seca, vento nulo):
+#   descolagem: corrida 960 ft (293 m), total sobre 50 ft 1630 ft (497 m)
+#   aterragem:  corrida 575 ft (175 m), total sobre 50 ft 1335 ft (407 m)
+#   razão de subida ao nível do mar 730 ft/min (3.7 m/s); V_S 53 KCAS (limpo) / 48 KCAS (flaps 30)
+# A técnica do POH (pista curta: flap 10, descolagem a 51 KIAS; aproximação a 61 KIAS) não é replicada à letra:
+# o simulador roda a 1.1 V_S,TO e aproxima a 1.3 V_S0 numa rampa de 3° — escolhas de projeto, ver o tutorial.
+mission:
+  name: C172S verificação POH
+  dt: 0.02
+  extrapolate_after_s: 60
+  segments:
+    - {type: takeoff, flap: 10}
+    - {type: climb, to_altitude_m: 600}
+    - {type: cruise, time_min: 3, speed_m_s: 55}
+    - {type: turn, heading_change_deg: 90, load_factor: 1.4}
+    - {type: descent, to_altitude_m: 150, vertical_speed_m_s: 3, speed_m_s: 40}
+    - {type: landing, flap: 30}

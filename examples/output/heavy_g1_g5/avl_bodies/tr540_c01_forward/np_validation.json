@@ -1,0 +1,32 @@
+{
+ "name": "tr540_c01_forward",
+ "mach": 0.0,
+ "mac_m": 0.127,
+ "xbar_np": {
+  "avl_bodies": 0.17733858267716524,
+  "avl_no_bodies": 0.23882677165354327,
+  "avl_torenbeek": 0.21381609046654784,
+  "munk_bound": 0.15775372941306798
+ },
+ "shift_mac": {
+  "avl_bodies": -0.06148818897637803,
+  "torenbeek": -0.025010681186995426,
+  "munk_bound": -0.08107304224047528
+ },
+ "munk_per_body": {
+  "fuselage": 0.08107304224047528
+ },
+ "avl_within_munk": true,
+ "reference": {
+  "xbar_np": 0.238,
+  "source": "Eastman N. Jacobs and Kenneth E. Ward, Interference of Wing and Fuselage from Tests of 209 Combinations in the N.A.C.A. Variable-Density Tunnel, NACA Report No. 540, 1936 (Langley, 8 March 1935). Table V, combination 1, rectangular NACA 0012 with the round fuselage, wing setting i_w = 0. The column n_0 is dC_m/dC_L at zero lift, the aerodynamic centre as a fraction of the wing chord ahead of the wing quarter-chord (report p. 8). xbar_np = 0.25 - n_0, from the leading edge of the MAC.",
+  "conditions": "Variable-density tunnel, Reynolds number about 3.1e6 (report p. 4). Mach is not stated; the tunnel is low-speed, so the AVL run uses Mach 0. Moments about the wing quarter-chord; coefficients on the original wing area and chord (150 in^2, c = 5 in, b = 30 in, AR = 6). d/c positive is the wing quarter-chord ahead of the fuselage reference; k/c positive is the wing chord plane above the fuselage axis (report p. 8). The fuselage reference is the maximum cross-section: station 8.000 in on p. 3, 8.156 in aft of the nose (station -0.156 in), because Figure 1 draws that point through the maximum ordinate. Stations 1.500, 2.312 and 3.406 in are omitted: 1.500 is blank in the printed diameter column and 2.312 / 3.406 are the dashed source-sink rows, not diameters. Model scale is the tunnel model (inches converted at 0.0254 m/in). The wing is the rectangular NACA 0012, no twist, no dihedral. This row: combination 1, d/c = 0.64, k/c = 0.0, i_w = 0 deg, n_0 = 0.012 (Table V)."
+ },
+ "error_mac": {
+  "avl_bodies": -0.060661417322834754,
+  "avl_no_bodies": 0.000826771653543279,
+  "avl_torenbeek": -0.024183909533452147,
+  "munk_bound": -0.08024627058693201
+ },
+ "best": "avl_no_bodies"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "uav_isr_28v",
+  "generation_ids": ["pma_28v_400w"],
+  "battery_ids": ["liion_6s_5ah"],
+  "payload_ids": ["eo_ir_mid", "ais_rx"],
+  "endurance_h": 4.0,
+  "loads": [
+    {"name": "autopilot", "power_w": 8, "duty": 1.0, "bus": "avionics"},
+    {"name": "datalink", "power_w": 25, "duty": 0.6, "peak_w": 40, "bus": "avionics"},
+    {"name": "servos", "power_w": 30, "duty": 0.3, "peak_w": 80, "bus": "servo"}
+  ]
+}

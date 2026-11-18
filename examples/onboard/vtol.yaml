@@ -1,0 +1,41 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Todos os valores novos são PRESSUPOSTOS ilustrativos, não dados publicados.
+schema_version: '1.0'
+model: vtol
+onboard:
+  schema_version: '1.0'
+  source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+    não é uma referência de aeronave'
+  items:
+  - id: instrument
+    role: payload
+    mass_kg: 1
+    mass_accounting: included
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+    included_in: mtow
+  loads:
+  - id: instrument_load
+    item_id: instrument
+    source_id: bus
+    power_W: 50
+    peak_W: 100
+    duty: 0.5
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+  sources:
+  - id: bus
+    kind: main_battery
+    delivery_efficiency: 0.9
+    continuous_W: 1000
+    peak_W: 1000
+    source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+      não é uma referência de aeronave'
+aircraft:
+  mass_kg: 25
+  electric:
+    systems_power_W: 0
+mass_ledger:
+  remaining_nonbattery_mass_kg: 15
+  source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+    não é uma referência de aeronave'

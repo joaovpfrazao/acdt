@@ -1,0 +1,1243 @@
+{
+ "cost_metric": "bottom_up",
+ "N": 50,
+ "year": 2025,
+ "points": [
+  {
+   "option": "infusão (VARI)",
+   "ws": 593.6853545549902,
+   "AR": 12.8,
+   "pw": 8.644528885593447,
+   "W0": 135.8480480087,
+   "We": 84.34897006388282,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 182786.51028556726,
+   "costs": {
+    "bottom_up": 182786.51028556726,
+    "eastlake": 243495.07070594287,
+    "dapca4": 456808.7482131137
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 593.6853545549902,
+   "AR": 16.0,
+   "pw": 8.286435315335806,
+   "W0": 137.5196300786308,
+   "We": 86.18049636318943,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 185511.98309798993,
+   "costs": {
+    "bottom_up": 185511.98309798993,
+    "eastlake": 246941.36811960334,
+    "dapca4": 463808.2210057421
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 593.6853545549902,
+   "AR": 19.2,
+   "pw": 8.07109332514072,
+   "W0": 140.3702985542557,
+   "We": 88.8881339730633,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 189540.1076061988,
+   "costs": {
+    "bottom_up": 189540.1076061988,
+    "eastlake": 252145.95082477326,
+    "dapca4": 474240.80156887963
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 667.896023874364,
+   "AR": 12.8,
+   "pw": 9.418286204569698,
+   "W0": 138.04142277162825,
+   "We": 86.11592051017259,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 185519.53629306867,
+   "costs": {
+    "bottom_up": 185519.53629306867,
+    "eastlake": 247331.4460411749,
+    "dapca4": 464073.2550380948
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 667.896023874364,
+   "AR": 16.0,
+   "pw": 9.04986782659571,
+   "W0": 139.13836654713973,
+   "We": 87.4945644391832,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 187555.60827746295,
+   "costs": {
+    "bottom_up": 187555.60827746295,
+    "eastlake": 249866.4159307198,
+    "dapca4": 469274.1598555702
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 667.896023874364,
+   "AR": 19.2,
+   "pw": 8.827564659189646,
+   "W0": 141.49635178918416,
+   "We": 89.79292872323305,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 190963.37980694917,
+   "costs": {
+    "bottom_up": 190963.37980694917,
+    "eastlake": 254255.99057840076,
+    "dapca4": 478091.41688602895
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 742.1066931937378,
+   "AR": 12.8,
+   "pw": 10.174159173799966,
+   "W0": 140.89626915707723,
+   "We": 88.4021263448673,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 189017.82490136032,
+   "costs": {
+    "bottom_up": 189017.82490136032,
+    "eastlake": 252175.28179182633,
+    "dapca4": 473333.8718543803
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 742.1066931937378,
+   "AR": 16.0,
+   "pw": 9.798088107771484,
+   "W0": 141.5043093714258,
+   "We": 89.40818711405562,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 190487.07422232375,
+   "costs": {
+    "bottom_up": 190487.07422232375,
+    "eastlake": 253958.6063364031,
+    "dapca4": 477054.2835908879
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "infusão (VARI)",
+   "ws": 742.1066931937378,
+   "AR": 19.2,
+   "pw": 9.746268430556574,
+   "W0": 144.70329080032798,
+   "We": 92.49158943068038,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 195060.72939889765,
+   "costs": {
+    "bottom_up": 195060.72939889765,
+    "eastlake": 259929.948341396,
+    "dapca4": 488938.2822738293
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 593.6853545549902,
+   "AR": 12.8,
+   "pw": 8.6132922512398,
+   "W0": 137.3517613444597,
+   "We": 84.92404432113129,
+   "structure_mass_change_kg": 0.7673993108149517,
+   "unit_cost": 183066.80521997344,
+   "costs": {
+    "bottom_up": 183066.80521997344,
+    "eastlake": 244642.202555043,
+    "dapca4": 459073.01783085224
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 593.6853545549902,
+   "AR": 16.0,
+   "pw": 8.251637438477745,
+   "W0": 139.23323259432973,
+   "We": 86.85789928101904,
+   "structure_mass_change_kg": 0.8572517072624102,
+   "unit_cost": 185878.56688146837,
+   "costs": {
+    "bottom_up": 185878.56688146837,
+    "eastlake": 248282.55159741567,
+    "dapca4": 466460.1021673174
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 593.6853545549902,
+   "AR": 19.2,
+   "pw": 8.032880543175306,
+   "W0": 142.32928144725608,
+   "We": 89.6923967758729,
+   "structure_mass_change_kg": 0.9527632512819295,
+   "unit_cost": 190021.93667894945,
+   "costs": {
+    "bottom_up": 190021.93667894945,
+    "eastlake": 253723.83011004233,
+    "dapca4": 477366.01713071036
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 667.896023874364,
+   "AR": 12.8,
+   "pw": 9.384510612655792,
+   "W0": 139.4459705274989,
+   "We": 86.64090282731621,
+   "structure_mass_change_kg": 0.7270256844446408,
+   "unit_cost": 185749.7759266941,
+   "costs": {
+    "bottom_up": 185749.7759266941,
+    "eastlake": 248375.33453701372,
+    "dapca4": 466133.2232510094
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 667.896023874364,
+   "AR": 16.0,
+   "pw": 9.012339556772849,
+   "W0": 140.72104638315497,
+   "We": 88.10317913763073,
+   "structure_mass_change_kg": 0.8072635631315848,
+   "unit_cost": 187852.0313031918,
+   "costs": {
+    "bottom_up": 187852.0313031918,
+    "eastlake": 251069.1714961013,
+    "dapca4": 471651.3994801696
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 667.896023874364,
+   "AR": 19.2,
+   "pw": 8.786460933892702,
+   "W0": 143.28741225208398,
+   "We": 90.5056232852941,
+   "structure_mass_change_kg": 0.8924029006494827,
+   "unit_cost": 191350.1048761468,
+   "costs": {
+    "bottom_up": 191350.1048761468,
+    "eastlake": 255653.31911916414,
+    "dapca4": 480857.55113821133
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 742.1066931937378,
+   "AR": 12.8,
+   "pw": 10.13799987853121,
+   "W0": 142.23212134736855,
+   "We": 88.89277756328482,
+   "structure_mass_change_kg": 0.6976452774686166,
+   "unit_cost": 189213.40327349247,
+   "costs": {
+    "bottom_up": 189213.40327349247,
+    "eastlake": 253146.38005171003,
+    "dapca4": 475250.1719017204
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 742.1066931937378,
+   "AR": 16.0,
+   "pw": 9.757991505874335,
+   "W0": 142.99577843872547,
+   "We": 89.96950112158187,
+   "structure_mass_change_kg": 0.7708068133575949,
+   "unit_cost": 190735.00279296035,
+   "costs": {
+    "bottom_up": 190735.00279296035,
+    "eastlake": 255063.92034374393,
+    "dapca4": 479238.6542617199
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  },
+  {
+   "option": "laminação manual",
+   "ws": 742.1066931937378,
+   "AR": 19.2,
+   "pw": 9.738775047395466,
+   "W0": 146.66452957646794,
+   "We": 93.39083449229497,
+   "structure_mass_change_kg": 0.8560026866527934,
+   "unit_cost": 195745.47067614354,
+   "costs": {
+    "bottom_up": 195745.47067614354,
+    "eastlake": 261697.69921817293,
+    "dapca4": 492423.6940362428
+   },
+   "violated": [
+    "g_stall_speed"
+   ],
+   "unresolved_parts": [],
+   "feasible": false,
+   "selection": {
+    "wing skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "wing rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "htail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail skin": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail spar": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "vtail rib": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage shell": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ],
+    "fuselage frame": [
+     "wet_layup",
+     "cf_fabric_handlayup"
+    ]
+   }
+  }
+ ],
+ "pareto": [
+  {
+   "option": "infusão (VARI)",
+   "ws": 593.6853545549902,
+   "AR": 12.8,
+   "pw": 8.644528885593447,
+   "W0": 135.8480480087,
+   "We": 84.34897006388282,
+   "structure_mass_change_kg": 0.0,
+   "unit_cost": 182786.51028556726,
+   "costs": {
+    "bottom_up": 182786.51028556726,
+    "eastlake": 243495.07070594287,
+    "dapca4": 456808.7482131137
+   },
+   "violated": [],
+   "unresolved_parts": [],
+   "feasible": true,
+   "selection": {
+    "wing skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "wing rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "htail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail skin": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail spar": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "vtail rib": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage shell": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ],
+    "fuselage frame": [
+     "vacuum_infusion",
+     "cf_fabric_vari"
+    ]
+   }
+  }
+ ],
+ "notes": [
+  "L0 handbook-aero MDA per point (no low-fi calibration); cost from the manufacturing study at N",
+  "material choice → structural mass change (Ashby) fed back into the W0 closure",
+  "infeasible = a sizing constraint violated (g > 0) or a part without a feasible, fully specified process"
+ ],
+ "plot": "examples/output/uav_gasoline_150kg_manufacturing/pareto_w0_cost.png"
+}

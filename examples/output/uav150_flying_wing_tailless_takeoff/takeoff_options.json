@@ -1,0 +1,260 @@
+{
+ "schema": "takeoff_options",
+ "source": "Raymer 2018 Sec. 17.8 (V_TO = 1,1 V_S, μ Table 17.1); Sadraey 2012 Sec. 9.6.2 (atitude de descolagem sem rotação) e Sec. 9.5.1.3 (folga traseira); 14 CFR 23.233(a) pré-Amdt 64 (vento cruzado ≥ 0,2 V_S0); Fahlstrom, Gleason & Sadraey 2022 Ch. 17 (catapulta)",
+ "requirement_m": 300.0,
+ "mode": "fly_off",
+ "ground_attitude_deg": 19.0,
+ "options": {
+  "a_vento_de_frente": {
+   "headwind_required_m_s": 1.2435370646744548,
+   "source": "Raymer 2018 Sec. 17.8 com V_ar = V_solo + V_frente (PRESSUPOSTO)",
+   "note": "operacional: escolha da pista face ao vento; a capacidade de 90° de 14 CFR 23.233(a) continua a ser demonstrada à parte",
+   "ground_roll_est_m": 299.81893365400987,
+   "wind_to_runway_angle_max_deg": 76.16410910041063,
+   "crosswind_left_m_s": 5.0491202767195835,
+   "closes": true,
+   "check_6dof": {
+    "history": [
+     {
+      "x": 1.2435370646744548,
+      "ground_roll_6dof_m": 301.51570709020433,
+      "point_mass_m": 268.4014475776919
+     },
+     {
+      "x": 1.3330416508902991,
+      "ground_roll_6dof_m": 300.07153982542445,
+      "point_mass_m": 266.8190064737817
+     },
+     {
+      "x": 1.3509419707894263,
+      "ground_roll_6dof_m": 299.40665563199076,
+      "point_mass_m": 266.5030658275
+     }
+    ],
+    "x_closing": 1.3509419707894263,
+    "closes": true,
+    "ground_roll_6dof_m": 299.40665563199076
+   },
+   "headwind_required_6dof_m_s": 1.3509419707894263,
+   "wind_to_runway_angle_max_6dof_deg": 74.94201052979017,
+   "heading_deg_6dof": 195.05798947020983,
+   "crosswind_left_6dof_m_s": 5.021449570747433
+  },
+  "b_tracao": {
+   "thrust_factor_required": 1.0602154636071646,
+   "closes": true,
+   "ground_roll_est_m": 299.88558844227924,
+   "cost": "massa do motor/hélice e consumo não iterados (PRESSUPOSTO) — novo ciclo W0 necessário",
+   "source": "Raymer 2018 Sec. 17.8",
+   "check_6dof": {
+    "history": [
+     {
+      "x": 1.0602154636071646,
+      "ground_roll_6dof_m": 302.21611315768854,
+      "point_mass_m": 268.4611177307454
+     },
+     {
+      "x": 1.0664627387313885,
+      "ground_roll_6dof_m": 299.8222936667524,
+      "point_mass_m": 266.3351828187275
+     }
+    ],
+    "x_closing": 1.0664627387313885,
+    "closes": true,
+    "ground_roll_6dof_m": 299.8222936667524
+   },
+   "thrust_factor_required_6dof": 1.0664627387313885
+  },
+  "c_carga_alar": {
+   "S_factor_required": 1.0786080963260245,
+   "WS_factor": 0.927120798931715,
+   "closes": true,
+   "ground_roll_est_m": 299.89479662560404,
+   "cost": "massa e arrasto da asa maiores não iterados (PRESSUPOSTO); C_L de cruzeiro desce",
+   "source": "Raymer 2018 Sec. 17.8"
+  },
+  "d_massa": {
+   "mass_factor_max": 0.9679206076441916,
+   "mass_reduction_kg": 4.919313670565357,
+   "closes": true,
+   "ground_roll_est_m": 299.93733498356585,
+   "cost": "menos combustível/carga útil → menos autonomia ou payload (requisito)",
+   "source": "Raymer 2018 Sec. 17.8"
+  },
+  "e_atitude": {
+   "sweep": [
+    {
+     "theta_deg": 19.0,
+     "ground_roll_est_m": 325.0817806053514,
+     "VLOF_over_VS": 1.1507628102026681,
+     "de_trim_deg": -17.71911740691108,
+     "stall_margin_deg": 4.3988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 19.5,
+     "ground_roll_est_m": 322.36653649605535,
+     "VLOF_over_VS": 1.1418008412281868,
+     "de_trim_deg": -18.920216056221822,
+     "stall_margin_deg": 3.8988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 20.0,
+     "ground_roll_est_m": 322.8134840925499,
+     "VLOF_over_VS": 1.1360255621999278,
+     "de_trim_deg": -20.17305549902029,
+     "stall_margin_deg": 3.3988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 20.5,
+     "ground_roll_est_m": 327.2883826300969,
+     "VLOF_over_VS": 1.1346500441786522,
+     "de_trim_deg": -21.498955412498603,
+     "stall_margin_deg": 2.8988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 21.0,
+     "ground_roll_est_m": 337.97240051334063,
+     "VLOF_over_VS": 1.1393503690515612,
+     "de_trim_deg": -22.925685703534896,
+     "stall_margin_deg": 2.3988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 21.5,
+     "ground_roll_est_m": 358.4067008451024,
+     "VLOF_over_VS": 1.1522972540135672,
+     "de_trim_deg": -24.48534960813722,
+     "stall_margin_deg": 1.8988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 22.0,
+     "ground_roll_est_m": 396.70854758534915,
+     "VLOF_over_VS": 1.1760200485817167,
+     "de_trim_deg": -26.207543515466565,
+     "stall_margin_deg": 1.3988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 22.5,
+     "ground_roll_est_m": 470.3004178224209,
+     "VLOF_over_VS": 1.2129413949827021,
+     "de_trim_deg": -28.10663066908384,
+     "stall_margin_deg": 0.8988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 23.0,
+     "ground_roll_est_m": 647.5981706925518,
+     "VLOF_over_VS": 1.2644490815442175,
+     "de_trim_deg": -30.166554509236086,
+     "stall_margin_deg": 0.3988446442165525,
+     "elevon_ok": true,
+     "vlof_ok": true,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 23.5,
+     "ground_roll_est_m": Infinity,
+     "VLOF_over_VS": null,
+     "de_trim_deg": -32.33329683443917,
+     "stall_margin_deg": -0.10115535578344748,
+     "elevon_ok": true,
+     "vlof_ok": false,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 24.0,
+     "ground_roll_est_m": Infinity,
+     "VLOF_over_VS": null,
+     "de_trim_deg": -34.525553223575116,
+     "stall_margin_deg": -0.6011553557834475,
+     "elevon_ok": true,
+     "vlof_ok": false,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 24.5,
+     "ground_roll_est_m": Infinity,
+     "VLOF_over_VS": null,
+     "de_trim_deg": -36.66157796474412,
+     "stall_margin_deg": -1.1011553557834475,
+     "elevon_ok": true,
+     "vlof_ok": false,
+     "aft_ok": true
+    },
+    {
+     "theta_deg": 25.0,
+     "ground_roll_est_m": Infinity,
+     "VLOF_over_VS": null,
+     "de_trim_deg": -38.68515501765124,
+     "stall_margin_deg": -1.6011553557834475,
+     "elevon_ok": true,
+     "vlof_ok": false,
+     "aft_ok": true
+    }
+   ],
+   "first_closing": null,
+   "closes": false,
+   "alpha_C_deg": 25.340071669673776,
+   "cost": "perna do nariz mais longa (massa, Raymer Eq. 15.51); folga traseira e hélice menores",
+   "source": "Sadraey 2012 Sec. 9.6.2 / 9.5.1.3; Raymer 2018 Sec. 17.8 (V_LOF ≥ 1,1 V_S)"
+  },
+  "f_catapulta": {
+   "closes": null,
+   "status": "unassessed",
+   "note": "assumptions.launch_recovery.catapult ausente — opção não avaliada (≠ passa)"
+  },
+  "g_vento_cruzado_menor": {
+   "closes": false,
+   "admissible": false,
+   "still_air_point_mass_m": 291.01704629601204,
+   "still_air_6dof_m": 296.1906273613211,
+   "note": "abaixo de 0,2 V_S0 falha 14 CFR 23.233(a) (pré-Amdt 64) — não relaxado",
+   "source": "14 CFR 23.233(a)"
+  }
+ },
+ "status": "assessed",
+ "ground_roll_6dof_m": 325.08178060535136,
+ "gap_m": 25.081780605351355,
+ "wind_headwind_m_s": 0.0,
+ "wind_crosswind_m_s": 5.2,
+ "point_mass": {
+  "mission_wind_m": 291.01704629601204,
+  "still_air_m": 291.01704629601204,
+  "V_LOF_m_s": 30.286295602904712,
+  "V_S_m_s": 26.318451842887413
+ },
+ "k_6dof_over_point_mass": 1.1170540858101141,
+ "k_source": "PRESSUPOSTO: razão 6-DOF/massa pontual medida no vento da missão, mantida constante entre opções",
+ "point_mass_target_m": 268.56354030739067,
+ "ground_roll_6dof_still_air_m": 296.1906273613211,
+ "crosswind_penalty_m": 28.89115324403025,
+ "closing": [
+  "a_vento_de_frente",
+  "b_tracao",
+  "c_carga_alar",
+  "d_massa"
+ ],
+ "any_closes": true
+}

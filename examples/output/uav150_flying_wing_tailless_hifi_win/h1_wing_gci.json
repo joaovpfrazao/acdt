@@ -1,0 +1,380 @@
+{
+ "case": "uav150_flying_wing_tailless",
+ "date": "2026-11-13",
+ "solver": "SU2 8.5.0 Harrier, RANS, Spalart-Allmaras, OpenMP, 6 threads",
+ "scope": "Um α, controlos alinhados, meia asa de estibordo, sem corpo, trem ou hélice. A espessura é a NACA simétrica do loft (naca_yt). O NACA 4415 do yaml é só o registo de tipo fixo. Não se avaliou a polar, o CLmax equilibrado, o ΔCD/Cn do split nem os momentos de charneira.",
+ "decision": "nao_aplicar",
+ "applied_to_l1_l2": false,
+ "valid": false,
+ "band": [
+  0.7,
+  1.5
+ ],
+ "band_note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND (0.2–5).",
+ "interpretation": "As três malhas dão CL 0,871–0,875. A dispersão entre elas é da ordem da deriva iterativa, não um caminho para o CL 0,50293 do AVL. A razão 1,74 fica fora da banda e o factor não se aplica. O CMy é negativo nas três malhas e o Cmtot do AVL é positivo. O CD do RANS não é a mesma grandeza que o CDtot invíscido.",
+ "cruise": {
+  "alpha_deg": 9.52057,
+  "alpha_source": "AVL, a c CL_target, mesma asa simétrica",
+  "faired_controls": true,
+  "trimmed": false,
+  "altitude_m": 3000.0,
+  "V_m_s": 45.0,
+  "W0_kg": 150.4,
+  "T_K": 268.65,
+  "p_Pa": 70108.52649606044,
+  "rho": 0.90912186121629,
+  "Mach": 0.1369538125677505,
+  "q_Pa": 920.4858844814936,
+  "CL_target": 0.502927759275556,
+  "Re_Cref": 1754529.3175639778,
+  "S_m2": 3.186,
+  "Bref_m": 4.3860993683382326,
+  "Cref_m": 0.7263857319327182,
+  "mac": {
+   "eta": 0.4285714285714286,
+   "lambda": 0.39999999999999997,
+   "c_mac_m": 0.7712738835241834,
+   "chord_at_station_m": 0.7712738835241832,
+   "loft_xyz_m": [
+    0.9801559793360929,
+    0.9393026763579405,
+    0.018383046737451655
+   ],
+   "x_ref_m": 0.9801559793360929,
+   "y_ref_m": 0.0,
+   "z_ref_m": 0.0,
+   "note": "Xref is the loft quarter-chord x on the centreline. Cref = S/b is the AVL reference length, not this geometric MAC."
+  },
+  "scale_k": 1.153614783048992,
+  "REF_AREA_m2": 1.593,
+  "REF_AREA_note": "S/2 para o CL da meia-asa igualar o CL do avião completo",
+  "RefForce_expected_N": 1466.3340139790193,
+  "RefForce_matches_history": true
+ },
+ "avl": {
+  "source": "examples/output/uav150_flying_wing_tailless_hifi_win/avl/avl_stdout.txt",
+  "alpha_deg": 9.52057,
+  "CL": 0.50293,
+  "Cmtot": 0.02889,
+  "CDtot": 0.01611,
+  "CDff": 0.0145358,
+  "Xref_m": 0.98016,
+  "nchord": 12,
+  "nspan": 40,
+  "CDtot_note": "Invíscido. Não é alvo de calibração."
+ },
+ "levels": {
+  "coarse": {
+   "counts": {
+    "n_chord": 49,
+    "n_span": 33,
+    "n_tip": 9,
+    "n_layers": 49,
+    "n_wrap": 97
+   },
+   "cells": 190464,
+   "yplus_target": 2.0,
+   "s0_m": 2.0280397755340613e-05,
+   "points": 197225,
+   "n_hex": 190464,
+   "n_prism": 0,
+   "min_hex_volume_m3": 1.845e-11,
+   "watertight": true,
+   "winding_ok": true,
+   "unmarked_boundary": 0,
+   "wall_s": 4147.704566717148,
+   "wall_source": "su2.log st_mtime - st_ctime, resolução de 1 s",
+   "iters": 8000,
+   "rms_rho": -6.907076485,
+   "residual_criterion": -8.0,
+   "residual_met": false,
+   "stop": "ITER=8000 antes de rms[Rho] = -8",
+   "CL": 0.8711381045,
+   "CD": 0.1347712369,
+   "CMy": -0.04293302656,
+   "CMz": -0.04548989729,
+   "CL_drift": 0.001850450108510988,
+   "CD_drift": 0.0006241138831606226,
+   "CMy_drift": 0.004939018908989826,
+   "RefForce_N": 1466.280586,
+   "pyhyp": {
+    "grid_ratio_printed": 1.339,
+    "integrated_march_m": 72.8,
+    "final_layer": 49,
+    "final_min_volume": 13.0
+   }
+  },
+  "medium": {
+   "counts": {
+    "n_chord": 69,
+    "n_span": 47,
+    "n_tip": 9,
+    "n_layers": 69,
+    "n_wrap": 137
+   },
+   "cells": 512448,
+   "yplus_target": 1.4142135623730951,
+   "s0_m": 1.4340406777961783e-05,
+   "points": 525297,
+   "n_hex": 512448,
+   "n_prism": 0,
+   "min_hex_volume_m3": 2.298e-12,
+   "watertight": true,
+   "winding_ok": true,
+   "unmarked_boundary": 0,
+   "wall_s": 11436.916682958603,
+   "wall_source": "su2.log st_mtime - st_ctime, resolução de 1 s",
+   "iters": 8000,
+   "rms_rho": -7.477756254,
+   "residual_criterion": -8.0,
+   "residual_met": false,
+   "stop": "ITER=8000 antes de rms[Rho] = -8",
+   "CL": 0.875465785,
+   "CD": 0.1256519206,
+   "CMy": -0.04010278381,
+   "CMz": -0.03301108016,
+   "CL_drift": 0.0025092289586164983,
+   "CD_drift": 0.0007703224872155123,
+   "CMy_drift": 0.01013179638413729,
+   "RefForce_N": 1466.280586,
+   "pyhyp": {
+    "grid_ratio_printed": 1.228,
+    "integrated_march_m": 73.0,
+    "final_layer": 69,
+    "final_min_volume": 5.98
+   }
+  },
+  "fine": {
+   "counts": {
+    "n_chord": 97,
+    "n_span": 66,
+    "n_tip": 12,
+    "n_layers": 98,
+    "n_wrap": 194
+   },
+   "cells": 1451702,
+   "yplus_target": 1.0,
+   "s0_m": 1.0140198877670306e-05,
+   "points": 1477252,
+   "n_hex": 1451702,
+   "n_prism": 0,
+   "min_hex_volume_m3": 1.6193183590239127e-14,
+   "watertight": true,
+   "winding_ok": true,
+   "unmarked_boundary": 0,
+   "wall_s": 33069.788036584854,
+   "wall_source": "su2.log st_mtime - st_ctime, resolução de 1 s",
+   "iters": 8000,
+   "rms_rho": -7.674471867,
+   "residual_criterion": -8.0,
+   "residual_met": false,
+   "stop": "ITER=8000 antes de rms[Rho] = -8",
+   "CL": 0.8733119478,
+   "CD": 0.1202372195,
+   "CMy": -0.03595237509,
+   "CMz": -0.02655701273,
+   "CL_drift": 0.003278826548993687,
+   "CD_drift": 0.0006207004811849357,
+   "CMy_drift": 0.019030016467265303,
+   "RefForce_N": 1466.280586,
+   "pyhyp": {
+    "grid_ratio_printed": 1.154,
+    "integrated_march_m": 72.7,
+    "final_layer": 98,
+    "final_min_volume": 2.98,
+    "final_quality": 0.38362,
+    "layer3_nodal_min_volume": -1.38e-14,
+    "layer3_quality": -0.8069,
+    "note": "O mínimo nodal da camada 3 é -1,38e-14. O auditor de hex do SU2, na mesma malha, deu volume mínimo positivo. Não é o sentinela -1 do pyHyp."
+   }
+  }
+ },
+ "gci": {
+  "method": "Celik et al., ASME JFE 130 (2008) 078001, Fs=1.25",
+  "h": "(1/N)**(1/3)",
+  "oscillatory": "Stern et al., ASME JFE 123 (2001) 793",
+  "CL": {
+   "f": [
+    0.8733119478,
+    0.875465785,
+    0.8711381045
+   ],
+   "h": [
+    0.008831629503011681,
+    0.012496356291956473,
+    0.01738050401642828
+   ],
+   "r21": 1.4149547699770557,
+   "r32": 1.3908457481814587,
+   "p": 2.079204124361336,
+   "oscillatory": true,
+   "f_ext": null,
+   "e_ext_fine": 0.0023367484467496603,
+   "gci_fine": null,
+   "u_osc": 0.002477740348624655,
+   "h_definition": "(1/N)**(1/3)",
+   "dimension": 3,
+   "iter_drift": [
+    0.003278826548993687,
+    0.0025092289586164983,
+    0.001850450108510988
+   ],
+   "iterative_ok": false,
+   "note": "Oscilatório: gci_fine e f_ext são nulos. e_ext_fine é o resíduo da extrapolação antes da rejeição e não é usado. A incerteza reportada é u_osc. O erro iterativo não é pequeno face à diferença fino–médio, porque as três malhas já concordam mais do que a deriva das últimas 10 % das iterações."
+  },
+  "CMy": {
+   "f": [
+    -0.03595237509,
+    -0.04010278381,
+    -0.04293302656
+   ],
+   "h": [
+    0.008831629503011681,
+    0.012496356291956473,
+    0.01738050401642828
+   ],
+   "r21": 1.4149547699770557,
+   "r32": 1.3908457481814587,
+   "p": 0.9323943464537592,
+   "oscillatory": false,
+   "f_ext": -0.025091363543819887,
+   "e_ext_fine": 0.43285856215874047,
+   "gci_fine": 0.3776180126831545,
+   "h_definition": "(1/N)**(1/3)",
+   "dimension": 3,
+   "iter_drift": [
+    0.019030016467265303,
+    0.01013179638413729,
+    0.004939018908989826
+   ],
+   "iterative_ok": false,
+   "note": "Monótono e sempre negativo. O GCI fino é 38 % e o erro iterativo não é pequeno face à diferença fino–médio. A extrapolação continua negativa, do lado oposto ao Cmtot do AVL."
+  }
+ },
+ "comparisons": {
+  "CL": {
+   "quantity": "k_CL",
+   "hifi": 0.8733119478,
+   "lowfi": 0.50293,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": 1.736448308512119,
+   "reason": "razão 1.736 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "valid": false
+  },
+  "CMy": {
+   "quantity": "k_CMy",
+   "hifi": -0.03595237509,
+   "lowfi": 0.02889,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": -1.244457427829699,
+   "reason": "razão -1.244 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "valid": false
+  },
+  "CD": {
+   "quantity": "k_CD",
+   "hifi": 0.1202372195,
+   "lowfi": 0.01611,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": null,
+   "reason": "CD do AVL é invíscido (CDtot); o SU2 é RANS-SA. Não é a mesma grandeza. k_CD contra o AVL não calibra (G3 fica por fazer).",
+   "valid": false
+  }
+ },
+ "factors": [
+  {
+   "name": "k_CL",
+   "value": 1.736448308512119,
+   "valid": false,
+   "invalid_reason": "razão 1.736 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+  },
+  {
+   "name": "k_CMy",
+   "value": -1.244457427829699,
+   "valid": false,
+   "invalid_reason": "razão -1.244 fora de [0.7, 1.5]; rever o modelo antes de aplicar",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+  },
+  {
+   "name": "k_CD",
+   "value": null,
+   "valid": false,
+   "invalid_reason": "CD do AVL é invíscido (CDtot); o SU2 é RANS-SA. Não é a mesma grandeza. k_CD contra o AVL não calibra (G3 fica por fazer).",
+   "eligible": false,
+   "decision": "nao_aplicar",
+   "band": [
+    0.7,
+    1.5
+   ],
+   "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+  }
+ ],
+ "geometry": {
+  "edge_opening": {
+   "half_over_chord": 0.002,
+   "max_move_m": 0.0020765066094882044,
+   "tip": "semicircle",
+   "tip_bulge_m": 0.02076106310278256
+  },
+  "tip": "semicírculo de raio igual à meia-espessura local; artifício de malha, não o OML do AVL",
+  "cornerAngle_deg": 150.0,
+  "epsE": 4.0,
+  "cMax": 0.5,
+  "farfield_chords": 100.0,
+  "march_requested_m": 72.63857319327181,
+  "rejected_marches": "epsE 1 inverte na camada 19. epsE 8 e 16 dobram a parede a partir da camada 3. cMax 5 (exemplo M6) inverte uma célula da face inferior, no bordo de ataque da ponta, na camada 25. cMax 1,5 inverte na camada 46. cMax 1,0 inverte só a camada 49. cMax 0,5 manteve o volume mínimo positivo nas camadas extrudidas da família usada.",
+  "coarse_straight_line_mean_m": 59.0,
+  "coarse_straight_line_note": "Distância recta média da malha grossa, já registada em geometry_record. É menor do que a marcha integrada de 72,8 m. A média recta das malhas média e fina não foi regravada neste JSON."
+ },
+ "time_model": {
+  "planning_s_per_cell_iter": 4e-06,
+  "planning_note": "US_PER_CELL_ITER herdado de full_aircraft_rans_case. Não foi medido nesta CPU.",
+  "coarse_wall_s_per_cell_iter": 2.722105336649674e-06,
+  "coarse_s_per_cell_iter_per_thread": 1.6332632019898045e-05,
+  "planning_vs_measured_thread": 0.24490847495534093,
+  "note": "A constante 4e-6 s/célula/iter é cerca de 4 vezes mais baixa do que a taxa medida na malha grossa, por thread. Os tectos de planeamento (30/90/240 min) foram ultrapassados. A guarda de 70 % da RAM manteve-se. O tempo não relaxa a RAM."
+ },
+ "ram": {
+  "estimator_GB_per_cell": 1.8e-06,
+  "fine_estimate_GB": 2.6130636,
+  "fine_working_set_GB_early": 8.44,
+  "fine_working_set_when": "início das iterações, cerca da iteração 70",
+  "free_GB_at_iter_7994": 11.19,
+  "available_at_launch_GB": 19.59,
+  "guard": "estimativa < 0,7 * RAM disponível no arranque; o conjunto de trabalho medido ficou abaixo desse tecto"
+ },
+ "pyhyp": {
+  "version": "2.6.3",
+  "container": "mdolab/public:u22-gcc-ompi-stable, udocker, sem re-pull",
+  "no_growthRatios": true,
+  "no_nTruncate": true,
+  "smoothing_source": "pyHyp 2.6.3 examples/m6/runM6.py, excepto epsE, cMax e cornerAngle medidos nesta marcha"
+ }
+}

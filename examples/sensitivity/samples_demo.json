@@ -1,0 +1,13 @@
+{
+  "baseline": {"W0_kg": 23.4, "E_Wh": 980, "CD0": 0.028},
+  "samples": [
+    {"variable": "assumptions.aero.AR", "x0": 14, "x1": 14.7,
+     "metrics": {"W0_kg": 22.9, "E_Wh": 940, "CD0": 0.0275}},
+    {"variable": "assumptions.propulsion.battery_Wh_kg", "x0": 200, "x1": 210,
+     "metrics": {"W0_kg": 22.6, "E_Wh": 920, "CD0": 0.028}},
+    {"variable": "assumptions.propulsion.systems_power_W", "x0": 30, "x1": 33,
+     "metrics": {"W0_kg": 23.6, "E_Wh": 1010, "CD0": 0.028}},
+    {"variable": "requirements.payload_mass", "x0": 4.0, "x1": 4.2,
+     "metrics": {"W0_kg": 24.1, "E_Wh": 1025, "CD0": 0.028}}
+  ]
+}

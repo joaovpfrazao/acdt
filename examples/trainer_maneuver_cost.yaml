@@ -1,0 +1,46 @@
+# Exemplo 3 — Treinador acrobático biplace (tandem)
+# Mistura de requisitos: MANOBRABILIDADE (fator de carga sustentado, taxa de volta, subida) + CUSTO (objetivo: minimizar).
+# Sem requisito de alcance explícito: usa-se a autonomia de treino (1.5 h + reserva).
+name: Treinador acrobático biplace
+description: Treinador de pistão para formação básica/acrobacia; custo unitário minimizado.
+aircraft_class: ga_single_engine
+requirements:
+  propulsion_type: piston_prop
+  regulatory_category: cs_23
+  crew_mass: {target: 180, unit: kg}           # instrutor + aluno com paraquedas
+  payload_mass: {target: 10, unit: kg}
+  endurance: {min: 1.5, unit: h}
+  cruise_speed: {target: 120, unit: kt, altitude: {value: 5000, unit: ft}}
+  load_factor: {min: 3.0, speed: {value: 110, unit: kt}, altitude: {value: 5000, unit: ft}}
+  turn_rate: {min: 18, unit: deg/s, speed: {value: 90, unit: kt}, altitude: {value: 3000, unit: ft}}
+  climb_rate: {min: 1200, unit: ft/min}
+  stall_speed: {max: 55, unit: kt}
+  takeoff_ground_roll: {max: 400, unit: m}
+  unit_cost: {objective: minimize}
+  mtow_objective: {objective: minimize}
+assumptions:
+  weights:
+    method: components            # Raymer Ch. 15 por componentes; Raymer Table 3.1 só como valor inicial
+    components:
+      material: metal
+      engine_kW_per_kg: 1.1       # PRESSUPOSTO: motor a pistão seco ≈1.1 kW/kg (IO-360: 134 kW / 122 kg, TCDS 1E10)
+      avionics_uninstalled_kg: 15 # PRESSUPOSTO
+      structural_category: aerobatic   # treinador acrobático: n_lim 6.0 (CS-23)
+  aero:
+    AR: 7
+    taper: 0.6
+    tc_root: 0.15
+    tc_tip: 0.12
+    airfoil: NACA 23015
+    clmax_airfoil: 1.55
+    flap: {kind: plain, flapped_area_ratio: 0.5}
+    roughness: smooth_paint
+    extra_drag_areas_m2: {fixed_gear: 0.16, canopy_misc: 0.05}
+  geometry: {}
+  cost:
+    N: 200
+    Q_m: 4
+    cpi: 1.38          # CPI 2012 -> 2026 (pressuposto do utilizador; atualizar)
+    F_CERT: 1.0
+    F_CF: 1.0
+    avionics_cost: 25000

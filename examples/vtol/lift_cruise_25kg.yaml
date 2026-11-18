@@ -1,0 +1,32 @@
+# Lift + cruise (quadplane) 25 kg — exemplo ilustrativo. Valores marcados PRESSUPOSTO são hipóteses.
+name: lift+cruise 25 kg, 40 km
+architecture: lift_cruise
+mass_kg: 25.0
+altitude_m: 500.0
+rotors:
+  n: 4
+  diameter_m: 0.66          # PRESSUPOSTO: hélices de elevação 26"
+  FM: 0.68                  # PRESSUPOSTO (pequenos rotores 0,5–0,75)
+mission:
+  t_hover_s: 90             # descolagem + aterragem
+  climb_height_m: 30
+  climb_rate_m_s: 2.0
+  cruise_distance_m: 40000
+  cruise_speed_m_s: 22
+  t_loiter_s: 600
+cruise:
+  LD: 10.0                  # PRESSUPOSTO: inclui o arrasto dos rotores parados
+  eta_prop: 0.80
+transition:
+  n: 2
+  t_s: 15                   # PRESSUPOSTO
+  V_wing_frac: 0.75         # PRESSUPOSTO: asa suporta W (V/V_wing)^2
+electric:
+  pack_Wh_kg: 180           # PRESSUPOSTO (pacote Li-ion)
+  c_rate_max: 6
+  systems_power_W: 40
+# compare: só usado por `acdt vtol compare` (mesma massa e missão)
+compare: [multirotor, lift_cruise, tilt_rotor]
+overrides:
+  lift_cruise:
+    rotors: {n: 4, diameter_m: 0.66}

@@ -1,0 +1,151 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# PRESSUPOSTO illustrative study: Raymer Sec.15.3.2 regressions for remaining
+# transport groups + optional W_press. NOT a fitted A320 OEW or certification model.
+# engines_dry / operating_items / other_empty_items stay supplied (no Sec.15.3.2 thrust→mass).
+configuration_id: illustrative-extended-transport-build-up
+aircraft_class: jet_transport
+payload_kg: 15000
+crew_kg: 800
+mass_bounds_kg: [40000, 110000]
+mtow_limit_kg: 78000
+wing_area_m2: 122.6
+aspect_ratio: 9.48
+mach: 0.79
+altitude_m: 11277.6
+range_m: 5000000
+thrust_sl_N: 120000
+n_engines: 2
+cd0: 0.02
+oswald: 0.82
+reserve_fraction: 0.06
+wave:
+  thickness_ratio: 0.12
+  sweep_deg: 25
+  technology_factor: 0.95
+assumption_sources:
+  payload_kg: 'PRESSUPOSTO: study mission payload, not a published A320 number'
+  geometry_and_engine_class: Public class context in examples/jet/a320_ref.json; not a matched certified configuration
+  all_new_component_inputs: PRESSUPOSTO illustrative geometry/loads; no published aircraft weight validation
+pressurization:
+  cabin_volume_m3: 140
+  delta_p_Pa: 55160
+  source: 'PRESSUPOSTO: illustrative cabin volume and ~8 psi differential; not CS-25.841'
+  extraction:
+    mode: supplied_auxiliary
+    fuel_flow_kg_s: 0.005
+    thrust_penalty_N: 200
+    source: 'PRESSUPOSTO: constant cruise offtake standing in for pack/bleed; not an ECS map'
+weights:
+  mode: components
+  conventional_metal_transport: true
+  configuration_description: 'PRESSUPOSTO: illustrative conventional metal tube-and-wing transport, NOT a fitted A320 model'
+  ultimate_n: 3.75
+  items:
+  - name: wing_structure
+    covers: [wing_structure]
+    method: raymer_transport_wing
+    inputs: {root_thickness_ratio: 0.14, taper_ratio: 0.3, sweep_quarter_chord_deg: 25, control_area_m2: 25}
+    source: 'PRESSUPOSTO: illustrative explicit geometry'
+  - name: horizontal_tail_structure
+    covers: [horizontal_tail_structure]
+    method: raymer_transport_htail
+    inputs: {area_m2: 32, aspect_ratio: 4.5, sweep_quarter_chord_deg: 30, tail_arm_m: 15, pitch_radius_m: 4.5,
+             fuselage_width_m: 3.5, elevator_area_m2: 8, all_moving: false}
+    source: 'PRESSUPOSTO: illustrative explicit geometry'
+  - name: vertical_tail_structure
+    covers: [vertical_tail_structure]
+    method: raymer_transport_vtail
+    inputs: {area_m2: 25, aspect_ratio: 1.8, sweep_quarter_chord_deg: 35, tail_arm_m: 14, yaw_radius_m: 14,
+             root_thickness_ratio: 0.12, tail_height_ratio: 0}
+    source: 'PRESSUPOSTO: illustrative explicit geometry'
+  - name: fuselage_structure
+    covers: [fuselage_structure]
+    method: raymer_transport_fuselage
+    inputs:
+      length_m: 37.5
+      wetted_area_m2: 380
+      depth_m: 4.1
+      wing_span_m: 34.1
+      wing_taper_ratio: 0.3
+      wing_sweep_quarter_chord_deg: 25
+      cargo_door: one_side
+      fuselage_mounted_main_gear: false
+      pressurized_volume_m3: 140
+      delta_p_Pa: 55160
+    source: 'PRESSUPOSTO: illustrative fuselage; W_press add-on with cabin pair'
+  - name: landing_gear
+    covers: [landing_gear]
+    method: raymer_transport_landing_gear
+    inputs:
+      landing_mass_kg: 65000
+      landing_load_factor: 3
+      main_length_m: 1.4
+      nose_length_m: 1.0
+      main_wheels: 4
+      nose_wheels: 2
+      main_shock_struts: 2
+      landing_stall_speed_kt: 110
+      main_kneeling: false
+      nose_kneeling: false
+    source: 'PRESSUPOSTO: illustrative gear; Wl and Vstall (kt) explicit'
+  - name: nacelles_pylons
+    covers: [nacelles_pylons]
+    method: raymer_transport_nacelles
+    inputs: {length_m: 5.0, width_m: 1.8, height_m: 1.8, mass_per_engine_kg: 2300, n_engines: 2,
+             pylon_mounted: true, thrust_reversers: true}
+    source: 'PRESSUPOSTO: illustrative nacelle/engine content mass'
+  - name: engines_dry
+    covers: [engines_dry]
+    method: supplied
+    mass_kg: 4600
+    source: 'PRESSUPOSTO: TOTAL dry engines; no Sec.15.3.2 thrust→mass correlation'
+  - name: propulsion_accessories
+    covers: [propulsion_accessories]
+    method: raymer_transport_propulsion_accessories
+    inputs: {n_engines: 2, cockpit_to_engine_length_m: 18, mass_per_engine_kg: 2300}
+    source: 'PRESSUPOSTO: engine controls + starter'
+  - name: apu_installed
+    covers: [apu_installed]
+    method: raymer_transport_apu
+    inputs: {uninstalled_mass_kg: 180}
+    source: 'PRESSUPOSTO: uninstalled APU mass'
+  - name: flight_controls
+    covers: [flight_controls]
+    method: raymer_transport_flight_controls
+    inputs: {n_control_functions: 5, control_surface_area_m2: 35, Iyy_kg_m2: 2500000.0, mechanical_controls_fraction: 0}
+    source: 'PRESSUPOSTO: Nf/Scs/Iyy'
+  - name: hydraulics
+    covers: [hydraulics]
+    method: raymer_transport_hydraulics
+    inputs: {n_control_functions: 5, fuselage_length_m: 37.5, wing_span_m: 34.1}
+    source: 'PRESSUPOSTO: Nf and lengths'
+  - name: electrical_avionics
+    covers: [electrical_avionics]
+    method: raymer_transport_electrical_avionics
+    inputs: {electrical_power_W: 50000, routing_distance_m: 25, n_engines: 2, uninstalled_avionics_mass_kg: 400}
+    source: 'PRESSUPOSTO: electrical+avionics; instruments not in this group'
+  - name: environmental_antiice
+    covers: [environmental_antiice]
+    method: raymer_transport_environmental
+    inputs: {n_crew: 2, n_pax: 150, pressurized_volume_m3: 140, uninstalled_avionics_mass_kg: 400}
+    source: 'PRESSUPOSTO: AC + anti-ice'
+  - name: furnishings_interiors
+    covers: [furnishings_interiors]
+    method: raymer_transport_furnishings
+    inputs: {n_crew: 2, cargo_mass_kg: 15000, fuselage_wetted_area_m2: 380}
+    source: 'PRESSUPOSTO: furnishings excl. seats'
+  - name: fuel_system_dry
+    covers: [fuel_system_dry]
+    method: raymer_transport_fuel_system
+    inputs: {fuel_volume_m3: 20, n_tanks: 4, integral_tank_fraction: 0.6}
+    source: 'PRESSUPOSTO: dry tanks/pumps'
+  - name: operating_items_noncrew_nonfuel
+    covers: [operating_items_noncrew_nonfuel]
+    method: supplied
+    mass_kg: 400
+    source: 'PRESSUPOSTO: operational items; no Sec.15.3.2 handling-gear auto-allocation into this group'
+  - name: other_empty_items
+    covers: [other_empty_items]
+    method: supplied
+    mass_kg: 300
+    source: 'PRESSUPOSTO: residual empty items'

@@ -1,0 +1,20 @@
+{
+  "label": "Taxas C2 / FCC / motor UAV — EXAMPLE / PRESSUPOSTO ilustrativo, NÃO cotações reais de fornecedor",
+  "supplier_rates": {
+    "uav_c2_link": {
+      "lambda_per_h": 2.0e-4,
+      "source": "EXAMPLE / PRESSUPOSTO ilustrativo de rádio C2 — substituir por MTBF do fornecedor com fonte e data",
+      "retrieved": "2026-11-10"
+    },
+    "uav_flight_computer": {
+      "mtbf_h": 20000,
+      "source": "EXAMPLE / PRESSUPOSTO ilustrativo de FCC — substituir por análise DO-254 / dados de campo do fornecedor",
+      "retrieved": "2026-11-10"
+    },
+    "uav_two_stroke_engine": {
+      "lambda_per_h": 5.0e-4,
+      "source": "EXAMPLE / PRESSUPOSTO ilustrativo de motor UAV — substituir por dados de campo do fornecedor",
+      "retrieved": "2026-11-10"
+    }
+  }
+}

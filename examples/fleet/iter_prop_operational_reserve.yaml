@@ -1,0 +1,256 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Esquema 1.1: autonomia máxima derivada, fecho dimensionamento↔capacidade e reserva operacional explícita.
+# Todos os números novos são PRESSUPOSTOS, não dados publicados.
+schema_version: '1.1'
+source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+  do fornecedor; não valida uma aeronave real'
+mission:
+  envelope:
+    distance_km:
+    - 10
+    - 10
+    speed_m_s:
+    - 30
+    - 30
+    on_station_h:
+    - 0.25
+    - 0.25
+    payload_kg:
+    - 5
+    - 5
+  samples:
+  - id: missão-lenta
+    distance_km: 10
+    speed_m_s: 30
+    on_station_h: 0.25
+    payload_kg: 5
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+operations:
+  availability: 0.9
+  n_stations: 1
+  handoff_overlap_h: 0
+  reserve_h: 0
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  operational_reserve:
+    time_h: 0.1
+    divert_km: 5
+    native_reserve: replace
+    source: 'PRESSUPOSTO: reserva operacional ilustrativa (tempo/desvio), não requisito
+      regulamentar; substituir pela política do operador'
+candidates:
+- id: elétrico
+  architecture: elétrico — opção fornecida, não preseleção automática
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 2
+    turnaround_h:
+    - 0.1
+    - 0.3
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: prop
+    onboard:
+      schema_version: '1.0'
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+      items:
+      - id: instrument
+        role: payload
+        mass_kg: 1
+        mass_accounting: incremental
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      loads:
+      - id: instrument_load
+        item_id: instrument
+        source_id: bus
+        power_W: 50
+        peak_W: 100
+        duty: 0.5
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      sources:
+      - id: bus
+        kind: main_battery
+        delivery_efficiency: 0.9
+        continuous_W: 1000
+        peak_W: 1000
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+    aircraft:
+      name: PRESSUPOSTO common electric
+      aircraft_class: uav_small
+      requirements:
+        propulsion_type: electric
+        payload_mass:
+          target: 4
+          unit: kg
+        endurance:
+          min: 0.5
+          unit: h
+        cruise_speed:
+          target: 22
+          unit: m/s
+        cruise_altitude:
+          target: 300
+          unit: m
+        stall_speed:
+          max: 13
+          unit: m/s
+        climb_rate:
+          min: 2
+          unit: m/s
+      assumptions:
+        aero:
+          fidelity: handbook
+        weights:
+          method: statistical
+          initial_class: uav_small
+        propulsion:
+          systems_power_W: 0
+          energy_reserve: 0.2
+        geometry:
+          fuselage_length_m: 1.8
+          fuselage_diameter_m: 0.22
+  turnaround:
+    method: charge
+    average_input_W: 300
+    efficiency: 0.9
+    allocation: dedicated_per_aircraft
+    fixed_h: 0.1
+    combine: serial
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  pack_power:
+    continuous_C: 5
+    peak_C: 8
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+- id: térmico
+  architecture: térmico — opção fornecida, não preseleção automática
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 2
+    turnaround_h:
+    - 0.1
+    - 0.3
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: prop
+    onboard:
+      schema_version: '1.0'
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+      items:
+      - id: instrument
+        role: payload
+        mass_kg: 1
+        mass_accounting: incremental
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      - id: power_unit
+        role: equipment
+        mass_kg: 0.5
+        mass_accounting: incremental
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      loads:
+      - id: instrument_load
+        item_id: instrument
+        source_id: bus
+        power_W: 50
+        peak_W: 100
+        duty: 0.5
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+      sources:
+      - id: bus
+        kind: generator
+        item_id: power_unit
+        delivery_efficiency: 0.9
+        continuous_W: 10000
+        peak_W: 10000
+        source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+          não é uma referência de aeronave'
+        generator_efficiency: 0.8
+        bsfc_kg_kWh_shaft: 0.3
+        shaft_limit_W: 1000
+    aircraft:
+      name: PRESSUPOSTO common thermal
+      aircraft_class: uav_small
+      requirements:
+        propulsion_type: piston_prop
+        payload_mass:
+          target: 185
+          unit: kg
+        endurance:
+          min: 2
+          unit: h
+        cruise_speed:
+          target: 50
+          unit: m/s
+        cruise_altitude:
+          target: 300
+          unit: m
+        stall_speed:
+          max: 13
+          unit: m/s
+        climb_rate:
+          min: 2
+          unit: m/s
+      assumptions:
+        aero:
+          fidelity: handbook
+        weights:
+          method: statistical
+          initial_class: uav_tactical_recce_ucav
+        propulsion:
+          systems_power_W: 0
+        geometry:
+          fuselage_length_m: 1.8
+          fuselage_diameter_m: 0.22
+    duration:
+      precruise_s: 300
+      postcruise_s: 180
+      source: 'PRESSUPOSTO: exemplo de integração, substituir por dados do fornecedor;
+        não é uma referência de aeronave'
+  turnaround:
+    method: supplied
+    duration_h: 0.15
+    activity: 'reabastecimento/serviço: tempo total agregado assumido'
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+- id: híbrido-aberto
+  architecture: híbrido por avaliar
+  source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+    do fornecedor; não valida uma aeronave real'
+  n0:
+    endurance_h:
+    - 1
+    - 4
+    turnaround_h:
+    - 0.1
+    - 0.5
+    source: 'PRESSUPOSTO: cenário de engenharia ilustrativo, substituir por requisitos/dados
+      do fornecedor; não valida uma aeronave real'
+  recipe:
+    schema_version: '1.0'
+    model: hybrid
+    aircraft: {}
+objectives:
+  fleet_required: min
+  fleet_mtow_kg: min

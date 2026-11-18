@@ -1,0 +1,39 @@
+{
+ "vsp3": "/workspace/aircraft-design-tools/examples/output/cessna172_check_hifi/geometry/cessna172_check.vsp3",
+ "step": "/workspace/aircraft-design-tools/examples/output/cessna172_check_hifi/geometry/cessna172_check.step",
+ "step_wing": "/workspace/aircraft-design-tools/examples/output/cessna172_check_hifi/geometry/cessna172_check_wing.step",
+ "stl": "/workspace/aircraft-design-tools/examples/output/cessna172_check_hifi/geometry/cessna172_check.stl",
+ "vsp_version": "OpenVSP 3.55.0",
+ "wetted": [
+  {
+   "component": "fuselage",
+   "Swet_vsp_m2": 20.767081866825663,
+   "Swet_L0_m2": 23.968235268912995,
+   "ratio": 0.866441839953096
+  },
+  {
+   "component": "wing",
+   "Swet_vsp_m2": 27.84533448707345,
+   "Swet_L0_m2": 24.599017817945814,
+   "ratio": 1.1319693612628443
+  },
+  {
+   "component": "htail",
+   "Swet_vsp_m2": 4.572066559744839,
+   "Swet_L0_m2": 5.6632723327075105,
+   "ratio": 0.8073188593349907
+  },
+  {
+   "component": "vtail",
+   "Swet_vsp_m2": 1.806061929819325,
+   "Swet_L0_m2": 2.3445282493925816,
+   "ratio": 0.7703306327348531
+  }
+ ],
+ "Swet_total_vsp": 54.990544843463276,
+ "Swet_total_L0": 56.5750536689589,
+ "Swet_ratio": 0.9719928003114737,
+ "ref": "McDonald & Gloudemans, Open Vehicle Sketch Pad, AIAA 2022-0004 (NASA Open Source Agreement 1.3)",
+ "note": "CompGeom exclui as interse\u00e7\u00f5es (asa\u2013fuselagem, cauda\u2013fuselagem); L0: Raymer Eq. 7.12 com \u00e1rea exposta e Torenbeek App. F para a fuselagem",
+ "render_png": "/workspace/aircraft-design-tools/examples/output/cessna172_check_hifi/geometry/cessna172_check_3d.png"
+}

@@ -1,0 +1,16 @@
+{
+ "Re_mac": 4872545.763974179,
+ "first_cell_m": 7.463288479681644e-06,
+ "surface_spacing_m": 0.013802602464351698,
+ "n_surface_tri": 292623,
+ "prism_layers": 42,
+ "cells_estimate": 14045906,
+ "ram_GB": 25.282631139397022,
+ "wall_h_8cores_3alpha": 46.81968729517967,
+ "wall_h_64cores_3alpha": 5.852460911897459,
+ "commands": [
+  "cd rans_case",
+  "gmsh aircraft_rans.geo -3 -format su2 -o aircraft_half.su2",
+  "mpirun -n <N> SU2_CFD aircraft_rans.cfg   # AOA in the cfg; repeat for \u03b1 = 0, 2, 4 (+ stall sweep)"
+ ]
+}

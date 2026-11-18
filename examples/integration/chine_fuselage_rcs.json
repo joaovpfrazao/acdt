@@ -1,0 +1,180 @@
+{
+ "_comment": "PRESSUPOSTO L0 demo: fuselage with opt-in hexagonal chine (sharp longitudinal edges) so the PO RCS mesh sees the feature; aero/RCS study reads this assembly (bodies/surfaces/disc + box/sphere/cylinder items) rather than the parallel parametric faceted aircraft. Disc/propeller excluded from PEC RCS (PRESSUPOSTO). Not a product study.",
+ "assembly": {
+  "components": [
+   {
+    "type": "body",
+    "name": "fuselage",
+    "role": "fuselage",
+    "origin": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "pod": {
+     "length": 2.4,
+     "width": 0.4,
+     "height": 0.36,
+     "nose_frac": 0.2,
+     "tail_frac": 0.25,
+     "tail_scale": 0.4,
+     "chine_deg": 45.0,
+     "crown_frac": 0.35
+    }
+   },
+   {
+    "type": "surface",
+    "name": "wing",
+    "role": "wing",
+    "origin": [
+     0.85,
+     0.0,
+     0.0
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.45,
+     "tip_chord": 0.28,
+     "span": 1.6,
+     "dihedral_deg": 2.0,
+     "tc_root": 0.14,
+     "tc_tip": 0.12
+    }
+   },
+   {
+    "type": "surface",
+    "name": "htail",
+    "role": "horizontal tail",
+    "origin": [
+     2.15,
+     0.0,
+     0.05
+    ],
+    "mirror": true,
+    "panel": {
+     "root_chord": 0.28,
+     "tip_chord": 0.18,
+     "span": 0.45,
+     "dihedral_deg": 0.0,
+     "tc_root": 0.1,
+     "tc_tip": 0.1
+    }
+   },
+   {
+    "type": "surface",
+    "name": "vtail",
+    "role": "vertical tail",
+    "origin": [
+     2.15,
+     0.0,
+     0.05
+    ],
+    "panel": {
+     "root_chord": 0.28,
+     "tip_chord": 0.18,
+     "span": 0.35,
+     "dihedral_deg": 90.0,
+     "tc_root": 0.1,
+     "tc_tip": 0.1
+    }
+   },
+   {
+    "type": "disc",
+    "name": "prop",
+    "role": "propeller",
+    "origin": [
+     2.45,
+     0.0,
+     0.0
+    ],
+    "diameter": 0.7,
+    "orientation": {
+     "yaw": 0.0
+    }
+   }
+  ]
+ },
+ "items": [
+  {
+   "name": "eo_ball",
+   "mass_kg": 1.2,
+   "size_m": [
+    0.18,
+    0.18,
+    0.18
+   ],
+   "shape": "sphere",
+   "position": [
+    0.35,
+    0.0,
+    -0.22
+   ],
+   "obstructs": true,
+   "protuberance": true,
+   "protuberance_shape": "sphere"
+  },
+  {
+   "name": "antenna_mast",
+   "mass_kg": 0.4,
+   "size_m": [
+    0.04,
+    0.04,
+    0.25
+   ],
+   "shape": "cylinder",
+   "cylinder_axis": "z",
+   "position": [
+    1.5,
+    0.0,
+    0.28
+   ],
+   "obstructs": true,
+   "protuberance": true,
+   "protuberance_shape": "cylinder"
+  },
+  {
+   "name": "avionics_box",
+   "mass_kg": 2.0,
+   "size_m": [
+    0.2,
+    0.15,
+    0.1
+   ],
+   "shape": "box",
+   "position": [
+    0.7,
+    0.0,
+    0.0
+   ],
+   "host": "fuselage"
+  }
+ ],
+ "constraints": [
+  {
+   "type": "within",
+   "item": "avionics_box",
+   "body": "fuselage"
+  },
+  {
+   "type": "min_separation",
+   "a": "eo_ball",
+   "b": "antenna_mast",
+   "distance_m": 0.3
+  }
+ ],
+ "flight": {
+  "W0_kg": 28.0,
+  "V_m_s": 28.0,
+  "altitude_m": 500.0,
+  "n_limit": 3.5,
+  "payload_kg": 3.0
+ },
+ "base": {
+  "mass_kg": 18.0,
+  "cg": [
+   1.0,
+   0.0,
+   0.0
+  ]
+ }
+}
