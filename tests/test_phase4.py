@@ -278,6 +278,30 @@ def test_rectangular_box_torsion_matches_bredt(tmp_path):
     assert rate == pytest.approx(T / (G * J), rel=0.03)
 
 
+def test_nlgeom_step_is_not_a_riks_card(tmp_path):
+    """CalculiX 2.23 geometric nonlinearity is *STEP, NLGEOM. Riks is not written."""
+    from acdt.domains.aircraft.hifi.fem import _tip_deflection, write_deck
+    from acdt.domains.aircraft.hifi.tools import find_exe, run
+
+    L, w, h, t = 2.0, 0.4, 0.1, 0.002
+    mesh = _constant_rectangle(L, w, h, t, n_span=4, n_chord=2, n_height=2, E=70e9, nu=0.3, rho=2700.0)
+    jt = len(mesh.y) - 1
+    loads = {mesh.spar_lines["f_up"][jt]: -20.0, mesh.spar_lines["r_up"][jt]: -20.0}
+    write_deck(mesh, tmp_path / "box_nlgeom.inp", "nlgeom", loads)
+    text = (tmp_path / "box_nlgeom.inp").read_text(encoding="utf-8")
+    assert "*STEP, NLGEOM\n" in text
+    assert "*STATIC, SOLVER=SPOOLES\n0.2, 1.\n" in text
+    assert "RIKS" not in text.upper()
+    with pytest.raises(ValueError):
+        write_deck(mesh, tmp_path / "nope.inp", "riks", loads)
+    if find_exe("ccx") is None:
+        pytest.skip("CalculiX ccx not on ACDT_HIFI_BIN or PATH")
+    rc = run([find_exe("ccx"), "box_nlgeom"], tmp_path, "box_nlgeom.log", timeout=180)
+    assert rc == 0, (tmp_path / "box_nlgeom.log").read_text(errors="replace")[-500:]
+    tip = _tip_deflection(mesh, tmp_path / "box_nlgeom.dat")
+    assert tip is not None and math.isfinite(tip[0]) and tip[0] < 0.0
+
+
 def test_shift_echo_is_scaled_back_to_the_ultimate_load():
     """A cluster about σ = 1 is not the lowest factor. Scaling the load must recover it."""
     from acdt.domains.aircraft.hifi.fem import reliable_buckling_factors
@@ -413,6 +437,19 @@ def test_calibration_build_traces_sources():
     c = calibration.build("t", sec, None, fl, sources={"cfd2d": "a"})
     assert c["factors"]["k_flutter"]["value"] == pytest.approx(162 / 113)
     assert c["factors"]["k_clmax"]["hifi"] == 1.82 and c["sources"]["cfd2d"] == "a"
+
+
+def test_k_flutter_is_not_zero_when_the_strip_speed_does_not_cross():
+    """Dividing a finite DLM speed by an infinite strip speed is 0 in IEEE arithmetic. That 0 is not a ratio."""
+    fl = {"strip_V_F": math.inf, "margin": {"V_F_g003": 284.5870142213441}}
+    c = calibration.build("uav150_flying_wing_tailless", None, None, fl)
+    f = c["factors"]["k_flutter"]
+    assert f["value"] is None and f["valid"] is False and f["lowfi"] is None
+    assert f["hifi"] == pytest.approx(284.5870142213441)
+    assert "not finite" in f["invalid_reason"]
+    assert "k_flutter" not in calibration.load({"calibration": {"factors": {"k_flutter": f}, "apply": ["flutter"]}})
+    line = calibration.table_md(c)[-1]
+    assert "`k_flutter`" in line and "inválido" in line and "0.000" not in line
 
 
 def test_k_cd_profile_from_turbulent_rans_is_reported_not_applied(tmp_path):

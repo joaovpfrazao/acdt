@@ -126,11 +126,18 @@ def build(name: str, section: dict | None = None, fem: dict | None = None, flutt
                 F["k_f_torsion"] = _stamp("k_f_torsion", {"group": "structures",
                                     "value": ft / fem["strip_f_torsion_Hz"], "hifi": ft,
                                     "lowfi": fem["strip_f_torsion_Hz"], "what": "1st torsion frequency FEM / strip"})
-    if flutter and flutter.get("strip_V_F") and math.isfinite(flutter["margin"]["V_F_g003"]):
-        F["k_flutter"] = _stamp("k_flutter", {"group": "flutter",
-                          "value": flutter["margin"]["V_F_g003"] / flutter["strip_V_F"],
-                          "hifi": flutter["margin"]["V_F_g003"], "lowfi": flutter["strip_V_F"],
-                          "what": "flutter speed FEM+DLM p-k (g = 0.03, min sym/antisym) / Phase 3 strip V_F"})
+    if flutter and flutter.get("margin") and math.isfinite(flutter["margin"].get("V_F_g003", math.nan)):
+        vf = flutter["margin"]["V_F_g003"]
+        strip = flutter.get("strip_V_F")
+        # A non-finite strip speed (no crossing) must not become 0 via IEEE division.
+        if isinstance(strip, (int, float)) and math.isfinite(strip) and strip > 0.0:
+            F["k_flutter"] = _stamp("k_flutter", {"group": "flutter", "value": vf / strip,
+                              "hifi": vf, "lowfi": strip,
+                              "what": "flutter speed FEM+DLM p-k (g = 0.03, min sym/antisym) / Phase 3 strip V_F"})
+        else:
+            F["k_flutter"] = {"group": "flutter", "value": None, "hifi": vf, "lowfi": None, "valid": False,
+                              "invalid_reason": "strip flutter speed is not finite; ratio not formed",
+                              "what": "flutter speed FEM+DLM p-k (g = 0.03, min sym/antisym) / Phase 3 strip V_F"}
     return out
 
 
@@ -171,12 +178,22 @@ def _group_of(k: str) -> str:
     return {"k_clmax": "aero", "k_cd_profile": "aero", "d_cm0": "aero", "k_flutter": "flutter"}.get(k, "structures")
 
 
+def _cell(x, fmt: str) -> str:
+    try:
+        v = float(x)
+    except (TypeError, ValueError):
+        return "—"
+    if not math.isfinite(v):
+        return "—"
+    return format(v, fmt)
+
+
 def table_md(cal: dict, applied: dict | None = None) -> list[str]:
     applied = applied or {}
     L = ["| fator | grupo | valor | alta fidelidade | baixa fidelidade | o quê | aplicado |", "|---|---|---|---|---|---|---|"]
     for k, f in cal["factors"].items():
         ok, _why = factor_acceptable(k, f)
         flag = "sim" if ok and k in applied else ("inválido" if not ok else "não")
-        L.append(f"| `{k}` | {f['group']} | {f['value']:.3f} | {f['hifi']:.4g} | {f['lowfi']:.4g} | {f['what']} | "
-                 f"{flag} |")
+        L.append(f"| `{k}` | {f['group']} | {_cell(f['value'], '.3f')} | {_cell(f['hifi'], '.4g')} | "
+                 f"{_cell(f['lowfi'], '.4g')} | {f['what']} | {flag} |")
     return L
