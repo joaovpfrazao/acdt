@@ -42,9 +42,12 @@ K_CD_PROFILE_NOT_APPLIED = (
 
 
 def factor_acceptable(name: str, factor: dict) -> tuple[bool, str]:
-    """Whether a stored factor may be applied. ``valid: false`` always rejects."""
+    """Whether a stored factor may be applied. ``valid: false`` and ``decision: nao_aplicar`` (H1 records,
+    ``acdt calib`` test-data factors) always reject."""
     if factor.get("valid") is False:
         return False, str(factor.get("invalid_reason") or "marked invalid")
+    if factor.get("decision") == "nao_aplicar":
+        return False, str(factor.get("invalid_reason") or "decision nao_aplicar")
     try:
         value = float(factor["value"])
     except (TypeError, ValueError, KeyError):

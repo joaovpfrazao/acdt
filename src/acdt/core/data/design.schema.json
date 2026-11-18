@@ -110,6 +110,7 @@
       "required": ["method", "source", "quantities"],
       "properties": {
         "method": {"type": "string"},
+        "fidelity": {"enum": ["modelo", "ensaio"], "description": "origem do bloco: modelo (omissão) ou ensaio (dados medidos / acdt calib)"},
         "references": {"type": "array", "items": {"type": "string"}},
         "source": {"type": "string"},
         "evidence": {"type": ["string", "null"]},
