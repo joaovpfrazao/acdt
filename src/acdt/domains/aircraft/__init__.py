@@ -10,6 +10,7 @@ from __future__ import annotations
 from acdt.core.pipeline import Domain, DesignState, Stage, register_domain
 
 from . import requirement_types  # noqa: F401  (registers requirement types + validators)
+from . import review_profile  # noqa: F401  (perfil de revisão de projeto, acdt report)
 from .mission import MissionSpec
 
 
