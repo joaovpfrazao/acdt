@@ -5,7 +5,9 @@ Source Parametric Geometry and Analysis Tool for Conceptual Aircraft Design", AI
 (NACA 4/5-digit sections, dihedral, sweep, incidence, optional section twist), horizontal and vertical tails,
 and a POD fuselage (length + fineness ratio). Tails and the fuselage are omitted when the spec has no key for
 them, so a flying wing is only the wing. Writes .vsp3, STEP, STL, the CompGeom wetted areas and a read-back of
-the parameters OpenVSP stored. An optional ``vspaero`` object runs one vortex-lattice point.
+the parameters OpenVSP stored. An optional ``vspaero`` object runs one point. ``surface`` ``thin`` (the
+default) is the vortex lattice. ``surface`` ``thick`` is the panel mesh, with the wake inputs named in the
+spec written and read back.
 Kept free of acdt imports: it runs in a separate interpreter (OpenVSP ships its own CPython build)."""
 import json
 import math
@@ -181,38 +183,128 @@ def _text_tail(path, limit=30000):
     return data if len(data) <= limit else data[-limit:]
 
 
-def _thin_surface(analysis):
-    """Put every surface on the thin set. A thick panel mesh on this build loads and then dies
-    while attaching the trailing wake (``Could not find global edge for trailing wake``)."""
-    vsp.SetIntAnalysisInput(analysis, "GeomSet", (int(vsp.SET_NONE),), 0)
-    vsp.SetIntAnalysisInput(analysis, "ThinGeomSet", (int(vsp.SET_ALL),), 0)
+# Analysis-input names confirmed on VSPAEROSweep. Integers use SetIntAnalysisInput;
+# WakeRelax is a double. A name absent from this table is not written.
+_WAKE_KIND = {
+    "WakeNumIter": "i",
+    "NumWakeNodes": "i",
+    "FixedWakeFlag": "i",
+    "ImplicitWake": "i",
+    "ImplicitWakeStartIteration": "i",
+    "FreezeWakeRootVortices": "i",
+    "FreezeWakeAtIteration": "i",
+    "WakeRelax": "d",
+}
+
+
+def _drop_mesh_geoms():
+    """Remove CompGeom meshes so a thick SET_ALL is the design geometry only.
+
+    ``ComputeCompGeom`` leaves one or more geoms of type ``Mesh`` in the vehicle.
+    A later thick solve with ``GeomSet`` = ``SET_ALL`` would panel those meshes as
+    well. On this wing that produced a history of non-finite forces. The wetted
+    areas are already stored before the solver runs. Thin solves are unchanged.
+    """
+    removed = []
+    while True:
+        meshes = [gid for gid in vsp.FindGeoms() if vsp.GetGeomTypeName(gid) == "Mesh"]
+        if not meshes:
+            break
+        removed.append(vsp.GetGeomName(meshes[0]))
+        vsp.DeleteGeom(meshes[0])
+    if removed:
+        vsp.Update()
+    return removed
+
+
+def _surface_sets(analysis, mode):
+    """Choose the thick panel set or the thin lattice set.
+
+    ``thin`` is GeomSet SET_NONE and ThinGeomSet SET_ALL. ``thick`` is the opposite:
+    GeomSet SET_ALL and ThinGeomSet SET_NONE. On OpenVSP 3.48.2 the thick mesh of this
+    wing died while attaching the trailing wake. The 3.56 thick path still only sets
+    inputs that exist; it does not invent a wake length."""
+    if mode == "thin":
+        geom, thin = int(vsp.SET_NONE), int(vsp.SET_ALL)
+    elif mode == "thick":
+        geom, thin = int(vsp.SET_ALL), int(vsp.SET_NONE)
+    else:
+        raise ValueError("surface must be thin or thick")
+    vsp.SetIntAnalysisInput(analysis, "GeomSet", (geom,), 0)
+    vsp.SetIntAnalysisInput(analysis, "ThinGeomSet", (thin,), 0)
+
+
+def _apply_wake(analysis, wake):
+    """Write wake inputs that this build actually has, then read each one back.
+
+    Unknown names are recorded and left untouched. The read-back is the value the
+    analysis manager stored, not the value the caller asked for."""
+    try:
+        known = set(vsp.GetAnalysisInputNames(analysis))
+    except Exception as exc:
+        return {}, {"_names": "ERR " + type(exc).__name__}
+    applied, skipped = {}, {}
+    for name, value in (wake or {}).items():
+        if name not in _WAKE_KIND:
+            skipped[name] = "name is not in the wake-input table"
+            continue
+        if name not in known:
+            skipped[name] = "input is absent on this build"
+            continue
+        kind = _WAKE_KIND[name]
+        if kind == "i":
+            vsp.SetIntAnalysisInput(analysis, name, (int(value),), 0)
+        else:
+            vsp.SetDoubleAnalysisInput(analysis, name, (float(value),), 0)
+        applied[name] = _input(analysis, name, kind)
+    return applied, skipped
+
+
+def _solver_exe():
+    folder = os.path.dirname(os.path.abspath(vsp.__file__))
+    exe = os.path.join(folder, "vspaero")
+    if os.path.isfile(exe):
+        return exe
+    windows = exe + ".exe"
+    if os.path.isfile(windows):
+        return windows
+    raise FileNotFoundError(exe)
 
 
 def _vspaero(cfg, wing_id, stem):
-    """One VSPAERO vortex-lattice point. Reference lengths come from the spec, not from the wing area.
+    """One VSPAERO point. Reference lengths come from the spec, not from the wing area.
 
-    The analysis manager writes the case and stops before the solver. Launching the solver from that
-    manager on this build does not return (the viewer binary is absent). The solver is therefore a
-    separate process, the ``vspaero`` executable that sits next to the OpenVSP Python module.
-    Both the geometry step and the sweep are thin surfaces: that is the lattice AVL solves."""
+    The analysis manager writes the case and stops (``StopBeforeRun``). The solver is a
+    separate process, the ``vspaero`` executable next to the OpenVSP Python module.
+    On the 3.48.2 container that manager did not return. This script keeps the split:
+    the viewer is not used to launch the solve.
+
+    ``surface`` defaults to ``thin``. ``thick`` selects the panel set on both the
+    geometry step and the sweep. A ``wake`` object is applied only through
+    :func:`_apply_wake`.
+    """
     analysis_geom = "VSPAEROComputeGeometry"
     analysis = "VSPAEROSweep"
+    mode = cfg.get("surface", "thin")
+    removed_meshes = _drop_mesh_geoms() if mode == "thick" else []
     vsp.SetVSPAERORefWingID(wing_id)
     vsp.SetAnalysisInputDefaults(analysis_geom)
-    _thin_surface(analysis_geom)
+    _surface_sets(analysis_geom, mode)
     t0 = time.time()
     vsp.ExecAnalysis(analysis_geom)
     vsp.SetAnalysisInputDefaults(analysis)
     alpha = float(cfg["alpha_deg"])
     mach = float(cfg["mach"])
     ncpu = int(cfg.get("ncpu", 4))
+    wake = dict(cfg.get("wake") or {})
     vsp.SetIntAnalysisInput(analysis, "RefFlag", (0,), 0)
     vsp.SetIntAnalysisInput(analysis, "AlphaNpts", (1,), 0)
-    vsp.SetIntAnalysisInput(analysis, "WakeNumIter", (int(cfg.get("wake_iter", 5)),), 0)
+    if "WakeNumIter" not in wake:
+        vsp.SetIntAnalysisInput(analysis, "WakeNumIter", (int(cfg.get("wake_iter", 5)),), 0)
     vsp.SetIntAnalysisInput(analysis, "NCPU", (ncpu,), 0)
     vsp.SetIntAnalysisInput(analysis, "StallModel", (0,), 0)
     vsp.SetIntAnalysisInput(analysis, "StopBeforeRun", (1,), 0)
-    _thin_surface(analysis)
+    _surface_sets(analysis, mode)
     vsp.SetDoubleAnalysisInput(analysis, "AlphaStart", (alpha,), 0)
     vsp.SetDoubleAnalysisInput(analysis, "AlphaEnd", (alpha,), 0)
     vsp.SetDoubleAnalysisInput(analysis, "MachStart", (mach,), 0)
@@ -225,9 +317,12 @@ def _vspaero(cfg, wing_id, stem):
     vsp.SetDoubleAnalysisInput(analysis, "Zcg", (float(cfg.get("zcg", 0.0)),), 0)
     if cfg.get("re_cref") is not None:
         vsp.SetDoubleAnalysisInput(analysis, "ReCref", (float(cfg["re_cref"]),), 0)
+    wake_applied, wake_skipped = _apply_wake(analysis, wake)
     inputs = {}
     for name, kind in (("RefFlag", "i"), ("AlphaNpts", "i"), ("AlphaStart", "d"), ("AlphaEnd", "d"),
-                       ("MachStart", "d"), ("WakeNumIter", "i"), ("NCPU", "i"), ("StallModel", "i"),
+                       ("MachStart", "d"), ("MachEnd", "d"), ("WakeNumIter", "i"), ("NumWakeNodes", "i"),
+                       ("WakeRelax", "d"), ("FixedWakeFlag", "i"), ("ImplicitWake", "i"),
+                       ("NCPU", "i"), ("StallModel", "i"),
                        ("StopBeforeRun", "i"), ("GeomSet", "i"), ("ThinGeomSet", "i"),
                        ("Sref", "d"), ("bref", "d"), ("cref", "d"),
                        ("Xcg", "d"), ("ReCref", "d")):
@@ -236,12 +331,15 @@ def _vspaero(cfg, wing_id, stem):
         except Exception as exc:
             inputs[name] = "ERR " + type(exc).__name__
     vsp.ExecAnalysis(analysis)
-    exe = os.path.join(os.path.dirname(os.path.abspath(vsp.__file__)), "vspaero")
+    exe = _solver_exe()
     t1 = time.time()
     proc = subprocess.run([exe, "-omp", str(ncpu), stem], cwd=os.getcwd(),
                           capture_output=True, text=True, timeout=1200)
     wall = time.time() - t1
-    return {"inputs": inputs, "surface": "thin", "solver": os.path.basename(exe),
+    return {"inputs": inputs, "surface": mode,
+            "mesh_geoms_removed": removed_meshes,
+            "wake_applied": wake_applied, "wake_skipped": wake_skipped,
+            "solver": os.path.basename(exe),
             "returncode": proc.returncode,
             "stdout_tail": proc.stdout[-4000:], "stderr_tail": proc.stderr[-4000:],
             "history": _text_tail(stem + ".history"), "polar": _text_tail(stem + ".polar"),

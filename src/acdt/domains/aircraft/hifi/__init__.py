@@ -1,7 +1,7 @@
 """Phase 4 — detailed design and high-fidelity verification (L3).
 
 Modules: :mod:`tools` (external-tool discovery and the box-capacity guard), :mod:`geometry` (OpenVSP
-.vsp3/STEP/STL + render), :mod:`cfd` (Gmsh meshes + SU2 RANS/Euler cases), :mod:`wing_bl` (pyHyp prism
+.vsp3/STEP/STL + render), :mod:`vspaero_panel` (thick-panel VSPAERO versus AVL), :mod:`cfd` (Gmsh meshes + SU2 RANS/Euler cases), :mod:`wing_bl` (pyHyp prism
 mesh of the tailless wing and the 3-D GCI), :mod:`pygeo_bridge` (FFD of that loft, pyGeo only
 inside the container), :mod:`fem` (CalculiX shell
 wing box: static, linear buckling, modes), :mod:`flutter` (FEM modes + doublet-lattice p-k, SOL 145 deck),
