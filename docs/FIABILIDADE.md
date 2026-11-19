@@ -190,3 +190,7 @@ atrasos logísticos 2–24 h, 2 surtidas/dia em turno de 12 h:
 * Sobressalentes multi-escalão (METRIC) e reparação local; custo de posse do stock.
 * Frota com abortos na cobertura, filas de manutenção partilhadas (`ground_queue`) e utilização sazonal.
 * Fontes de taxas públicas adicionais verificáveis (p. ex. NPRD/EPRD com edição e página) quando houver acesso.
+
+## 9. Adaptador nativo (19 nov 2026)
+
+Cada item de `payload_equipment` e cada fonte da arquitetura elétrica entra no RBD como componente crítico (`payload:…`, `eletrica:…`). λ ou MTBF só entram com fonte não vazia e diferente de `EXAMPLE`. Sem taxa, o componente fica desconhecido: o minorante da fiabilidade de missão usa R = 0 e o veredicto é `nao_avaliado`. Não é um passa. A duração, se não for declarada, é a soma dos segmentos nativos ou, no jato, alcance/velocidade do cruzeiro. Medida de ensaio: motor com λ = 10⁻⁵ h⁻¹ e carga sem λ, missão de 1 h, R ∈ [0; 0,99999]. Ficheiro: `examples/output/adaptadores_vtol_jato/adaptadores.json`.

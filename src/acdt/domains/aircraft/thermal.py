@@ -180,7 +180,7 @@ def operating_points(res: Any) -> dict[str, dict[str, Any]]:
     return out
 
 
-def hotel_power(res: Any) -> tuple[float, str]:
+def hotel_power(res: Any) -> tuple[float | None, str]:
     p = res.spec.assumptions["propulsion"]
     a = float(p.get("systems_power_W", 0.0) or 0.0) + float(p.get("onboard_power_W", 0.0) or 0.0)
     b = None
@@ -192,8 +192,11 @@ def hotel_power(res: Any) -> tuple[float, str]:
         except Exception:  # noqa: BLE001
             b = None
     if b is not None and b > a:
-        return b, "orçamento de potência dos sistemas (MIL-E-7016F / Moir & Seabridge), média"
-    return a, "assumptions.propulsion.systems_power_W + onboard_power_W"
+        base, src = b, "orçamento de potência dos sistemas (MIL-E-7016F / Moir & Seabridge), média"
+    else:
+        base, src = a, "assumptions.propulsion.systems_power_W + onboard_power_W"
+    from .native_disciplines import hotel_adjustment
+    return hotel_adjustment(base, src, res.spec)
 
 
 def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
@@ -228,10 +231,13 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
         phase_of.setdefault(str(c["name"]), cr if float(c.get("V_m_s", 0) or 0) > 0.5 else None)
     # ---- fontes
     P_hot, hot_src = hotel_power(res)
-    srcs: dict[str, Any] = {"avionica": {"heat_W": electrical_load("avionica", P_hot, float(o["radiated_fraction"]),
-                                                                    f"carga elétrica de bordo: {hot_src}"),
-                                         "method": hot_src}}
-    if P_hot <= 0.0:
+    if P_hot is None:
+        srcs: dict[str, Any] = {"avionica": {"heat_W": None, "method": hot_src}}
+    else:
+        srcs = {"avionica": {"heat_W": electrical_load("avionica", P_hot, float(o["radiated_fraction"]),
+                                                       f"carga elétrica de bordo: {hot_src}"),
+                             "method": hot_src}}
+    if P_hot is not None and P_hot <= 0.0:
         notes.append("carga elétrica de bordo declarada = 0 W (systems_power_W/onboard_power_W e power_budget): "
                      "aviónica sem calor — confirme que não é uma omissão do modelo")
     el = o.get("electric") or {}
@@ -289,6 +295,8 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
                      "thermal.sources (fica desconhecido, nunca zero, se o compartimento o listar)")
     for sid, v in (o.get("sources") or {}).items():
         srcs[str(sid)] = v if isinstance(v, dict) else {"heat_W": v}
+    from .native_disciplines import distribution_source
+    srcs.update(distribution_source(res.spec))
     # ---- compartimentos
     bays = o.get("bays")
     if not bays:
@@ -303,6 +311,15 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
                  "note": "PRESSUPOSTO: compartimento único = fuselagem cilíndrica π·D·L, altura D; emissividades e "
                          "absortividade desconhecidas (intervalo físico [0, 1])"}]
         notes.append(bays[0]["note"])
+    for bay in bays:
+        if not isinstance(bay, dict):
+            continue
+        have = [str(s) for s in (bay.get("sources") or [])]
+        if "perdas_distribuicao" in srcs and "perdas_distribuicao" not in have and (
+                "avionica" in have or bay is bays[0]):
+            have.append("perdas_distribuicao")
+            bay["sources"] = have
+            notes.append(f"{bay.get('id')}: perdas de distribuição acrescentadas às fontes do compartimento")
     S = res.S
     spec = {"conditions": conds, "sources": srcs, "bays": bays,
             "reference": {"S_ref_m2": S, "cruise_condition": "cruzeiro_quente"}}

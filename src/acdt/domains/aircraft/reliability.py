@@ -32,6 +32,11 @@ def _opts(spec: Any) -> dict[str, Any]:
     o = copy.deepcopy(DEFAULTS)
     user = (spec.assumptions.get("reliability") or {}) if isinstance(spec.assumptions, dict) else {}
     o.update(user)
+    from .native_disciplines import equipment_components
+    extra = equipment_components(spec)
+    if extra:
+        have = {str(c.get("id")) for c in (o.get("components") or []) if isinstance(c, dict)}
+        o["components"] = list(o.get("components") or []) + [c for c in extra if c["id"] not in have]
     return o
 
 
