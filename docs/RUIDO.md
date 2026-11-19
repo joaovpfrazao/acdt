@@ -133,3 +133,65 @@ Não há ainda caso de **validação** contra medições de ruído de hélice co
 ## 8. Adaptador nativo (19 nov 2026)
 
 `size_vtol` chama `acdt.api.rotor_noise` (Gutin + Schlegel-King-Mull) no pairar quando há pás, rpm de funcionamento e `noise.flyover_altitude_m`. O rpm é `rotors.rpm` ou, se o BEMT tiver corrido, `hover.rpm_bemt`. `rpm_max` é o limite de ponta e não é o ponto de funcionamento. O nível é um limite inferior: sem espessura, sem motor e sem ISO 9613-2. A carga útil não tem espetro declarado, por isso não entra no nível e também não é 0 dB. O jato fica `nao_avaliado`: SAE ARP876 não está verificado e o modelo de hélice não é aplicado. Medida de ensaio (3000 rpm, 100 m, 2 pás, D = 0,38 m): 12,1 dB(A) na vertical, limite inferior. Ficheiro: `examples/output/adaptadores_vtol_jato/adaptadores.json`.
+
+## 9. Solo ISO 9613-2:1996 e ruído de espessura (19 nov 2026)
+
+Entra, quando `assumptions.noise.iso9613_ground` traz alturas e factores de solo, a atenuação A_gr do método geral
+da ISO 9613-2:1996 §7.3.1 (solo plano ou de inclinação constante, Tabela 3, Eq. 9) e, só se `C0_dB` vier declarado,
+a correção meteorológica C_met do §8 (Eq. 21–22). Sem C_0, C_met não se aplica: o nível corrigido por A_gr fica o
+de propagação favorável (vento a favor ou inversão moderada), que a Eq. 6 trata como limite superior da média de
+longo prazo. G em falta, G fora de [0, 1], altura negativa, geometria inconsistente (r < |h_s − h_r|) ou frequência
+fora das oito bandas nominais (63 Hz a 8 kHz) não entram como 0 dB.
+
+`ground_dB` (placa rígida, +6,02 dB na Parte 36) e A_gr não se somam. Se os dois estiverem declarados, fica A_gr e
+`ground_dB` é ignorado. A verificação da Parte 36 Ap. G continua na placa e não usa esta tabela. A assinatura de
+`acdt.api.rotor_noise` não mudou (API 1.7.0). O núcleo aceita `ground_spec`; a etapa lê `iso9613_ground`.
+
+```yaml
+assumptions:
+  noise:
+    iso9613_ground:
+      hs_m: 100          # altura da fonte, m; não há omissão
+      hr_m: 1.5          # altura do recetor, m
+      Gs: 0              # 0 duro, 1 poroso
+      Gr: 1
+      Gm: 0.5
+      # C0_dB: 2         # só com valor local declarado; sem isto C_met não entra
+```
+
+PRESSUPOSTO: a Tabela 3 é de bandas de oitava; um tom usa a banda nominal que contém a frequência recebida (depois
+do Doppler), com limites f/√2 … f·√2. No pequeno overlap 63 Hz / 125 Hz fica o centro mais próximo. d_p é a
+projeção no solo da distância r que a fonte já usa. d_p = 0 está no limite do §7.3: o valor calcula-se (os termos
+1−exp anulam-se) e fica anotado; não é substituído por zero.
+
+Não entrou, e não é zero:
+
+* Ruído de espessura. Deming, NACA TN 605 (1937, NTRS 19930081380), não foi transcrito de uma cópia legível.
+  Hanson e SAE AIR1407 não foram verificados equação a equação. `thickness_noise.spl_dB` fica vazio e o veredicto
+  é `nao_avaliado`. O nível das fontes que existem continua a ser um limite inferior.
+* Refração por traçado de raios. O efeito meteorológico citado é C_met, não um raio curvo.
+* Barreiras, reflexões, folhagem e a forma de 2024 com K_geo (edição diferente da Tabela 3 de 1996).
+
+O alcance de deteção não fica uma distância ISO validada. Continua a ser a pior direção (limite superior das
+fontes modeladas). Sem A_gr, essa omissão não tem sinal: nas bandas graves a tabela amplifica (A_gr negativo),
+pelo que faltar o solo não torna o alcance um limite superior. Com A_gr e sem C_0, o alcance é ainda o da
+propagação favorável.
+
+Veredicto desta secção: `validado` para a transcrição da Tabela 3 e de C_met (caso `NOISE-ISO9613-2-AGR`; não é
+medição de voo). Calibração `nao_aplicar`. Espessura, refração geométrica e o alcance: `nao_avaliado`.
+
+Medição de 19 nov 2026, pai `e9726e4`, em `examples/output/ruido_solo_iso9613/solo.json`. O YAML dos exemplos não
+foi editado e o resultado não foi aplicado ao projeto.
+
+| Caso | Resultado |
+|---|---|
+| Solo duro, q = 0, 500 Hz | A_gr = −3,0 dB |
+| 63 Hz, q = 1 | A_gr = −6,0 dB |
+| 2 kHz, G = 1, q = 0 | A_gr = 0,0 dB |
+| 250 Hz, h_s = 5 m, h_r = 1 m, d_p = 100 m, G_s = 0,5, G_r = 1, G_m = 0,6 | A_gr = 6,438 dB |
+| C_0 = 2 dB, h_s = h_r = 1 m, d_p = 40 m | C_met = 1,0 dB |
+| Sem C_0, ou sem G | vazio (não é 0 dB) |
+| Rotor, 2 pás, 0,6 m, 6000 rpm, 60 N, 3 kW, um harmónico, 100 m, sem solo | 47,7 dB(A); 9,05 km no solo |
+| O mesmo, G = 0, h_s = 100 m, h_r = 0 (d_p = 0, limite do §7.3) | A_gr = −3,0 dB; 50,7 dB(A); 12,3 km; C_met não aplicado |
+| O mesmo com G em falta | fica o campo livre (47,7 dB(A)); `nao_avaliado` |
+| C172 do exemplo, lowfi, sem `iso9613_ground` | 46,2 dB(A) / 60,4 dB(A) / 27,5 km, como no §6; estado `nao_pedido` |

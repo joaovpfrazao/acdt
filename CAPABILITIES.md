@@ -2019,3 +2019,16 @@ O VTOL e o jato passam a chamar as mesmas disciplinas da asa fixa a partir do re
 * **Fiabilidade, custo de série e ciclo de vida.** Cada item entra no RBD. λ sem fonte, ou com fonte `EXAMPLE`, fica desconhecido (R de missão com minorante 0). Custo unitário incompleto abre o majorante do custo de série. No VTOL a energia por hora de voo já traz o hotel; não é somada outra vez. Num jato não há modelo de extração de combustível para a potência elétrica: o CO₂e fica em aberto.
 * **Veredicto.** `validado` quando o método citado correu e o resultado fecha. `nao_avaliado` quando falta um dado. `calibracao_L1_L2`: `nao_aplicar`. Fonte `EXAMPLE` entra no número e fica marcada; não é ficha de fornecedor.
 * **Medida** (ensaio, 19 nov 2026, `examples/output/adaptadores_vtol_jato/adaptadores.json`; o YAML de exemplo não foi editado): multirrotor de 5 kg, 25 W durante 600 s, +4,17 Wh e a massa de entrada inalterada; calor de pairar +25,0 W; perda de distribuição de 40 W com η = 0,9 igual a 4,44 W; ruído de pairar a 3000 rpm, 12,1 dB(A), limite inferior; MTOW do jato ilustrativo 67 856 kg com e sem a carga declarada. Este ramo não depende do PR #28.
+
+## 34. Atenuação de solo ISO 9613-2:1996 e ruído de espessura (19 nov 2026)
+
+A cadeia de ruído passa a poder subtrair A_gr da ISO 9613-2:1996 §7.3.1 (Tabela 3, Eq. 9) e, se C_0 for declarado,
+C_met do §8 (Eq. 21–22). Sem o mapa `noise.iso9613_ground`, o resultado numérico é o de campo livre já existente.
+G em falta não é 0 dB. A forma de 2024 com K_geo, as barreiras e a refração por raios não entram.
+
+O ruído de espessura (Deming, NACA TN 605; Hanson; SAE AIR1407) fica `nao_avaliado`: a equação não foi conferida
+e não se publica um SPL. O alcance de deteção continua um limite superior pela pior direção; omitir A_gr não lhe
+dá esse sinal, porque a tabela pode amplificar os graves. Calibração `nao_aplicar` (não há medição de voo).
+
+Veredicto da transcrição da tabela: `validado` (caso `NOISE-ISO9613-2-AGR`). Alcance, espessura e refração
+geométrica: `nao_avaliado`. Medição em `examples/output/ruido_solo_iso9613/solo.json`. Doc: [docs/RUIDO.md](docs/RUIDO.md) §9.
