@@ -10,12 +10,17 @@ from typing import Any, Iterable, Mapping
 from acdt.core.provenance import sha256_file
 
 from .bundle import Bundle, ReviewInputError, recorded_hashes
-from .criteria import GATES, STANDARD, criteria_for, gate_key
+from .criteria import DEFAULT_REQUIRED_LEVEL, GATES, STANDARD, criteria_for, gate_key
+from .figures import histogram_plan, pareto_plan
 from .evaluate import (LEVEL_ORDER, UNEVALUATED, Ctx, discipline_levels, evaluate_criteria, primary_disciplines,
                        verdict)
 from .profile import apply_overrides, profile_for
 
 SCHEMA = "acdt.review/1"
+_NIVEL_ORDEM = ("SRR", "PDR", "CDR", "MDR", "TRR", "PRR")
+_PRESSUPOSTO_NIVEL = ("nível exigido por revisão = PRESSUPOSTO do acdt ("
+                      + ", ".join(f"{g} {DEFAULT_REQUIRED_LEVEL[g]}" for g in _NIVEL_ORDEM)
+                      + "); a NPR 7123.1D não define níveis de fidelidade")
 _PRESS = re.compile(r"PRESSUPOSTO", re.IGNORECASE)
 _OUTVAL = re.compile(r"fora da gama de validade", re.IGNORECASE)
 PARETO_MAX_ROWS = 20
@@ -174,9 +179,7 @@ def _fidelity(c: Ctx) -> dict[str, Any]:
                      "required": need if d in prim else None, "status": st, "method": blk.get("method") if blk else None,
                      "fidelity": (blk.get("fidelity") or "modelo") if blk else None, "n_sem_unidade": n_nounit})
     low = [r["discipline"] for r in rows if r["max_level"] in ("L0", "L1")]
-    return {"required_level": need, "rows": rows, "ainda_L0_L1": low,
-            "pressuposto": "nível exigido por revisão = PRESSUPOSTO do acdt (SRR L0, PDR L1, CDR L2); a NPR "
-                           "7123.1D não define níveis de fidelidade"}
+    return {"required_level": need, "rows": rows, "ainda_L0_L1": low, "pressuposto": _PRESSUPOSTO_NIVEL}
 
 
 def _uq(c: Ctx) -> dict[str, Any]:
@@ -232,6 +235,13 @@ def _mdo(c: Ctx) -> dict[str, Any]:
                                    if ch else None),
                         "warnings": list(d.get("warnings") or [])})
     return {"present": bool(studies), "studies": studies}
+
+
+def _figure_plans(b: Bundle) -> dict[str, Any]:
+    """Planos de figura a partir dos registos já guardados. Não desenha o ficheiro."""
+    plans = [pareto_plan(r.data, b.rel(r.path), r.sha256) for r in b.mdo]
+    plans += [histogram_plan(r.data, b.rel(r.path), r.sha256) for r in b.uq]
+    return {"plans": plans}
 
 
 def _vv(c: Ctx) -> dict[str, Any]:
@@ -372,7 +382,7 @@ def _open_items(c: Ctx, crit: list[dict[str, Any]], fid: dict[str, Any], trace: 
 
 def build(b: Bundle, gate: str, overrides: Mapping[str, Any] | None = None, now: str | None = None
           ) -> dict[str, Any]:
-    """Relatório ``acdt.review/1`` de uma revisão (SRR, PDR ou CDR) a partir da evidência recolhida."""
+    """Relatório ``acdt.review/1`` de uma revisão (SRR, PDR, CDR, MDR, TRR ou PRR) a partir da evidência recolhida."""
     g = gate_key(gate)
     over = dict(overrides or {})
     prof = apply_overrides(profile_for(b.design.get("domain")), over)
@@ -395,6 +405,7 @@ def build(b: Bundle, gate: str, overrides: Mapping[str, Any] | None = None, now:
         "design": _design_summary(c), "requirements": _requirements(c), "fidelity": fid,
         "uq": _uq(c), "mdo": _mdo(c), "vv": _vv(c), "calibration": _calib(c),
         "open_items": _open_items(c, crit, fid, trace), "traceability": trace, "figures": figures,
+        "figure_plans": _figure_plans(b),
         "overrides": {"waivers": waivers, "tailoring": tailoring,
                       "required_level": dict(prof.required_level), "primary_disciplines": primary_disciplines(c)},
         "profile_notes": list(prof.notes), "warnings": list(b.warnings),

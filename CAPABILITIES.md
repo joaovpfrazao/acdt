@@ -2000,3 +2000,30 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |
 | 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |
 | 19 | BAIXA (L0 feito 18 nov 2026, §32u) | **Fiabilidade e manutenção de frota** | fiabilidade de missão, disponibilidade, MMH/FH, sobressalentes, dimensão da frota e custo de manutenção | feito: MIL-HDBK-338B (RBD, k-de-n, Eq. 10.18–10.24, Poisson), Ha 2010; falta espera fria/quente, fases, Weibull, causa comum, METRIC |
+
+## 34. Figuras nos relatórios e revisões MDR, TRR e PRR (19 nov 2026)
+
+* **O que faz**: `acdt report --level MDR|TRR|PRR`, além de SRR/PDR/CDR. O relatório desenha a frente de Pareto
+  a partir de um `acdt.mdo/1` completo e, quando o `acdt.uq/1` guarda amostras completas, um histograma. Sem
+  amostras o histograma fica `nao_avaliado`: não se desenha uma distribuição vazia e uma amostra em falta não é
+  zero. Os PNG já produzidos continuam a ser embutidos. O PNG novo só aparece quando o relatório é escrito numa
+  pasta; não entra na lista `files` (continuam JSON, Markdown e HTML).
+* **Norma**: NASA NPR 7123.1D (2023, Alteração 2), Apêndice G, excertos conferidos no NODIS em 19 nov 2026.
+  Tabela G-5 (MDR/SDR de projetos e programas de projeto único; a SDR de outros programas é a Tabela G-2 e não
+  está neste comando), Tabela G-10 (TRR) e Tabela G-8 (PRR). A PRR declara o âmbito de vários sistemas
+  (tipicamente mais de três); um único avião não é reprovado só por isso.
+* **Avaliadores**: só os já existentes e só onde o texto da tabela o permite — `conceito_viavel`,
+  `arvore_requisitos`, `estudos_compromisso`, `linha_de_base`, `requisitos_cumpridos`. A leitura é PRESSUPOSTO.
+  Espetro, instalações, formação, segurança, custo, calendário, fornecedores, lista de materiais e registo de
+  riscos ficam em `revisao_humana`. O V&V dos modelos não conta como objetivo de ensaio. A incerteza não conta
+  como registo de riscos. `fidelidade_disciplinas` não entra na MDR, na TRR nem na PRR.
+* **Nível exigido**: PRESSUPOSTO do acdt, porque a NPR não define L0–L3. SRR L0, PDR L1, CDR L2, MDR L0, TRR L0,
+  PRR L0.
+* **Exemplo (teste, `tests/data/review_small`, YAML de `examples/` por editar)**: frente com 9 avaliações, as 9
+  na frente (`f1` min, `f2` min), veredicto da figura `validado`, calibração `nao_aplicar`; histograma
+  `nao_avaliado` (o registo não guarda amostras). Nesse modelo analítico a MDR fica `pronto`, a TRR e a PRR
+  `nao_pronto` por requisito em falha. Não é a decisão de um painel.
+* **Veredicto da tarefa**: `validado` para a transcrição da frente e dos excertos; calibração `nao_aplicar`.
+  Registo em `examples/output/relatorios_figuras/resultado.json`. `applied: false`.
+
+  Pormenor em [docs/RELATORIOS.md](docs/RELATORIOS.md).

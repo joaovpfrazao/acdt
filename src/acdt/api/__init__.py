@@ -40,7 +40,7 @@ __all__ = [
     "uq", "uq_study", "mdo", "mdo_study", "function_model", "vv", "vv_cases", "calibrate", "load_test_data",
     # estado de projeto (design.json)
     "db_load", "db_save", "db_get", "db_diff", "db_validate",
-    # relatórios de revisão (SRR/PDR/CDR)
+    # relatórios de revisão (SRR/PDR/CDR/MDR/TRR/PRR)
     "report",
     # ruído de rotores/hélices (L0)
     "rotor_noise",
@@ -497,16 +497,16 @@ def report(design: PathLike, level: str, output: PathLike | None = None, *, uq: 
            mdo: Sequence[PathLike] = (), vv: Sequence[PathLike] = (), calib: Sequence[PathLike] = (),
            criteria: PathLike | Mapping[str, Any] | None = None, discover: bool = True,
            pdf: bool = False) -> dict[str, Any]:
-    """Relatório de revisão de projeto (SRR, PDR ou CDR; docs/RELATORIOS.md; desde a API 1.1.0).
+    """Relatório de revisão de projeto (SRR, PDR, CDR, MDR, TRR ou PRR; docs/RELATORIOS.md; desde a API 1.1.0).
 
-    Avalia os critérios de entrada e de sucesso de NASA NPR 7123.1D, Apêndice G (Tabelas G-4, G-6, G-7) sobre o
-    estado de projeto ``acdt.design/1`` e os registos à volta (matriz de verificação, proveniência, UQ, MDO, V&V,
-    calibração), e calcula o veredito: ``pronto``, ``nao_pronto`` ou ``insuficiente`` (falta evidência — nunca
-    conta como cumprido). Os critérios que só um painel pode decidir ficam como ``revisao_humana``.
+    Avalia os critérios de entrada e de sucesso de NASA NPR 7123.1D, Apêndice G (Tabelas G-4, G-5, G-6, G-7, G-8
+    e G-10) sobre o estado de projeto ``acdt.design/1`` e os registos à volta (matriz de verificação, proveniência,
+    UQ, MDO, V&V, calibração), e calcula o veredito: ``pronto``, ``nao_pronto`` ou ``insuficiente`` (falta
+    evidência — nunca conta como cumprido). Os critérios que só um painel pode decidir ficam como ``revisao_humana``.
 
     Args:
         design: ``design.json`` ou a pasta que o contém.
-        level: ``"SRR"``, ``"PDR"`` ou ``"CDR"``.
+        level: ``"SRR"``, ``"PDR"``, ``"CDR"``, ``"MDR"``, ``"TRR"`` ou ``"PRR"``.
         output: pasta onde escrever ``relatorio_<nível>.json/.md/.html`` (``None`` = só devolve o ``dict``).
         uq: estudos de incerteza extra (``uq.json`` ou pasta), além dos encontrados na pasta do projeto.
         mdo: estudos MDO extra (``mdo.json`` ou pasta).

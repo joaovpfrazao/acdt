@@ -12,8 +12,9 @@ import pytest
 
 from acdt import api, cli
 from acdt.core import review as R
-from acdt.core.review.criteria import CRITERIA, GATES, STANDARD
+from acdt.core.review.criteria import CRITERIA, DEFAULT_REQUIRED_LEVEL, GATES, STANDARD
 from acdt.core.review.evaluate import verdict
+from acdt.core.review.figures import draw_plan, histogram_plan, pareto_plan
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "data" / "review_small"
@@ -41,7 +42,7 @@ def test_golden_markdown_of_small_example():
 
 # --------------------------------------------------------------------------------------------- estrutura
 def test_criteria_declared_and_cited():
-    assert set(GATES) == {"SRR", "PDR", "CDR"} and STANDARD["id"] == "NPR 7123.1D"
+    assert set(GATES) == {"SRR", "PDR", "CDR", "MDR", "TRR", "PRR"} and STANDARD["id"] == "NPR 7123.1D"
     for g, cs in CRITERIA.items():
         ids = [c.id for c in cs]
         assert len(ids) == len(set(ids)), g
@@ -182,6 +183,73 @@ def test_figures_embedded(proj, tmp_path):
     assert (tmp_path / "o" / "figuras" / "diagrama.png").read_bytes() == png
     assert "data:image/png;base64," in (tmp_path / "o" / "relatorio_srr.html").read_text(encoding="utf-8")
     assert "](figuras/diagrama.png)" in (tmp_path / "o" / "relatorio_srr.md").read_text(encoding="utf-8")
+    names = {Path(f).name for f in r["files"]}
+    assert names == {"relatorio_srr.html", "relatorio_srr.json", "relatorio_srr.md"}
+
+
+def test_pareto_from_stored_points_and_histogram_without_samples(proj, tmp_path):
+    r = R.report(proj, "PDR", tmp_path / "out", now=FIX)
+    plans = {p["kind"]: p for p in r["figure_plans"]["plans"]}
+    pareto, hist = plans["pareto"], plans["histograma_uq"]
+    assert pareto["veredicto"] == "validado" and pareto["calibracao"] == "nao_aplicar"
+    assert pareto["n"] == 9 and pareto["n_front"] == 9 and pareto["file"] == "mdo/mdo.json"
+    assert {p["id"] for p in pareto["points"]} == set(pareto["front"])
+    png = tmp_path / "out" / "figuras" / pareto["out_name"]
+    assert png.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+    assert hist["veredicto"] == "nao_avaliado" and "amostras" in hist["reason"]
+    assert not (tmp_path / "out" / "figuras" / hist["out_name"]).exists()
+    md = (tmp_path / "out" / "relatorio_pdr.md").read_text(encoding="utf-8")
+    assert "Nenhuma figura já produzida nas pastas do projeto." in md
+    assert "não avaliado" in md and "veredicto validado" in md
+    assert pareto["out_name"] not in {Path(f).name for f in r["files"]}
+
+
+def test_incomplete_records_are_not_drawn(tmp_path):
+    bad = {"objectives": [{"metric": "f1", "sense": "min"}, {"metric": "f2", "sense": "min"}],
+           "evaluations": [{"id": 0, "objectives": {"f1": 1.0, "f2": float("nan")}},
+                           {"id": 1, "objectives": {"f1": True, "f2": 1.0}}],
+           "pareto": [0]}
+    plan = pareto_plan(bad, "mdo/mdo.json", "abc")
+    assert plan["veredicto"] == "nao_avaliado" and plan["points"] == []
+    missing = pareto_plan({"objectives": [{"metric": "f1", "sense": "min"}, {"metric": "f2", "sense": "min"}],
+                           "evaluations": [{"id": 0, "objectives": {"f1": 1.0, "f2": 2.0}}],
+                           "pareto": [0, 9]}, "a/mdo.json", None)
+    assert missing["veredicto"] == "nao_avaliado" and "9" in missing["reason"]
+    dest = tmp_path / "no.png"
+    draw_plan(plan, dest)
+    assert not dest.exists()
+    assert pareto_plan(bad, "mdo/mdo.json", None)["out_name"] != pareto_plan(bad, "outro/mdo.json", None)["out_name"]
+    none = histogram_plan({"n": 200}, "uq/uq.json", None)
+    assert none["veredicto"] == "nao_avaliado" and none["values"] == []
+    partial = histogram_plan({"samples": [{"ok": True, "metrics": {"y": 1.0}},
+                                          {"ok": False, "metrics": {"y": 0.0}}]}, "uq/uq.json", None)
+    assert partial["veredicto"] == "nao_avaliado"
+    short = histogram_plan({"samples": [{"ok": True, "metrics": {"y": 1.0}},
+                                        {"ok": True, "metrics": {"y": 2.0}}], "n_ok": 3}, "uq/uq.json", None)
+    assert short["veredicto"] == "nao_avaliado" and "n_ok" in short["reason"]
+    good = histogram_plan({"samples": [{"ok": True, "metrics": {"y": 1.0}},
+                                       {"ok": True, "metrics": {"y": 2.5}}], "n_ok": 2}, "uq/uq.json", None)
+    assert good["veredicto"] == "validado" and good["calibracao"] == "nao_aplicar" and good["values"] == [1.0, 2.5]
+    draw_plan(good, tmp_path / "h.png")
+    assert (tmp_path / "h.png").read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+
+
+def test_mdr_trr_prr_transcribed(proj):
+    assert DEFAULT_REQUIRED_LEVEL["MDR"] == DEFAULT_REQUIRED_LEVEL["TRR"] == DEFAULT_REQUIRED_LEVEL["PRR"] == "L0"
+    for gate, banned in (("MDR", "fidelidade_disciplinas"), ("TRR", "fidelidade_disciplinas"),
+                         ("PRR", "fidelidade_disciplinas")):
+        r = R.report(proj, gate, now=FIX)
+        assert r["gate"] == gate and r["fidelity"]["required_level"] == "L0"
+        checks = [c["check"] for c in r["criteria"]]
+        assert banned not in checks
+        assert any(c is None for c in checks) and any(c for c in checks)
+        assert "Tabela G-" in r["standard"]["table"]
+    assert "typically greater than three" in GATES["PRR"]["purpose"]
+    assert "single-project programs" in GATES["MDR"]["purpose"]
+    prr_tbd = next(c.quote for c in CRITERIA["PRR"] if c.id == "PRR-S06")
+    trr_tbd = next(c.quote for c in CRITERIA["TRR"] if c.id == "TRR-S06")
+    assert prr_tbd.startswith("TBD and TBR items are clearly identified, with")
+    assert trr_tbd.startswith("TBD and TBR items are clearly identified with")
 
 
 def test_bad_inputs(tmp_path, proj):

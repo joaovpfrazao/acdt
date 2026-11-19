@@ -119,6 +119,7 @@ files = [
   "src/acdt/core/review/profile.py",
   "src/acdt/core/review/evaluate.py",
   "src/acdt/core/review/build.py",
+  "src/acdt/core/review/figures.py",
   "src/acdt/core/review/render.py",
   "src/acdt/domains/aircraft/review_profile.py",
   "src/acdt/core/acoustics/__init__.py",

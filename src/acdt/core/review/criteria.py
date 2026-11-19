@@ -1,9 +1,10 @@
 # Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
-"""Critérios de entrada e de sucesso das revisões de projeto (SRR, PDR, CDR), declarados como dados.
+"""Critérios de entrada e de sucesso das revisões de projeto, declarados como dados.
 
 Fonte: NASA, *NPR 7123.1D — NASA Systems Engineering Processes and Requirements* (em vigor desde 5 jul 2023, com a
 Alteração 2), Apêndice G "Life-Cycle and Technical Review Entrance and Success Criteria": Tabela G-4 (SRR de
-projetos), Tabela G-6 (PDR) e Tabela G-7 (CDR). https://nodis3.gsfc.nasa.gov/displayDir.cfm?Internal_ID=N_PR_7123_001D_&page_name=AppendixG
+projetos), Tabela G-5 (MDR/SDR de projetos), Tabela G-6 (PDR), Tabela G-7 (CDR), Tabela G-8 (PRR) e Tabela G-10
+(TRR). https://nodis3.gsfc.nasa.gov/displayDir.cfm?Internal_ID=N_PR_7123_001D_&page_name=AppendixG
 
 O próprio apêndice diz que os critérios são "recommended best practices" e que "Tailoring and customizing are
 expected" (G.1.2). Cada critério abaixo cita o texto da tabela (excerto literal, em inglês) e diz se o acdt o avalia
@@ -38,12 +39,30 @@ GATES: dict[str, dict[str, str]] = {
     "CDR": {"title": "Critical Design Review", "table": "Tabela G-7 (CDR)", "section": "G.8",
             "purpose": "The CDR demonstrates that the maturity of the design is appropriate to support proceeding "
                        "with full-scale fabrication, assembly, integration, and test."},
+    "MDR": {"title": "Mission Definition Review", "table": "Tabela G-5 (MDR/SDR, projetos)", "section": "G.6",
+            "purpose": "The MDR/SDR evaluates whether the proposed mission/system architecture is responsive to the "
+                       "program mission/system functional and performance requirements and whether requirements have "
+                       "been allocated to the next lower product layer and to all functional elements of the "
+                       "mission/system.  This table is to be used for projects and single-project programs."},
+    "TRR": {"title": "Test Readiness Review", "table": "Tabela G-10 (TRR)", "section": "G.11",
+            "purpose": "A TRR for each planned test or series of tests ensures that the test article "
+                       "(hardware/software), test facility, support personnel, and test procedures are ready for "
+                       "testing and data acquisition, reduction, and control."},
+    "PRR": {"title": "Production Readiness Review", "table": "Tabela G-8 (PRR)", "section": "G.9",
+            "purpose": "For projects developing or acquiring multiple systems/units (typically greater than three "
+                       "or as determined by the project).  The PRR determines the readiness of the system developers "
+                       "to efficiently produce the required number of systems.  It ensures that the production "
+                       "plans, fabrication, assembly, integration enabling products, operational support, and "
+                       "personnel are in place and ready to begin production."},
 }
 
 #: Nível de fidelidade mínimo das disciplinas primárias por revisão (escada L0…L3 de CAPABILITIES.md).
 #: PRESSUPOSTO do acdt (a NPR não fala em níveis de fidelidade): SRR = L0 (manual), PDR = L1 (baixa fidelidade
-#: física), CDR = L2. Ajustável por projeto (``required_level`` no ficheiro de critérios).
-DEFAULT_REQUIRED_LEVEL: dict[str, str] = {"SRR": "L0", "PDR": "L1", "CDR": "L2"}
+#: física), CDR = L2. MDR, TRR e PRR ficam em L0: a norma não pede L2, e exigir L2 reprovaria a revisão por um
+#: motivo que ela não escreve. Estes três níveis não usam o avaliador ``fidelidade_disciplinas``. Ajustável por
+#: projeto (``required_level`` no ficheiro de critérios).
+DEFAULT_REQUIRED_LEVEL: dict[str, str] = {"SRR": "L0", "PDR": "L1", "CDR": "L2", "MDR": "L0", "TRR": "L0",
+                                           "PRR": "L0"}
 
 #: Estados de um critério.
 CRITERION_STATUSES = ("cumpre", "nao_cumpre", "insuficiente", "revisao_humana", "dispensado")
@@ -170,6 +189,58 @@ CRITERIA: dict[str, tuple[Criterion, ...]] = {
         _c("CDR", 11, "sucesso", "The program/project cost and schedule estimates are credible and within "
            "program/project constraints.", None, _HUMAN),
         _c("CDR", 12, "sucesso", "Manufacturability has been adequately included in design.", None, _HUMAN),
+    ),
+    # Tabela G-5. A SDR de programas que não são de projeto único é a Tabela G-2 e não está aqui.
+    "MDR": (
+        _c("MDR", 1, "entrada", "The project has successfully completed the previously planned life-cycle reviews "
+           "and all RFAs and RIDs have been addressed and resolved, or a timely closure plan exists for those "
+           "items remaining open.", None, _HUMAN),
+        _c("MDR", 2, "entrada", "A preliminary MDR/SDR agenda, success criteria, and instructions to the review "
+           "board have been agreed to by the technical team, project manager, and review chair prior to the "
+           "MDR/SDR.", None, _HUMAN),
+        _c("MDR", 3, "sucesso", "The proposed mission/system architecture is credible and responsive to program "
+           "requirements and constraints, including resources.", "conceito_viavel",
+           "PRESSUPOSTO: só a grandeza de viabilidade do dimensionamento; recursos, custo e calendário não entram"),
+        _c("MDR", 4, "sucesso", "All technical requirements are allocated to the architectural elements.",
+           "arvore_requisitos",
+           "PRESSUPOSTO: árvore sem problemas e com fonte; não demonstra a atribuição a cada elemento físico"),
+        _c("MDR", 5, "sucesso", "The architecture tradeoffs are completed, and those planned for Phase B adequately "
+           "address the option space.", "estudos_compromisso",
+           "PRESSUPOSTO: estudo MDO com projeto viável escolhido; não demonstra a cobertura da Fase B"),
+        _c("MDR", 6, "sucesso", "TBD and TBR items are clearly identified with acceptable plans and schedule for "
+           "their disposition.", None, _HUMAN + " (os TBD/não avaliados estão listados nos itens em aberto)"),
+    ),
+    # Tabela G-10. Planos de ensaio, instalações, formação, segurança e espetro ficam humanos: o V&V dos modelos
+    # não é o objetivo do ensaio.
+    "TRR": (
+        _c("TRR", 1, "entrada", "The objectives of the testing have been clearly defined and documented.", None,
+           _HUMAN),
+        _c("TRR", 2, "entrada", "Approved test plans, test procedures, test environment, and configuration of the "
+           "test item(s) that support test objectives are available.", None, _HUMAN),
+        _c("TRR", 3, "entrada", "As-built hardware and software documentation defining the configuration of the item "
+           "under test are released and under configuration control.", "linha_de_base",
+           "PRESSUPOSTO: só o SHA-256 e a proveniência dos ficheiros registados; não é um artigo físico"),
+        _c("TRR", 4, "entrada", "All known system discrepancies have been identified and dispositioned in "
+           "accordance with an agreed-upon plan.", "requisitos_cumpridos",
+           "PRESSUPOSTO: só falhas de requisitos conhecidas; nao_avaliado/desconhecido não passa"),
+        _c("TRR", 5, "sucesso", "Adequate test plans are completed and approved for the system under test.", None,
+           _HUMAN),
+        _c("TRR", 6, "sucesso", "TBD and TBR items are clearly identified with acceptable plans and schedule for "
+           "their disposition.", None, _HUMAN + " (os TBD/não avaliados estão listados nos itens em aberto)"),
+    ),
+    # Tabela G-8. O âmbito («typically greater than three») fica no objetivo da revisão; um único avião não é
+    # reprovado só por isso. Documentação de produção, BOM, riscos, custo, instalações e fornecedores ficam humanos.
+    "PRR": (
+        _c("PRR", 1, "entrada", "The design documentation needed to support production is available.", None, _HUMAN),
+        _c("PRR", 2, "entrada", "The bill of materials is available and critical parts identified.", None, _HUMAN),
+        _c("PRR", 3, "entrada", "Risks have been identified, credibly assessed, and characterized, and mitigation "
+           "efforts have been defined.", None, _HUMAN + " (um estudo de incerteza não é um registo de riscos)"),
+        _c("PRR", 4, "sucesso", "High confidence exists that the system requirements will be met in the final "
+           "production configuration.", "requisitos_cumpridos",
+           "nenhum requisito em falha (salvo dispensa); nao_avaliado/desconhecido → insuficiente"),
+        _c("PRR", 5, "sucesso", "The product is deemed manufacturable.", None, _HUMAN),
+        _c("PRR", 6, "sucesso", "TBD and TBR items are clearly identified, with acceptable plans and schedule for "
+           "their disposition.", None, _HUMAN + " (os TBD/não avaliados estão listados nos itens em aberto)"),
     ),
 }
 

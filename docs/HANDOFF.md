@@ -1904,3 +1904,21 @@ reutilização do `result.json` em `size_fleet(run_id=…)`. Pormenor em [QUALID
 ## Melhorias futuras em espera
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
+
+## Figuras nos relatórios e revisões MDR, TRR e PRR (19 nov 2026)
+
+Ramo `relatorios-figuras-revisao`, cortado de `e9726e4` (`origin/main`). Não faz merge.
+
+* **Veredicto**: `validado` para a transcrição da frente de Pareto guardada e para os excertos da NPR 7123.1D
+  Apêndice G (Tabelas G-5, G-10 e G-8), conferidos no NODIS em 19 nov 2026. Calibração `nao_aplicar`. O
+  histograma do exemplo pequeno fica `nao_avaliado` porque `samples` é nulo. Desconhecido não entrou como zero.
+* **O que entrou**: `core/review/figures.py` prepara a frente e o histograma; o relatório escreve o PNG na pasta
+  de saída. MDR, TRR e PRR acrescentados no fim de `criteria.py`, sem reescrever SRR/PDR/CDR. Nível exigido
+  PRESSUPOSTO: MDR L0, TRR L0, PRR L0, sem `fidelidade_disciplinas`. A SDR de programas (Tabela G-2) não está
+  implementada. A PRR não reprova um único avião só por o texto da norma falar em vários sistemas.
+* **Exemplo**: `tests/data/review_small` (modelo analítico, não é um projeto). Frente: 9 avaliações, 9 na frente.
+  Nesse exemplo a MDR fica `pronto` e a TRR/PRR ficam `nao_pronto` por requisito em falha. Os YAML de `examples/`
+  não foram editados (`example_yaml_edited: false`, `applied: false`).
+* **Registo**: `examples/output/relatorios_figuras/resultado.json`.
+* **Ainda por fazer nos relatórios**: registo de decisões, `acdt certify` como evidência, ficha RID/RFA.
+  Pormenor em [RELATORIOS.md](RELATORIOS.md).
