@@ -109,3 +109,7 @@ os desconhecidos, a API e a etapa do pipeline com requisitos e `design.json`.
   * curvas com degraus (alterações de projeto a meio da série, FAA Cap. 18, «step functions»);
   * modelo de cadência com fonte;
   * custo de RDT&E distribuído no tempo (isso fica no ciclo de vida).
+
+## 7. Adaptador nativo (19 nov 2026)
+
+`size_vtol` e `size_jet` só correm o custo de série se o bloco `series_cost` estiver declarado. Não se inventam We nem entradas Eastlake. O custo unitário do equipamento soma-se ao unitário quando todos os itens o trazem. Se algum falta, `average_unit_cost_USD`, `flyaway_cost_USD` e `unit_cost_at_quantity_USD` ficam só com minorante e o veredicto é `nao_avaliado`. Na asa fixa a mesma regra corre no fim de `analyse_series_cost`. Medida de ensaio (aprendizagem, T1 = 1000 USD, N = 10, declive 0,85, NRE = 0): 711,61 USD, e 761,61 USD com 50 USD declarados na carga. Ficheiro: `examples/output/adaptadores_vtol_jato/adaptadores.json`.

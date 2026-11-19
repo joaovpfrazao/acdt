@@ -20,8 +20,9 @@ partir do que o dimensionamento já calculou — nada de novo é estimado:
 * ``relatorio`` (omissão): uma passagem; o arrasto de arrefecimento (área de arrasto, ΔC_D0), a massa de condutas/
   permutadores/ventiladores e a potência elétrica dos ventiladores são calculados e o seu efeito relatado, sem
   alterar o projeto;
-* ``iterar``: dentro da etapa de dimensionamento, ciclo de ponto fixo — dimensiona, avalia a térmica no ponto de
-  projeto, injeta ``aero.extra_drag_areas_m2.arrefecimento_termico`` (majorante do intervalo de arrasto),
+* ``iterar``: dentro da etapa de dimensionamento, ciclo de ponto fixo — dimensiona, calcula a missão exigida
+  (a mesma tabela de segmentos do desempenho) e avalia a térmica nesses segmentos, injeta
+  ``aero.extra_drag_areas_m2.arrefecimento_termico`` (majorante do intervalo de arrasto),
   ``weights.fixed_mass_kg`` (+ massa de arrefecimento conhecida) e, nos elétricos,
   ``propulsion.systems_power_W`` (+ potência do ventilador em cruzeiro; com power budget em malha fechada também
   como carga ``systems.loads``, porque o fecho substitui ``systems_power_W``), e redimensiona até variação < ``tol``.
@@ -83,13 +84,44 @@ def _h_range(s: str) -> tuple[float, float]:
 
 
 def _segments(res: Any) -> list[dict[str, Any]]:
-    perf = getattr(res, "performance", None)
-    if perf is None:
+    """Tabela da missão exigida. O desempenho, quando já correu, ganha; no ciclo ``iterar`` (ainda sem essa etapa)
+    usa-se ``required_mission``, calculada com o mesmo ``simulate_mission(..., stop='legs')``."""
+    for holder in (getattr(res, "performance", None),):
+        if holder is None:
+            continue
+        try:
+            table = list(holder.mission_required.table())
+        except Exception:  # noqa: BLE001 — sem tabela de segmentos: tenta a missão do ciclo, senão o ponto de projeto
+            table = []
+        if table:
+            return table
+    sim = getattr(res, "required_mission", None)
+    if sim is None:
         return []
     try:
-        return list(perf.mission_required.table())
-    except Exception:  # noqa: BLE001 — sem tabela de segmentos: usa o ponto de projeto
+        return list(sim.table())
+    except Exception:  # noqa: BLE001
         return []
+
+
+def ensure_required_mission(res: Any) -> dict[str, Any]:
+    """Garante a tabela de segmentos no ciclo ``iterar``. Se a missão não puder ser calculada, o ponto de projeto
+    continua a ser a alternativa e fica dito — não se trata essa falta como segmento de duração zero."""
+    if _segments(res):
+        src = "performance.mission_required (segmento)" if getattr(res, "performance", None) is not None else (
+            "missão exigida (simulate_mission, stop=legs) calculada no ciclo iterar")
+        return {"used": True, "source": src}
+    try:
+        from .performance import required_mission
+        sim = required_mission(res)
+    except Exception as ex:  # noqa: BLE001 — a missão em falta não parte o ciclo; o ponto de projeto fica explícito
+        return {"used": False, "source": f"tabela de missão indisponível ({type(ex).__name__}: {ex}); ponto de projeto"}
+    if not getattr(sim, "segments", None):
+        return {"used": False, "source": "missão exigida sem segmentos; ponto de projeto"}
+    res.required_mission = sim
+    if not _segments(res):
+        return {"used": False, "source": "tabela de segmentos vazia; ponto de projeto"}
+    return {"used": True, "source": "missão exigida (simulate_mission, stop=legs) calculada no ciclo iterar"}
 
 
 def _bsfc_kg_J(res: Any) -> tuple[float, str]:
@@ -148,7 +180,7 @@ def operating_points(res: Any) -> dict[str, dict[str, Any]]:
     return out
 
 
-def hotel_power(res: Any) -> tuple[float, str]:
+def hotel_power(res: Any) -> tuple[float | None, str]:
     p = res.spec.assumptions["propulsion"]
     a = float(p.get("systems_power_W", 0.0) or 0.0) + float(p.get("onboard_power_W", 0.0) or 0.0)
     b = None
@@ -160,8 +192,11 @@ def hotel_power(res: Any) -> tuple[float, str]:
         except Exception:  # noqa: BLE001
             b = None
     if b is not None and b > a:
-        return b, "orçamento de potência dos sistemas (MIL-E-7016F / Moir & Seabridge), média"
-    return a, "assumptions.propulsion.systems_power_W + onboard_power_W"
+        base, src = b, "orçamento de potência dos sistemas (MIL-E-7016F / Moir & Seabridge), média"
+    else:
+        base, src = a, "assumptions.propulsion.systems_power_W + onboard_power_W"
+    from .native_disciplines import hotel_adjustment
+    return hotel_adjustment(base, src, res.spec)
 
 
 def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
@@ -196,10 +231,13 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
         phase_of.setdefault(str(c["name"]), cr if float(c.get("V_m_s", 0) or 0) > 0.5 else None)
     # ---- fontes
     P_hot, hot_src = hotel_power(res)
-    srcs: dict[str, Any] = {"avionica": {"heat_W": electrical_load("avionica", P_hot, float(o["radiated_fraction"]),
-                                                                    f"carga elétrica de bordo: {hot_src}"),
-                                         "method": hot_src}}
-    if P_hot <= 0.0:
+    if P_hot is None:
+        srcs: dict[str, Any] = {"avionica": {"heat_W": None, "method": hot_src}}
+    else:
+        srcs = {"avionica": {"heat_W": electrical_load("avionica", P_hot, float(o["radiated_fraction"]),
+                                                       f"carga elétrica de bordo: {hot_src}"),
+                             "method": hot_src}}
+    if P_hot is not None and P_hot <= 0.0:
         notes.append("carga elétrica de bordo declarada = 0 W (systems_power_W/onboard_power_W e power_budget): "
                      "aviónica sem calor — confirme que não é uma omissão do modelo")
     el = o.get("electric") or {}
@@ -257,6 +295,8 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
                      "thermal.sources (fica desconhecido, nunca zero, se o compartimento o listar)")
     for sid, v in (o.get("sources") or {}).items():
         srcs[str(sid)] = v if isinstance(v, dict) else {"heat_W": v}
+    from .native_disciplines import distribution_source
+    srcs.update(distribution_source(res.spec))
     # ---- compartimentos
     bays = o.get("bays")
     if not bays:
@@ -271,6 +311,15 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
                  "note": "PRESSUPOSTO: compartimento único = fuselagem cilíndrica π·D·L, altura D; emissividades e "
                          "absortividade desconhecidas (intervalo físico [0, 1])"}]
         notes.append(bays[0]["note"])
+    for bay in bays:
+        if not isinstance(bay, dict):
+            continue
+        have = [str(s) for s in (bay.get("sources") or [])]
+        if "perdas_distribuicao" in srcs and "perdas_distribuicao" not in have and (
+                "avionica" in have or bay is bays[0]):
+            have.append("perdas_distribuicao")
+            bay["sources"] = have
+            notes.append(f"{bay.get('id')}: perdas de distribuição acrescentadas às fontes do compartimento")
     S = res.S
     spec = {"conditions": conds, "sources": srcs, "bays": bays,
             "reference": {"S_ref_m2": S, "cruise_condition": "cruzeiro_quente"}}
@@ -302,6 +351,7 @@ def _engine_cooling(res: Any, o: dict[str, Any], spec: dict[str, Any], th: dict[
     from acdt.core.thermal.study import _source_for, build_condition
     eng = o.get("engine") or {}
     dT = _f(eng.get("air_temperature_rise_K"))
+    mfr = _f(eng.get("mass_flow_ratio")) or NACA_MFR_DESIGN
     out: dict[str, Any] = {"by_condition": {}}
     for c in spec["conditions"]:
         cn = str(c["name"])
@@ -311,7 +361,7 @@ def _engine_cooling(res: Any, o: dict[str, Any], spec: dict[str, Any], th: dict[
         cond = build_condition(c)
         if dT is None or dT <= 0:
             out["by_condition"][cn] = {"Q_W": {"lo": q.lo, "hi": q.hi}, "m_dot_kg_s": None, "drag_N": None,
-                                       "status": "desconhecido",
+                                       "inlet_area_m2": None, "status": "desconhecido",
                                        "reason": "thermal.engine.air_temperature_rise_K não declarado"}
             continue
         m_lo = q.lo / (CP_AIR * dT)
@@ -321,12 +371,42 @@ def _engine_cooling(res: Any, o: dict[str, Any], spec: dict[str, Any], th: dict[
         d_lo = internal_drag(m_lo, cond.V_m_s, zeta)[0]
         d_hi = None if m_hi is None else internal_drag(m_hi, cond.V_m_s, zeta)[1]
         qd = 0.5 * cond.ambient.rho * cond.V_m_s ** 2
-        mfr = _f(eng.get("mass_flow_ratio")) or NACA_MFR_DESIGN
+        area = None if m_hi is None else m_hi / (mfr * cond.ambient.rho * cond.V_m_s)
         out["by_condition"][cn] = {"Q_W": {"lo": q.lo, "hi": q.hi}, "m_dot_kg_s": {"lo": m_lo, "hi": m_hi},
                                    "drag_N": {"lo": d_lo, "hi": d_hi}, "zeta": zeta,
                                    "drag_area_m2": {"lo": d_lo / qd, "hi": None if d_hi is None else d_hi / qd},
-                                   "inlet_area_m2": None if m_hi is None else m_hi / (mfr * cond.ambient.rho
-                                                                                      * cond.V_m_s)}
+                                   "inlet_area_m2": area}
+    candidates = {cn: row.get("inlet_area_m2") for cn, row in out["by_condition"].items()}
+    if not candidates or any(a is None for a in candidates.values()):
+        out["design_inlet"] = {
+            "status": "desconhecido",
+            "candidates_m2": candidates,
+            "reason": ("thermal.engine.air_temperature_rise_K não declarado" if dT is None or dT <= 0 else
+                       "há segmento em voo sem área; o pior não é o máximo dos restantes")}
+        return out
+    winner = max(candidates, key=lambda cn: float(candidates[cn] or 0.0))
+    installed = float(candidates[winner] or 0.0)
+    out["design_inlet"] = {
+        "status": "dimensionado", "condition": winner, "inlet_area_m2": installed, "candidates_m2": candidates,
+        "method": "A = max ṁ/(MFR·ρ·V) nos segmentos em voo; MFR de projeto 0,60 (Hall & Frank, NACA RM A8I29)",
+        "off_design_note": ("PRESSUPOSTO: em cada segmento o caudal admitido é MFR·ρ·V·A com o mesmo MFR de "
+                            "projeto; a variação de recuperação com o MFR, descrita no NACA RM A8I29, não é aplicada")}
+    for c in spec["conditions"]:
+        cn = str(c["name"])
+        row = out["by_condition"].get(cn)
+        if row is None or row.get("inlet_area_m2") is None:
+            continue
+        cond = build_condition(c)
+        m_adm = mfr * cond.ambient.rho * cond.V_m_s * installed
+        zeta = row.get("zeta")
+        d_lo, d_hi, _ve = internal_drag(m_adm, cond.V_m_s, zeta if isinstance(zeta, float) else None)
+        qd = 0.5 * cond.ambient.rho * cond.V_m_s ** 2
+        row["required_m_dot_kg_s"] = row["m_dot_kg_s"]
+        row["required_inlet_area_m2"] = row["inlet_area_m2"]
+        row["m_dot_kg_s"] = {"lo": m_adm, "hi": m_adm}
+        row["drag_N"] = {"lo": d_lo, "hi": d_hi}
+        row["drag_area_m2"] = {"lo": d_lo / qd, "hi": d_hi / qd}
+        row["inlet_area_m2"] = installed
     return out
 
 
@@ -428,12 +508,15 @@ def size_with_thermal(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]
     sp = spec
     res = sysr = None
     converged = False
+    mission: dict[str, Any] = {"used": False, "source": "ciclo não arrancou"}
     for it in range(int(o["max_iter"])):
         res, sysr = run_fn(sp)
+        mission = ensure_required_mission(res)
         th = analyse_thermal(res)
         inc = coupling_increments(th, spec.propulsion_kind)
         new = {k: float(inc[k] or 0.0) for k in ("drag_area_m2", "mass_kg", "power_W")}
-        hist.append({"iter": it, "W0_kg": res.sizing.W0, **new, "not_coupled": inc["not_coupled"]})
+        hist.append({"iter": it, "W0_kg": res.sizing.W0, **new, "not_coupled": inc["not_coupled"],
+                     "mission": mission})
         dif = max(abs(new[k] - cur[k]) / max(abs(new[k]), abs(cur[k]), 1e-9) for k in new) if any(
             new[k] or cur[k] for k in new) else 0.0
         if it > 0 and dif < float(o["tol"]):
@@ -452,6 +535,9 @@ def size_with_thermal(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]
             if new["power_W"] and getattr(spec, "systems", None):
                 sp.systems = with_load(spec.systems, FAN_LOAD_NAME, new["power_W"], 1.0)
     return res, sysr, {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ térmica",
+                       "mission": mission,
+                       "operating_point": "tabela de segmentos da missão exigida, quando a missão fecha; senão o "
+                                          "ponto de projeto (a falta fica em mission.source)",
                        "electrical_load": "propulsion.systems_power_W + systems.loads (ciclo 1, conservador)"}
 
 

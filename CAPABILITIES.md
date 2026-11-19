@@ -2001,7 +2001,57 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |
 | 19 | BAIXA (L0 feito 18 nov 2026, §32u) | **Fiabilidade e manutenção de frota** | fiabilidade de missão, disponibilidade, MMH/FH, sobressalentes, dimensão da frota e custo de manutenção | feito: MIL-HDBK-338B (RBD, k-de-n, Eq. 10.18–10.24, Poisson), Ha 2010; falta espera fria/quente, fases, Weibull, causa comum, METRIC |
 
-## 34. Figuras nos relatórios e revisões MDR, TRR e PRR (19 nov 2026)
+## 32x. Ponto de operação da missão na térmica e no gelo (19 nov 2026)
+
+* **O que faz**: nos modos `coupling: iterar` da térmica e do gelo, o ponto de funcionamento passa a sair da missão exigida (`simulate_mission`, `stop=legs`), a mesma tabela do desempenho. A entrada NACA do compartimento pode ser dimensionada com `ram_air.size_for: pior_segmento` (maior `A = ṁ/(MFR·ρ·V)` nos segmentos em voo). A entrada do motor térmico usa sempre essa área.
+* **Métodos**: missão por segmentos já usada no desempenho (Raymer cap. 17, com as frações da Tabela 3.2 onde o modelo as cita); caudal e área da entrada, NACA RM A8I29 (MFR 0,60) e arrasto interno de Anderson, como em §32s.
+* **Completude**: missão que não fecha → ponto de projeto, com a falta escrita em `coupling_loop.mission.source` (não é duração zero). Segmento em voo que não fecha a entrada → área e arrasto desconhecidos; não se usa o máximo dos outros.
+* **PRESSUPOSTO**: no motor térmico o MFR de projeto mantém-se fora do segmento de dimensionamento; a curva de recuperação versus MFR do NACA RM A8I29 não é aplicada.
+* **Validado**: `tests/test_thermal.py`, `tests/test_icing.py`. O yaml dos exemplos não muda. Veredicto e números em `examples/output/uav_endurance_payload_missao_termica/acoplamento.json`. No UAV elétrico o arrasto de cruzeiro do ciclo `iterar` coincide com o da missão final; face ao ponto de projeto a diferença medida é 7,88 %. Com `pior_segmento` a subida desse caso não fecha (ar de entrada acima do limite do compartimento) e a área fica desconhecida. No UAV a gasolina, com o aumento de temperatura do ar declarado só no teste, a entrada do motor é a da subida.
+
+## 32y. Adaptadores nativos de VTOL e jato para as disciplinas (19 nov 2026)
+
+O VTOL e o jato passam a chamar as mesmas disciplinas da asa fixa a partir do resultado nativo (`size_vtol` / `size_jet`), em `domains/aircraft/native_disciplines.py`. A carga útil e a arquitetura elétrica entram nos três tipos. A massa fechada não muda: `mass_kg`, `payload_kg` e W0 já são a massa dimensionada.
+
+* **Potência.** Modo arquitetura (MIL-E-7016F; Moir & Seabridge Cap. 5): o hotel é o máximo entre o valor declarado e a média da arquitetura. Modo carga útil: a média soma-se ao hotel. Um `power_w_avg` em falta torna a média desconhecida. `duty` omisso é 1 (PRESSUPOSTO). `distribution_eta` em falta deixa o calor das perdas em [0; desconhecido]; não é η = 1.
+* **Térmica e gelo.** Só com baías ou superfícies declaradas, ou, no jato, com S, alongamento e `wave.thickness_ratio` (corda média √(S/AR); PRESSUPOSTO NACA de 4 dígitos já usado no tipo fixo). A transição VTOL e a subida do jato L0 não têm velocidade única: o estudo corre e o veredicto fica `nao_avaliado`. Heywood não é aplicado ao jato.
+* **Ruído.** Rotor com pás, rpm de funcionamento (`rotors.rpm` ou `hover.rpm_bemt`; nunca `rpm_max`) e `noise.flyover_altitude_m`: Gutin + Schlegel-King-Mull. O nível é limite inferior. O jato fica `nao_avaliado` (SAE ARP876 não verificado).
+* **Fiabilidade, custo de série e ciclo de vida.** Cada item entra no RBD. λ sem fonte, ou com fonte `EXAMPLE`, fica desconhecido (R de missão com minorante 0). Custo unitário incompleto abre o majorante do custo de série. No VTOL a energia por hora de voo já traz o hotel; não é somada outra vez. Num jato não há modelo de extração de combustível para a potência elétrica: o CO₂e fica em aberto.
+* **Veredicto.** `validado` quando o método citado correu e o resultado fecha. `nao_avaliado` quando falta um dado. `calibracao_L1_L2`: `nao_aplicar`. Fonte `EXAMPLE` entra no número e fica marcada; não é ficha de fornecedor.
+* **Medida** (ensaio, 19 nov 2026, `examples/output/adaptadores_vtol_jato/adaptadores.json`; o YAML de exemplo não foi editado): multirrotor de 5 kg, 25 W durante 600 s, +4,17 Wh e a massa de entrada inalterada; calor de pairar +25,0 W; perda de distribuição de 40 W com η = 0,9 igual a 4,44 W; ruído de pairar a 3000 rpm, 12,1 dB(A), limite inferior; MTOW do jato ilustrativo 67 856 kg com e sem a carga declarada. Este ramo não depende do PR #28.
+
+## 34. Atenuação de solo ISO 9613-2:1996 e ruído de espessura (19 nov 2026)
+
+A cadeia de ruído passa a poder subtrair A_gr da ISO 9613-2:1996 §7.3.1 (Tabela 3, Eq. 9) e, se C_0 for declarado,
+C_met do §8 (Eq. 21–22). Sem o mapa `noise.iso9613_ground`, o resultado numérico é o de campo livre já existente.
+G em falta não é 0 dB. A forma de 2024 com K_geo, as barreiras e a refração por raios não entram.
+
+O ruído de espessura (Deming, NACA TN 605; Hanson; SAE AIR1407) fica `nao_avaliado`: a equação não foi conferida
+e não se publica um SPL. O alcance de deteção continua um limite superior pela pior direção; omitir A_gr não lhe
+dá esse sinal, porque a tabela pode amplificar os graves. Calibração `nao_aplicar` (não há medição de voo).
+
+Veredicto da transcrição da tabela: `validado` (caso `NOISE-ISO9613-2-AGR`). Alcance, espessura e refração
+geométrica: `nao_avaliado`. Medição em `examples/output/ruido_solo_iso9613/solo.json`. Doc: [docs/RUIDO.md](docs/RUIDO.md) §9.
+
+## 35. Espera inativa, Weibull e fator β — L0 (19 nov 2026)
+
+* **O que faz**: bloco lateral da fiabilidade (`standby` e `weibull` na especificação `acdt.reliability/1`,
+  funções em `acdt.core.reliability.standby`). Não substitui o RBD ativo nem a fiabilidade de missão. Sem o
+  bloco, o estudo fica igual ao de antes. A API `reliability` não muda de assinatura (continua a 1.7.0).
+* **Espera**: MIL-HDBK-338B §7.5.5.3, comutador perfeito (Fig. 7.5-17, R_S = 1). Dois elementos com λ
+  diferente (p. 7-113) e n elementos idênticos (p. 7-114). Exemplo n = 4, t/θ = 1, requisito 0,98.
+* **Weibull**: Eq. 5.50 e 5.51, γ = 0. Exemplo §5.3.6.1: β = 2, η = 1000 h, t = 100 h, R ≈ 0,99,
+  h = 0,0002/h.
+* **Por avaliar**: taxa do comutador (a p. 7-116 não dá equação); γ ≠ 0; fator β. O §7.5.5.4 é partilha de
+  carga com fator k, não β. Essa partilha não foi codificada. A equação λ_cc = β λ não foi aplicada.
+* **FTA**: evento básico ARP4761/NUREG-0492 com q = 1 − R(t). Uma porta AND ou OR dos elementos não é a
+  espera inativa. O SCRAM (GPL) continua fora do processo.
+* **Veredicto**: identidades transcritas `validado`; calibração `nao_aplicar`; comutador imperfeito, γ ≠ 0
+  e fator β `nao_avaliado`. Casos `FIAB-338B-STANDBY-N4` e `FIAB-338B-WEIBULL-5361`. Resultado em
+  `examples/output/fiabilidade_standby_weibull/resultado.json`. Pormenor em
+  [docs/FIABILIDADE.md](docs/FIABILIDADE.md) §10.
+
+## 36. Figuras nos relatórios e revisões MDR, TRR e PRR (19 nov 2026)
 
 * **O que faz**: `acdt report --level MDR|TRR|PRR`, além de SRR/PDR/CDR. O relatório desenha a frente de Pareto
   a partir de um `acdt.mdo/1` completo e, quando o `acdt.uq/1` guarda amostras completas, um histograma. Sem

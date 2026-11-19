@@ -63,7 +63,10 @@ def test_vv_cases_registered_and_pass():
 
     r = vv.run(disciplines=["fiabilidade"])
     st = {c["id"]: c["status"] for c in r["cases"]}
-    assert len(st) == 5 and set(st.values()) == {"passa"}
+    assert set(st) == {
+        "FIAB-338B-AVAIL-EX3", "FIAB-338B-AAV-EX4", "FIAB-338B-POISSON-5381", "FIAB-338B-EQ630",
+        "FIAB-338B-PARALLEL-MTBF", "FIAB-338B-STANDBY-N4", "FIAB-338B-WEIBULL-5361"}
+    assert set(st.values()) == {"passa"}
 
 
 # ------------------------------------------------------------------------------------------ RBD e taxas
@@ -264,3 +267,118 @@ def test_sortie_duration_defaults_to_mission_duration():
     s.pop("mission_duration_h")
     with pytest.raises(ValueError):
         analyse(s)
+
+
+# -------------------------------------------------------------------------------- espera inativa e Weibull
+def test_inactive_standby_identities():
+    from acdt.core.reliability.standby import (inactive_standby_mtbf_h, inactive_standby_mtbf_two_h,
+                                               inactive_standby_reliability, inactive_standby_reliability_two)
+
+    # Fig. 7.5-17: n = 4, t/θ = 1. A soma impressa é e^{−1} (1 + 1 + 1/2 + 1/6).
+    exact = math.exp(-1.0) * (1.0 + 1.0 + 0.5 + 1.0 / 6.0)
+    r4 = inactive_standby_reliability(0.01, 4, 100.0)
+    assert r4 == pytest.approx(exact)
+    assert r4 is not None and r4 >= 0.98
+    assert inactive_standby_mtbf_h(0.01, 4) == pytest.approx(400.0)
+    # n = 1 é a exponencial; n = 2 com taxas iguais é e^{−λt}(1 + λt) e MTBF = 2/λ.
+    assert inactive_standby_reliability(0.02, 1, 50.0) == pytest.approx(math.exp(-1.0))
+    assert inactive_standby_reliability(0.01, 2, 100.0) == pytest.approx(2.0 / math.e)
+    assert inactive_standby_reliability_two(0.01, 0.01, 100.0) == pytest.approx(2.0 / math.e)
+    assert inactive_standby_mtbf_two_h(0.01, 0.01) == pytest.approx(200.0)
+    la, lb, t = 0.01, 0.02, 100.0
+    closed = (lb / (lb - la)) * math.exp(-la * t) - (la / (lb - la)) * math.exp(-lb * t)
+    assert inactive_standby_reliability_two(la, lb, t) == pytest.approx(closed)
+    assert inactive_standby_mtbf_two_h(la, lb) == pytest.approx(1.0 / la + 1.0 / lb)
+    near = inactive_standby_reliability_two(0.01, 0.01 * (1.0 + 1e-12), 100.0)
+    assert near == pytest.approx(2.0 / math.e, rel=1e-6)
+
+
+def test_standby_rejects_invalid_and_does_not_invent():
+    from acdt.core.reliability.standby import (inactive_standby_mtbf_h, inactive_standby_reliability,
+                                               inactive_standby_reliability_two, weibull_hazard_per_h)
+
+    assert inactive_standby_reliability(-0.01, 2, 10.0) is None
+    assert inactive_standby_reliability(0.01, 0, 10.0) is None
+    assert inactive_standby_reliability(0.01, 2, -1.0) is None
+    assert inactive_standby_reliability(True, 2, 10.0) is None  # type: ignore[arg-type]
+    assert inactive_standby_mtbf_h(0.0, 2) is None  # λ = 0 → MTBF infinita, não zero
+    assert inactive_standby_reliability(0.0, 2, 10.0) == 1.0
+    assert inactive_standby_reliability_two(0.0, 0.02, 10.0) == 1.0
+    assert weibull_hazard_per_h(0.0, 0.5, 1000.0) is None  # singular, não zero
+
+
+def test_weibull_handbook_example():
+    from acdt.core.reliability.standby import weibull_hazard_per_h, weibull_reliability
+
+    assert weibull_reliability(100.0, 2.0, 1000.0) == pytest.approx(math.exp(-0.01))
+    assert weibull_reliability(100.0, 2.0, 1000.0) == pytest.approx(0.99, abs=5e-4)
+    assert weibull_hazard_per_h(100.0, 2.0, 1000.0) == pytest.approx(0.0002, abs=1e-12)
+    assert weibull_reliability(100.0, 1.0, 1000.0) == pytest.approx(math.exp(-0.1))  # β = 1, exponencial
+    assert weibull_reliability(100.0, 2.0, 1000.0, location_h=10.0) is None
+    assert weibull_hazard_per_h(100.0, 2.0, 1000.0, location_h=10.0) is None
+
+
+def test_standby_fault_tree_is_not_a_gate():
+    from acdt.core.reliability.standby import inactive_standby_reliability, standby_fault_tree
+    from acdt.core.safety.fta import BasicEvent, FaultTree, Gate
+
+    r = inactive_standby_reliability(0.01, 2, 100.0)
+    assert r is not None
+    tree = standby_fault_tree("SB", r)
+    assert tree is not None
+    assert tree.top_probability(100.0) == pytest.approx(1.0 - r)
+    assert tree.minimal_cut_sets() == [frozenset({"SB"})]
+    q = -math.expm1(-1.0)
+    active = FaultTree(top="G")
+    active.add_event(BasicEvent("a", rate_per_h=0.01, exposure_h=100.0))
+    active.add_event(BasicEvent("b", rate_per_h=0.01, exposure_h=100.0))
+    active.add_gate(Gate("G", "AND", ["a", "b"]))
+    series = FaultTree(top="G")
+    series.add_event(BasicEvent("a", rate_per_h=0.01, exposure_h=100.0))
+    series.add_event(BasicEvent("b", rate_per_h=0.01, exposure_h=100.0))
+    series.add_gate(Gate("G", "OR", ["a", "b"]))
+    assert active.top_probability(100.0) == pytest.approx(q * q)
+    assert series.top_probability(100.0) == pytest.approx(1.0 - math.exp(-2.0))
+    assert active.top_probability(100.0) != pytest.approx(1.0 - r)
+    assert series.top_probability(100.0) != pytest.approx(1.0 - r)
+
+
+def test_study_standby_weibull_does_not_replace_mission():
+    from acdt.core.reliability.study import analyse
+
+    base = analyse(_spec())
+    assert "standby_weibull" not in base
+    side = analyse(_spec(standby={"n": 2, "lambda_per_h": 1e-3, "t_h": 100.0},
+                          weibull=[{"id": "tube", "shape": 2, "scale_h": 1000, "t_h": 100}]))
+    assert side["mission"]["reliability"] == base["mission"]["reliability"]
+    assert side["basic"]["mtbf_h"] == base["basic"]["mtbf_h"]
+    block = side["standby_weibull"]
+    assert block["veredicto"] == "validado"
+    assert block["standby"]["veredicto"] == "validado"
+    assert block["standby"]["replaces_rbd"] is False
+    assert block["standby"]["R"] == pytest.approx(math.exp(-0.1) * 1.1)
+    assert block["weibull"]["items"][0]["hazard_per_h"] == pytest.approx(0.0002)
+    assert block["fator_beta"] == "nao_avaliado"
+    assert block["comutador_imperfeito"] == "nao_avaliado"
+    assert "não substitui" in side["notes"][-1]
+    switched = analyse(_spec(standby={"n": 2, "lambda_per_h": 1e-3, "t_h": 100.0, "switch_rate_per_h": 1e-4}))
+    sb = switched["standby_weibull"]["standby"]
+    assert sb["veredicto"] == "nao_avaliado" and sb["R"] is None
+    assert sb["R_perfect_switch"] == pytest.approx(math.exp(-0.1) * 1.1)
+    assert sb["switch"]["imperfect"]["applied"] is False
+    mixed = analyse(_spec(weibull=[{"id": "loc", "shape": 2, "scale_h": 1000, "t_h": 100, "location_h": 5}]))
+    assert mixed["standby_weibull"]["veredicto"] == "nao_avaliado"
+    assert mixed["standby_weibull"]["weibull"]["items"][0]["R"] is None
+    ambiguous = analyse(_spec(standby={"n": 2, "lambda_per_h": 1e-3, "lambda_a_per_h": 1e-3,
+                                       "lambda_b_per_h": 2e-3, "t_h": 1.0}))
+    assert ambiguous["standby_weibull"]["standby"]["R"] is None
+
+
+def test_adapter_forwards_standby_block():
+    from acdt.domains.aircraft.reliability import build_spec
+
+    o = {"mission_duration_h": 1.0, "components": [{"id": "a"}],
+         "standby": {"n": 4, "lambda_per_h": 0.01}}
+    spec, _notes = build_spec(object(), o)  # type: ignore[arg-type]
+    assert spec["standby"]["n"] == 4
+    assert "weibull" not in spec
