@@ -1905,6 +1905,16 @@ reutilização do `result.json` em `size_fleet(run_id=…)`. Pormenor em [QUALID
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
 
+## Ponto de operação da missão na térmica e no gelo (19 nov 2026, ramo `acoplamento-ponto-missao`)
+
+O ciclo `iterar` da térmica e do gelo calculava o ponto de funcionamento no ponto de projeto, porque a tabela de segmentos só existia depois do desempenho. A área de arrasto injectada ficava abaixo da da passagem final. Agora os dois ciclos chamam `required_mission` (`simulate_mission`, `stop=legs`), a mesma missão exigida do desempenho.
+
+* **Medido** (`examples/uav_endurance_payload.yaml`, baía só no teste, `size_for: cruzeiro_quente`, `coupling: iterar`, handbook, AVL desligado): área de arrasto da iteração = área final = 3,917×10⁻⁴ m². No ponto de projeto a mesma aeronave dá 3,631×10⁻⁴ m², 7,88 % abaixo. O yaml não foi alterado. Veredicto do acoplamento: `validado`. Sem fator. `nao_aplicar`.
+* **Entrada do compartimento** (`size_for: pior_segmento`): a subida quente não fecha. O ar entra a 49,2 °C e o limite do ar é 41,9 °C (254,9 W). A área fica desconhecida. A do cruzeiro, 7,08×10⁻⁴ m², não é usada. `nao_avaliado`. `nao_aplicar`.
+* **Entrada do motor** (`examples/uav_gasoline_150kg.yaml`, ΔT do ar 30 K declarado no teste): a área instalada é a da subida quente, 0,02904 m², contra 0,01706 m² pedidos no cruzeiro quente. ζ não declarado: o arrasto continua [0, ṁV]. `validado` como escolha do máximo. `nao_aplicar`.
+
+Números e proveniência: `examples/output/uav_endurance_payload_missao_termica/acoplamento.json`. Doc: [TERMICA.md](TERMICA.md) §8 e [GELO.md](GELO.md) §8.
+
 ## Adaptadores nativos VTOL e jato (19 nov 2026, ramo `adaptadores-vtol-jato`)
 
 Estado: código e testes neste ramo, cortado de `origin/main` `e9726e4`. Não inclui o PR #28 (acoplamento do ponto de missão). Não faz merge.
