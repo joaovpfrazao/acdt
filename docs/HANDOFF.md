@@ -1987,3 +1987,15 @@ Ramo `relatorios-figuras-revisao`, cortado de `e9726e4` (`origin/main`). Não fa
 * **Registo**: `examples/output/relatorios_figuras/resultado.json`.
 * **Ainda por fazer nos relatórios**: registo de decisões, `acdt certify` como evidência, ficha RID/RFA.
   Pormenor em [RELATORIOS.md](RELATORIOS.md).
+
+## Estado de projeto — MDO, V&V e L3 (19 nov 2026)
+
+Ramo `design-db-mdo-vv-l3`, cortado de `origin/main` `e9726e4`. Comandos `acdt db add-mdo`, `add-vv` e `add-hifi`. Não há nome novo na API (1.7.0). Pormenor em [DADOS.md](DADOS.md).
+
+* **Veredicto:** `validado` para a transcrição dos registos já gravados em `tests/data/review_small` (MDO `acdt.mdo/1` e V&V `acdt.vv/1`) para `acdt.design/1`. Calibração `nao_aplicar`. Comparação externa `nao_aplicar`. A lista de desvios vazia não é um ensaio que passou.
+* **MDO** do ensaio analítico: projeto escolhido 4, 9 avaliações, 9 na frente, `n_failed` = 0 porque o ficheiro o declara. Objetivos do escolhido: f1 = 0,7190488072346632 e f2 = 1,3271789813488566, unidade não declarada (a métrica não tem sufixo). Variável `x` = 0,8479674564714517. SHA-256 do `mdo.json` `5f04f2824b7e6e62ce65e5d185c286c9bee9c53f2904668f4f867c5843c9251f`.
+* **V&V:** caso `ATM-ISA-SL` com estado `passa`, 15 grandezas copiadas, nenhuma omitida neste relatório (todas as linhas estão `passa`). `delta` de T = 0, unidade K. `delta_rel` de `rho` = 1,479533701902775×10⁻⁸, unidade `1`. Versão do registo `2026.11.17`. SHA-256 `2eb629bc2598d305dc6c71c7c05815164eb65dbddb60c60a579c14834774df60`.
+* **L3:** sem corrida de solver. O excerto hifi do registo é sintético. Estimativa RANS sem `CL` e passo de flutter com `skipped` ficam `nao_avaliado` e não escrevem números. O escritor copiou `fem.tip_w_fem_m` = 0,001 m de um JSON inventado; isso não valida a estrutura. Resultado físico do hifi: `nao_avaliado`.
+* `mdo` e `vv` não contam como disciplinas primárias. O `definition.input` não é substituído. O YAML de exemplo não foi editado e nada foi aplicado ao L1 ou ao L2.
+* Continuam por fazer as unidades das chaves sem sufixo e a leitura de YAML com unidades nas specs de MDO/UQ.
+* Registo: `examples/output/design_db_blocos/resultado.json`.
