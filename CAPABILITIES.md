@@ -2032,3 +2032,21 @@ dá esse sinal, porque a tabela pode amplificar os graves. Calibração `nao_apl
 
 Veredicto da transcrição da tabela: `validado` (caso `NOISE-ISO9613-2-AGR`). Alcance, espessura e refração
 geométrica: `nao_avaliado`. Medição em `examples/output/ruido_solo_iso9613/solo.json`. Doc: [docs/RUIDO.md](docs/RUIDO.md) §9.
+
+## 35. Espera inativa, Weibull e fator β — L0 (19 nov 2026)
+
+* **O que faz**: bloco lateral da fiabilidade (`standby` e `weibull` na especificação `acdt.reliability/1`,
+  funções em `acdt.core.reliability.standby`). Não substitui o RBD ativo nem a fiabilidade de missão. Sem o
+  bloco, o estudo fica igual ao de antes. A API `reliability` não muda de assinatura (continua a 1.7.0).
+* **Espera**: MIL-HDBK-338B §7.5.5.3, comutador perfeito (Fig. 7.5-17, R_S = 1). Dois elementos com λ
+  diferente (p. 7-113) e n elementos idênticos (p. 7-114). Exemplo n = 4, t/θ = 1, requisito 0,98.
+* **Weibull**: Eq. 5.50 e 5.51, γ = 0. Exemplo §5.3.6.1: β = 2, η = 1000 h, t = 100 h, R ≈ 0,99,
+  h = 0,0002/h.
+* **Por avaliar**: taxa do comutador (a p. 7-116 não dá equação); γ ≠ 0; fator β. O §7.5.5.4 é partilha de
+  carga com fator k, não β. Essa partilha não foi codificada. A equação λ_cc = β λ não foi aplicada.
+* **FTA**: evento básico ARP4761/NUREG-0492 com q = 1 − R(t). Uma porta AND ou OR dos elementos não é a
+  espera inativa. O SCRAM (GPL) continua fora do processo.
+* **Veredicto**: identidades transcritas `validado`; calibração `nao_aplicar`; comutador imperfeito, γ ≠ 0
+  e fator β `nao_avaliado`. Casos `FIAB-338B-STANDBY-N4` e `FIAB-338B-WEIBULL-5361`. Resultado em
+  `examples/output/fiabilidade_standby_weibull/resultado.json`. Pormenor em
+  [docs/FIABILIDADE.md](docs/FIABILIDADE.md) §10.

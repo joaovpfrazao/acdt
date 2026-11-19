@@ -194,3 +194,77 @@ atrasos logísticos 2–24 h, 2 surtidas/dia em turno de 12 h:
 ## 9. Adaptador nativo (19 nov 2026)
 
 Cada item de `payload_equipment` e cada fonte da arquitetura elétrica entra no RBD como componente crítico (`payload:…`, `eletrica:…`). λ ou MTBF só entram com fonte não vazia e diferente de `EXAMPLE`. Sem taxa, o componente fica desconhecido: o minorante da fiabilidade de missão usa R = 0 e o veredicto é `nao_avaliado`. Não é um passa. A duração, se não for declarada, é a soma dos segmentos nativos ou, no jato, alcance/velocidade do cruzeiro. Medida de ensaio: motor com λ = 10⁻⁵ h⁻¹ e carga sem λ, missão de 1 h, R ∈ [0; 0,99999]. Ficheiro: `examples/output/adaptadores_vtol_jato/adaptadores.json`.
+
+## 10. Espera inativa, Weibull e fator β (19 nov 2026)
+
+O RBD do §2 continua a ser redundância ativa, sem comutação. O que se segue é um bloco lateral
+(`standby` / `weibull` na especificação `acdt.reliability/1`, ou as funções de
+`acdt.core.reliability.standby`). Não substitui a fiabilidade de missão. Sem estes blocos, o
+resultado do estudo fica igual ao de antes.
+
+### 10.1 Espera inativa, comutador perfeito
+
+MIL-HDBK-338B §7.5.5.3. Dois elementos exponenciais com taxas diferentes (p. 7-113):
+
+R(t) = [λ_b / (λ_b − λ_a)] e^{−λ_a t} − [λ_a / (λ_b − λ_a)] e^{−λ_b t},
+
+MTBF = θ_a + θ_b. O texto diz que é indiferente qual elemento é o primário. Quando λ_a = λ_b a
+expressão é singular. Usa-se então n elementos idênticos (p. 7-114 e a fórmula impressa na
+Fig. 7.5-17, com R_S = 1):
+
+R(t) = e^{−λ t} Σ_{r=0}^{n−1} (λ t)^r / r!,
+
+MTBF = n / λ. n = 1 recupera a exponencial. n = 2 com taxas iguais recupera e^{−λ t} (1 + λ t) e
+MTBF = 2θ.
+
+Exemplo da p. 7-116: θ = 100 h e requisito R_g = 0,98 às 100 h (t/θ = 1). O texto diz que n = 4
+satisfaz o requisito. A fórmula da figura dá e^{−1} (1 + 1 + 1/2 + 1/6) ≈ 0,981. O manual não
+imprime 0,981: imprime 0,98 como requisito. O caso `FIAB-338B-STANDBY-N4` exige R ≥ 0,98 e as
+razões de MTBF 4 e 2.
+
+A Fig. 7.5-16 (p. 7-115) é votação por maioria e não entra neste modelo.
+
+Comutador: a Fig. 7.5-17 declara R_S = 1. A p. 7-116 diz que a taxa dos dispositivos de comutação
+tem de ser considerada a seguir e não dá equação. Se a especificação traz `switch_rate_per_h`,
+essa taxa não entra no cálculo: o R com R_S = 1 fica só em `R_perfect_switch` e o veredicto do
+bloco pedido é `nao_avaliado`. Não se trata a taxa em falta como zero.
+
+PRESSUPOSTO do título da secção: o reserva está inativo (não energizado) até à comutação, e não
+há reparação durante a missão. PRESSUPOSTO numérico: |λ_b − λ_a| ≤ 10^{−9} max(λ) usa o limite
+de taxas iguais, porque a expressão da p. 7-113 é singular na igualdade. λ = 0 declarado dá
+R = 1; a MTBF correspondente é infinita e fica `None`.
+
+### 10.2 Weibull com γ = 0
+
+Eq. 5.50 e 5.51, exemplo §5.3.6.1 (p. 5-23):
+
+R(t) = exp[−(t/η)^β], h(t) = (β/η) (t/η)^{β−1}.
+
+Para β = 2, η = 1000 h e t = 100 h, R(100) = e^{−0,01} ≈ 0,99 e h(100) = 0,0002 avarias/h
+(`FIAB-338B-WEIBULL-5361`). O texto diz que β = 1 é a exponencial; a equação confirma-o. γ ≠ 0
+não foi transcrito (a Eq. 5.50 não tem localização) e o item fica `nao_avaliado`. O MTTF por
+função gama não está na página lida e não é calculado. Em t = 0 e β < 1 a taxa de risco é
+singular: fica desconhecida, não zero.
+
+### 10.3 Fator β
+
+O §7.5.5.4 (p. 7-117) trata falhas dependentes como partilha de carga com fator k (θ′ = θ/k e
+θ_s = θ/k + θ/2), não como fator β de causa comum. A equação λ_cc = β λ não está nessa página e
+não foi aplicada. A partilha de carga também não foi codificada: não é o fator pedido. Veredicto
+do fator β: `nao_avaliado`. Calibração: `nao_aplicar`.
+
+### 10.4 Ligação à árvore de falhas (ARP4761)
+
+`standby_fault_tree` cria um evento básico (`acdt.core.safety.fta`, NUREG-0492) com
+q = 1 − R(t). O corte mínimo é esse evento. Uma porta AND dos elementos é a falha da redundância
+ativa (o sistema só falha quando todos falham). Uma porta OR é a falha em série. Nenhuma das duas
+é a espera inativa da §7.5.5.3. Para λt = 1 e n = 2, q da espera é 1 − 2/e; a porta AND dá
+(1 − e^{−1})^2 e a porta OR dá 1 − e^{−2}. O SCRAM (GPL) continua fora do processo.
+
+### 10.5 Veredicto
+
+Transcrição das identidades (espera com R_S = 1 e Weibull com γ = 0): **validado**. Calibração
+face a medida de voo ou a L1/L2: **nao_aplicar**. Comutador imperfeito, γ ≠ 0 e fator β:
+**nao_avaliado**. O resultado versionado está em
+`examples/output/fiabilidade_standby_weibull/resultado.json`. O yaml dos exemplos não foi
+alterado e o bloco não foi aplicado ao projeto.
