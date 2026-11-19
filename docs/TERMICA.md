@@ -174,3 +174,4 @@ com acoplamento iterado e pipeline a gasolina).
   térmico (via `onboard`).
 * Efeito Meredith e arrasto externo da entrada (dados NACA de entradas submersas).
 * Dados de capacidade térmica por componente; permutadores líquidos; irradiância solar em altitude.
+* Alta fidelidade: proposta em [proposta-termica-gelo.md](proposta-termica-gelo.md), sem malha e sem corrida. O L0/L1 não fica validado por essa proposta.
