@@ -1,0 +1,140 @@
+{
+ "schema": "acdt.design_db_blocos/1",
+ "date": "2026-11-19",
+ "parent": "e9726e401e75fe7a04ebe97ca0e20940d811bddc",
+ "branch": "design-db-mdo-vv-l3",
+ "example_yaml_edited": false,
+ "applied": false,
+ "veredicto": "validado",
+ "calibracao": "nao_aplicar",
+ "comparacao_externa": "nao_aplicar",
+ "desvios": [],
+ "nota": "validado = a transcrição dos registos já gravados (mdo.json e vv_report.json do ensaio analítico tests/data/review_small) para acdt.design/1. Uma lista de desvios vazia não é um ensaio externo que passou. O excerto hifi é sintético: a cópia do escritor não valida um solver.",
+ "fontes": {
+  "mdo": {
+   "path": "tests/data/review_small/mdo/mdo.json",
+   "sha256": "5f04f2824b7e6e62ce65e5d185c286c9bee9c53f2904668f4f867c5843c9251f"
+  },
+  "vv": {
+   "path": "tests/data/review_small/vv/vv_report.json",
+   "sha256": "2eb629bc2598d305dc6c71c7c05815164eb65dbddb60c60a579c14834774df60"
+  },
+  "hifi": "sintético, escrito por este medidor; não é um ficheiro de solver"
+ },
+ "validate": [],
+ "mdo": {
+  "veredicto": "validado",
+  "calibracao": "nao_aplicar",
+  "omitidas": [],
+  "n_escritas": 8,
+  "chosen": 4,
+  "variables": {
+   "x": 0.8479674564714517
+  },
+  "n_evaluations": {
+   "value": 9,
+   "unit": null
+  },
+  "n_failed": {
+   "value": 0,
+   "unit": null
+  },
+  "n_feasible": {
+   "value": 9,
+   "unit": null
+  },
+  "n_pareto": {
+   "value": 9,
+   "unit": null
+  },
+  "objetivo_f1": {
+   "value": 0.7190488072346632,
+   "unit": null
+  },
+  "objetivo_f2": {
+   "value": 1.3271789813488566,
+   "unit": null
+  },
+  "x": {
+   "value": 0.8479674564714517,
+   "unit": null
+  },
+  "feasible": {
+   "value": true,
+   "unit": null
+  },
+  "evidence_sha256": "5f04f2824b7e6e62ce65e5d185c286c9bee9c53f2904668f4f867c5843c9251f"
+ },
+ "vv": {
+  "veredicto": "validado",
+  "calibracao": "nao_aplicar",
+  "n_escritas": 15,
+  "n_omitidas": 0,
+  "references": [
+   "2026.11.17"
+  ],
+  "status": {
+   "value": "passa",
+   "unit": null
+  },
+  "T_delta": {
+   "value": 0.0,
+   "unit": "K"
+  },
+  "T_delta_rel": {
+   "value": 0.0,
+   "unit": "1"
+  },
+  "rho_delta_rel": {
+   "value": 1.479533701902775e-08,
+   "unit": "1"
+  },
+  "evidence_sha256": "2eb629bc2598d305dc6c71c7c05815164eb65dbddb60c60a579c14834774df60"
+ },
+ "hifi_sintetico": {
+  "veredicto": "nao_avaliado",
+  "motivo": "os JSON foram inventados por este medidor para exercitar o escritor; não há corrida de solver",
+  "calibracao": "nao_aplicar",
+  "passos": [
+   {
+    "veredicto": "nao_avaliado",
+    "calibracao": "nao_aplicar",
+    "escritas": [],
+    "motivo": "o caso RANS de avião completo neste ficheiro não traz CL; uma estimativa de malha não entra como aerodinâmica L3",
+    "passo": "rans_case"
+   },
+   {
+    "veredicto": "validado",
+    "calibracao": "nao_aplicar",
+    "disciplina": "estruturas",
+    "escritas": [
+     "fem.tip_w_fem_m"
+    ],
+    "passo": "fem"
+   },
+   {
+    "veredicto": "nao_avaliado",
+    "calibracao": "nao_aplicar",
+    "escritas": [],
+    "motivo": "passo não corrido: SINTETICO: passo não corrido",
+    "passo": "flutter"
+   }
+  ],
+  "estruturas_L3": {
+   "quantities": {
+    "fem.tip_w_fem_m": {
+     "value": 0.001,
+     "unit": "m"
+    }
+   },
+   "sections": {
+    "fem": "acdt hifi passo fem"
+   }
+  },
+  "disciplinas": [
+   "estruturas",
+   "mdo",
+   "vv"
+  ]
+ }
+}

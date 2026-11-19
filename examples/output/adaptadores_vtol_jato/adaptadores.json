@@ -1,0 +1,233 @@
+{
+ "schema": "acdt.native_disciplines.medida/1",
+ "date": "2026-11-19",
+ "branch": "adaptadores-vtol-jato",
+ "parent": "e9726e401e75fe7a04ebe97ca0e20940d811bddc",
+ "example_yaml_edited": false,
+ "applied": false,
+ "calibracao_L1_L2": "nao_aplicar",
+ "veredicto": "validado",
+ "veredicto_nota": "O adaptador corre os métodos já citados quando os dados declarados fecham. Não há fator L1/L2. Segmentos em falta, taxas sem fonte, η de distribuição em falta e o ruído de jato ficam nao_avaliado. Os números são de ensaio, não de uma aeronave.",
+ "methods": {
+  "eletrica": "MIL-E-7016F; Moir & Seabridge Cap. 5, via electrical_analyse",
+  "termica": "acdt.core.thermal.study (Incropera; calor = potência elétrica a bordo)",
+  "gelo": "acdt.core.icing.study (14 CFR 25 Ap. C; Langmuir & Blodgett; Messinger)",
+  "ruido_vtol": "Gutin + Schlegel-King-Mull via acdt.api.rotor_noise; nível é limite inferior",
+  "ruido_jato": "SAE ARP876 não verificado: nao_avaliado",
+  "fiabilidade": "MIL-HDBK-338B via acdt.core.reliability.study",
+  "custo_serie": "curva de aprendizagem (Wright/Crawford) via manufacturing.series; Eastlake não é inventado",
+  "ciclo_vida": "OSD CAPE 2020; NIST HB 135; rede declarada"
+ },
+ "pressupostos": [
+  "duty omisso = 1 no item de carga útil",
+  "energia do equipamento na hora de voo com ciclo 1",
+  "massa do equipamento não entra no fecho (mass_kg / payload_kg / W0 já são a massa dimensionada)",
+  "asa do jato: corda média √(S/AR) e t/c = wave.thickness_ratio; sem segmento de subida",
+  "combustível/FH do jato inclui a reserva",
+  "sem modelo de extração de combustível para a potência elétrica de um jato"
+ ],
+ "cases": {
+  "vtol_energia_carga_util": {
+   "ensaio": "multirrotor 5 kg, 4 rotores D = 0,38 m, pairar 600 s, hotel declarado 0 W, carga 25 W",
+   "mass_kg_inalterada": true,
+   "energy_Wh_sem_carga": 98.92427538201082,
+   "energy_Wh_com_carga": 103.09094204867749,
+   "delta_Wh": 4.166666666666671,
+   "delta_esperado_Wh": 4.166666666666667,
+   "energy_complete": true,
+   "veredicto": "validado"
+  },
+  "vtol_potencia_desconhecida": {
+   "energy_complete": false,
+   "energy_Wh": 98.92427538201082,
+   "igual_ao_hotel_declarado": true,
+   "P_avg_W": null,
+   "veredicto": "nao_avaliado",
+   "nota": "o número de energia é só o hotel declarado; não é a energia fechada"
+  },
+  "vtol_termica": {
+   "Q_hover_W_sem_carga": {
+    "lo": 114.2575380662225,
+    "hi": 114.2575380662225
+   },
+   "Q_hover_W_com_25W": {
+    "lo": 139.25753806622248,
+    "hi": 139.25753806622248
+   },
+   "delta_lo_W": 24.999999999999986,
+   "sem_carga": {
+    "evaluated": true,
+    "veredicto": "validado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": true,
+    "skipped": []
+   },
+   "com_carga": {
+    "evaluated": true,
+    "veredicto": "validado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": true,
+    "skipped": []
+   },
+   "veredicto": "validado"
+  },
+  "vtol_distribuicao_sem_eta": {
+   "distribution_heat_W": [
+    0.0,
+    null
+   ],
+   "termica": {
+    "evaluated": true,
+    "veredicto": "nao_avaliado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "perdas de distribuição com limite superior desconhecido",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": false,
+    "skipped": [
+     "perdas de distribuição com limite superior desconhecido"
+    ]
+   },
+   "veredicto": "nao_avaliado"
+  },
+  "vtol_arquitetura_40W_eta_0_9": {
+   "P_avg_W": 40.0,
+   "distribution_heat_W": [
+    4.444444444444446,
+    4.444444444444446
+   ],
+   "perda_esperada_W": 4.444444444444446,
+   "hotel_W": 40.0,
+   "veredicto": "validado"
+  },
+  "vtol_ruido": {
+   "sem_rpm": {
+    "evaluated": false,
+    "veredicto": "nao_avaliado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "ruído não avaliado: rpm de funcionamento (rpm_max é o limite de ponta, não o ponto)",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": null,
+    "skipped": null
+   },
+   "rpm_max_nao_usado": 10261.794372405406,
+   "com_rpm_3000": {
+    "evaluated": true,
+    "veredicto": "validado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "Gutin + Schlegel-King-Mull no pairar; nível é limite inferior (sem espessura, sem motor)",
+    "lower_bound": true,
+    "co2_complete": null,
+    "mission_complete": null,
+    "skipped": null
+   },
+   "overhead_LA_dBA": 12.119102168889547,
+   "lower_bound": true,
+   "veredicto": "validado",
+   "nota": "o nível é limite inferior; ISO 9613-2 e espessura ficam para a tarefa de ruído"
+  },
+  "vtol_fiabilidade": {
+   "bloco": {
+    "evaluated": true,
+    "veredicto": "nao_avaliado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "duração: reliability.mission_duration_h; λ desconhecido em payload:cam",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": null,
+    "skipped": null
+   },
+   "unknown_components": [
+    "payload:cam"
+   ],
+   "mission_reliability": {
+    "lo": 0.0,
+    "hi": 0.9999900000499998
+   },
+   "veredicto": "nao_avaliado"
+  },
+  "vtol_custo_serie": {
+   "medio_sem_equipamento_USD": 711.6062726675125,
+   "medio_com_50_USD": 761.6062726675125,
+   "veredicto": "validado"
+  },
+  "vtol_ciclo_vida": {
+   "sem_carga": {
+    "evaluated": true,
+    "veredicto": "validado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "energia/FH = energy_Wh do size_vtol / duração (PRESSUPOSTO: ciclo 1; o hotel da carga já está em energy_Wh quando energy_complete; é minorante se for falso)",
+    "lower_bound": null,
+    "co2_complete": true,
+    "mission_complete": null,
+    "skipped": null
+   },
+   "com_25W": {
+    "evaluated": true,
+    "veredicto": "validado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "energia/FH = energy_Wh do size_vtol / duração (PRESSUPOSTO: ciclo 1; o hotel da carga já está em energy_Wh quando energy_complete; é minorante se for falso); o hotel da carga ou da arquitetura já está em energy_Wh; não é somado outra vez",
+    "lower_bound": null,
+    "co2_complete": true,
+    "mission_complete": null,
+    "skipped": null
+   },
+   "grid_CO2e_lo_sem": 0.1318990338426811,
+   "grid_CO2e_lo_com": 0.13745458939823668,
+   "veredicto": "validado"
+  },
+  "jato": {
+   "fonte": "examples/jet/coupled_size.yaml copiado em memória; o ficheiro não foi editado",
+   "mtow_kg_sem": 67855.97801208496,
+   "mtow_kg_com_carga_declarada": 67855.97801208496,
+   "mtow_inalterado": true,
+   "ruido": {
+    "evaluated": false,
+    "veredicto": "nao_avaliado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "jato sem método de ruído citado (SAE ARP876 não está verificado neste repositório); não se usa o modelo de hélice",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": null,
+    "skipped": null
+   },
+   "gelo": {
+    "evaluated": true,
+    "veredicto": "nao_avaliado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "subida: o fecho L0 do jato não tem segmento de subida; a espessura é só o cruzeiro",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": false,
+    "skipped": [
+     "subida: o fecho L0 do jato não tem segmento de subida; a espessura é só o cruzeiro"
+    ]
+   },
+   "termica": {
+    "evaluated": true,
+    "veredicto": "nao_avaliado",
+    "calibracao_L1_L2": "nao_aplicar",
+    "reason": "subida: o fecho L0 do jato não tem segmento de subida; calor do motor do jato desconhecido (heat_rejection_W não declarado)",
+    "lower_bound": null,
+    "co2_complete": null,
+    "mission_complete": false,
+    "skipped": [
+     "subida: o fecho L0 do jato não tem segmento de subida",
+     "calor do motor do jato desconhecido (heat_rejection_W não declarado)"
+    ]
+   },
+   "massa_equipamento_kg_nao_acoplada": 4.0,
+   "coupled_to_mass": false,
+   "veredicto_ruido": "nao_avaliado",
+   "veredicto_gelo": "nao_avaliado",
+   "veredicto_termica": "nao_avaliado"
+  }
+ }
+}

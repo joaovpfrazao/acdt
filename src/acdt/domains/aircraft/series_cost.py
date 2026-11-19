@@ -118,6 +118,8 @@ def analyse_series_cost(res: Any) -> dict[str, Any]:
         out["average_unit_cost_USD"] = {"lo": out.get("average_unit_cost_USD"), "hi": None}
     out.update({"level": LEVEL, "adapter_notes": notes,
                 "currency": "USD (CER: 2012 × cpi; learning: T1 e NRE declarados em USD)"})
+    from .native_disciplines import fold_series_cost
+    fold_series_cost(out, res.spec)
     return out
 
 

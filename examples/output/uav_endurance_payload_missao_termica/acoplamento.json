@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-19",
+  "branch": "acoplamento-ponto-missao",
+  "example_yaml_edited": false,
+  "applied": false,
+  "veredicto": "validado",
+  "calibracao_L1_L2": "nao_aplicar",
+  "motivo": "O ciclo iterar usa a missão exigida e a área de arrasto fica igual à da passagem final. A diferença face ao ponto de projeto, medida, é 7,88 %. Não há fator de calibração. Na baía do UAV elétrico a subida quente não fecha a entrada de ar dinâmico: a área fica desconhecida e não se aplica a do cruzeiro.",
+  "methods": [
+    "simulate_mission(..., stop=legs), a mesma missão exigida de performance_analysis",
+    "Hall & Frank, NACA RM A8I29 (1948), MFR de projeto 0,60: A = ṁ/(MFR·ρ·V)",
+    "Anderson, Fundamentals of Aerodynamics, 5.ª ed., Cap. 2–3: arrasto interno"
+  ],
+  "pressuposto": "No motor térmico o MFR de projeto mantém-se em todos os segmentos. A variação de recuperação com o MFR, descrita no NACA RM A8I29, não é aplicada.",
+  "ponto_de_operacao": {
+    "veredicto": "validado",
+    "example": "examples/uav_endurance_payload.yaml",
+    "yaml_edited": false,
+    "setup": "fidelity handbook, AVL desligado, bay de teste com size_for cruzeiro_quente, coupling iterar, η_ESC 0,97, η_motor 0,90",
+    "drag_area_mission_m2": 0.00039170475232898377,
+    "drag_area_iter_m2": 0.00039170475232898377,
+    "drag_area_design_point_m2": 0.0003630937388427441,
+    "relative_mission_minus_design_point": 0.07879787070256014,
+    "W0_kg": 25.45018673695178,
+    "P_batt_cruise_mission_W": 516.5058851719914,
+    "P_batt_cruise_design_point_W": 485.50588517199577,
+    "cruise_source": "performance.mission_required (segmento)",
+    "design_point_source": "DesignResult.cruise_power_required (D·V/η_p)"
+  },
+  "entrada_compartimento": {
+    "veredicto": "nao_avaliado",
+    "decision": "nao_aplicar",
+    "example": "examples/uav_endurance_payload.yaml",
+    "yaml_edited": false,
+    "setup": "a mesma baía, size_for pior_segmento, coupling relatorio",
+    "policy": "pior_segmento",
+    "status": "desconhecido",
+    "subida_quente": {
+      "T_in_C": 49.2,
+      "T_in_note": "valor impresso pela nota do dimensionador, uma casa decimal",
+      "T_limit_air_C": 41.90618820854439,
+      "Q_W": 254.8647632361219,
+      "inlet_area_m2": null,
+      "needs_fan": true,
+      "reason": "ar de entrada a 49.2 °C ≥ limite 41.9 °C: ar dinâmico não arrefece"
+    },
+    "cruzeiro_quente_area_m2": 0.0007084825508911167,
+    "why": "O segmento que governa não fecha. A área do cruzeiro não é usada como se fosse a do pior."
+  },
+  "entrada_motor": {
+    "veredicto": "validado",
+    "decision": "nao_aplicar",
+    "example": "examples/uav_gasoline_150kg.yaml",
+    "yaml_edited": false,
+    "setup": "fidelity handbook, AVL desligado, thermal.engine.air_temperature_rise_K 30; ram_recovery e duct_loss_q não declarados",
+    "condition": "subida_quente",
+    "inlet_area_m2": 0.029038792653225343,
+    "candidates_m2": {
+      "subida_quente": 0.029038792653225343,
+      "cruzeiro_quente": 0.017057420952017528,
+      "cruzeiro_frio": 0.014352778636615082
+    },
+    "cruise_required_inlet_area_m2": 0.017057420952017528,
+    "drag_status": "zeta desconhecido: arrasto em [0, ṁV], não um valor único"
+  }
+}

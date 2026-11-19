@@ -334,7 +334,7 @@ def _vspaero(cfg, wing_id, stem):
     exe = _solver_exe()
     t1 = time.time()
     proc = subprocess.run([exe, "-omp", str(ncpu), stem], cwd=os.getcwd(),
-                          capture_output=True, text=True, timeout=1200)
+                          capture_output=True, text=True, timeout=float(cfg.get("timeout_s", 1200)))
     wall = time.time() - t1
     return {"inputs": inputs, "surface": mode,
             "mesh_geoms_removed": removed_meshes,

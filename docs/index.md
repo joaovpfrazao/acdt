@@ -18,7 +18,7 @@ ficam marcados como **PRESSUPOSTO**; desconhecido nunca é zero e "não avaliado
 | casos de referência (V&V) | [V&V](VV.md) |
 | estado de projeto com unidades | [Dados](DADOS.md) |
 | calibrar com dados de ensaio | [Calibração](CALIBRACAO.md) |
-| relatório de revisão SRR/PDR/CDR com veredito | [Relatórios](RELATORIOS.md) |
+| relatório de revisão SRR/PDR/CDR/MDR/TRR/PRR com veredito | [Relatórios](RELATORIOS.md) |
 | ruído de hélices/rotores, deteção auditiva, Parte 36 Ap. G | [Ruído](RUIDO.md) |
 | gestão térmica: compartimentos, dias quente/frio MIL-HDBK-310, arrefecimento e arrasto | [Térmica](TERMICA.md) |
 | gelo: envelopes 14 CFR 25 Ap. C, captação, rime/glaze, espessura, potência de proteção | [Gelo](GELO.md) |

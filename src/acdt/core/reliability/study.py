@@ -326,7 +326,20 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
         "fleet": "acdt.core.concept.fleet_feedback (Ha 2010) ou balanço de surtidas",
         "operating_cost": "Raymer 2018 Cap. 18 (estrutura DOC) via manufacturing.costing.operating_cost",
     }
+    extra = _standby_weibull(spec, t_m)
+    if extra is not None:
+        out["standby_weibull"] = extra
+        notes.append("espera inativa / Weibull à parte do RBD ativo: não substitui a fiabilidade de missão")
     return out
+
+
+def _standby_weibull(spec: Mapping[str, Any], t_m: float | None) -> dict[str, Any] | None:
+    """Só quando a especificação pede ``standby`` ou ``weibull``. Não mexe no RBD."""
+    if "standby" not in spec and "weibull" not in spec:
+        return None
+    from .standby import evaluate_extensions
+
+    return evaluate_extensions(spec, t_m)
 
 
 def operating_cost(block: Mapping[str, Any], rel: Mapping[str, Any]) -> dict[str, Any]:

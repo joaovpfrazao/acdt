@@ -111,3 +111,7 @@ casos de teste).
 * Fatores PV por item declarados só em `present_value` (não no calendário do programa).
 * Custo de produção constante por aeronave (sem curva sobre o calendário); sem inflação diferencial por categoria
   além de `escalation_os`.
+
+## 8. Adaptador nativo (19 nov 2026)
+
+No VTOL, a energia por hora de voo é `energy_Wh` / duração quando o utilizador não declara `battery_kWh_per_fh`. Esse `energy_Wh` já inclui o hotel da carga ou da arquitetura, por isso não é somado outra vez. Se a potência da carga for desconhecida, `energy_complete` é falso e o majorante do CO₂e abre. Num jato ou num motor térmico não há modelo de extração: a potência elétrica do equipamento não entra no combustível e o CO₂e fica em aberto. Frota, vida e horas de voo não são inventadas. O veredicto só é `validado` quando o custo e o CO₂e fecham. Na asa fixa elétrica a energia do equipamento soma-se uma vez a `battery_kWh_per_fh` (PRESSUPOSTO: ciclo 1 durante a hora de voo), porque o dimensionamento ainda não a leu de `payload_equipment`. Medida de ensaio: `examples/output/adaptadores_vtol_jato/adaptadores.json`.

@@ -1,13 +1,17 @@
 # Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
 """Thick-panel wake map, history parser and the AVL comparison. OpenVSP is not called."""
 import csv
+import math
 
 import pytest
 
 from acdt.domains.aircraft.hifi.vspaero_panel import (
     COEFFICIENTS,
     DOCUMENTED_WAKE,
+    NONLINEAR_FACTOR_DEFAULT,
+    WAKE_ITER_UPPER,
     compare_with_avl,
+    max_residual_limit,
     nonfinite_columns,
     parse_history,
     thick_vspaero_block,
@@ -109,6 +113,42 @@ def test_nonfinite_history_is_not_a_coefficient():
     assert rec["CL"]["ratio"] is None
     assert rec["CL"]["reason"] == "quantidade em falta ou não é a mesma grandeza"
     assert rec["overall"] == "nao_aplicar"
+
+
+def test_wake_stop_is_the_openvsp_356_residual():
+    assert NONLINEAR_FACTOR_DEFAULT == 1.0
+    assert WAKE_ITER_UPPER == 255
+    assert max_residual_limit(1.0) == pytest.approx(math.log10(0.001))
+    assert max_residual_limit(0.0) is None
+    assert max_residual_limit(-1.0) is None
+    met = wake_residual_note(
+        [{"Max_Residual": "-3.0", "L2_Residual": "-4.2", "CLtot": "0.5"}],
+        factor=1.0, wake_iters_requested=255)
+    assert met["converged"] is True and met["iterative_ok"] is True
+    assert met["hit_iteration_cap"] is False
+    above = wake_residual_note(
+        [{"Max_Residual": "-2.999", "L2_Residual": "-3.0", "CLtot": "0.5"}],
+        wake_iters_requested=1)
+    assert above["converged"] is False and above["hit_iteration_cap"] is True
+    missing = wake_residual_note([{"CLtot": "0.5"}], wake_iters_requested=255)
+    assert missing["converged"] is False and missing["Max_last"] is None
+
+
+def test_calibration_proposal_requires_the_residual_and_the_band():
+    avl = {"CL": 0.50, "CDff": 0.02, "Cmtot": 0.03, "CDtot": 0.03}
+    row = {"CLtot": "0.50", "CMytot": "0.03", "CDi": "0.04", "CDiw": "0.04", "CDtot": "0.05"}
+    held = compare_with_avl(row, avl, iterative_ok=False)
+    assert held["calibracao"] == "nao_aplicar"
+    assert held["overall"] == "nao_aplicar" and held["applied"] is False
+    proposed = compare_with_avl(row, avl, iterative_ok=True)
+    assert proposed["calibracao"] == "calibrar"
+    assert proposed["applied"] is False and proposed["valid"] is False
+    assert proposed["overall"] == "nao_aplicar"
+    outside = compare_with_avl(
+        {"CLtot": "0.80", "CMytot": "0.06", "CDi": "0.04", "CDiw": "0.04", "CDtot": "0.05"},
+        avl, iterative_ok=True)
+    assert outside["CL"]["ratio"] == pytest.approx(1.6)
+    assert outside["calibracao"] == "nao_aplicar"
 
 
 def test_csv_leaves_a_missing_coefficient_blank(tmp_path):

@@ -218,3 +218,63 @@ Na SRR, o mesmo projeto dá `pronto`.
 * Ler o registo de decisões (`acdt decisions`) como evidência dos estudos de compromisso.
 * Ligar o resultado de `acdt certify` (matriz de conformidade) aos critérios de segurança.
 * Permitir o modelo de ficha RID/RFA para o painel.
+
+## Figuras geradas e revisões MDR, TRR e PRR (19 nov 2026)
+
+Os dois primeiros pontos de «Por fazer» estão feitos neste ramo. O registo de decisões, a matriz de `acdt certify`
+e a ficha RID/RFA continuam por fazer.
+
+`acdt report` passa a aceitar também `--level MDR`, `--level TRR` e `--level PRR`. A assinatura de
+`acdt.api.report` não mudou (o nível já era uma cadeia). A versão da API mantém-se.
+
+### Figuras
+
+A secção 12 continua a listar os PNG que já estejam nas pastas do projeto. Se não houver nenhum, o relatório
+mantém a frase «Nenhuma figura já produzida nas pastas do projeto.»
+
+Por cima disso, o relatório prepara figuras só com números já guardados:
+
+* Frente de Pareto de um `acdt.mdo/1`, quando há dois objetivos e todas as avaliações trazem os dois valores
+  finitos, e quando cada identificador da frente existe no registo. Veredicto `validado` e calibração
+  `nao_aplicar`: é uma transcrição, não uma medida nova. O PNG (`figuras/pareto_….png`) só é desenhado quando o
+  relatório é escrito numa pasta. O Markdown de referência não guarda a soma do PNG.
+* Histograma de uma métrica das amostras de um `acdt.uq/1`. Se `samples` falta ou é nulo, se alguma amostra não
+  tem `ok` verdadeiro, se a métrica não é finita em todas, ou se `n_ok` inteiro não coincide com a lista, o
+  veredicto é `nao_avaliado`. Não se desenha um histograma vazio e não se trata a amostra em falta como zero.
+  O Monte Carlo do acdt deixa `samples` nulo quando n > 64.
+
+No exemplo analítico `tests/data/review_small` (não é um projeto): a frente tem 9 avaliações e as 9 estão na
+frente, objetivos `f1` (min) e `f2` (min), ficheiro `mdo/mdo.json`. O `uq/uq.json` não guarda amostras, por isso
+o histograma fica `nao_avaliado`. Os YAML de `examples/` não foram editados.
+
+### Critérios novos
+
+Fonte: NASA NPR 7123.1D (em vigor desde 5 jul 2023, Alteração 2), Apêndice G, conferido no NODIS em 19 nov 2026.
+Os excertos são literais. A ligação ao avaliador automático continua a ser um PRESSUPOSTO do acdt (G.1.2).
+
+| Revisão | Secção | Tabela | O que o acdt avalia sozinho |
+|---|---|---|---|
+| MDR | G.6 | G-5, projetos e programas de projeto único | arquitetura credível (`conceito_viavel`), requisitos atribuídos (`arvore_requisitos`), compromissos (`estudos_compromisso`) |
+| TRR | G.11 | G-10 | configuração dos ficheiros registados (`linha_de_base`), discrepâncias conhecidas (`requisitos_cumpridos`) |
+| PRR | G.9 | G-8 | requisitos na configuração registada (`requisitos_cumpridos`) |
+
+A SDR de projeto usa a mesma Tabela G-5. O comando é `--level MDR`. A SDR de programas que não são de projeto
+único é a Tabela G-2 e não está implementada.
+
+A PRR, no texto da norma, destina-se a projetos que desenvolvem ou adquirem vários sistemas (tipicamente mais de
+três, ou o que o projeto determinar). Um único avião não fica `nao_pronto` só por esse âmbito.
+
+PRESSUPOSTO: o nível de fidelidade exigido passa a ser L0 na MDR, na TRR e na PRR, além de L0/L1/L2 na
+SRR/PDR/CDR. A NPR não define esta escada. Estes três níveis não usam `fidelidade_disciplinas`: documentação de
+produção, planos de ensaio e «o produto é fabricável» não passam por haver um resultado L0.
+
+Ficam para o painel, e não passam por um estudo que já exista: espetro, instalações, formação, segurança, custo,
+calendário, fornecedores, lista de materiais e registo de riscos. Um estudo de incerteza não é um registo de
+riscos. O V&V dos modelos não é o objetivo do ensaio.
+
+No mesmo exemplo analítico, a MDR fica `pronto` porque os três avaliadores automáticos cumprem; a TRR fica
+`nao_pronto` (TRR-E04, requisito em falha); a PRR fica `nao_pronto` (PRR-S04). Os critérios humanos não tornam a
+revisão pronta nem a bloqueiam. Isto não é a decisão de um painel.
+
+O registo medido está em `examples/output/relatorios_figuras/resultado.json`. Veredicto da tarefa: `validado`
+para a transcrição da frente e dos excertos; calibração `nao_aplicar`; histograma `nao_avaliado`.

@@ -175,7 +175,7 @@ def _transition(cfg: dict, hp: dict, P_cruise_shaft: float) -> dict[str, Any]:
             "source": "Glauert inflow + wing-borne fraction (V/V_wing)^2 (PRESSUPOSTO envelope)"}
 
 
-def size_vtol(spec: dict) -> dict[str, Any]:
+def size_vtol(spec: dict, *, disciplines: bool = True) -> dict[str, Any]:
     """L0 VTOL / eVTOL sizing for one architecture. ``spec`` keys: architecture, mass_kg, rotors{n, diameter_m |
     disk_loading_N_m2, FM, bemt? (opt-in axial BEMT; unassessed≠pass), …}, mission{t_hover_s, climb_height_m, climb_rate_m_s, cruise_distance_m,
     cruise_speed_m_s, t_loiter_s}, cruise{LD, eta_prop}, transition{n, t_s, V_wing_frac, power_factor?},
@@ -239,7 +239,12 @@ def size_vtol(spec: dict) -> dict[str, Any]:
         Pe = Ps / eta_el
         seg_out.append({"segment": name, "P_shaft_W": Ps, "P_elec_W": Pe, "t_s": ts, "E_Wh": Pe * ts / 3600})
         E += Pe * ts
-    E += e["systems_power_W"] * t_total
+    from ..native_disciplines import hotel_adjustment
+    hotel, hotel_src = hotel_adjustment(float(e["systems_power_W"]), "electric.systems_power_W", spec)
+    energy_complete = hotel is not None
+    if hotel is None:
+        hotel = float(e["systems_power_W"])
+    E += hotel * t_total
     E_Wh = E / 3600
     E_nom_Wh = E_Wh * (1 + e["reserve"]) / e["dod"]
     if "systems_peak_power_W" in e:
@@ -268,6 +273,7 @@ def size_vtol(spec: dict) -> dict[str, Any]:
                    "P_elec_W": P_cruise / eta_el},
         "transition": tr,
         "segments": seg_out, "t_total_s": t_total, "eta_chain": eta_el,
+        "hotel_W": hotel, "hotel_source": hotel_src, "energy_complete": energy_complete,
         "energy_Wh": E_Wh, "energy_nominal_Wh": E_nom_Wh, "battery_mass_kg": m_batt,
         "battery_mass_energy_kg": m_batt_E, "battery_mass_power_kg": m_batt_P, "battery_limiting": limiting,
         "battery_mass_fraction": frac, "c_rate_peak": c_rate,
@@ -283,6 +289,9 @@ def size_vtol(spec: dict) -> dict[str, Any]:
         out["storage"] = aircraft_storage(spec["storage"], "vtol_size", out)
     if onboard_bridge_report and onboard_bridge_report.get("applied"):
         out["onboard_bridge"] = onboard_bridge_report
+    if disciplines:
+        from ..native_disciplines import attach
+        attach("vtol", out, spec)
     return out
 
 
