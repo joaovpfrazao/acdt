@@ -1904,3 +1904,24 @@ reutilização do `result.json` em `size_fleet(run_id=…)`. Pormenor em [QUALID
 ## Melhorias futuras em espera
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
+
+## Solo ISO 9613-2 e espessura da hélice (19 nov 2026, ramo `ruido-solo-espessura`)
+
+Atenuação de solo A_gr (ISO 9613-2:1996 §7.3.1, Tabela 3, Eq. 9) e C_met (§8, Eq. 21–22, só com C_0 declarado) em
+`acdt/core/acoustics/ground.py`, ligadas a `propagation`, a `study.rotor_noise(ground_spec=…)` e à etapa
+`noise.iso9613_ground`. Sem esse mapa o número não muda: o C172 lowfi do exemplo, YAML intacto, deu 46,2 dB(A),
+60,4 dB(A) e 27,5 km, como no §6 de [RUIDO.md](RUIDO.md). A API pública não subiu (assinatura de `rotor_noise`
+igual, 1.7.0). `ground_dB` da placa da Parte 36 não se soma a A_gr.
+
+* **Veredicto**: `validado` na transcrição da tabela (caso `NOISE-ISO9613-2-AGR`; não é ensaio em voo). Calibração
+  `nao_aplicar`.
+* **Espessura**: `nao_avaliado`. NACA TN 605 não foi transcrita; Hanson e SAE AIR1407 não foram verificados. Não há
+  SPL de espessura.
+* **Refração geométrica, barreiras, folhagem e a forma de 2024 com K_geo**: `nao_avaliado`, não 0 dB. O efeito
+  meteorológico citado é C_met.
+* **Alcance**: `nao_avaliado`. Continua a pior direção (limite superior das fontes modeladas). Sem A_gr a omissão
+  não tem sinal, porque a tabela nos graves pode amplificar. Com A_gr e sem C_0 o nível é o caso favorável da Eq. 6.
+* **Medição** (pai `e9726e4`, `applied: false`): `examples/output/ruido_solo_iso9613/solo.json`. Rotor de um
+  harmónico a 100 m, solo duro, d_p = 0: A_gr = −3,0 dB e o nível sobe 3,0 dB (47,7 → 50,7 dB(A)); o alcance no
+  solo passa de 9,05 km a 12,3 km e não fica validado. G em falta deixa o campo livre.
+* **Falta**: Deming ou Hanson quando a equação estiver conferida; Fidell; barreiras da ISO 9613-2 se forem lidas.

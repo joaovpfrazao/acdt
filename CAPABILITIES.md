@@ -2000,3 +2000,16 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |
 | 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |
 | 19 | BAIXA (L0 feito 18 nov 2026, §32u) | **Fiabilidade e manutenção de frota** | fiabilidade de missão, disponibilidade, MMH/FH, sobressalentes, dimensão da frota e custo de manutenção | feito: MIL-HDBK-338B (RBD, k-de-n, Eq. 10.18–10.24, Poisson), Ha 2010; falta espera fria/quente, fases, Weibull, causa comum, METRIC |
+
+## 34. Atenuação de solo ISO 9613-2:1996 e ruído de espessura (19 nov 2026)
+
+A cadeia de ruído passa a poder subtrair A_gr da ISO 9613-2:1996 §7.3.1 (Tabela 3, Eq. 9) e, se C_0 for declarado,
+C_met do §8 (Eq. 21–22). Sem o mapa `noise.iso9613_ground`, o resultado numérico é o de campo livre já existente.
+G em falta não é 0 dB. A forma de 2024 com K_geo, as barreiras e a refração por raios não entram.
+
+O ruído de espessura (Deming, NACA TN 605; Hanson; SAE AIR1407) fica `nao_avaliado`: a equação não foi conferida
+e não se publica um SPL. O alcance de deteção continua um limite superior pela pior direção; omitir A_gr não lhe
+dá esse sinal, porque a tabela pode amplificar os graves. Calibração `nao_aplicar` (não há medição de voo).
+
+Veredicto da transcrição da tabela: `validado` (caso `NOISE-ISO9613-2-AGR`). Alcance, espessura e refração
+geométrica: `nao_avaliado`. Medição em `examples/output/ruido_solo_iso9613/solo.json`. Doc: [docs/RUIDO.md](docs/RUIDO.md) §8.

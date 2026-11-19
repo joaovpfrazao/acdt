@@ -127,6 +127,7 @@ files = [
   "src/acdt/core/acoustics/absorption.py",
   "src/acdt/core/acoustics/hearing.py",
   "src/acdt/core/acoustics/rotor.py",
+  "src/acdt/core/acoustics/ground.py",
   "src/acdt/core/acoustics/propagation.py",
   "src/acdt/core/acoustics/certification.py",
   "src/acdt/core/acoustics/study.py",

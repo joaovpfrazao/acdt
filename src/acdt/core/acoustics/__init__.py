@@ -11,6 +11,7 @@ Módulos (cada um só com métodos publicados e citados):
   banda larga (vórtices) de Schlegel, King & Mull (1966), como apresentados por Marte & Kurtz (1970);
 * :mod:`.propagation` — nível no observador (espectro de fonte → divergência + absorção + Doppler + ponderação A),
   sobrevoo (L_A,max) e alcance de deteção auditiva;
+* :mod:`.ground` — atenuação do solo e C_met da ISO 9613-2:1996 (§7.3.1 e §8), quando os dados são declarados;
 * :mod:`.certification` — limites de 14 CFR Parte 36, Apêndice G (G36.301) e altura de referência (G36.111).
 """
 from __future__ import annotations
