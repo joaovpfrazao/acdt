@@ -61,8 +61,12 @@ não validações independentes. As variantes públicas são ilustrativas e não
 pyCycle/OpenMDAO fica fora do processo acdt. Um adaptador futuro deverá fornecer os mesmos campos
 `thrust_installed_N` e `TSFC_kg_N_s` por Mach/altitude/rating, com dados e versão do
 deck, e calibrar a correlação L0. A 18 nov 2026 o turbojato simples publicado correu noutro
-intérprete (pyCycle 4.4.0). O TSFC no ponto de projecto foi 0,799 lb/(lbf·h), contra 0,400
-desta correlação de turbofan. Não há deck L1, e nenhum factor entrou. A correlação não mudou.
+intérprete (pyCycle 4.4.0, com um ajuste local que não está no repositório). O TSFC impresso
+no ponto de projecto foi 0,79852 lb/(lbf·h), contra 0,400 desta correlação de turbofan.
+A mesma etiqueta, com OpenMDAO 3.41.0 e NumPy 1.26.4 e sem esse ajuste, volta a imprimir
+0,79852. O L0 não fica validado nem calibrado. O deck L1 continua ausente e essa comparação
+fica `nao_avaliado`. Nenhum factor entrou. A correlação não mudou. O registo está em
+`examples/output/jet_pycycle/h8_pycycle_sem_ajuste.json`.
 Faltam fecho MDA de jato, mapas ECS, build-up Torenbeek completo,
 ajuste de throttle, rajadas/Mach/buffet e validação CFD/ensaio e referência 737.
 

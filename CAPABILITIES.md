@@ -956,10 +956,21 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * **Mapas L0/L1 opt-in (9 nov 2026)**: `engine.map` em `jet_size` / performance / analyse —
   `correlation` (default Mattingly/Ihme), `table` (grelha Mach×altitude×throttle com
   `thrust_lapse`/`TSFC`) ou `corrected_table` (F/δ, SFC/√θ; Walsh & Fletcher). Fora do domínio
-  → `unassessed` (nunca extrapola em silêncio). Sem pyCycle/NPSS/GasTurb/T-MATS/CFD.
+  → `unassessed` (nunca extrapola em silêncio). O processo acdt não corre pyCycle, NPSS,
+  GasTurb, T-MATS nem CFD.
   Exemplo `examples/jet/engine_map_table.yaml` (MTOW idêntico ao default em cruzeiro Π=1).
   Motor elétrico: `core.motor_map` η(P) opcional no hybrid dispatch; mapas de motor térmico
   de ciclo continuam pendentes no PC do João.
+  A instalação publicada `om-pycycle` 4.4.0, OpenMDAO 3.41.0 e NumPy 1.26.4, noutro
+  intérprete, resolve o turbojato simples da etiqueta 4.4.0 sem ajuste local de `ThermoAdd`.
+  A comparação com a correlação L0 de turbofan de alta razão de bypass fica `nao_aplicar`:
+  o L0 não fica validado nem calibrado. O deck termodinâmico L1 deste turbojato não existe
+  (`nao_avaliado`). Faltam, na grelha que `engine_map` aceita, `source`, `mach`,
+  `altitude_m`, `throttle`, `thrust_lapse`, `thrust_installed_N` e `TSFC_kg_N_s`, e na
+  tabela corrigida `F_over_delta`, `SFC_over_sqrt_theta` e `totals`. O mapa também não
+  guarda OPR, caudais, empuxos bruto e de ram, FAR, T4, eficiências, rotação nem totais
+  de estação. O yaml ilustrativo não foi editado. Registo:
+  `examples/output/jet_pycycle/h8_pycycle_sem_ajuste.json`.
 * **Exemplo**: `examples/jet/a320_ref.json` (URL/data por campo) e
   [tutorial-jet](docs/tutorial-jet.md) e [triagem](docs/tutorial-jet-performance.md). Check apenas de ordem de grandeza We/OEW,
   tolerância PRESSUPOSTO de 25%; alcance e empuxo são entradas, não validações independentes.
