@@ -26,9 +26,11 @@ from typing import Any
 import numpy as np
 
 from acdt.core.acoustics import certification as cert
+from acdt.core.acoustics.ground import GroundPath, annotate_ground, iso_chain_applied, parse_ground_spec, refraction_status
 from acdt.core.acoustics.levels import spherical_spreading_db
 from acdt.core.acoustics.propagation import Atmosphere, Component, detection_range, flyover, received
-from acdt.core.acoustics.rotor import GUTIN_REF, SKM_REF, projected_thickness, rotor_components
+from acdt.core.acoustics.rotor import (GUTIN_REF, SKM_REF, projected_thickness, rotor_components,
+                                      thickness_noise_status)
 from acdt.core.atmosphere import isa
 
 LEVEL = "L0"
@@ -39,7 +41,7 @@ DEFAULTS: dict[str, Any] = {
     "effective_radius_fraction": 0.8, "broadband": True, "blade_thickness_ratio": None,
     "flyover_altitude_m": None, "flyover_speed_m_s": None, "sideline_m": 0.0, "ground_dB": 0.0,
     "ambient_third_octave_dB": None, "detection_margin_dB": 0.0, "other_sources": None, "engine_noise": None,
-    "certification": None,
+    "certification": None, "iso9613_ground": None,
 }
 
 
@@ -184,13 +186,44 @@ def analyse_noise(res: Any) -> dict[str, Any]:
         complete = False
     atm = Atmosphere(float(o["T_C"]), float(o["rh_pct"]), float(o["p_kpa"]), isa(H).a)
     gdb = float(o["ground_dB"])
-    fly = flyover(comps, H, V, atm, float(o["sideline_m"]), gdb)
-    over = received(comps, H, math.pi / 2, atm, 0.0, gdb, detail=True)
-    mach = V / atm.c_m_s
-    quiet = detection_range(comps, atm, mach, None, 0.0, gdb)
     amb = o.get("ambient_third_octave_dB")
     ambd = {float(k): float(v) for k, v in amb.items()} if isinstance(amb, dict) and amb else None
-    det = detection_range(comps, atm, mach, ambd, float(o["detection_margin_dB"]), gdb) if ambd else quiet
+    mach = V / atm.c_m_s
+    path, ground_block = parse_ground_spec(o.get("iso9613_ground"))
+
+    def _chain(gp: GroundPath | None) -> tuple[Any, Any, Any, Any]:
+        fly_ = flyover(comps, H, V, atm, float(o["sideline_m"]), gdb, ground=gp)
+        over_ = received(comps, H, math.pi / 2, atm, 0.0, gdb, detail=True, ground=gp)
+        quiet_ = detection_range(comps, atm, mach, None, 0.0, gdb, ground=gp)
+        det_ = detection_range(comps, atm, mach, ambd, float(o["detection_margin_dB"]), gdb, ground=gp) if ambd else quiet_
+        return fly_, over_, quiet_, det_
+
+    fly, over, quiet, det = _chain(None)
+    if path is not None:
+        fly_c, over_c, quiet_c, det_c = _chain(path)
+        applied = iso_chain_applied(over_c.ground, fly_c, quiet_c, det_c)
+        if applied and over_c.ground:
+            fly, over, quiet, det = fly_c, over_c, quiet_c, det_c
+            ground_block.update(over_c.ground)
+            ground_block["nivel_reportado"] = "com_A_gr"
+            assumptions.append(
+                "Atenuação de solo ISO 9613-2:1996 §7.3.1 aplicada com noise.iso9613_ground. "
+                "PRESSUPOSTO: h_s e h_r são os declarados; d_p projeta a distância já usada pela fonte. "
+                "O pressuposto de campo livre acima não cobre A_gr neste resultado.")
+        else:
+            if over_c.ground:
+                ground_block.update({k: over_c.ground[k] for k in
+                                     ("components", "omitted", "notas", "reason", "pressuposto", "C_met")
+                                     if k in over_c.ground})
+            ground_block["status"] = "nao_avaliado"
+            ground_block["nivel_reportado"] = "sem_A_gr"
+            applied = False
+        annotate_ground(ground_block, applied=applied, c0_declared=path.C0_dB is not None,
+                        components_omitted=bool(ground_block.get("omitted")) or not applied)
+    else:
+        applied = False
+        ground_block["nivel_reportado"] = "sem_A_gr"
+        annotate_ground(ground_block, applied=False, c0_declared=False, components_omitted=False)
 
     def ground(rs: Any) -> float | None:
         if rs is None:
@@ -199,7 +232,9 @@ def analyse_noise(res: Any) -> dict[str, Any]:
 
     det_slant = det["range_m"]
     out: dict[str, Any] = {
-        "evaluated": True, "level": LEVEL, "methods": METHODS, "assumptions": assumptions,
+        "evaluated": True, "level": LEVEL,
+        "methods": METHODS + (["ISO 9613-2:1996 §7.3.1 Tabela 3 e §8 Eq. (21)–(22)"] if applied else []),
+        "assumptions": assumptions,
         "sources_complete": complete,
         "sources_note": ("fontes declaradas completas pelo utilizador: " + str(other.get("justification"))) if complete
         else "nível e alcance são limites inferiores (fontes não modeladas; declare noise.other_sources)",
@@ -217,6 +252,9 @@ def analyse_noise(res: Any) -> dict[str, Any]:
         "detection_ground_range_m": ground(det_slant),
         "detection_ground_range_quiet_m": ground(quiet["range_m"]),
         "validity": _validity(info),
+        "thickness_noise": thickness_noise_status(),
+        "refraction": refraction_status(),
+        "iso9613_ground": ground_block,
     }
     c = o.get("certification") or {}
     p36 = c.get("part36_G") if isinstance(c, dict) else None
@@ -278,6 +316,12 @@ def noise_stage(res: Any) -> None:
         return
     try:
         res.noise = analyse_noise(res)
+        from .native_disciplines import equipment_effect
+        eq = equipment_effect(res.spec)
+        if eq["present"]:
+            res.noise.setdefault("adapter_notes", []).append(
+                "carga útil e arquitetura elétrica sem espectro declarado: não entram no nível "
+                "(não é 0 dB); o nível continua um limite inferior")
     except Exception as ex:  # noqa: BLE001 — a etapa de ruído nunca parte o pipeline; fica desconhecido
         res.noise = _not_evaluated(f"falhou: {type(ex).__name__}: {ex}")
         res.issues.append(Issue("warning", f"ruído não avaliado: {type(ex).__name__}: {ex}"))

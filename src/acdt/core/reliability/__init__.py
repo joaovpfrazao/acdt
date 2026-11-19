@@ -10,7 +10,9 @@
 * :mod:`.spares` — provisão de sobressalentes por Poisson (MIL-HDBK-338B Eq. 5.58);
 * :mod:`.fleet` — dimensão da frota por cobertura (reutiliza :func:`acdt.core.concept.fleet_feedback.fleet`) ou por
   taxa de surtidas;
-* :mod:`.study` — análise genérica ``acdt.reliability/1`` com intervalos ``{lo, hi}``.
+* :mod:`.study` — análise genérica ``acdt.reliability/1`` com intervalos ``{lo, hi}``;
+* :mod:`.standby` — espera inativa com comutador perfeito (§7.5.5.3) e Weibull γ = 0 (Eq. 5.50–5.51).
+  O fator β e o comutador imperfeito ficam por avaliar.
 """
 from __future__ import annotations
 

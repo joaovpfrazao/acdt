@@ -31,6 +31,8 @@ NACA_RM_A8I29 = ("Hall, C. F. & Frank, J. L., Ram-Recovery Characteristics of NA
                  "Speeds, NACA RM A8I29 (1948) — MFR de projeto ≈ 0,60")
 MOMENTUM_REF = "Anderson, Fundamentals of Aerodynamics, 5.ª ed. (2011), Cap. 2 (quantidade de movimento) e 3 (Bernoulli)"
 NACA_MFR_DESIGN = 0.60
+# A entrada fica com a maior área pedida pelos segmentos em voo (o pior), não com a de um segmento nomeado.
+WORST_SEGMENT = "pior_segmento"
 
 
 @dataclass
