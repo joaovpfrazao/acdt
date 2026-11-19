@@ -178,3 +178,7 @@ intervalos, FIKI, API, pipeline com requisitos e acoplamento iterado).
   no balanço (hoje ciclo médio + pico).
 * Combinação de encontros contínuo + intermitente; temperatura do dia (MIL-HDBK-310 frio) em vez do varrimento.
 * Alta fidelidade: proposta em [proposta-termica-gelo.md](proposta-termica-gelo.md). Não há malha de acreção, o LEWICE não foi instalado e as formas da NASA IRT não estão no repositório. O L0/L1 não fica validado por essa proposta.
+
+## 8. Adaptador nativo (19 nov 2026)
+
+O VTOL só avalia gelo com superfícies declaradas: o L0 não traz corda nem t/c, e não são inventados. O pairar (V = 0) e a transição (V desconhecida) ficam de fora; se algum segmento propulsado for omitido, o veredicto é `nao_avaliado`. No jato, sem superfícies do utilizador e com S, alongamento e `wave.thickness_ratio`, usa-se uma asa de corda média √(S/AR) e o t/c declarado. O fecho L0 não tem subida, por isso a espessura é só o cruzeiro e o veredicto fica `nao_avaliado`. A carga útil e a arquitetura elétrica não são uma superfície de gelo. Medida de ensaio: `examples/output/adaptadores_vtol_jato/adaptadores.json`.

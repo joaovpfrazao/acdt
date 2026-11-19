@@ -175,3 +175,7 @@ com acoplamento iterado e pipeline a gasolina).
 * Efeito Meredith e arrasto externo da entrada (dados NACA de entradas submersas).
 * Dados de capacidade térmica por componente; permutadores líquidos; irradiância solar em altitude.
 * Alta fidelidade: proposta em [proposta-termica-gelo.md](proposta-termica-gelo.md), sem malha e sem corrida. O L0/L1 não fica validado por essa proposta.
+
+## 8. Adaptador nativo (19 nov 2026)
+
+`native_disciplines.py` monta o estudo térmico do VTOL e do jato quando há `thermal.bays`. A área da fuselagem não é inventada. A carga útil soma-se ao hotel; a arquitetura elétrica substitui-o pelo máximo (MIL-E-7016F; Moir & Seabridge Cap. 5). As perdas de distribuição são P·(1/η − 1) só com η declarado; sem η o calor fica [0; desconhecido] e o veredicto é `nao_avaliado`. A transição VTOL e a subida do jato L0 não têm um ponto de velocidade: o estudo dos segmentos conhecidos corre e a missão não fecha. O calor do turbofan só entra com `thermal.engine.heat_rejection_W`. Heywood não é aplicado ao jato. Na asa fixa as mesmas regras entram em `hotel_power` e na fonte `perdas_distribuicao`. A massa não é acoplada. Medida de ensaio: `examples/output/adaptadores_vtol_jato/adaptadores.json`.

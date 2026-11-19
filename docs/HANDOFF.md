@@ -1904,3 +1904,22 @@ reutilização do `result.json` em `size_fleet(run_id=…)`. Pormenor em [QUALID
 ## Melhorias futuras em espera
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
+
+## Adaptadores nativos VTOL e jato (19 nov 2026, ramo `adaptadores-vtol-jato`)
+
+Estado: código e testes neste ramo, cortado de `origin/main` `e9726e4`. Não inclui o PR #28 (acoplamento do ponto de missão). Não faz merge.
+
+* **O que entrou.** `domains/aircraft/native_disciplines.py` constrói a especificação genérica da térmica, do gelo, do ruído, da fiabilidade, do custo de série e do ciclo de vida a partir de `size_vtol` e `size_jet`. A carga útil e a arquitetura elétrica entram também na asa fixa (hotel, perdas de distribuição, RBD, custo unitário, energia por hora de voo). A massa fechada não é somada outra vez.
+* **Veredicto:** `validado` para o adaptador quando os dados declarados fecham. `calibracao_L1_L2`: `nao_aplicar` (não há fator novo). Partes sem dado ficam `nao_avaliado`: rpm em falta (não se usa `rpm_max`), η de distribuição em falta, λ sem fonte, subida do jato L0, ruído de jato (SAE ARP876 não verificado).
+* **Medida** (`examples/output/adaptadores_vtol_jato/adaptadores.json`, 19 nov 2026; YAML de exemplo intacto; números de ensaio, não de uma aeronave):
+  * multirrotor 5 kg, pairar 600 s, carga 25 W: energia 98,92 Wh → 103,09 Wh (+4,17 Wh); `mass_kg` igual;
+  * potência da carga em falta: `energy_complete` falso e a energia fica a do hotel declarado;
+  * baía declarada: calor de pairar 114,26 W → 139,26 W;
+  * arquitetura 40 W, η = 0,9: perda 4,44 W; sem η o veredicto térmico é `nao_avaliado`;
+  * ruído a 3000 rpm e 100 m: 12,1 dB(A), limite inferior (Gutin + Schlegel-King-Mull);
+  * λ da carga em falta: R de missão [0; 0,99999], veredicto `nao_avaliado`;
+  * custo de série (T1 = 1000 USD, N = 10, declive 0,85): 711,61 USD → 761,61 USD com 50 USD declarados;
+  * CO₂e da rede, minorante: 0,132 kg → 0,137 kg por hora de voo (a carga de 25 W soma 0,025 kWh uma só vez; η de carga 0,9 e 0,2 kg/kWh, declarados no ensaio);
+  * jato ilustrativo: MTOW 67 856 kg inalterado; gelo e térmica `nao_avaliado` (sem subida); ruído `nao_avaliado`.
+* **Métodos.** MIL-E-7016F e Moir & Seabridge Cap. 5; estudo térmico e de gelo já citados; Gutin e Schlegel-King-Mull; MIL-HDBK-338B; curva de Wright/Crawford; OSD CAPE 2020 e NIST HB 135. PRESSUPOSTOS: duty 1, ciclo 1 na hora de voo, corda média √(S/AR) no jato, combustível/FH com a reserva. Sem extração de combustível para a potência elétrica de um jato.
+* **Falta, fora deste ramo.** ISO 9613-2 e ruído de espessura; redundância em espera, Weibull e fator β; figuras de revisão e níveis MDR/TRR/PRR; blocos MDO, V&V e L3 no `design.json`.

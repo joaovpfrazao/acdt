@@ -250,6 +250,11 @@ def icing_stage(res: Any) -> None:
         return
     try:
         out = analyse_icing(res)
+        from .native_disciplines import equipment_effect
+        eq = equipment_effect(res.spec)
+        if eq["present"]:
+            out.setdefault("adapter_notes", []).append(
+                "carga útil e arquitetura elétrica não têm superfície de gelo própria: não entram na captação")
     except Exception as ex:  # noqa: BLE001 — a etapa de gelo nunca parte o pipeline; fica desconhecido
         res.icing = _not_evaluated(f"falhou: {type(ex).__name__}: {ex}")
         res.issues.append(Issue("warning", f"gelo não avaliado: {type(ex).__name__}: {ex}"))

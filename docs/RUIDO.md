@@ -129,3 +129,7 @@ Não há ainda caso de **validação** contra medições de ruído de hélice co
 * Modelo de deteção de Fidell et al. (1974) quando o artigo original for consultado (coeficientes exatos).
 * ICAO Anexo 16 Vol. I Cap. 10 quando o texto for verificado.
 * Ligar ao `acdt vtol` (ponto de pairar) e ao estudo de frota.
+
+## 8. Adaptador nativo (19 nov 2026)
+
+`size_vtol` chama `acdt.api.rotor_noise` (Gutin + Schlegel-King-Mull) no pairar quando há pás, rpm de funcionamento e `noise.flyover_altitude_m`. O rpm é `rotors.rpm` ou, se o BEMT tiver corrido, `hover.rpm_bemt`. `rpm_max` é o limite de ponta e não é o ponto de funcionamento. O nível é um limite inferior: sem espessura, sem motor e sem ISO 9613-2. A carga útil não tem espetro declarado, por isso não entra no nível e também não é 0 dB. O jato fica `nao_avaliado`: SAE ARP876 não está verificado e o modelo de hélice não é aplicado. Medida de ensaio (3000 rpm, 100 m, 2 pás, D = 0,38 m): 12,1 dB(A) na vertical, limite inferior. Ficheiro: `examples/output/adaptadores_vtol_jato/adaptadores.json`.

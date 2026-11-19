@@ -159,6 +159,8 @@ def build_specs(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], dict[str, 
             espec["lhv_source"] = LHV_REF[espec["fuel"]] + " (PRESSUPOSTO: mínimo da norma)"
     espec["mission_duration_h"] = t
     espec["fleet_size"] = int(n)
+    from .native_disciplines import fold_life_cycle_energy
+    fold_life_cycle_energy(espec, notes, res.spec, kind)
     return lspec, espec, notes
 
 
@@ -177,6 +179,8 @@ def analyse_life_cycle(res: Any) -> dict[str, Any]:
     if e["unknown"]:
         for k in ("co2e_per_flight_hour_kg", "life_cycle_co2e_kg"):
             out[k] = {"lo": out[k].get("lo"), "hi": None}
+    from .native_disciplines import open_unaccounted
+    open_unaccounted(out, espec)
     out.update({"level": LEVEL, "adapter_notes": notes})
     return out
 
