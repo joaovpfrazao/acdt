@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import shutil
 import subprocess
 from pathlib import Path
@@ -42,6 +43,15 @@ DOCUMENTED_WAKE = {
     "FixedWakeFlag": 0,
     "ImplicitWake": 0,
 }
+
+# OpenVSP_3.56.0, src/vsp_aero/Solver/VSP_Solver.C, the steady wake loop:
+# log10(MaxResidual_) <= log10(0.001 * NonLinearConvergenceFactor_) sets Converged.
+# NonLinearConvergenceFactor_ starts at 1. VSPAEROMgr.cpp Init of that parm is also 1,
+# and WakeNumIter Init is (default 5, lower 3, upper 255).
+# OutputStatusFile writes log10(MaxResidual_) in the history column "Max Residual".
+RESIDUAL_BASE = 0.001
+NONLINEAR_FACTOR_DEFAULT = 1.0
+WAKE_ITER_UPPER = 255
 
 # Ceiling carried from the thin-lattice record. Not a measurement of the panel mesh.
 RAM_ESTIMATE_GB = 0.8
@@ -116,28 +126,71 @@ def _reported_ratio(hifi, lowfi):
     return ratio, bool(lo <= ratio <= hi)
 
 
-def wake_residual_note(rows: list[dict]) -> dict:
-    """Five default wake iterations are not a converged solution.
+def max_residual_limit(factor: float = NONLINEAR_FACTOR_DEFAULT):
+    """``log10(0.001 * factor)``. A non-positive factor does not become a limit."""
+    if isinstance(factor, bool) or not isinstance(factor, (int, float)):
+        return None
+    if not math.isfinite(factor) or factor <= 0.0:
+        return None
+    return math.log10(RESIDUAL_BASE * float(factor))
 
-    No cited stop criterion is applied as a pass. ``converged`` stays false.
+
+def wake_residual_note(rows: list[dict], *, factor: float = NONLINEAR_FACTOR_DEFAULT,
+                       wake_iters_requested: int | None = None) -> dict:
+    """Apply the OpenVSP 3.56.0 wake stop, not a stand-in.
+
+    ``converged`` is true only when the last finite ``Max Residual`` column is at or
+    below ``log10(0.001 * NonLinearConvergenceFactor)``. A missing column stays missing.
+    Reaching ``WakeNumIter`` without that inequality is not convergence.
     """
     last = rows[-1] if rows else None
     prev = rows[-2] if len(rows) >= 2 else None
     l2_last = _num(last, "L2_Residual")
     l2_prev = _num(prev, "L2_Residual")
+    max_last = _num(last, "Max_Residual")
     cl_last = _num(last, "CLtot")
     cl_prev = _num(prev, "CLtot")
+    limit = max_residual_limit(factor)
+    converged = bool(max_last is not None and limit is not None and max_last <= limit)
+    hit_cap = bool(
+        wake_iters_requested is not None and len(rows) >= int(wake_iters_requested) and not converged)
+    if max_last is None:
+        reason = "a coluna Max Residual não tem valor finito; o critério não é avaliado e não é um passa"
+    elif limit is None:
+        reason = "o factor não linear não é positivo e finito; o critério não é avaliado"
+    elif converged:
+        reason = (
+            "log10(MaxResidual) da última linha cumpre "
+            "log10(MaxResidual_) <= log10(0.001*NonLinearConvergenceFactor_) "
+            "(VSP_Solver.C, etiqueta OpenVSP_3.56.0)"
+        )
+    elif hit_cap:
+        reason = (
+            f"WakeNumIter pedido {wake_iters_requested} esgotou-se e log10(MaxResidual) "
+            f"{max_last} continua acima de {limit}. O solver não declarou convergência."
+        )
+    else:
+        reason = (
+            f"log10(MaxResidual) {max_last} está acima de {limit}. "
+            "O critério de VSP_Solver.C não está cumprido."
+        )
     return {
-        "converged": False,
-        "iterative_ok": False,
+        "converged": converged,
+        "iterative_ok": converged,
         "n_rows": len(rows),
         "L2_last": l2_last,
         "L2_previous": l2_prev,
-        "dCL_last_step": None if cl_last is None or cl_prev is None else cl_last - cl_prev,
-        "reason": (
-            "WakeNumIter fica no default 5. O residual L2 da última iteração ainda muda. "
-            "Não há critério de paragem citado que declare esta corrida convergida."
+        "Max_last": max_last,
+        "limit_log10": limit,
+        "factor": None if limit is None else float(factor),
+        "wake_iters_requested": wake_iters_requested,
+        "hit_iteration_cap": hit_cap,
+        "criterion": (
+            "OpenVSP_3.56.0 src/vsp_aero/Solver/VSP_Solver.C: "
+            "log10(MaxResidual_) <= log10(0.001*NonLinearConvergenceFactor_)"
         ),
+        "dCL_last_step": None if cl_last is None or cl_prev is None else cl_last - cl_prev,
+        "reason": reason,
     }
 
 
@@ -200,8 +253,32 @@ def compare_with_avl(last: dict | None, avl: dict, *, iterative_ok: bool = False
             stored["reported_ratio"] = dec["reported_ratio"]
             stored["reported_ratio_inside_band"] = dec["reported_ratio_inside_band"]
         factors.append(stored)
+    band_lo, band_hi = H1_RATIO_BAND
+    inside = []
+    for dec in (cl, cm):
+        ratio = dec.get("ratio")
+        if isinstance(ratio, (int, float)) and not isinstance(ratio, bool) and band_lo <= float(ratio) <= band_hi:
+            inside.append(str(dec["quantity"]))
+    if not iterative_ok:
+        calibracao = "nao_aplicar"
+        calibracao_nota = "o residual da esteira não cumpre o critério do solver; não se propõe calibração"
+    elif not inside:
+        calibracao = "nao_aplicar"
+        calibracao_nota = (
+            "o residual cumpre o critério e nenhuma razão de CL ou de Cm está na banda; "
+            "não se propõe calibração"
+        )
+    else:
+        calibracao = "calibrar"
+        calibracao_nota = (
+            "proposta apenas para " + ", ".join(inside)
+            + ": o residual cumpre o critério e a razão está na banda. "
+            "Um α e sem GCI: o factor não se aplica e o yaml não muda."
+        )
     return {
         "overall": "nao_aplicar",
+        "calibracao": calibracao,
+        "calibracao_nota": calibracao_nota,
         "valid": False,
         "applied": False,
         "model_L1": "nao_aplicar",
@@ -219,9 +296,17 @@ def compare_with_avl(last: dict | None, avl: dict, *, iterative_ok: bool = False
     }
 
 
-def thick_vspaero_block(ref: dict, state: dict, x_ref: float, alpha_deg: float, ncpu: int = 4) -> dict:
-    """Case block for ``vsp_build``. StallModel stays 0 inside the build script."""
-    return {
+def thick_vspaero_block(ref: dict, state: dict, x_ref: float, alpha_deg: float, ncpu: int = 4,
+                        wake_num_iter: int | None = None, timeout_s: int | None = None) -> dict:
+    """Case block for ``vsp_build``. StallModel stays 0 inside the build script.
+
+    ``wake_num_iter`` replaces only ``WakeNumIter``. The other wake fields stay the live
+    default. The parm upper bound on OpenVSP 3.56.0 is 255.
+    """
+    wake = dict(DOCUMENTED_WAKE)
+    if wake_num_iter is not None:
+        wake["WakeNumIter"] = int(wake_num_iter)
+    block = {
         "surface": "thick",
         "alpha_deg": float(alpha_deg),
         "mach": float(state["Mach"]),
@@ -233,8 +318,34 @@ def thick_vspaero_block(ref: dict, state: dict, x_ref: float, alpha_deg: float, 
         "zcg": 0.0,
         "re_cref": float(state["Re_Cref"]),
         "ncpu": int(ncpu),
-        "wake": dict(DOCUMENTED_WAKE),
+        "wake": wake,
     }
+    if timeout_s is not None:
+        block["timeout_s"] = int(timeout_s)
+    return block
+
+
+def nonlinear_factor_from_case(work: Path) -> tuple[float | None, str | None]:
+    """Read ``NonLinearConvergenceFactor`` from a ``.vspaero`` case. Absent → ``(None, None)``."""
+    for path in sorted(Path(work).rglob("*.vspaero")):
+        if not path.is_file() or path.stat().st_size > 5_000_000:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for line in text.splitlines():
+            if not line.strip().startswith("NonLinearConvergenceFactor"):
+                continue
+            tokens = line.replace("=", " ").split()
+            for token in tokens[1:]:
+                try:
+                    value = float(token)
+                except ValueError:
+                    continue
+                if math.isfinite(value) and value > 0.0:
+                    return value, path.name
+    return None, None
 
 
 def write_iteration_csv(path: Path, rows: list[dict]) -> None:
@@ -292,7 +403,20 @@ def _last_numbers(row: dict | None) -> dict:
     return out
 
 
-def run_thick_panel(work: Path, dest: Path, *, today: str) -> dict:
+def _requested_iters(inputs: dict, fallback: int) -> int | None:
+    raw = inputs.get("WakeNumIter")
+    if isinstance(raw, list) and raw:
+        raw = raw[0]
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return fallback
+    if isinstance(raw, float) and not raw.is_integer():
+        return fallback
+    return int(raw)
+
+
+def run_thick_panel(work: Path, dest: Path, *, today: str, wake_num_iter: int | None = None,
+                    result_json: str | None = None, result_csv: str | None = None,
+                    timeout_s: int | None = None) -> dict:
     """Run the coarse thick panel and the AVL card. Write JSON and CSV under ``dest``.
 
     Mesh files stay in ``work``. The example YAML is not edited. A budget refusal
@@ -328,7 +452,10 @@ def run_thick_panel(work: Path, dest: Path, *, today: str) -> dict:
         "windows_openvsp": True,
         "surface": "thick",
         "stall_model": 0,
+        "veredicto": "nao_avaliado",
         "documented_wake_requested": dict(DOCUMENTED_WAKE),
+        "wake_requested": dict(DOCUMENTED_WAKE, WakeNumIter=(
+            int(wake_num_iter) if wake_num_iter is not None else DOCUMENTED_WAKE["WakeNumIter"])),
         "prior_panel_failure": {
             "source": "examples/output/uav150_flying_wing_tailless_hifi_win/h7_openvsp.json",
             "openvsp": "OpenVSP 3.48.2",
@@ -389,8 +516,10 @@ def run_thick_panel(work: Path, dest: Path, *, today: str) -> dict:
             "note": "O cartão de quatro secções do estudo de controlos é outra discretização e não entra nesta comparação.",
         },
     }
-    json_path = dest / RESULT_JSON
-    csv_path = dest / RESULT_CSV
+    json_name = result_json or RESULT_JSON
+    csv_name = result_csv or RESULT_CSV
+    json_path = dest / json_name
+    csv_path = dest / csv_name
     if not guard.run_here:
         base["vspaero_run"] = False
         base["model_note"] = "A guarda de 70 % da RAM livre recusou a corrida. Não há coeficientes."
@@ -406,8 +535,18 @@ def run_thick_panel(work: Path, dest: Path, *, today: str) -> dict:
         write_iteration_csv(csv_path, [])
         return base
     spec = flying_wing_vsp_spec(surf, "wing")
-    spec["vspaero"] = thick_vspaero_block(ref, state, x_ref, avl["alpha_deg"])
-    info = export_vsp(spec, work, "wing")
+    spec["vspaero"] = thick_vspaero_block(
+        ref, state, x_ref, avl["alpha_deg"], wake_num_iter=wake_num_iter, timeout_s=timeout_s)
+    try:
+        info = export_vsp(spec, work, "wing", timeout=float(timeout_s or 600))
+    except (RuntimeError, subprocess.TimeoutExpired) as exc:
+        base["vspaero_run"] = False
+        base["veredicto"] = "nao_avaliado"
+        base["model_note"] = f"o OpenVSP não acabou ({type(exc).__name__}). Não há coeficientes."
+        base["comparison"] = compare_with_avl(None, avl, iterative_ok=False)
+        json_path.write_text(json.dumps(base, indent=1, ensure_ascii=False), encoding="utf-8")
+        write_iteration_csv(csv_path, [])
+        return base
     comp = info["compgeom"]
     solved = comp.get("vspaero") or {}
     history_path = work / "wing.history"
@@ -418,14 +557,18 @@ def run_thick_panel(work: Path, dest: Path, *, today: str) -> dict:
     parsed = parse_history(history_text)
     rows = parsed["rows"]
     missing = [key for key in COEFFICIENTS if rows and key not in rows[0]]
-    residual = wake_residual_note(rows)
+    factor, factor_file = nonlinear_factor_from_case(work)
+    factor_used = NONLINEAR_FACTOR_DEFAULT if factor is None else factor
+    requested = _requested_iters(solved.get("inputs") or {}, wake_num_iter or DOCUMENTED_WAKE["WakeNumIter"])
+    residual = wake_residual_note(rows, factor=factor_used, wake_iters_requested=requested)
+    residual["factor_source"] = factor_file or "omissão 1 de VSP_Solver.C; o caso não trouxe o factor"
     tokens = rows[-1] if rows and not missing else None
     bad = nonfinite_columns(tokens)
     last = None if bad else tokens
     comparison = compare_with_avl(last, {
         "CL": avl.get("CL"), "CDff": avl.get("CDff"),
         "Cmtot": avl.get("Cmtot"), "CDtot": avl.get("CDtot"),
-    }, iterative_ok=False)
+    }, iterative_ok=bool(residual["iterative_ok"]) and not bad and not missing)
     inputs = solved.get("inputs") or {}
     base.update({
         "vspaero_run": True,
@@ -468,6 +611,7 @@ def run_thick_panel(work: Path, dest: Path, *, today: str) -> dict:
     if bad or solved.get("returncode") not in (0, None) or not rows or missing or solved.get("returncode") is None:
         base["decision"] = "nao_aplicar"
         base["model_L1"] = "nao_aplicar"
+        base["veredicto"] = "nao_avaliado"
         if solved.get("stderr_tail"):
             base["stderr_tail"] = solved.get("stderr_tail")
         if bad:
@@ -484,6 +628,7 @@ def run_thick_panel(work: Path, dest: Path, *, today: str) -> dict:
     elif solved.get("returncode") == 0:
         base["decision"] = "nao_aplicar"
         base["model_L1"] = "nao_aplicar"
+        base["veredicto"] = comparison.get("calibracao") if residual.get("converged") else "nao_aplicar"
     base["estimate"]["geometry_wall_s"] = solved.get("geometry_wall_s")
     base["estimate"]["solver_wall_s"] = solved.get("sweep_wall_s")
     json_path.write_text(json.dumps(base, indent=1, ensure_ascii=False), encoding="utf-8")
