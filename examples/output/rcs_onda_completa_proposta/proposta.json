@@ -1,0 +1,143 @@
+{
+ "date": "2026-11-18",
+ "branch": "rcs-onda-completa-proposta",
+ "kind": "proposta",
+ "ran": false,
+ "decision": "nao_aplicar",
+ "valid": false,
+ "applied": false,
+ "model_L1": "nao_avaliado",
+ "example_yaml_edited": false,
+ "mesh": {
+  "po_facets_are_not_the_grid": true,
+  "fdtd_cells": null,
+  "fdtd_cells_status": "nao_avaliado",
+  "domain_m": null,
+  "grid": {
+   "freq_Hz": 10000000000.0,
+   "c_m_s": 299792458.0,
+   "lambda_m": 0.0299792458,
+   "cells_per_wavelength": 10,
+   "cells_per_wavelength_status": "PRESSUPOSTO",
+   "cells_per_wavelength_note": "PRESSUPOSTO: dez células por comprimento de onda é uma grelha de trabalho para FDTD. Não é uma citação de convergência e não foi corrida.",
+   "dx_m": 0.0029979245799999998
+  },
+  "why": "Sem caixa de cálculo e sem o sólido que o PO deixa por avaliar (fuselagem, derivas, trem, hélice), a contagem de células fica em falta."
+ },
+ "solver": {
+  "name": "openEMS",
+  "license": "GPL-3.0",
+  "process": "executável externo",
+  "imported_by_acdt": false,
+  "started": false,
+  "source": "THIRD_PARTY.md",
+  "mom_mlfmm_binary": null,
+  "mom_note": "core/em/po.py nomeia MoM/MLFMM como classe de onda completa. Não há binário escolhido nem instalado."
+ },
+ "cost": {
+  "ram_GB": null,
+  "cpu_h": null,
+  "status": "nao_avaliado",
+  "gate": "tools.budget recusa memória acima de 70 % da RAM livre ou tempo acima de 45 min. A estimativa de 0,05 GB do PO não é o custo FDTD.",
+  "why": "Sem malha de onda completa não se inventa GB nem horas.",
+  "pressuposto": null
+ },
+ "lower_level": {
+  "source": "examples/output/uav150_flying_wing_tailless_hifi_win/h6_rcs_bounces2.json",
+  "method": "Physical Optics",
+  "vv_mean_dbsm_one_bounce": -10.03090814653696,
+  "vv_mean_dbsm_two_bounces": -7.490945627876502,
+  "full_wave_in_that_file": {
+   "status": "proposta",
+   "ran": false,
+   "candidates": "MoM/MLFMM ou FDTD",
+   "reason": "O processo acdt não tem um solver de onda completa. O PO não o substitui."
+  },
+  "same_as_full_wave": false
+ },
+ "comparison": {
+  "overall": "nao_aplicar",
+  "valid": false,
+  "applied": false,
+  "model_L1": "nao_avaliado",
+  "recomputed": false,
+  "rows": [
+   {
+    "quantity": "frontal_mean_rcs_dbsm",
+    "hifi": null,
+    "lower_level": -7.490945627876502,
+    "lower_method": "PO, duas reflexões, VV",
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "A média do PO não é uma RCS de onda completa. Não se forma razão."
+   },
+   {
+    "quantity": "measured_rcs",
+    "hifi": null,
+    "lower_level": null,
+    "lower_method": null,
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Não há RCS medido no repositório. Em falta não é zero."
+   }
+  ],
+  "model_note": "O PO não fica validado nem calibrado por uma proposta que não correu. nao_avaliado não é aprovação. O yaml não muda."
+ },
+ "tarefas": [
+  {
+   "task": 1,
+   "pr": 23,
+   "branch": "win-openvsp-esteira",
+   "state": "integrado",
+   "merged": true,
+   "verdict": "nao_aplicar",
+   "model": "L1 AVL nao_avaliado como validação: nao_aplicar, sem calibração",
+   "blocked": null
+  },
+  {
+   "task": 2,
+   "pr": 24,
+   "branch": "pycycle-sem-ajuste",
+   "state": "aberto",
+   "merged": false,
+   "verdict": "nao_aplicar",
+   "model": "L0 nao_aplicar; L1 nao_avaliado, deck ausente",
+   "blocked": "O deck termodinâmico L1 não existe. O gráfico final não correu."
+  },
+  {
+   "task": 3,
+   "pr": 25,
+   "branch": "c172-rans-asa-fuselagem",
+   "state": "aberto",
+   "merged": false,
+   "verdict": "nao_aplicar",
+   "model": "L1 nao_avaliado",
+   "blocked": "21,731 GB e 40,24 h. Na primeira medição havia 16,32 GB livres, limite 11,42 GB, e 2415 min contra 45 min. Nova leitura: 16,34 GB livres de 31,86 GB, limite 11,44 GB. O solver não arrancou. Não se engrossou a malha."
+  },
+  {
+   "task": 4,
+   "pr": 26,
+   "branch": "termico-gelo-proposta",
+   "state": "aberto",
+   "merged": false,
+   "verdict": "nao_aplicar",
+   "model": "L0 e L1 nao_avaliado",
+   "blocked": "Pedido só como proposta. Não há sólido da baía nem malha de acreção."
+  },
+  {
+   "task": 5,
+   "pr": 27,
+   "branch": "rcs-onda-completa-proposta",
+   "state": "aberto",
+   "merged": false,
+   "verdict": "nao_aplicar",
+   "model": "L1 PO nao_avaliado face à onda completa",
+   "blocked": "Pedido só como proposta. O openEMS não arrancou e não há contagem de células."
+  }
+ ],
+ "csv": "proposta.csv"
+}
