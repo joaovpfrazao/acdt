@@ -1,0 +1,396 @@
+{
+ "design": "cessna172_check",
+ "date": "2026-11-19",
+ "branch": "c172-rans-malha-um-angulo",
+ "parent": "e9726e401e75fe7a04ebe97ca0e20940d811bddc",
+ "decision": "nao_aplicar",
+ "valid": false,
+ "applied": false,
+ "model_L1": "nao_avaliado",
+ "example_yaml_edited": false,
+ "veredicto": "nao_aplicar",
+ "solver_started": true,
+ "mesh_written": true,
+ "solid": "wing+fuselage",
+ "imported_by_acdt": false,
+ "mpiexec": false,
+ "alphas_planned_deg": [
+  0.0,
+  2.0,
+  4.0
+ ],
+ "alpha_run_deg": 0.0,
+ "alphas_not_run_deg": [
+  2.0,
+  4.0
+ ],
+ "prior_record": "examples/output/cessna172_check_hifi_win/h5_c172_rans_asa_fuselagem.json",
+ "prior_not_rewritten": true,
+ "prism_layers": 0,
+ "prism_note": "Não há camada de prismas. O caso de 42 camadas e 12,07 milhões de células continua no registo anterior e não foi repetido.",
+ "disk_free_GB": 196.33232498168945,
+ "ram_available_at_launch_GB": 17.346675872802734,
+ "ram_limit_GB": 12.142673110961914,
+ "reference": {
+  "mac_m": 1.3802602464351699,
+  "s_full_m2": 13.660387635922797,
+  "s_half_m2": 6.830193817961399,
+  "s_half_note": "A referência é a meia área da asa, como no Euler de meia asa.",
+  "semispan_m": 4.999850935151839,
+  "x_ref_m": 0.40178808543489536,
+  "x_ref_source": "wing_x_ac, o mesmo x_ac do modelo AVL",
+  "mach_freestream": 0.1897270299056677,
+  "mach_note": "Abaixo de 0,15 o deck sobe a 0,15, como o RANS 2D. O valor pedido fica aqui.",
+  "re_mac": 4872545.763974179,
+  "cruise_altitude_m": 2438.4,
+  "cruise_speed_m_s": 62.76222222222223,
+  "alpha_deg": 0.0,
+  "alpha_note": "α = 0° é o primeiro dos três ângulos já nomeados no caso RANS (0, 2, 4). Não é um α de cruzeiro equilibrado. Os outros dois não correm."
+ },
+ "l1_polar_scalars": {
+  "CD0": 0.038553184542287705,
+  "K": 0.04690767531165392,
+  "CLmax_clean": 1.5417729619233995
+ },
+ "wetted_L0_m2": {
+  "wing": 24.15070316215019,
+  "fuselage": 23.76638986223826
+ },
+ "comparison_l1": {
+  "overall": "nao_aplicar",
+  "valid": false,
+  "applied": false,
+  "model_L1": "nao_avaliado",
+  "model_note": "A polar L1 fica registada à parte e não é calibrada. nao_avaliado não é aprovação. O yaml não muda.",
+  "rows": [
+   {
+    "quantity": "CL",
+    "hifi": null,
+    "L1": null,
+    "published": null,
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Não há coeficiente RANS. Em falta não é zero."
+   },
+   {
+    "quantity": "CD",
+    "hifi": null,
+    "L1": null,
+    "published": null,
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Não há coeficiente RANS. Em falta não é zero."
+   },
+   {
+    "quantity": "Cm",
+    "hifi": null,
+    "L1": null,
+    "published": null,
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Não há coeficiente RANS. Em falta não é zero."
+   }
+  ],
+  "l1_polar": {
+   "CD0": 0.038553184542287705,
+   "K": 0.04690767531165392,
+   "CLmax_clean": 1.5417729619233995,
+   "method": "Raymer Eq. 12.5 (CD = CD0 + K CL²) e Eq. 12.15 (CLmax limpo)",
+   "same_as_rans_polar": false,
+   "why": "CD0, K e CLmax limpo não são CL, CD e Cm de um ângulo da malha de asa e fuselagem. Não se forma razão."
+  },
+  "published_polar": {
+   "present": false,
+   "status": "nao_avaliado",
+   "requirements_in_the_example": [],
+   "absent": [
+    "CL(alpha)",
+    "CD(alpha)",
+    "Cm(alpha)"
+   ],
+   "why": "O exemplo cita o POH 172S para velocidade, perda, subida e distâncias. Não há, no repositório, uma tabela publicada de CL, CD e Cm deste avião em função do ângulo."
+  }
+ },
+ "tails": "omitted",
+ "fuselage_note": "O corpo é o POD do OpenVSP (comprimento e finura), não um loft do C172. É a geometria já declarada em geometry.py.",
+ "vsp_version": "OpenVSP 3.56.0",
+ "len_unit": {
+  "STEPSettings": 2.0,
+  "IGESSettings": 2.0
+ },
+ "component_names": [
+  "Fuselage",
+  "Wing",
+  "MeshGeom"
+ ],
+ "tails_present_in_compgeom": false,
+ "cell_caps": {
+  "run_here": true,
+  "cell_cap": 124233.12883435584,
+  "binding": "measured_rate_time",
+  "reason": "o tecto é measured_rate_time",
+  "limit_GB": 12.142673110961914,
+  "by_formula_ram": 6745929.506089953,
+  "by_workset_ram": 2088523.066900914,
+  "by_time": 124233.12883435584,
+  "workset_factor": 3.23,
+  "workset_factor_note": "PRESSUPOSTO: 3,23 é o conjunto de trabalho da malha hex da asa voadora dividido pela fórmula de 1,8 kB/célula. Não foi medido nesta malha.",
+  "measured_rate_s": 1.63e-05,
+  "measured_rate_note": "PRESSUPOSTO: 1,63e-5 s/célula/iteração por thread é a taxa dessa malha hex. Não foi medida nesta malha de tetraedros."
+ },
+ "mesh": {
+  "cells": 59958,
+  "h_m": 0.17253253080439623,
+  "farfield_c": 12.0,
+  "markers": {
+   "aircraft": 8,
+   "symmetry": 1,
+   "farfield": 5
+  },
+  "guard": {
+   "run_here": true,
+   "reasons": [],
+   "ram_formula_GB": 0.1079244,
+   "ram_workset_GB": 0.348595812,
+   "time_min_measured_rate": 21.71812,
+   "cells": 59958,
+   "limit_GB": 12.153402328491211,
+   "caps": {
+    "run_here": true,
+    "cell_cap": 124233.12883435584,
+    "binding": "measured_rate_time",
+    "reason": "o tecto é measured_rate_time",
+    "limit_GB": 12.153402328491211,
+    "by_formula_ram": 6751890.182495117,
+    "by_workset_ram": 2090368.477552668,
+    "by_time": 124233.12883435584,
+    "workset_factor": 3.23,
+    "workset_factor_note": "PRESSUPOSTO: 3,23 é o conjunto de trabalho da malha hex da asa voadora dividido pela fórmula de 1,8 kB/célula. Não foi medido nesta malha.",
+    "measured_rate_s": 1.63e-05,
+    "measured_rate_note": "PRESSUPOSTO: 1,63e-5 s/célula/iteração por thread é a taxa dessa malha hex. Não foi medida nesta malha de tetraedros."
+   },
+   "n_threads": 6,
+   "iters": 8000,
+   "n_alpha": 1,
+   "max_time_min": 45.0
+  },
+  "prism_layers": 0
+ },
+ "chunks": [
+  {
+   "iter_target": 400,
+   "returncode": 0,
+   "wall_s": 22.20555520011112,
+   "history_rows": 400,
+   "last_iter": 399.0,
+   "peak_working_set_GB": 0.12470626831054688,
+   "ram_available_GB": 17.374710083007812
+  },
+  {
+   "iter_target": 800,
+   "returncode": 0,
+   "wall_s": 40.38808450009674,
+   "history_rows": 800,
+   "last_iter": 799.0,
+   "peak_working_set_GB": 0.12481689453125,
+   "ram_available_GB": 17.35822296142578
+  },
+  {
+   "iter_target": 1200,
+   "returncode": 0,
+   "wall_s": 60.60601809993386,
+   "history_rows": 1200,
+   "last_iter": 1199.0,
+   "peak_working_set_GB": 0.1248931884765625,
+   "ram_available_GB": 17.378578186035156
+  },
+  {
+   "iter_target": 1600,
+   "returncode": 0,
+   "wall_s": 82.81049750000238,
+   "history_rows": 1600,
+   "last_iter": 1599.0,
+   "peak_working_set_GB": 0.12487411499023438,
+   "ram_available_GB": 17.410297393798828
+  },
+  {
+   "iter_target": 2000,
+   "returncode": 0,
+   "wall_s": 100.9167109997943,
+   "history_rows": 2000,
+   "last_iter": 1999.0,
+   "peak_working_set_GB": 0.12476730346679688,
+   "ram_available_GB": 17.362300872802734
+  },
+  {
+   "iter_target": 2400,
+   "returncode": 0,
+   "wall_s": 113.10224669985473,
+   "history_rows": 2400,
+   "last_iter": 2399.0,
+   "peak_working_set_GB": 0.12487411499023438,
+   "ram_available_GB": 17.38782501220703
+  },
+  {
+   "iter_target": 2800,
+   "returncode": 0,
+   "wall_s": 139.32280870014802,
+   "history_rows": 2800,
+   "last_iter": 2799.0,
+   "peak_working_set_GB": 0.12467193603515625,
+   "ram_available_GB": 17.444316864013672
+  },
+  {
+   "iter_target": 3200,
+   "returncode": 0,
+   "wall_s": 159.41899710008875,
+   "history_rows": 3200,
+   "last_iter": 3199.0,
+   "peak_working_set_GB": 0.1248626708984375,
+   "ram_available_GB": 17.365398406982422
+  },
+  {
+   "iter_target": 3600,
+   "returncode": 0,
+   "wall_s": 171.58487479994074,
+   "history_rows": 3600,
+   "last_iter": 3599.0,
+   "peak_working_set_GB": 0.1245880126953125,
+   "ram_available_GB": 17.400894165039062
+  },
+  {
+   "iter_target": 4000,
+   "returncode": 0,
+   "wall_s": 197.86086999997497,
+   "history_rows": 4000,
+   "last_iter": 3999.0,
+   "peak_working_set_GB": 0.12470626831054688,
+   "ram_available_GB": 17.40854263305664
+  },
+  {
+   "iter_target": 4400,
+   "returncode": 0,
+   "wall_s": 216.0963472002186,
+   "history_rows": 4400,
+   "last_iter": 4399.0,
+   "peak_working_set_GB": 0.12479400634765625,
+   "ram_available_GB": 17.403133392333984
+  },
+  {
+   "iter_target": 4800,
+   "returncode": 0,
+   "wall_s": 242.33216530038044,
+   "history_rows": 4800,
+   "last_iter": 4799.0,
+   "peak_working_set_GB": 0.12476348876953125,
+   "ram_available_GB": 16.716445922851562
+  },
+  {
+   "iter_target": 5200,
+   "returncode": 0,
+   "wall_s": 262.62507890025154,
+   "history_rows": 5200,
+   "last_iter": 5199.0,
+   "peak_working_set_GB": 0.1248016357421875,
+   "ram_available_GB": 16.943832397460938
+  },
+  {
+   "iter_target": 5600,
+   "returncode": 0,
+   "wall_s": 297.02868360001594,
+   "history_rows": 5600,
+   "last_iter": 5599.0,
+   "peak_working_set_GB": 0.12479400634765625,
+   "ram_available_GB": 16.910839080810547
+  },
+  {
+   "iter_target": 6000,
+   "returncode": 0,
+   "wall_s": 313.07709509972483,
+   "history_rows": 6000,
+   "last_iter": 5999.0,
+   "peak_working_set_GB": 0.1248016357421875,
+   "ram_available_GB": 17.31561279296875
+  },
+  {
+   "iter_target": 6400,
+   "returncode": 0,
+   "wall_s": 304.98327710013837,
+   "history_rows": 6400,
+   "last_iter": 6399.0,
+   "peak_working_set_GB": 0.12491226196289062,
+   "ram_available_GB": 18.000823974609375
+  }
+ ],
+ "iterative_ok": false,
+ "stop_reason": "o tempo de 45 min esgotou-se antes do bloco seguinte",
+ "last_iteration": {
+  "Time_Iter": 0.0,
+  "Outer_Iter": 0.0,
+  "Inner_Iter": 6399.0,
+  "rms[Rho]": -2.201483822,
+  "rms[RhoU]": 0.03373976506,
+  "rms[RhoV]": -0.2863818207,
+  "rms[RhoW]": -0.196501202,
+  "rms[RhoE]": 3.240854799,
+  "rms[nu]": -7.36252804,
+  "RefForce": 13925.34323,
+  "CD": 0.0512305491,
+  "CL": 0.03290901283,
+  "CSF": 0.125232253,
+  "CMx": 0.03093976844,
+  "CMy": -0.02571885832,
+  "CMz": 0.1484686677,
+  "CFx": 0.0512305491,
+  "CFy": 0.125232253,
+  "CFz": 0.03290901283,
+  "CEff": 0.6423708785,
+  "Buffet": null
+ },
+ "comparison_rows": [
+  {
+   "quantity": "CL",
+   "hifi": 0.03290901283,
+   "column": "CL",
+   "L1": null,
+   "ratio": null,
+   "same_quantity": false,
+   "decision": "nao_aplicar",
+   "status": "nao_avaliado",
+   "iterative_ok": false,
+   "why": "O critério de Cauchy do deck não foi cumprido. O número fica registado e não valida o L1."
+  },
+  {
+   "quantity": "CD",
+   "hifi": 0.0512305491,
+   "column": "CD",
+   "L1": null,
+   "ratio": null,
+   "same_quantity": false,
+   "decision": "nao_aplicar",
+   "status": "nao_avaliado",
+   "iterative_ok": false,
+   "why": "O critério de Cauchy do deck não foi cumprido. O número fica registado e não valida o L1."
+  },
+  {
+   "quantity": "Cm",
+   "hifi": -0.02571885832,
+   "column": "CMy",
+   "L1": null,
+   "ratio": null,
+   "same_quantity": false,
+   "decision": "nao_aplicar",
+   "status": "nao_avaliado",
+   "iterative_ok": false,
+   "why": "O critério de Cauchy do deck não foi cumprido. O número fica registado e não valida o L1."
+  }
+ ],
+ "model_note": "o tempo de 45 min esgotou-se antes do bloco seguinte. Os coeficientes, se existirem, não validam o L1.",
+ "path_leak": false
+}
