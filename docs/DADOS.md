@@ -230,3 +230,23 @@ Por fazer, por ordem:
 4. **Unidades declaradas para as chaves sem sufixo** no `result.json` (coeficientes como adimensional `"1"`,
    velocidades `*_eas` em m/s EAS), por um mapa de chaves no domínio e não por adivinhação.
 5. Leitura de YAML com unidades nas restantes entradas (`acdt mdo`/`uq` specs, bases de componentes).
+
+## Blocos de MDO, V&V e L3 (19 nov 2026)
+
+Os itens 1 a 3 da lista anterior têm comando. Os itens 4 e 5 continuam por fazer. Os comandos não calculam um avião: copiam escalares finitos que o ficheiro já traz. Um valor em falta não entra. `nao_avaliado` e `desconhecido` não trazem erro e não contam como `passa`.
+
+```text
+acdt db add-mdo design.json mdo.json
+acdt db add-vv design.json vv_report.json
+acdt db add-hifi design.json pasta_hifi
+acdt db add-hifi design.json fem_results.json --step fem
+```
+
+Uma pasta serve quando contém `mdo.json`, `vv_report.json` ou um dos JSON de passo listados abaixo. Um ficheiro hifi avulso exige `--step`.
+
+* **MDO** (`acdt.mdo/1` → `results.mdo.L2`, fonte `acdt mdo`). PRESSUPOSTO: L2 é a casa pedida na lista acima, não uma análise aerodinâmica L2. Entram `n_evaluations`, `n_failed`, `n_feasible` e `n_pareto` (o comprimento da lista). Os identificadores da frente ficam no `mdo.json`. O projeto `chosen` copia `objetivo.<métrica>` e `x.<caminho>`. Sem projeto escolhido, objetivos e variáveis não são escritos: não se inventa um ótimo e não se escreve zero. As variáveis finitas vão também para `definition.derived.mdo`, ao lado de `definition.input`, que não é substituído. A unidade é a do sufixo do nome (`unit_from_key`). Sem sufixo reconhecido a unidade fica não declarada (`null`), nunca adimensional por omissão. Um zero que o registo declara (por exemplo `n_failed: 0`) é copiado; um objetivo ausente não vira zero.
+* **V&V** (`acdt.vv/1` → um bloco `results.vv.L0`, fonte `acdt vv`). PRESSUPOSTO: o esquema só tem L0…L3; este bloco é o relatório da framework, não a fidelidade do avião. O erro relativo é o `delta_rel` já gravado no relatório. Se a referência é zero, esse campo vem nulo e o estado não escreve zero. Uma linha `nao_avaliado` ou `desconhecido` não copia `delta` nem `delta_rel`.
+* **L3** (passos de `acdt hifi` → `results.<disciplina>.L3`, fonte `acdt hifi`). PRESSUPOSTO de pasta, não um mapa de coeficientes: `geometry` → geometria; `cfd2d`, `gci`, `wing_euler` e `rans_case` → aerodinâmica; `fem`, `nastran` e `nlgeom` → estruturas; `flutter` → aeroelasticidade; `detailed` → dimensionamento. `rans_case` só entra com `CL` finito. Uma estimativa de malha sem `CL` não cria bloco. O nome leva o passo (`fem.tip_w_fem_m`), para dois passos da mesma disciplina se juntarem. Um passo `skipped` não escreve números. Um passo sem disciplina declarada (a calibração, por exemplo) não cria bloco. `inf` não entra. Uma lista (o polar `CL`) não entra. A unidade é a do sufixo da folha: `cover_bay.bay` não herda MPa. O campo `evidence` fica com o último ficheiro; a evidência anterior fica nas `notes`, com o SHA-256.
+* `mdo` e `vv` não são disciplinas primárias de revisão, ao lado de `outros` e `calibracao`. Um L3 com nome de disciplina real entra na tabela de fidelidade. O `acdt db diff` já compara L1 e L3 quando os dois blocos existem. Estes comandos não lançam o VSPAERO, o CalculiX nem o pyCycle.
+
+Transcrição medida do ensaio analítico `tests/data/review_small` (o YAML de exemplo não foi editado; nada foi aplicado ao L1 ou ao L2): `examples/output/design_db_blocos/resultado.json`. O veredicto `validado` cobre só essa transcrição. A calibração é `nao_aplicar`. A comparação externa é `nao_aplicar`. A lista de desvios vazia não é um ensaio externo que passou. O excerto hifi desse ficheiro foi inventado para exercitar o escritor e, como resultado físico, fica `nao_avaliado`.

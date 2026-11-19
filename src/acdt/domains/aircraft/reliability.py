@@ -32,6 +32,11 @@ def _opts(spec: Any) -> dict[str, Any]:
     o = copy.deepcopy(DEFAULTS)
     user = (spec.assumptions.get("reliability") or {}) if isinstance(spec.assumptions, dict) else {}
     o.update(user)
+    from .native_disciplines import equipment_components
+    extra = equipment_components(spec)
+    if extra:
+        have = {str(c.get("id")) for c in (o.get("components") or []) if isinstance(c, dict)}
+        o["components"] = list(o.get("components") or []) + [c for c in extra if c["id"] not in have]
     return o
 
 
@@ -64,7 +69,8 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     notes.append(f"duração da missão: {'?' if t is None else f'{t:.3g} h'} ({src})")
     spec: dict[str, Any] = {k: copy.deepcopy(o.get(k)) for k in ("components", "rbd", "accept_assumptions",
                                                                  "preventive", "logistics", "utilization", "fleet",
-                                                                 "spares", "operating_cost", "labour_rate_per_h")
+                                                                 "spares", "operating_cost", "labour_rate_per_h",
+                                                                 "standby", "weibull")
                             if o.get(k) is not None}
     spec["schema"] = "acdt.reliability/1"
     spec["mission_duration_h"] = t

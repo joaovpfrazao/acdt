@@ -1,9 +1,10 @@
 # Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
-"""Relatórios automáticos de revisão de projeto (SRR, PDR, CDR; ``acdt report``; docs/RELATORIOS.md).
+"""Relatórios automáticos de revisão de projeto (SRR, PDR, CDR, MDR, TRR, PRR; ``acdt report``; docs/RELATORIOS.md).
 
-Critérios de entrada e de sucesso de NASA NPR 7123.1D, Apêndice G (Tabelas G-4, G-6, G-7), avaliados sobre o
-estado de projeto (``acdt.design/1``) e os registos à volta (verificação, proveniência, UQ, MDO, V&V,
-calibração). Veredito ``pronto`` / ``nao_pronto`` / ``insuficiente``; dados em falta nunca contam como cumpridos.
+Critérios de entrada e de sucesso de NASA NPR 7123.1D, Apêndice G (Tabelas G-4, G-5, G-6, G-7, G-8 e G-10),
+avaliados sobre o estado de projeto (``acdt.design/1``) e os registos à volta (verificação, proveniência, UQ,
+MDO, V&V, calibração). Veredito ``pronto`` / ``nao_pronto`` / ``insuficiente``; dados em falta nunca contam como
+cumpridos.
 """
 from __future__ import annotations
 

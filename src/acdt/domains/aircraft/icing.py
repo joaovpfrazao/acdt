@@ -4,8 +4,9 @@
 Etapa do pipeline depois da térmica. Constrói uma especificação genérica (:mod:`acdt.core.icing.study`) a partir do
 que o dimensionamento já calculou:
 
-* **condições**: os segmentos da missão exigida (altitude, velocidade, duração) quando o desempenho correu; senão
-  subida e cruzeiro do ponto de projeto (como na térmica). Só entram no varrimento os pontos dentro do envelope
+* **condições**: os segmentos da missão exigida (altitude, velocidade, duração) quando o desempenho correu ou, no
+  ciclo ``iterar``, quando a missão exigida acaba de ser calculada; senão subida e cruzeiro do ponto de projeto
+  (como na térmica). Só entram no varrimento os pontos dentro do envelope
   altitude–temperatura do Apêndice C;
 * **superfícies**: ``icing.surfaces`` do utilizador; sem isso asa (corda média aerodinâmica, t/c médio), estabilizador
   horizontal e vertical da configuração, **sem proteção** (d = 2 r_le, r_le = 1,1019 t² c — PRESSUPOSTO perfil NACA
@@ -27,7 +28,7 @@ from typing import Any
 
 from acdt.core.icing.study import analyse
 
-from .thermal import _f, _h_range, _segments, operating_points, with_load
+from .thermal import _f, _h_range, _segments, ensure_required_mission, operating_points, with_load
 
 LEVEL = "L0"
 DEFAULTS: dict[str, Any] = {
@@ -205,15 +206,17 @@ def size_with_icing(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]:
     sp = spec
     res = sysr = None
     converged = False
+    mission: dict[str, Any] = {"used": False, "source": "ciclo não arrancou"}
     for it in range(int(o["max_iter"])):
         res, sysr = run_fn(sp)
+        mission = ensure_required_mission(res)
         ic_spec, _n = build_spec(res, o)
         out = analyse(ic_spec)
         inc = coupling_increments(out, ic_spec, spec.propulsion_kind, str(o.get("power_schedule") or "exposicao"))
         new = {k: float(inc[k] or 0.0) for k in ("power_W", "mass_kg")}
         duty = float(inc["duty"])
         hist.append({"iter": it, "W0_kg": res.sizing.W0, **new, "duty": duty, "duty_note": inc["duty_note"],
-                     "not_coupled": inc["not_coupled"]})
+                     "not_coupled": inc["not_coupled"], "mission": mission})
         dif = max(abs(new[k] - cur[k]) / max(abs(new[k]), abs(cur[k]), 1e-9) for k in new) if any(
             new[k] or cur[k] for k in new) else 0.0
         if it > 0 and dif < float(o["tol"]):
@@ -234,6 +237,9 @@ def size_with_icing(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]:
             if new["power_W"] and getattr(spec, "systems", None):
                 sp.systems = with_load(spec.systems, ICE_LOAD_NAME, new["power_W"], duty, peak_w=new["power_W"])
     return res, sysr, {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ gelo",
+                       "mission": mission,
+                       "operating_point": "tabela de segmentos da missão exigida, quando a missão fecha; senão o "
+                                          "ponto de projeto (a falta fica em mission.source)",
                        "electrical_load": "propulsion.systems_power_W (+ P × ciclo) e systems.loads (ciclo = fração da "
                                           "missão em gelo, ou 1 sem durações; pico = P)"}
 
@@ -250,6 +256,11 @@ def icing_stage(res: Any) -> None:
         return
     try:
         out = analyse_icing(res)
+        from .native_disciplines import equipment_effect
+        eq = equipment_effect(res.spec)
+        if eq["present"]:
+            out.setdefault("adapter_notes", []).append(
+                "carga útil e arquitetura elétrica não têm superfície de gelo própria: não entram na captação")
     except Exception as ex:  # noqa: BLE001 — a etapa de gelo nunca parte o pipeline; fica desconhecido
         res.icing = _not_evaluated(f"falhou: {type(ex).__name__}: {ex}")
         res.issues.append(Issue("warning", f"gelo não avaliado: {type(ex).__name__}: {ex}"))

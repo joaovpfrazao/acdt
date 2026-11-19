@@ -132,6 +132,10 @@ def size_jet(spec: dict) -> dict:
     if "onboard" in spec:
         from acdt.domains.aircraft.onboard_bridge import apply_onboard_to_jet_spec
         spec, onboard_bridge_report = apply_onboard_to_jet_spec(spec)
+    from acdt.domains.aircraft.native_disciplines import DISC_KEYS
+    side = {k: spec[k] for k in DISC_KEYS if k in spec}
+    if side:
+        spec = {k: v for k, v in spec.items() if k not in side}
     required = {"configuration_id", "aircraft_class", "payload_kg", "crew_kg", "wing_area_m2",
                 "aspect_ratio", "mach", "altitude_m", "range_m", "thrust_sl_N", "n_engines", "mass_bounds_kg"}
     allowed = required | set(PHYSICAL_DEFAULTS) | {"wave", "engine", "solver", "mtow_limit_kg", "assumption_sources", "performance", "storage", "weights", "auxiliary", "pressurization", "onboard_bridge", "duration"}
@@ -395,6 +399,8 @@ def size_jet(spec: dict) -> dict:
             out["limitations"].append("Pressurization cabin declared without supplied extraction: extraction unassessed (unknown≠pass).")
         elif pressurization_report["status"] == "assessed_supplied_auxiliary":
             out["limitations"].append("Pressurization extraction is a user-supplied constant auxiliary offtake, not an ECS pack / bleed map.")
+    from acdt.domains.aircraft.native_disciplines import attach
+    attach("jet", out, {**spec, **side})
     return out
 
 

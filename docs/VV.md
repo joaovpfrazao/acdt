@@ -142,3 +142,10 @@ como `slow`.
   dados de ensaio (túnel, voo, banco de motor) com fonte — ver «Ficaram de fora».
 * Os casos PO usam as formas fechadas de ótica física (não a medição); a validação RCS contra medições fica por
   fazer.
+
+## Espera inativa e Weibull (19 nov 2026)
+
+`FIAB-338B-STANDBY-N4`: n = 4 em t/θ = 1 satisfaz o requisito impresso 0,98 (Fig. 7.5-17); MTBF/θ = 4
+(p. 7-114) e, com taxas iguais, MTBF/θ = 2 (p. 7-113). `FIAB-338B-WEIBULL-5361`: R(100 h) ≈ 0,99 e
+h(100 h) = 0,0002 (Eq. 5.50 e 5.51, §5.3.6.1). O comutador imperfeito e o fator β não têm equação na
+página lida e não são casos de «passa». Pormenor em [FIABILIDADE.md](FIABILIDADE.md) §10.

@@ -223,6 +223,39 @@ def test_generic_study_intervals_unknown_and_ram_air_coupling_outputs():
     assert r4["cooling"]["drag_N"]["hi"] is None and r4["cooling"]["mass_kg"] is None
 
 
+def test_ram_inlet_sized_for_the_worst_flying_segment_not_the_max_of_a_partial_set():
+    """A entrada fica com a maior área pedida pelos segmentos em voo. Um segmento que não fecha deixa a área
+    desconhecida: não se toma o máximo dos outros."""
+    hot = {"case": "hot", "atmosphere": "mil310_hot_1pct"}
+    conds = [{"name": "subida_quente", **hot, "altitude_m": 0.0, "V_m_s": 18.0},
+             {"name": "cruzeiro_quente", **hot, "altitude_m": 1000.0, "V_m_s": 32.0}]
+    s = _spec(ram_air={"size_for": "pior_segmento", "ram_recovery": 0.8, "duct_loss_q": 0.5,
+                       "duct": {"length_m": 0.4, "areal_density_kg_m2": 1.0}})
+    s["conditions"] = conds
+    s["sources"]["aviónica"] = {"heat_W": {"subida_quente": 120.0, "cruzeiro_quente": 40.0, "default": 40.0}}
+    s["sources"]["bateria"] = {"heat_W": {"subida_quente": 30.0, "cruzeiro_quente": 10.0, "default": 10.0}}
+    r = analyse(s)
+    rs = r["bays"]["baia"]["cooling"]["ram_sizing"]
+    areas = {c["condition"]: c["inlet_area_m2"] for c in rs["candidates"]}
+    assert rs["policy"] == "pior_segmento" and rs["status"] != "desconhecido"
+    assert rs["condition"] == max(areas, key=areas.get)
+    assert rs["inlet_area_m2"] == pytest.approx(max(areas.values()))
+    assert rs["condition"] == "subida_quente"
+    named = _spec(ram_air={"size_for": "cruzeiro_quente", "ram_recovery": 0.8, "duct_loss_q": 0.5,
+                           "duct": {"length_m": 0.4, "areal_density_kg_m2": 1.0}})
+    named["conditions"] = conds
+    named["sources"] = s["sources"]
+    cruise_only = analyse(named)["bays"]["baia"]["cooling"]["inlet_area_m2"]
+    assert r["bays"]["baia"]["cooling"]["inlet_area_m2"] > cruise_only
+    bad = _spec(ram_air={"size_for": "pior_segmento", "ram_recovery": 0.8, "duct_loss_q": 0.5})
+    bad["conditions"] = conds
+    bad["sources"]["aviónica"] = {"heat_W": {"subida_quente": None, "cruzeiro_quente": 40.0, "default": 40.0}}
+    bad["sources"]["bateria"] = {"heat_W": 0.0}
+    u = analyse(bad)
+    assert u["bays"]["baia"]["cooling"]["ram_sizing"]["status"] == "desconhecido"
+    assert u["cooling"]["drag_N"]["hi"] is None
+
+
 def test_thermal_evaluator_interval_semantics():
     from acdt.core.verification import TracedRequirement, VerificationContext, classify, resolve_evaluator
     import acdt.domains.aircraft.verification_evaluators  # noqa: F401
@@ -278,7 +311,7 @@ def test_thermal_stage_electric_uav_in_pipeline_and_coupling():
            "capacity_J_K": 9000.0,
            "components": [{"id": "bateria_pack", "source": "bateria", "conductance_W_K": 10.0, "T_max_C": 60,
                            "T_min_C": -20, "limit_source": "teste (limite declarado)"}],
-           "ram_air": {"size_for": "cruzeiro_quente", "ram_recovery": 0.8, "duct_loss_q": 0.5,
+           "ram_air": {"size_for": "pior_segmento", "ram_recovery": 0.8, "duct_loss_q": 0.5,
                        "duct": {"length_m": 0.4, "areal_density_kg_m2": 1.0}}}
     d["assumptions"]["thermal"] = {"bays": [bay], "electric": {"eta_esc": 0.97, "eta_motor": 0.9},
                                    "ground_time_s": 300}
@@ -289,22 +322,43 @@ def test_thermal_stage_electric_uav_in_pipeline_and_coupling():
     assert th["evaluated"] and th["level"] == "L0"
     src = {s["id"]: s for s in th["bays"]["fuselagem"]["conditions"]["cruzeiro_quente"]["sources"]}
     assert src["esc"]["lo_W"] == src["esc"]["hi_W"] > 0  # η declarados → bateria pela diferença, ESC exato
-    assert th["bays"]["fuselagem"]["cooling"]["inlet_area_m2"] > 0
-    assert th["cooling"]["drag_area_m2"]["hi"] > 0 and th["cooling"]["mass_kg"] > 0
+    rs = th["bays"]["fuselagem"]["cooling"]["ram_sizing"]
+    climb = next(c for c in rs["candidates"] if str(c["condition"]).startswith("subida"))
+    # A subida quente não fecha: o ar de entrada fica acima do limite. A área não é a do cruzeiro.
+    assert rs["status"] == "desconhecido" and rs["policy"] == "pior_segmento"
+    assert climb["inlet_area_m2"] is None and climb["needs_fan"] is True
+    assert th["cooling"]["drag_N"]["hi"] is None and th["cooling"]["mass_kg"] is None
+    assert "segmento" in th["operating_points"]["cruzeiro"]["source"]
     tmax = th["bays"]["fuselagem"]["transient"]["T_bay_max_C"]
     assert tmax["hi"] is not None and tmax["lo"] <= tmax["hi"]
     rows = {r["id"]: r for r in st["verification"]["rows"]}
     assert rows["TH-01"]["status"] in ("passa", "falha", "desconhecido")
-    assert rows["TH-02"]["status"] == "passa"
+    assert rows["TH-02"]["status"] == "desconhecido"  # arrasto desconhecido não passa
     assert "L0" in st["design"]["results"]["termica"]
     W0_rel = st["result"].sizing.W0
+    d["assumptions"]["thermal"]["bays"][0]["ram_air"]["size_for"] = "cruzeiro_quente"
     d["assumptions"]["thermal"]["coupling"] = "iterar"
     st2 = run_pipeline("aircraft", MissionSpec.from_dict(d, EX / "uav_endurance_payload.yaml"))
     loop = st2["result"].thermal["coupling_loop"]
     assert loop["converged"] and len(loop["history"]) >= 2
+    assert loop["mission"]["used"] is True and "ponto de projeto" not in loop["mission"]["source"]
+    assert "segmento" in st2["result"].thermal["operating_points"]["cruzeiro"]["source"]
+    da_iter = loop["history"][-1]["drag_area_m2"]
+    da_final = st2["result"].thermal["cooling"]["drag_area_m2"]["hi"]
+    assert da_final is not None and da_iter == pytest.approx(da_final, rel=0.02)
     a2 = st2["result"].spec.assumptions
     assert st2["result"].sizing.W0 > W0_rel  # arrasto e massa de arrefecimento aumentam o W0
     assert a2 is not None
+    saved_perf = st2["result"].performance
+    saved_req = getattr(st2["result"], "required_mission", None)
+    st2["result"].performance = None
+    st2["result"].required_mission = None
+    from acdt.domains.aircraft.thermal import analyse_thermal
+    da_dp = analyse_thermal(st2["result"])["cooling"]["drag_area_m2"]["hi"]
+    st2["result"].performance = saved_perf
+    st2["result"].required_mission = saved_req
+    assert da_dp is not None and da_final is not None and da_dp > 0
+    assert math.isfinite((da_final - da_dp) / da_dp)
 
 
 @pytest.mark.slow
@@ -324,11 +378,18 @@ def test_thermal_stage_piston_engine_cooling_and_defaults():
     assert th["evaluated"] and "fuselagem" in th["bays"]
     ec = th["engine_cooling"]["by_condition"]["cruzeiro_quente"]
     assert ec["status"] == "desconhecido" and th["cooling"]["drag_known"] is False
+    assert th["engine_cooling"]["design_inlet"]["status"] == "desconhecido"
     d["assumptions"]["thermal"] = {"engine": {"air_temperature_rise_K": 30.0}}
     st2 = run_pipeline("aircraft", MissionSpec.from_dict(d, EX / "uav_gasoline_150kg.yaml"))
     ec2 = st2["result"].thermal["engine_cooling"]["by_condition"]["cruzeiro_quente"]
     assert ec2["Q_W"]["lo"] == 0.0 and ec2["Q_W"]["hi"] > 0
     assert ec2["drag_N"]["lo"] == 0.0 and ec2["drag_N"]["hi"] > 0  # perdas não declaradas: [0, ṁV]
+    di = st2["result"].thermal["engine_cooling"]["design_inlet"]
+    assert di["status"] == "dimensionado"
+    assert di["inlet_area_m2"] == pytest.approx(max(di["candidates_m2"].values()))
+    assert di["condition"] == max(di["candidates_m2"], key=di["candidates_m2"].get)
+    assert ec2["inlet_area_m2"] == pytest.approx(di["inlet_area_m2"])
+    assert ec2["required_inlet_area_m2"] <= di["inlet_area_m2"] + 1e-12
 
 
 @pytest.mark.slow

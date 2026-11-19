@@ -1905,6 +1905,101 @@ reutilização do `result.json` em `size_fleet(run_id=…)`. Pormenor em [QUALID
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
 
+## Ponto de operação da missão na térmica e no gelo (19 nov 2026, ramo `acoplamento-ponto-missao`)
+
+O ciclo `iterar` da térmica e do gelo calculava o ponto de funcionamento no ponto de projeto, porque a tabela de segmentos só existia depois do desempenho. A área de arrasto injectada ficava abaixo da da passagem final. Agora os dois ciclos chamam `required_mission` (`simulate_mission`, `stop=legs`), a mesma missão exigida do desempenho.
+
+* **Medido** (`examples/uav_endurance_payload.yaml`, baía só no teste, `size_for: cruzeiro_quente`, `coupling: iterar`, handbook, AVL desligado): área de arrasto da iteração = área final = 3,917×10⁻⁴ m². No ponto de projeto a mesma aeronave dá 3,631×10⁻⁴ m², 7,88 % abaixo. O yaml não foi alterado. Veredicto do acoplamento: `validado`. Sem fator. `nao_aplicar`.
+* **Entrada do compartimento** (`size_for: pior_segmento`): a subida quente não fecha. O ar entra a 49,2 °C e o limite do ar é 41,9 °C (254,9 W). A área fica desconhecida. A do cruzeiro, 7,08×10⁻⁴ m², não é usada. `nao_avaliado`. `nao_aplicar`.
+* **Entrada do motor** (`examples/uav_gasoline_150kg.yaml`, ΔT do ar 30 K declarado no teste): a área instalada é a da subida quente, 0,02904 m², contra 0,01706 m² pedidos no cruzeiro quente. ζ não declarado: o arrasto continua [0, ṁV]. `validado` como escolha do máximo. `nao_aplicar`.
+
+Números e proveniência: `examples/output/uav_endurance_payload_missao_termica/acoplamento.json`. Doc: [TERMICA.md](TERMICA.md) §8 e [GELO.md](GELO.md) §8.
+
+## Adaptadores nativos VTOL e jato (19 nov 2026, ramo `adaptadores-vtol-jato`)
+
+Estado: código e testes neste ramo, cortado de `origin/main` `e9726e4`. Não inclui o PR #28 (acoplamento do ponto de missão). Não faz merge.
+
+* **O que entrou.** `domains/aircraft/native_disciplines.py` constrói a especificação genérica da térmica, do gelo, do ruído, da fiabilidade, do custo de série e do ciclo de vida a partir de `size_vtol` e `size_jet`. A carga útil e a arquitetura elétrica entram também na asa fixa (hotel, perdas de distribuição, RBD, custo unitário, energia por hora de voo). A massa fechada não é somada outra vez.
+* **Veredicto:** `validado` para o adaptador quando os dados declarados fecham. `calibracao_L1_L2`: `nao_aplicar` (não há fator novo). Partes sem dado ficam `nao_avaliado`: rpm em falta (não se usa `rpm_max`), η de distribuição em falta, λ sem fonte, subida do jato L0, ruído de jato (SAE ARP876 não verificado).
+* **Medida** (`examples/output/adaptadores_vtol_jato/adaptadores.json`, 19 nov 2026; YAML de exemplo intacto; números de ensaio, não de uma aeronave):
+  * multirrotor 5 kg, pairar 600 s, carga 25 W: energia 98,92 Wh → 103,09 Wh (+4,17 Wh); `mass_kg` igual;
+  * potência da carga em falta: `energy_complete` falso e a energia fica a do hotel declarado;
+  * baía declarada: calor de pairar 114,26 W → 139,26 W;
+  * arquitetura 40 W, η = 0,9: perda 4,44 W; sem η o veredicto térmico é `nao_avaliado`;
+  * ruído a 3000 rpm e 100 m: 12,1 dB(A), limite inferior (Gutin + Schlegel-King-Mull);
+  * λ da carga em falta: R de missão [0; 0,99999], veredicto `nao_avaliado`;
+  * custo de série (T1 = 1000 USD, N = 10, declive 0,85): 711,61 USD → 761,61 USD com 50 USD declarados;
+  * CO₂e da rede, minorante: 0,132 kg → 0,137 kg por hora de voo (a carga de 25 W soma 0,025 kWh uma só vez; η de carga 0,9 e 0,2 kg/kWh, declarados no ensaio);
+  * jato ilustrativo: MTOW 67 856 kg inalterado; gelo e térmica `nao_avaliado` (sem subida); ruído `nao_avaliado`.
+* **Métodos.** MIL-E-7016F e Moir & Seabridge Cap. 5; estudo térmico e de gelo já citados; Gutin e Schlegel-King-Mull; MIL-HDBK-338B; curva de Wright/Crawford; OSD CAPE 2020 e NIST HB 135. PRESSUPOSTOS: duty 1, ciclo 1 na hora de voo, corda média √(S/AR) no jato, combustível/FH com a reserva. Sem extração de combustível para a potência elétrica de um jato.
+* **Falta, fora deste ramo.** ISO 9613-2 e ruído de espessura; redundância em espera, Weibull e fator β; figuras de revisão e níveis MDR/TRR/PRR; blocos MDO, V&V e L3 no `design.json`.
+
+## Solo ISO 9613-2 e espessura da hélice (19 nov 2026, ramo `ruido-solo-espessura`)
+
+Atenuação de solo A_gr (ISO 9613-2:1996 §7.3.1, Tabela 3, Eq. 9) e C_met (§8, Eq. 21–22, só com C_0 declarado) em
+`acdt/core/acoustics/ground.py`, ligadas a `propagation`, a `study.rotor_noise(ground_spec=…)` e à etapa
+`noise.iso9613_ground`. Sem esse mapa o número não muda: o C172 lowfi do exemplo, YAML intacto, deu 46,2 dB(A),
+60,4 dB(A) e 27,5 km, como no §6 de [RUIDO.md](RUIDO.md). A API pública não subiu (assinatura de `rotor_noise`
+igual, 1.7.0). `ground_dB` da placa da Parte 36 não se soma a A_gr.
+
+* **Veredicto**: `validado` na transcrição da tabela (caso `NOISE-ISO9613-2-AGR`; não é ensaio em voo). Calibração
+  `nao_aplicar`.
+* **Espessura**: `nao_avaliado`. NACA TN 605 não foi transcrita; Hanson e SAE AIR1407 não foram verificados. Não há
+  SPL de espessura.
+* **Refração geométrica, barreiras, folhagem e a forma de 2024 com K_geo**: `nao_avaliado`, não 0 dB. O efeito
+  meteorológico citado é C_met.
+* **Alcance**: `nao_avaliado`. Continua a pior direção (limite superior das fontes modeladas). Sem A_gr a omissão
+  não tem sinal, porque a tabela nos graves pode amplificar. Com A_gr e sem C_0 o nível é o caso favorável da Eq. 6.
+* **Medição** (pai `e9726e4`, `applied: false`): `examples/output/ruido_solo_iso9613/solo.json`. Rotor de um
+  harmónico a 100 m, solo duro, d_p = 0: A_gr = −3,0 dB e o nível sobe 3,0 dB (47,7 → 50,7 dB(A)); o alcance no
+  solo passa de 9,05 km a 12,3 km e não fica validado. G em falta deixa o campo livre.
+* **Falta**: Deming ou Hanson quando a equação estiver conferida; Fidell; barreiras da ISO 9613-2 se forem lidas.
+
+## Espera inativa, Weibull e fator β (19 nov 2026)
+
+Ramo `fiabilidade-standby-weibull`, cortado de `e9726e4`. Bloco lateral em `acdt.core.reliability.standby`
+(MIL-HDBK-338B §7.5.5.3 com R_S = 1, e Eq. 5.50–5.51 com γ = 0). Não substitui o RBD ativo. O yaml dos
+exemplos não foi alterado.
+
+* **Veredicto**: `validado` para as identidades transcritas (n = 4 em t/θ = 1 fica acima do requisito 0,98;
+  h(100 h) = 0,0002). Calibração L1/L2: `nao_aplicar` (não há medida de voo).
+* **nao_avaliado**: comutador com taxa (a p. 7-116 não dá equação), γ ≠ 0, fator β. O §7.5.5.4 é partilha
+  de carga com k, não β; essa fórmula não foi aplicada.
+* **FTA**: evento básico com q = 1 − R. Porta AND = redundância ativa; porta OR = série. Nenhuma é a espera.
+* **Resultado**: `examples/output/fiabilidade_standby_weibull/resultado.json`. Casos
+  `FIAB-338B-STANDBY-N4` e `FIAB-338B-WEIBULL-5361`. Pormenor em [FIABILIDADE.md](FIABILIDADE.md) §10.
+* **Ainda em aberto** (já estavam no §8): reparação em missão, fases, espera quente, METRIC.
+
+## Figuras nos relatórios e revisões MDR, TRR e PRR (19 nov 2026)
+
+Ramo `relatorios-figuras-revisao`, cortado de `e9726e4` (`origin/main`). Não faz merge.
+
+* **Veredicto**: `validado` para a transcrição da frente de Pareto guardada e para os excertos da NPR 7123.1D
+  Apêndice G (Tabelas G-5, G-10 e G-8), conferidos no NODIS em 19 nov 2026. Calibração `nao_aplicar`. O
+  histograma do exemplo pequeno fica `nao_avaliado` porque `samples` é nulo. Desconhecido não entrou como zero.
+* **O que entrou**: `core/review/figures.py` prepara a frente e o histograma; o relatório escreve o PNG na pasta
+  de saída. MDR, TRR e PRR acrescentados no fim de `criteria.py`, sem reescrever SRR/PDR/CDR. Nível exigido
+  PRESSUPOSTO: MDR L0, TRR L0, PRR L0, sem `fidelidade_disciplinas`. A SDR de programas (Tabela G-2) não está
+  implementada. A PRR não reprova um único avião só por o texto da norma falar em vários sistemas.
+* **Exemplo**: `tests/data/review_small` (modelo analítico, não é um projeto). Frente: 9 avaliações, 9 na frente.
+  Nesse exemplo a MDR fica `pronto` e a TRR/PRR ficam `nao_pronto` por requisito em falha. Os YAML de `examples/`
+  não foram editados (`example_yaml_edited: false`, `applied: false`).
+* **Registo**: `examples/output/relatorios_figuras/resultado.json`.
+* **Ainda por fazer nos relatórios**: registo de decisões, `acdt certify` como evidência, ficha RID/RFA.
+  Pormenor em [RELATORIOS.md](RELATORIOS.md).
+
+## Estado de projeto — MDO, V&V e L3 (19 nov 2026)
+
+Ramo `design-db-mdo-vv-l3`, cortado de `origin/main` `e9726e4`. Comandos `acdt db add-mdo`, `add-vv` e `add-hifi`. Não há nome novo na API (1.7.0). Pormenor em [DADOS.md](DADOS.md).
+
+* **Veredicto:** `validado` para a transcrição dos registos já gravados em `tests/data/review_small` (MDO `acdt.mdo/1` e V&V `acdt.vv/1`) para `acdt.design/1`. Calibração `nao_aplicar`. Comparação externa `nao_aplicar`. A lista de desvios vazia não é um ensaio que passou.
+* **MDO** do ensaio analítico: projeto escolhido 4, 9 avaliações, 9 na frente, `n_failed` = 0 porque o ficheiro o declara. Objetivos do escolhido: f1 = 0,7190488072346632 e f2 = 1,3271789813488566, unidade não declarada (a métrica não tem sufixo). Variável `x` = 0,8479674564714517. SHA-256 do `mdo.json` `5f04f2824b7e6e62ce65e5d185c286c9bee9c53f2904668f4f867c5843c9251f`.
+* **V&V:** caso `ATM-ISA-SL` com estado `passa`, 15 grandezas copiadas, nenhuma omitida neste relatório (todas as linhas estão `passa`). `delta` de T = 0, unidade K. `delta_rel` de `rho` = 1,479533701902775×10⁻⁸, unidade `1`. Versão do registo `2026.11.17`. SHA-256 `2eb629bc2598d305dc6c71c7c05815164eb65dbddb60c60a579c14834774df60`.
+* **L3:** sem corrida de solver. O excerto hifi do registo é sintético. Estimativa RANS sem `CL` e passo de flutter com `skipped` ficam `nao_avaliado` e não escrevem números. O escritor copiou `fem.tip_w_fem_m` = 0,001 m de um JSON inventado; isso não valida a estrutura. Resultado físico do hifi: `nao_avaliado`.
+* `mdo` e `vv` não contam como disciplinas primárias. O `definition.input` não é substituído. O YAML de exemplo não foi editado e nada foi aplicado ao L1 ou ao L2.
+* Continuam por fazer as unidades das chaves sem sufixo e a leitura de YAML com unidades nas specs de MDO/UQ.
+* Registo: `examples/output/design_db_blocos/resultado.json`.
+
 ## Esteira do painel grosso, 255 iterações (19 nov 2026, ramo `vspaero-esteira-residual`)
 
 Base `e9726e4`. O registo de cinco iterações em `h7_vspaero_painel.json` não foi reescrito. O default documentado da esteira continua WakeNumIter 5, NumWakeNodes 8, WakeRelax 1, FixedWakeFlag 0 e ImplicitWake 0. Esta corrida só pede WakeNumIter 255, o tecto do parâmetro em `VSPAEROMgr.cpp` do OpenVSP 3.56.0 (`Init` 5, 3, 255), lido de volta como 255. Os outros campos ficam no default.
