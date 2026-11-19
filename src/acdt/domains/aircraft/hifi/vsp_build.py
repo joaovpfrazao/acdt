@@ -382,6 +382,12 @@ def main(spec_path):
     # wing-only STEP for the CFD wing case
     vsp.SetSetFlag(vsp.FindGeomsWithName("Wing")[0], 3, True)
     vsp.ExportFile(out + "_wing.step", 3, vsp.EXPORT_STEP)
+    # fuselage-only STEP. Set 4 is empty unless this geom is flagged.
+    if "fuselage" in sp:
+        bodies = vsp.FindGeomsWithName("Fuselage")
+        if bodies:
+            vsp.SetSetFlag(bodies[0], 4, True)
+            vsp.ExportFile(out + "_fuselage.step", 4, vsp.EXPORT_STEP)
     vsp.ComputeCompGeom(vsp.SET_ALL, False, 0)
     rid = vsp.FindLatestResultsID("Comp_Geom")
     names = vsp.GetStringResults(rid, "Comp_Name")

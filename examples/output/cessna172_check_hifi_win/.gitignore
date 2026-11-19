@@ -12,5 +12,6 @@
 *.vtk
 *.csv
 !h5_c172_rans_asa_fuselagem.csv
+!h5_c172_rans_um_angulo.csv
 *.log
 *.msh
