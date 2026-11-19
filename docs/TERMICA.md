@@ -175,3 +175,13 @@ com acoplamento iterado e pipeline a gasolina).
 * Efeito Meredith e arrasto externo da entrada (dados NACA de entradas submersas).
 * Dados de capacidade térmica por componente; permutadores líquidos; irradiância solar em altitude.
 * Alta fidelidade: proposta em [proposta-termica-gelo.md](proposta-termica-gelo.md), sem malha e sem corrida. O L0/L1 não fica validado por essa proposta.
+
+## 8. Ponto de operação da missão e entrada no pior segmento (19 nov 2026)
+
+No modo `coupling: iterar` a etapa de dimensionamento corre antes do desempenho. O ciclo passa a calcular a missão exigida com `simulate_mission(..., stop="legs")` — a mesma função que `performance_analysis` guarda em `mission_required` — e a térmica usa essa tabela (altitude, velocidade, duração, potência ou caudal). Se a missão não fechar, o ponto de projeto continua a ser a alternativa e `coupling_loop.mission.source` diz porquê. Não se trata a falta como duração zero.
+
+A entrada de ar do compartimento, com `ram_air.size_for: pior_segmento`, fica com a maior área `A = ṁ/(MFR·ρ·V)` entre os segmentos em voo (`V > 0,5 m/s`). MFR de projeto 0,60 (Hall & Frank, NACA RM A8I29). Uma condição nomeada (`size_for: cruzeiro_quente`, por exemplo) continua a dimensionar só essa condição. Se algum segmento em voo não fecha (calor sem majorante, ou ar que não arrefece), a área fica desconhecida: não se toma o máximo dos restantes e o arrasto não passa a zero.
+
+No motor térmico a entrada instalada é sempre essa área máxima. O caudal em cada segmento é `MFR·ρ·V·A`. PRESSUPOSTO: o MFR mantém-se o de projeto; a variação de recuperação com o MFR, descrita no mesmo relatório, não é aplicada. O arrasto acoplado à polar continua a ser `D/q` na condição de referência de cruzeiro, com esse caudal admitido.
+
+No UAV elétrico de exemplo, com a baía de teste e `pior_segmento`, a subida quente não fecha: o ar de entrada fica acima do limite e a área fica desconhecida. No UAV a gasolina, com ΔT do ar declarado, a entrada do motor fica a da subida. Os números estão em `examples/output/uav_endurance_payload_missao_termica/acoplamento.json`. O yaml dos exemplos não muda.

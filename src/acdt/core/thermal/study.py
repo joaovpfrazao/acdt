@@ -13,7 +13,8 @@ from typing import Any, Mapping, Sequence
 
 from .air import MIL310, SOLAR_HOT_DAY_W_M2, ambient
 from .convection import INCROPERA, vertical_plate_natural
-from .cooling import MOMENTUM_REF, NACA_MFR_DESIGN, NACA_RM_A8I29, fan_power, size_ram_duct
+from .cooling import (MOMENTUM_REF, NACA_MFR_DESIGN, NACA_RM_A8I29, WORST_SEGMENT, fan_power,
+                       size_ram_duct)
 from .network import Bay, Bound, Condition, Phase, corners, solve_bay_bounds, solve_bay_transient
 from .sources import HeatSource, from_spec, total
 
@@ -142,12 +143,13 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                 return _source_for(str(c["source"]), sources_raw.get(str(c["source"])), cn)
             return _source_for(str(c["id"]), {"heat_W": c.get("heat_W", 0.0)}, cn)
 
-        # ---- ar dinâmico: área dada ou dimensionada na condição pedida
+        # ---- ar dinâmico: área dada, uma condição nomeada, ou o pior segmento em voo
         bres: dict[str, Any] = {"id": bid, "notes": list(bay.notes), "conditions": {}, "cooling": {}}
         A_in = _num((ram or {}).get("inlet_area_m2"))
         mfr = float((ram or {}).get("mass_flow_ratio", NACA_MFR_DESIGN))
-        if ram is not None and A_in is None and ram.get("size_for"):
-            cn = str(ram["size_for"])
+        ram_spec: Mapping[str, Any] = ram if isinstance(ram, Mapping) else {}
+
+        def try_size(cn: str) -> dict[str, Any]:
             cond, _case = conds[cn]
             _lo, Qhi, _d = bay_heat(cn)
             lims: list[float | None] = []
@@ -164,23 +166,49 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
             if _num(b.get("air_T_max_C")) is not None:
                 lims.append(float(b["air_T_max_C"]) + 273.15)
             if Qhi is None or not lims or any(x is None for x in lims):
-                bres["cooling"]["ram_sizing"] = {"status": "desconhecido",
-                                                 "reason": "calor máximo ou limite de componente desconhecido"}
-                complete = False
+                return {"_unknown_heat": True, "condition": cn, "status": "desconhecido", "inlet_area_m2": None,
+                        "reason": "calor máximo ou limite de componente desconhecido"}
+            T_lim = min(x for x in lims if x is not None)
+            from .air import ram_temperature
+            raw_duct = ram_spec.get("duct")
+            duct: Mapping[str, Any] = raw_duct if isinstance(raw_duct, Mapping) else {}
+            d = size_ram_duct(Qhi, T_lim, ram_temperature(cond.ambient.T_K, cond.V_m_s), cond.ambient.rho,
+                              cond.V_m_s, mfr=mfr, ram_recovery=_num(ram_spec.get("ram_recovery")),
+                              duct_loss_q=_num(ram_spec.get("duct_loss_q")),
+                              duct_length_m=_num(duct.get("length_m")),
+                              areal_density_kg_m2=_num(duct.get("areal_density_kg_m2")),
+                              fixed_mass_kg=float(ram_spec.get("hx_mass_kg", 0.0) or 0.0))
+            return {"condition": cn, "T_limit_air_C": T_lim - 273.15, "Q_W": Qhi, **d.to_dict(),
+                    "note": "PRESSUPOSTO: todo o calor sai pelo ar (pele ignorada; conservativo)"}
+
+        if ram is not None and A_in is None and ram.get("size_for"):
+            requested = str(ram["size_for"])
+            if requested == WORST_SEGMENT:
+                names = [n for n, (c, _k) in conds.items() if c.V_m_s > 0.5]
+                attempts = [try_size(n) for n in names]
+                failed = [a for a in attempts if a.pop("_unknown_heat", False) or a.get("inlet_area_m2") is None]
+                if not names or failed:
+                    why = ("sem segmento em voo (V > 0,5 m/s) para dimensionar a entrada" if not names else
+                           "há segmento em voo cuja entrada não fecha; o pior não é o máximo dos restantes")
+                    bres["cooling"]["ram_sizing"] = {"status": "desconhecido", "policy": WORST_SEGMENT,
+                                                     "reason": why, "candidates": attempts}
+                    if any(a.get("reason") == "calor máximo ou limite de componente desconhecido" for a in failed):
+                        complete = False
+                else:
+                    best = max(attempts, key=lambda a: float(a["inlet_area_m2"]))
+                    A_in = best.get("inlet_area_m2")
+                    bres["cooling"]["ram_sizing"] = {
+                        **best, "status": "dimensionado", "policy": WORST_SEGMENT,
+                        "candidates": [{"condition": a["condition"], "inlet_area_m2": a.get("inlet_area_m2"),
+                                        "status": "dimensionado"} for a in attempts],
+                        "method": "A = max ṁ/(MFR·ρ·V) nos segmentos em voo (NACA RM A8I29, MFR de projeto)"}
             else:
-                T_lim = min(x for x in lims if x is not None)
-                from .air import ram_temperature
-                d = size_ram_duct(Qhi, T_lim, ram_temperature(cond.ambient.T_K, cond.V_m_s), cond.ambient.rho,
-                                  cond.V_m_s, mfr=mfr, ram_recovery=_num(ram.get("ram_recovery")),
-                                  duct_loss_q=_num(ram.get("duct_loss_q")),
-                                  duct_length_m=_num((ram.get("duct") or {}).get("length_m")),
-                                  areal_density_kg_m2=_num((ram.get("duct") or {}).get("areal_density_kg_m2")),
-                                  fixed_mass_kg=float(ram.get("hx_mass_kg", 0.0) or 0.0))
-                bres["cooling"]["ram_sizing"] = {"condition": cn, "T_limit_air_C": T_lim - 273.15,
-                                                 "Q_W": Qhi, **d.to_dict(),
-                                                 "note": "PRESSUPOSTO: todo o calor sai pelo ar (pele ignorada; "
-                                                         "conservativo)"}
-                A_in = d.inlet_area_m2
+                one = try_size(requested)
+                if one.pop("_unknown_heat", False):
+                    complete = False
+                bres["cooling"]["ram_sizing"] = one
+                if one.get("inlet_area_m2") is not None:
+                    A_in = one["inlet_area_m2"]
         if ram is not None:
             bres["cooling"]["inlet_area_m2"] = A_in
             bres["cooling"]["mass_flow_ratio"] = mfr
