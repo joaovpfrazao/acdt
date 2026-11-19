@@ -1,0 +1,141 @@
+{
+  "schema": "acdt.ruido_solo_iso9613/1",
+  "date": "2026-11-19",
+  "parent": "e9726e401e75fe7a04ebe97ca0e20940d811bddc",
+  "example_yaml_edited": false,
+  "applied": false,
+  "veredicto": "validado",
+  "calibracao": "nao_aplicar",
+  "nota_veredicto": "validado é a verificação da Tabela 3 e de C_met (ISO 9613-2:1996 §7.3.1 e §8) contra os valores da tabela. Não é medição de voo. O alcance de deteção não fica validado.",
+  "metodo": "ISO 9613-2:1996 §7.3.1 (Tabela 3, Eq. 9) e §8 (Eq. 6, 21 e 22)",
+  "nao_aplicado": [
+    "Forma de 2024 com K_geo",
+    "Barreiras, reflexões e folhagem",
+    "Refração por traçado de raios",
+    "Ruído de espessura (Deming, NACA TN 605) e Hanson"
+  ],
+  "tabela": {
+    "veredicto": "validado",
+    "calibracao": "nao_aplicar",
+    "entradas_e_resultados_dB": {
+      "hard_q0_500Hz": -3.0,
+      "band63_q1": -6.0,
+      "porous_2k_q0": 0.0,
+      "mixed_250Hz": 6.437979285109771,
+      "cmet_C0_2_dp40": 1.0,
+      "cmet_sem_C0": null,
+      "G_em_falta": null
+    },
+    "referencias_dB": {
+      "hard_q0_500Hz": -3.0,
+      "band63_q1": -6.0,
+      "porous_2k_q0": 0.0,
+      "mixed_250Hz": 6.437979285109771,
+      "cmet_C0_2_dp40": 1.0,
+      "cmet_sem_C0": null,
+      "G_em_falta": null
+    },
+    "desvios": []
+  },
+  "rotor_um_harmonico": {
+    "entradas": {
+      "blades": 2,
+      "diameter_m": 0.6,
+      "rpm": 6000,
+      "thrust_N": 60.0,
+      "power_W": 3000.0,
+      "harmonics": 1,
+      "altitude_m": 100.0,
+      "ground_spec_duro": {
+        "hs_m": 100.0,
+        "hr_m": 0.0,
+        "Gs": 0.0,
+        "Gr": 0.0,
+        "Gm": 0.0
+      }
+    },
+    "pressuposto": "PRESSUPOSTO: r é a distância de Gutin (altitude_m). d_p projeta esse r com hs e hr declarados. Neste caso hs = 100 m, hr = 0 m e r = 100 m, logo d_p = 0 m (limite do §7.3).",
+    "sem_solo": {
+      "overhead_LA_dBA": 47.73653425548174,
+      "detection_ground_range_quiet_m": 9054.879953834446,
+      "bpf_Hz": 200.0,
+      "iso_status": "nao_pedido",
+      "tabela_veredicto": "nao_avaliado",
+      "alcance_veredicto": "nao_avaliado",
+      "range_bound": "superior",
+      "nivel_reportado": "sem_A_gr",
+      "components": null,
+      "C_met": null
+    },
+    "com_solo_G0": {
+      "overhead_LA_dBA": 50.736534255481736,
+      "detection_ground_range_quiet_m": 12270.23174450612,
+      "bpf_Hz": 200.0,
+      "iso_status": "aplicado",
+      "tabela_veredicto": "validado",
+      "alcance_veredicto": "nao_avaliado",
+      "range_bound": "superior",
+      "nivel_reportado": "com_A_gr",
+      "components": [
+        {
+          "name": "rotor: tom m=1",
+          "f_received_Hz": 200.0,
+          "band_Hz": 250.0,
+          "dp_m": 0.0,
+          "A_gr_dB": -3.0,
+          "C_met_dB": null,
+          "ground": "aplicado"
+        }
+      ],
+      "C_met": "nao_aplicado"
+    },
+    "delta_LA_dB": 2.999999999999993,
+    "G_incompleto": {
+      "overhead_LA_dBA": 47.73653425548174,
+      "detection_ground_range_quiet_m": 9054.879953834446,
+      "bpf_Hz": 200.0,
+      "iso_status": "nao_avaliado",
+      "tabela_veredicto": "nao_avaliado",
+      "alcance_veredicto": "nao_avaliado",
+      "range_bound": "superior",
+      "nivel_reportado": "sem_A_gr",
+      "components": null,
+      "C_met": null
+    }
+  },
+  "espessura": {
+    "evaluated": false,
+    "veredicto": "nao_avaliado",
+    "method": null,
+    "spl_dB": null,
+    "reason": "Ruído de espessura de Deming (NACA TN 605, 1937, «Noise from Propellers with Symmetrical Sections at Zero Blade Angle», NTRS 19930081380) não foi transcrito: a equação não está conferida. Hanson e SAE AIR1407 não foram verificados equação a equação. Não se devolve um nível.",
+    "sources": [
+      "Deming, A. F., NACA TN 605 (1937), NTRS 19930081380 — equação não transcrita",
+      "Hanson — não verificado",
+      "SAE AIR1407 — não verificado"
+    ]
+  },
+  "refracao": {
+    "evaluated": false,
+    "veredicto": "nao_avaliado",
+    "correction_dB": null,
+    "reason": "Não há equação de refração por traçado de raios verificada. A ISO 9613-2:1996 trata a meteorologia no §8: sem C_met o nível é o de propagação favorável (vento a favor ou inversão moderada) e a média de longo prazo é L_AT(LT) = L_AT(DW) − C_met (Eq. 6). C_met só entra com C_0 declarado (Eq. 21–22). Barreiras (A_bar), reflexões e folhagem não foram verificadas e não entram como 0 dB. A forma de 2024 com K_geo não é a Tabela 3 de 1996 e não está aplicada."
+  },
+  "c172": {
+    "yaml": "examples/cessna172_check.yaml",
+    "yaml_edited": false,
+    "fidelity": "lowfi",
+    "evaluated": true,
+    "overhead_LAmax_dBA": 46.18897235292003,
+    "SEL_dBA": 60.39431089373749,
+    "detection_ground_range_quiet_m": 27521.863876037813,
+    "sources_complete": false,
+    "iso9613_ground_status": "nao_pedido",
+    "iso_tabela_veredicto": "nao_avaliado",
+    "iso_alcance_veredicto": "nao_avaliado",
+    "thickness_veredicto": "nao_avaliado",
+    "refraction_veredicto": "nao_avaliado",
+    "elapsed_s": 54.3,
+    "nota": "Sem noise.iso9613_ground o nível é o de campo livre já existente. A tabela do §6 de docs/RUIDO.md não foi substituída por esta corrida."
+  }
+}

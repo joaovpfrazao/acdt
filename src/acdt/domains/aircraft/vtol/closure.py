@@ -230,7 +230,7 @@ def close_vtol(spec: dict) -> dict[str, Any]:
 
     def evaluate(m):
         s = dict(copy.deepcopy(base), mass_kg=m)
-        r = size_vtol(s)
+        r = size_vtol(s, disciplines=False)
         hp = r["hover"]
         n_rot = hp["n_rotors"]
         R = hp["diameter_m"] / 2
@@ -361,4 +361,6 @@ def close_vtol(spec: dict) -> dict[str, Any]:
     out["feasible"] = bool(converged and all(c["passed"] for c in checks))
     out["deferred"] = [d for d in out.get("deferred", []) if d != "W0 closure / full size MDA"]
     out["issues"] = [status] if not converged else [c["name"] for c in checks if not c["passed"]]
+    from ..native_disciplines import attach
+    attach("vtol", out, spec)
     return out

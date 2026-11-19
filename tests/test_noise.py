@@ -182,3 +182,70 @@ def test_api_rotor_noise_hover_and_flyover():
     assert h["overhead_LA_dBA"] - one["overhead_LA_dBA"] == pytest.approx(10 * math.log10(4), abs=1e-6)
     assert f["flyover"]["LAmax_dBA"] >= f["overhead_LA_dBA"] - 1e-9 and f["flyover"]["SEL_dBA"] is not None
     assert h["detection_ground_range_quiet_m"] > 100.0
+    assert h["thickness_noise"]["evaluated"] is False and h["thickness_noise"]["spl_dB"] is None
+    assert h["thickness_noise"]["veredicto"] == "nao_avaliado"
+    assert h["iso9613_ground"]["status"] == "nao_pedido"
+    assert h["iso9613_ground"]["veredicto"] == "nao_avaliado"
+    assert "A_gr não entrou" in " ".join(h["iso9613_ground"]["range_bound_reasons"])
+
+
+def test_iso9613_2_ground_table():
+    """Tabela 3 e C_met. G em falta, G fora de [0, 1] e banda fora da tabela não são 0 dB."""
+    from acdt.core.acoustics.ground import (c_met_dB, ground_attenuation_dB, ground_distance_m, octave_band_hz)
+
+    assert _case("NOISE-ISO9613-2-AGR")["status"] == "passa"
+    assert ground_attenuation_dB(500.0, 100.0, 1.0, 1.0, None, 0.0, 0.0) is None
+    assert ground_attenuation_dB(63.0, 100.0, 0.0, 0.0, 1.2, 0.0, 0.0) is None
+    assert ground_attenuation_dB(30.0, 100.0, 1.0, 1.0, 0.0, 0.0, 0.0) is None
+    assert ground_attenuation_dB(500.0, -1.0, 1.0, 1.0, 0.0, 0.0, 0.0) is None
+    assert c_met_dB(100.0, 1.0, 1.0, None) is None
+    assert c_met_dB(10.0, 1.0, 1.0, 2.0) == 0.0  # d_p = 10(h_s + h_r)
+    assert c_met_dB(40.0, 1.0, 1.0, -1.0) is None
+    assert octave_band_hz(90.0) == 125.0 and octave_band_hz(88.7) == 63.0
+    assert octave_band_hz(40.0) is None and octave_band_hz(12000.0) is None
+    assert ground_distance_m(100.0, 200.0, 0.0) is None
+    assert ground_distance_m(100.0, 100.0, 0.0) == 0.0
+
+
+def test_iso_ground_corrects_level_and_ignores_plate():
+    """Solo duro, q = 0: A_gr = −3 dB, o nível sobe 3 dB. A placa de +6,02 dB não se soma."""
+    from acdt.core.acoustics.ground import GroundPath
+
+    tone = [Component("tom", 500.0, lambda r, th: 80.0)]
+    atm = Atmosphere()
+    path = GroundPath(1.0, 1.0, 0.0, 0.0, 0.0)
+    plain = received(tone, 100.0, 1.0, atm)
+    plate = received(tone, 100.0, 1.0, atm, 0.0, 6.02)
+    iso = received(tone, 100.0, 1.0, atm, ground=path)
+    both = received(tone, 100.0, 1.0, atm, 0.0, 6.02, ground=path)
+    assert plain.ground is None and plate.LA == pytest.approx(plain.LA + 6.02)
+    assert iso.ground is not None and iso.ground["status"] == "aplicado"
+    assert iso.ground["veredicto"] == "validado" and iso.ground["calibracao"] == "nao_aplicar"
+    assert iso.ground["alcance"]["veredicto"] == "nao_avaliado"
+    assert iso.LA == pytest.approx(plain.LA + 4.2)  # A_gr = −4,2 dB com q = 0,4
+    assert both.LA == pytest.approx(iso.LA) and both.ground["ground_dB_ignored"] is True
+    # geometria impossível e banda fora da tabela: o total corrigido não se publica
+    bad = received(tone, 10.0, 1.0, atm, ground=GroundPath(50.0, 0.0, 0.0, 0.0, 0.0))
+    assert math.isnan(bad.LA) and bad.ground["status"] == "nao_avaliado"
+    high = received([Component("agudo", 20000.0, lambda r, th: 80.0)], 100.0, 1.0, atm, ground=path)
+    assert math.isnan(high.LA) and high.ground["omitted"] == ["agudo"]
+
+
+def test_rotor_ground_spec_does_not_change_api_and_keeps_free_field_when_incomplete():
+    from acdt.core.acoustics.study import rotor_noise
+
+    common = dict(blades=2, diameter_m=0.6, rpm=6000, thrust_N=60, power_W=3000, harmonics=1)
+    free = rotor_noise(**common, altitude_m=100.0)
+    hard = {"hs_m": 100.0, "hr_m": 0.0, "Gs": 0.0, "Gr": 0.0, "Gm": 0.0}
+    corr = rotor_noise(**common, altitude_m=100.0, ground_spec=hard)
+    assert corr["overhead_LA_dBA"] == pytest.approx(free["overhead_LA_dBA"] + 3.0)
+    assert corr["iso9613_ground"]["status"] == "aplicado"
+    assert corr["iso9613_ground"]["alcance"]["veredicto"] == "nao_avaliado"
+    assert corr["detection_ground_range_quiet_m"] > free["detection_ground_range_quiet_m"]
+    missing = rotor_noise(**common, altitude_m=100.0, ground_spec={"hs_m": 10.0, "hr_m": 1.5})
+    assert missing["overhead_LA_dBA"] == pytest.approx(free["overhead_LA_dBA"])
+    assert missing["iso9613_ground"]["status"] == "nao_avaliado"
+    assert missing["iso9613_ground"]["veredicto"] == "nao_avaliado"
+    import inspect
+    from acdt import api
+    assert "ground_spec" not in inspect.signature(api.rotor_noise).parameters

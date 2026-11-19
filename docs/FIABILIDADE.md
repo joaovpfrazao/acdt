@@ -191,14 +191,18 @@ atrasos logísticos 2–24 h, 2 surtidas/dia em turno de 12 h:
 * Frota com abortos na cobertura, filas de manutenção partilhadas (`ground_queue`) e utilização sazonal.
 * Fontes de taxas públicas adicionais verificáveis (p. ex. NPRD/EPRD com edição e página) quando houver acesso.
 
-## 9. Espera inativa, Weibull e fator β (19 nov 2026)
+## 9. Adaptador nativo (19 nov 2026)
+
+Cada item de `payload_equipment` e cada fonte da arquitetura elétrica entra no RBD como componente crítico (`payload:…`, `eletrica:…`). λ ou MTBF só entram com fonte não vazia e diferente de `EXAMPLE`. Sem taxa, o componente fica desconhecido: o minorante da fiabilidade de missão usa R = 0 e o veredicto é `nao_avaliado`. Não é um passa. A duração, se não for declarada, é a soma dos segmentos nativos ou, no jato, alcance/velocidade do cruzeiro. Medida de ensaio: motor com λ = 10⁻⁵ h⁻¹ e carga sem λ, missão de 1 h, R ∈ [0; 0,99999]. Ficheiro: `examples/output/adaptadores_vtol_jato/adaptadores.json`.
+
+## 10. Espera inativa, Weibull e fator β (19 nov 2026)
 
 O RBD do §2 continua a ser redundância ativa, sem comutação. O que se segue é um bloco lateral
 (`standby` / `weibull` na especificação `acdt.reliability/1`, ou as funções de
 `acdt.core.reliability.standby`). Não substitui a fiabilidade de missão. Sem estes blocos, o
 resultado do estudo fica igual ao de antes.
 
-### 9.1 Espera inativa, comutador perfeito
+### 10.1 Espera inativa, comutador perfeito
 
 MIL-HDBK-338B §7.5.5.3. Dois elementos exponenciais com taxas diferentes (p. 7-113):
 
@@ -230,7 +234,7 @@ há reparação durante a missão. PRESSUPOSTO numérico: |λ_b − λ_a| ≤ 10
 de taxas iguais, porque a expressão da p. 7-113 é singular na igualdade. λ = 0 declarado dá
 R = 1; a MTBF correspondente é infinita e fica `None`.
 
-### 9.2 Weibull com γ = 0
+### 10.2 Weibull com γ = 0
 
 Eq. 5.50 e 5.51, exemplo §5.3.6.1 (p. 5-23):
 
@@ -242,14 +246,14 @@ não foi transcrito (a Eq. 5.50 não tem localização) e o item fica `nao_avali
 função gama não está na página lida e não é calculado. Em t = 0 e β < 1 a taxa de risco é
 singular: fica desconhecida, não zero.
 
-### 9.3 Fator β
+### 10.3 Fator β
 
 O §7.5.5.4 (p. 7-117) trata falhas dependentes como partilha de carga com fator k (θ′ = θ/k e
 θ_s = θ/k + θ/2), não como fator β de causa comum. A equação λ_cc = β λ não está nessa página e
 não foi aplicada. A partilha de carga também não foi codificada: não é o fator pedido. Veredicto
 do fator β: `nao_avaliado`. Calibração: `nao_aplicar`.
 
-### 9.4 Ligação à árvore de falhas (ARP4761)
+### 10.4 Ligação à árvore de falhas (ARP4761)
 
 `standby_fault_tree` cria um evento básico (`acdt.core.safety.fta`, NUREG-0492) com
 q = 1 − R(t). O corte mínimo é esse evento. Uma porta AND dos elementos é a falha da redundância
@@ -257,7 +261,7 @@ ativa (o sistema só falha quando todos falham). Uma porta OR é a falha em sér
 é a espera inativa da §7.5.5.3. Para λt = 1 e n = 2, q da espera é 1 − 2/e; a porta AND dá
 (1 − e^{−1})^2 e a porta OR dá 1 − e^{−2}. O SCRAM (GPL) continua fora do processo.
 
-### 9.5 Veredicto
+### 10.5 Veredicto
 
 Transcrição das identidades (espera com R_S = 1 e Weibull com γ = 0): **validado**. Calibração
 face a medida de voo ou a L1/L2: **nao_aplicar**. Comutador imperfeito, γ ≠ 0 e fator β:

@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from scipy.special import jv
 
@@ -54,6 +54,27 @@ SKM_ST = 0.28
 SKM_OCTAVES: tuple[tuple[float, float], ...] = ((0.5, -8.0), (1.0, -4.0), (2.0, -8.0), (4.0, -9.0), (8.0, -13.0),
                                                 (16.0, -14.0))
 RHO_SL_SLUG_FT3 = 0.002378
+
+
+def thickness_noise_status() -> dict[str, Any]:
+    """Espessura (Deming) e Hanson: não avaliadas. Não devolve um SPL.
+
+    NACA TN 605 (Deming, 1937, NTRS 19930081380) é de domínio público, mas a equação não foi
+    transcrita de uma cópia legível. Hanson e SAE AIR1407 continuam por verificar equação a
+    equação. Não avaliado não é zero nem passa.
+    """
+    return {
+        "evaluated": False, "veredicto": "nao_avaliado", "method": None, "spl_dB": None,
+        "reason": (
+            "Ruído de espessura de Deming (NACA TN 605, 1937, «Noise from Propellers with Symmetrical "
+            "Sections at Zero Blade Angle», NTRS 19930081380) não foi transcrito: a equação não está conferida. "
+            "Hanson e SAE AIR1407 não foram verificados equação a equação. Não se devolve um nível."),
+        "sources": [
+            "Deming, A. F., NACA TN 605 (1937), NTRS 19930081380 — equação não transcrita",
+            "Hanson — não verificado",
+            "SAE AIR1407 — não verificado",
+        ],
+    }
 
 
 def gutin_prms(m: int, B: int, omega: float, T: float, Q: float, r: float, theta: float, c: float,
