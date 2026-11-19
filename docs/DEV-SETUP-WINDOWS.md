@@ -51,7 +51,7 @@ fidelidade. Crie uma pasta, por exemplo `C:\acdt-tools\bin`, e ponha-a no `PATH`
 | Gmsh | malhas 2-D/3-D (Fase 4) | https://gmsh.info/#Download, ou `pip install gmsh` no venv (instala `gmsh.exe` em `.venv\Scripts`) | `gmsh.exe` |
 | SU2 8.x | CFD Euler/RANS (Fase 4) | https://su2code.github.io/download.html (binários Windows); MPI: Microsoft MPI https://learn.microsoft.com/message-passing-interface/microsoft-mpi | `SU2_CFD.exe`; `mpiexec` para corridas paralelas |
 | CalculiX 2.2x | FEM de cascas, modos (Fases 4–6) | https://www.calculix.de/ (ligações para builds Windows, p. ex. bConverged) | `ccx.exe` (renomear `ccx_2.xx.exe`) |
-| OpenVSP | geometria STEP/STL (Fase 4) | https://openvsp.org/download.php (zip Windows com o pacote Python `openvsp`) | ver `ACDT_VSP_PYTHON` |
+| OpenVSP 3.56.0 | geometria STEP/STL e VSPAERO (Fase 4) | https://openvsp.org/download.php?file=zips/current/windows/OpenVSP-3.56.0-win64-Python3.13.zip | `ACDT_VSP_PYTHON` = o `python.exe` onde `import openvsp` imprime `OpenVSP 3.56.0` |
 | JSBSim | verificação do simulador 6-DOF (Fase 8) | `pip install jsbsim` (extra `sim`; rodas Windows no PyPI) | processo separado |
 | WireViz / KiCad (opcional) | diagramas de cablagem | https://github.com/wireviz/WireViz, https://www.kicad.org/download/windows/ | `wireviz` |
 
@@ -74,8 +74,15 @@ O acdt procura cada executável primeiro nas pastas de `ACDT_HIFI_BIN` (separada
 | `ACDT_MCP_WORKERS` | trabalhos MCP em paralelo (omissão 1) | `setx ACDT_MCP_WORKERS 2` |
 | `ACDT_POLAR_CACHE` | cache de polares (omissão `%USERPROFILE%\.cache\acdt\polars`; `0` desliga) | |
 
-OpenVSP: crie um venv com a versão de Python indicada no zip do OpenVSP e instale o pacote `openvsp` que vem
-no zip (`python\openvsp`); teste com `"%ACDT_VSP_PYTHON%" -c "import openvsp"`.
+OpenVSP: crie um venv com a versão de Python indicada no zip e instale os pacotes locais
+`openvsp`, `openvsp_config`, `degen_geom` e `utilities` (pasta `python/` do zip). O OpenVSP em si é NOSA 1.3;
+o pacote `openvsp` que o zip declara é o wrapper MIT. O processo acdt não importa `openvsp`: o solver é o
+`vspaero.exe` que fica ao lado do módulo, noutro processo. Teste com
+`"%ACDT_VSP_PYTHON%" -c "import openvsp; print(openvsp.GetVSPVersion())"`.
+
+Neste PC, a 18 nov 2026, o zip Python 3.13 de cima descarregou (o 3.55.0, a 28 out 2026, não chegou a
+descarregar: o handshake TLS de `openvsp.org` falhava). O venv ficou em `C:\acdt-tools\openvsp\py313`.
+O `python/README.md` do zip aponta para `setup.ps1` e conda; a instalação usada foi o venv e o `pip`.
 
 ## 5. Testes
 

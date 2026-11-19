@@ -1,0 +1,469 @@
+{
+ "design": "uav150_flying_wing_tailless",
+ "date": "2026-11-18",
+ "branch": "win-openvsp-esteira",
+ "decision": "nao_aplicar",
+ "valid": false,
+ "applied": false,
+ "model_L1": "nao_aplicar",
+ "example_yaml_edited": false,
+ "windows_openvsp": true,
+ "surface": "thick",
+ "stall_model": 0,
+ "documented_wake_requested": {
+  "WakeNumIter": 5,
+  "NumWakeNodes": 8,
+  "WakeRelax": 1.0,
+  "FixedWakeFlag": 0,
+  "ImplicitWake": 0
+ },
+ "prior_panel_failure": {
+  "source": "examples/output/uav150_flying_wing_tailless_hifi_win/h7_openvsp.json",
+  "openvsp": "OpenVSP 3.48.2",
+  "error": "Could not find global edge for trailing wake. Nodes 1363 and 1364.",
+  "history": false,
+  "used_for_these_coefficients": false
+ },
+ "resolution_note": "OpenVSP 3.56.0 no Windows, conjunto grosso, com WakeNumIter, NumWakeNodes, WakeRelax, FixedWakeFlag e ImplicitWake escritos e lidos de volta. A linha do CHANGELOG 3.46.0, «Fix TE wake detection for VSPAERO», não é tomada como causa: a nota não descreve esta asa, e a asa não tem corpo. A diferença de versão fica registada.",
+ "citations": [
+  "McDonald and Gloudemans, Open Vehicle Sketch Pad, AIAA 2022-0004",
+  "OpenVSP 3.45.0 changelog, 2025-07-18: implicit wake couples vortex strength and wake position through the adjoint; explicit-wake convergence was also improved. ImplicitWake is left at 0.",
+  "OpenVSP 3.46.0 changelog lists «Fix TE wake detection for VSPAERO» and does not describe this wing.",
+  "Drela and Youngren, AVL 3.40, avl_doc.txt"
+ ],
+ "estimate": {
+  "ram_available_GB": 17.01089096069336,
+  "limit_GB": 11.90762367248535,
+  "ram_estimate_GB": 0.8,
+  "ram_estimate_is_a_ceiling": true,
+  "ram_estimate_source": "teto do registo VSPAERO fino; não é uma medição desta malha de painéis",
+  "disk_free_GB": 194.22493362426758,
+  "time_estimate_min": 20.0,
+  "budget_run_here": true,
+  "budget_reason": "cabe nesta máquina",
+  "geometry_wall_s": 0.06178450584411621,
+  "solver_wall_s": 2.1896259784698486
+ },
+ "reference": {
+  "sref_m2": 3.186,
+  "bref_m": 4.381874564811488,
+  "cref_m": 0.7270860799131671,
+  "xcg_m": 0.9801559793360929,
+  "mach": 0.1369538125677505,
+  "re_cref": 1756220.9546793227,
+  "re_cref_note": "Escrito no caso. StallModel 0, por isso a solução não é viscosa.",
+  "alpha_deg": 9.52057,
+  "alpha_source": "AVL externo, cartão de duas secções, nesta corrida"
+ },
+ "avl_two_section": {
+  "available": true,
+  "source": "AVL 3.x external process, symmetric wing, YDUPLICATE",
+  "alpha_deg": 9.52057,
+  "CLtot": 0.50293,
+  "CDff": 0.0145358,
+  "Cmtot": 0.02886,
+  "CDtot": 0.01611,
+  "Xref": 0.98016,
+  "Sref": 3.186,
+  "Cref": 0.72709,
+  "Bref": 4.3819,
+  "Mach": 0.1369538125677505,
+  "nchord": 12,
+  "nspan": 40,
+  "note": "O cartão de quatro secções do estudo de controlos é outra discretização e não entra nesta comparação."
+ },
+ "vspaero_run": true,
+ "openvsp": "OpenVSP 3.56.0",
+ "vspaero_solver": "vspaero.exe",
+ "vsp_python": "python.exe",
+ "returncode": 0,
+ "vspaero_error": null,
+ "geometry_wall_s": 0.06178450584411621,
+ "solver_wall_s": 2.1896259784698486,
+ "wake_applied": {
+  "WakeNumIter": [
+   5
+  ],
+  "NumWakeNodes": [
+   8
+  ],
+  "WakeRelax": [
+   1.0
+  ],
+  "FixedWakeFlag": [
+   0
+  ],
+  "ImplicitWake": [
+   0
+  ]
+ },
+ "wake_skipped": {},
+ "inputs_read_back": {
+  "RefFlag": [
+   0
+  ],
+  "AlphaNpts": [
+   1
+  ],
+  "AlphaStart": [
+   9.52057
+  ],
+  "AlphaEnd": [
+   9.52057
+  ],
+  "MachStart": [
+   0.1369538125677505
+  ],
+  "MachEnd": [
+   0.1369538125677505
+  ],
+  "WakeNumIter": [
+   5
+  ],
+  "NumWakeNodes": [
+   8
+  ],
+  "WakeRelax": [
+   1.0
+  ],
+  "FixedWakeFlag": [
+   0
+  ],
+  "ImplicitWake": [
+   0
+  ],
+  "NCPU": [
+   4
+  ],
+  "StallModel": [
+   0
+  ],
+  "StopBeforeRun": [
+   1
+  ],
+  "GeomSet": [
+   0
+  ],
+  "ThinGeomSet": [
+   -1
+  ],
+  "Sref": [
+   3.186
+  ],
+  "bref": [
+   4.381874564811488
+  ],
+  "cref": [
+   0.7270860799131671
+  ],
+  "Xcg": [
+   0.9801559793360929
+  ],
+  "ReCref": [
+   1756220.9546793227
+  ]
+ },
+ "history_reference": {
+  "Sref_": "3.1860000",
+  "Cref_": "0.7270861",
+  "Bref_": "4.3818746",
+  "Xcg_": "0.9801560",
+  "Ycg_": "0.0000000",
+  "Zcg_": "0.0000000",
+  "Mach_": "0.1369538",
+  "AoA_": "9.5205698",
+  "Beta_": "0.0000000",
+  "Rho_": "0.0023770",
+  "Vinf_": "100.0000000"
+ },
+ "mesh_geoms_removed": [
+  "MeshGeom",
+  "MeshGeom"
+ ],
+ "mesh_note": "ComputeCompGeom deixa geoms do tipo Mesh no veículo. No conjunto grosso, SET_ALL incluía esses geoms e a história saía não finita. São apagados antes do VSPAERO. O conjunto grosso continua GeomSet SET_ALL e ThinGeomSet SET_NONE sobre a geometria de projecto. O caminho fino não mexe neles.",
+ "history_columns_missing": [],
+ "nonfinite_columns": [],
+ "n_history_rows": 5,
+ "residual": {
+  "converged": false,
+  "iterative_ok": false,
+  "n_rows": 5,
+  "L2_last": -0.695285133166,
+  "L2_previous": 0.255913848552,
+  "dCL_last_step": 0.00030795793700000296,
+  "reason": "WakeNumIter fica no default 5. O residual L2 da última iteração ainda muda. Não há critério de paragem citado que declare esta corrida convergida."
+ },
+ "last_iteration_tokens": {
+  "Iter": "5",
+  "Mach": "0.136953812568",
+  "AoA": "9.520570000000",
+  "CLtot": "0.528617793438",
+  "CDo": "0.015022219394",
+  "CDi": "0.024896685554",
+  "CDtot": "0.039918904949",
+  "CMytot": "0.035398852751",
+  "CLiw": "0.541907177500",
+  "CDiw": "0.019933177212",
+  "L2_Residual": "-0.695285133166",
+  "Max_Residual": "0.870626383931"
+ },
+ "last_iteration": {
+  "Iter": 5.0,
+  "Mach": 0.136953812568,
+  "AoA": 9.52057,
+  "CLtot": 0.528617793438,
+  "CDo": 0.015022219394,
+  "CDi": 0.024896685554,
+  "CDtot": 0.039918904949,
+  "CMytot": 0.035398852751,
+  "CLiw": 0.5419071775,
+  "CDiw": 0.019933177212,
+  "L2_Residual": -0.695285133166,
+  "Max_Residual": 0.870626383931
+ },
+ "wing_readback": {
+  "name": "Wing",
+  "Y_Rel_Rotation_deg": 0.0,
+  "Z_Rel_Location_m": 0.0,
+  "X_Rel_Location_m": 0.288403695762248,
+  "Span_m": 2.1918680877930847,
+  "ProjectedSpan_m": 2.190532860976295,
+  "TotalProjectedSpan_m": 4.38106572195259,
+  "Dihedral_deg": 1.9999999999999996,
+  "Sweep_deg": 28.000000000000004,
+  "Sweep_Location": 0.0,
+  "xsec": [
+   {
+    "ThickChord": 0.15,
+    "Twist": 0.0,
+    "Twist_Location": 0.0,
+    "Camber": 0.0,
+    "CamberLoc": 0.1
+   },
+   {
+    "ThickChord": 0.12,
+    "Twist": -10.0,
+    "Twist_Location": 0.0,
+    "Camber": 0.0,
+    "CamberLoc": 0.1
+   }
+  ],
+  "sections": {
+   "root": {
+    "le_m": [
+     0.288403695762248,
+     0.0,
+     0.0
+    ],
+    "te_m": [
+     1.326657000506341,
+     0.0,
+     0.0
+    ],
+    "te_other_m": [
+     1.326657000506341,
+     0.0,
+     0.0
+    ],
+    "te_closure_m": 0.0,
+    "chord_m": 1.038253304744093,
+    "tc_geometric": 4.2772722978187006e-16,
+    "nose_up_deg": 0.0,
+    "te_minus_le_z_m": 0.0
+   },
+   "tip": {
+    "le_m": [
+     1.4538406309996414,
+     2.190532860976295,
+     0.07649509310225185
+    ],
+    "te_m": [
+     1.862832592640653,
+     2.1880160377834734,
+     0.14856747952020022
+    ],
+    "te_other_m": [
+     1.862832592640653,
+     2.1880160377834734,
+     0.14856747952020022
+    ],
+    "te_closure_m": 0.0,
+    "chord_m": 0.41530132189763697,
+    "tc_geometric": 2.2054685285627686e-15,
+    "nose_up_deg": -10.000000000000004,
+    "te_minus_le_z_m": 0.07207238641794837
+   }
+  }
+ },
+ "len_unit": {
+  "STEPSettings": 2.0,
+  "IGESSettings": 2.0
+ },
+ "len_unit_metre": 2.0,
+ "comparison": {
+  "overall": "nao_aplicar",
+  "valid": false,
+  "applied": false,
+  "model_L1": "nao_aplicar",
+  "model_note": "O modelo L1, o AVL de duas secções, não fica validado e não é calibrado. Um α e malhas diferentes (painel 41×16, AVL nchord 12 e nspan 40) não aplicam factor. A razão informativa CDi/CDff fica fora de [0.7, 1.5].",
+  "same_lattice": false,
+  "same_geometry_family": true,
+  "moment_sign": "same",
+  "h1_band_not_an_apply_gate": true,
+  "CL": {
+   "quantity": "CL",
+   "hifi": 0.528617793438,
+   "lowfi": 0.50293,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": 1.051076279875927,
+   "reason": "um α; a polar não foi avaliada; o residual da esteira não está parado; não há GCI",
+   "valid": false
+  },
+  "Cm": {
+   "quantity": "Cm",
+   "hifi": 0.035398852751,
+   "lowfi": 0.02886,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": 1.2265714743936245,
+   "reason": "um α; a polar não foi avaliada; o residual da esteira não está parado; não há GCI",
+   "valid": false
+  },
+  "CDi_vs_CDff": {
+   "quantity": "CDi",
+   "hifi": 0.024896685554,
+   "lowfi": 0.0145358,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": null,
+   "reason": "O CDi de integração de superfície do VSPAERO é outra grandeza que o CDff do AVL.",
+   "valid": false,
+   "reported_ratio": 1.712783992212331,
+   "reported_ratio_inside_band": false,
+   "band_is_not_an_apply_gate": true
+  },
+  "CDiw_vs_CDff": {
+   "quantity": "CDiw",
+   "hifi": 0.019933177212,
+   "lowfi": 0.0145358,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": null,
+   "reason": "O CDiw da esteira é outra grandeza que o CDff do AVL.",
+   "valid": false,
+   "reported_ratio": 1.3713161444158561,
+   "reported_ratio_inside_band": true,
+   "band_is_not_an_apply_gate": true
+  },
+  "CDtot_vs_AVL_CDtot": {
+   "quantity": "CDtot",
+   "hifi": 0.039918904949,
+   "lowfi": 0.01611,
+   "band": [
+    0.7,
+    1.5
+   ],
+   "decision": "nao_aplicar",
+   "eligible": false,
+   "ratio": null,
+   "reason": "O CDtot do VSPAERO inclui o CDo. O CDtot do AVL é outra grandeza.",
+   "valid": false,
+   "reported_ratio": 2.477896024146493,
+   "reported_ratio_inside_band": false,
+   "band_is_not_an_apply_gate": true
+  },
+  "factors": [
+   {
+    "name": "CL",
+    "value": 1.051076279875927,
+    "valid": false,
+    "invalid_reason": "um α; a polar não foi avaliada; o residual da esteira não está parado; não há GCI",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+   },
+   {
+    "name": "Cm",
+    "value": 1.2265714743936245,
+    "valid": false,
+    "invalid_reason": "um α; a polar não foi avaliada; o residual da esteira não está parado; não há GCI",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND."
+   },
+   {
+    "name": "CDi",
+    "value": null,
+    "valid": false,
+    "invalid_reason": "O CDi de integração de superfície do VSPAERO é outra grandeza que o CDff do AVL.",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+    "reported_ratio": 1.712783992212331,
+    "reported_ratio_inside_band": false
+   },
+   {
+    "name": "CDiw",
+    "value": null,
+    "valid": false,
+    "invalid_reason": "O CDiw da esteira é outra grandeza que o CDff do AVL.",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+    "reported_ratio": 1.3713161444158561,
+    "reported_ratio_inside_band": true
+   },
+   {
+    "name": "CDtot",
+    "value": null,
+    "valid": false,
+    "invalid_reason": "O CDtot do VSPAERO inclui o CDo. O CDtot do AVL é outra grandeza.",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+    "reported_ratio": 2.477896024146493,
+    "reported_ratio_inside_band": false
+   }
+  ]
+ },
+ "model_note": "O modelo L1, o AVL de duas secções, não fica validado e não é calibrado. Um α e malhas diferentes (painel 41×16, AVL nchord 12 e nspan 40) não aplicam factor. A razão informativa CDi/CDff fica fora de [0.7, 1.5].",
+ "csv": "h7_vspaero_painel.csv",
+ "rho_vinf_note": "Rho_ e Vinf_ são os valores do cabeçalho do .history. StallModel 0, por isso não escalam o CL invíscido. A densidade por omissão não é tratada como kg/m3."
+}
