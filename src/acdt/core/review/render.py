@@ -14,6 +14,8 @@ import shutil
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .figures import draw_plan
+
 Block = tuple[Any, ...]
 
 STATUS_LABEL = {"cumpre": "cumpre", "nao_cumpre": "NÃO CUMPRE", "insuficiente": "insuficiente",
@@ -44,6 +46,21 @@ def unit(u: Any) -> str:
 
 def _short(h: Any, n: int = 12) -> str:
     return str(h)[:n] if h else "—"
+
+
+def _plan_text(plan: Mapping[str, Any]) -> str:
+    kind = "Frente de Pareto" if plan.get("kind") == "pareto" else "Histograma"
+    head = f"{kind} de {plan.get('file')} (SHA-256 {_short(plan.get('sha256'))})"
+    if plan.get("veredicto") != "validado":
+        return (f"{head}: não avaliado — {plan.get('reason') or 'sem motivo registado'}. "
+                "Calibração nao_aplicar.")
+    if plan.get("kind") == "pareto":
+        return (f"{head}: {plan.get('n')} avaliações, {plan.get('n_front')} na frente, objetivos "
+                f"{plan.get('x')} ({plan.get('x_sense') or '?'}) e {plan.get('y')} "
+                f"({plan.get('y_sense') or '?'}). Transcrição dos valores do registo; veredicto validado; "
+                "calibração nao_aplicar.")
+    return (f"{head}: {plan.get('n')} valores de {plan.get('metric')}. Transcrição das amostras guardadas; "
+            "veredicto validado; calibração nao_aplicar.")
 
 
 # --------------------------------------------------------------------------------------------- blocos
@@ -207,11 +224,20 @@ def blocks(r: Mapping[str, Any], figure_dir: str = "figuras") -> list[Block]:
               [[t["role"], t["path"], t["sha256"] or "—", t["status"]] for t in r["traceability"]]))
 
     B.append(("h", 2, "12. Figuras"))
-    if not r["figures"]:
+    if not r.get("figures"):
         B.append(("p", "Nenhuma figura já produzida nas pastas do projeto."))
-    for fg in r["figures"]:
+    for fg in r.get("figures") or []:
         B.append(("img", fg["path"], f"{figure_dir}/{Path(fg['path']).name}", f"{fg['path']} (SHA-256 "
                                                                               f"{_short(fg['sha256'])})"))
+    plans = (r.get("figure_plans") or {}).get("plans") or []
+    if plans:
+        B.append(("p", "As figuras seguintes saem só dos números já guardados nos registos. Um plano não avaliado "
+                       "não produz ficheiro."))
+    for plan in plans:
+        B.append(("p", _plan_text(plan)))
+        if plan.get("veredicto") == "validado":
+            name = str(plan.get("out_name"))
+            B.append(("img", name, f"{figure_dir}/{name}", name))
     ov = r["overrides"]
     if ov["waivers"] or ov["tailoring"] or r["profile_notes"] or r["warnings"]:
         B.append(("h", 2, "13. Dispensas, adaptações e notas"))
@@ -262,8 +288,9 @@ figure{margin:1em 0}figure img{max-width:100%;border:1px solid #ddd}figcaption{f
 @media print{body{max-width:none}}"""
 
 
-def to_html(r: Mapping[str, Any], base: Path | None = None) -> str:
-    """HTML autónomo; as figuras ficam embutidas (base64) se ``base`` (pasta do design.json) for dado."""
+def to_html(r: Mapping[str, Any], base: Path | None = None, embed_dir: Path | None = None) -> str:
+    """HTML autónomo. As figuras ficam embutidas (base64) a partir de ``embed_dir`` ou de ``base`` (pasta do
+    design.json)."""
     e = html.escape
     out = ["<!DOCTYPE html>", '<html lang="pt-PT"><head><meta charset="utf-8">',
            f"<title>{e(r['gate'])} — {e(str(r['design'].get('name')))}</title>", f"<style>{_CSS}</style></head><body>"]
@@ -285,10 +312,15 @@ def to_html(r: Mapping[str, Any], base: Path | None = None) -> str:
             out.append("<ul>" + "".join(f"<li>{e(str(x))}</li>" for x in b[1]) + "</ul>")
         elif k == "img":
             src = b[2]
+            candidates: list[Path] = []
+            if embed_dir is not None:
+                candidates.append(Path(embed_dir) / Path(str(b[2])).name)
             if base is not None:
-                p = (base / b[1])
-                if p.is_file():
-                    src = "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode("ascii")
+                candidates.append(Path(base) / str(b[1]))
+            for pth in candidates:
+                if pth.is_file():
+                    src = "data:image/png;base64," + base64.b64encode(pth.read_bytes()).decode("ascii")
+                    break
             out.append(f'<figure><img src="{e(src)}" alt="{e(b[3])}"><figcaption>{e(b[3])}</figcaption></figure>')
     out.append("</body></html>")
     return "\n".join(out) + "\n"
@@ -309,19 +341,23 @@ def write(r: Mapping[str, Any], out: str | Path, base: Path, pdf: bool = False) 
     o.mkdir(parents=True, exist_ok=True)
     stem = f"relatorio_{str(r['gate']).lower()}"
     files: list[Path] = []
-    if r["figures"]:
-        fd = o / "figuras"
+    fd = o / "figuras"
+    if r.get("figures"):
         fd.mkdir(exist_ok=True)
         for fg in r["figures"]:
             src = base / fg["path"]
             if src.is_file():
                 shutil.copyfile(src, fd / src.name)
+    for plan in (r.get("figure_plans") or {}).get("plans") or []:
+        if plan.get("veredicto") == "validado":
+            fd.mkdir(exist_ok=True)
+            draw_plan(plan, fd / str(plan["out_name"]))
     pj = o / f"{stem}.json"
     pj.write_text(json.dumps(r, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     pm = o / f"{stem}.md"
     pm.write_text(to_markdown(r), encoding="utf-8")
     ph = o / f"{stem}.html"
-    h = to_html(r, base)
+    h = to_html(r, base, embed_dir=fd if fd.is_dir() else None)
     ph.write_text(h, encoding="utf-8")
     files += [pj, pm, ph]
     if pdf:

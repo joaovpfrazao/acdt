@@ -61,7 +61,7 @@ O domínio não declara grandezas de resumo (perfil genérico); ver as disciplin
 
 ## 5. Fidelidade por disciplina
 
-Nível exigido às disciplinas primárias nesta revisão: L1 (nível exigido por revisão = PRESSUPOSTO do acdt (SRR L0, PDR L1, CDR L2); a NPR 7123.1D não define níveis de fidelidade).
+Nível exigido às disciplinas primárias nesta revisão: L1 (nível exigido por revisão = PRESSUPOSTO do acdt (SRR L0, PDR L1, CDR L2, MDR L0, TRR L0, PRR L0); a NPR 7123.1D não define níveis de fidelidade).
 
 | Disciplina | Níveis | Máximo | Primária | Exigido | Estado | Origem | Método | Sem unidade |
 |---|---|---|---|---|---|---|---|---|
@@ -152,3 +152,13 @@ SHA-256 atual de cada ficheiro e, quando outro registo o guardou, a comparação
 ## 12. Figuras
 
 Nenhuma figura já produzida nas pastas do projeto.
+
+As figuras seguintes saem só dos números já guardados nos registos. Um plano não avaliado não produz ficheiro.
+
+Frente de Pareto de mdo/mdo.json (SHA-256 5f04f2824b7e): 9 avaliações, 9 na frente, objetivos f1 (min) e f2 (min). Transcrição dos valores do registo; veredicto validado; calibração nao_aplicar.
+
+![pareto_mdo_mdo.png](figuras/pareto_mdo_mdo.png)
+
+*pareto_mdo_mdo.png*
+
+Histograma de uq/uq.json (SHA-256 f91e283dcc27): não avaliado — o registo UQ não guarda amostras (samples nulo ou ausente); não se desenha uma distribuição. Calibração nao_aplicar.

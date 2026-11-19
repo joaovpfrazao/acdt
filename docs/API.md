@@ -16,7 +16,7 @@ pacote sem aviso. Referência gerada: [API Python](referencia/api.md) · [CLI](r
 | V&V | `vv_cases()`, `vv(cases=, disciplines=, max_cost=, output=)` |
 | dados de ensaio | `load_test_data(ficheiro, meta)`, `calibrate(estudo, saída)` |
 | estado de projeto | `db_load`, `db_save`, `db_get`, `db_diff`, `db_validate` |
-| revisões de projeto | `report(design, level, saída, uq=, mdo=, vv=, calib=, criteria=, discover=, pdf=)` — SRR/PDR/CDR (desde 1.1.0; [RELATORIOS.md](RELATORIOS.md)) |
+| revisões de projeto | `report(design, level, saída, uq=, mdo=, vv=, calib=, criteria=, discover=, pdf=)` — SRR/PDR/CDR/MDR/TRR/PRR (desde 1.1.0; [RELATORIOS.md](RELATORIOS.md)) |
 | ruído | `rotor_noise(blades=, diameter_m=, rpm=, thrust_N=, power_W=, n_rotors=, altitude_m=, speed_m_s=, …)` — ruído L0 de rotores/hélices dados explicitamente (desde 1.2.0; [RUIDO.md](RUIDO.md)) |
 | térmica | `thermal(spec)` — compartimentos, margens e arrefecimento a partir de uma especificação genérica `acdt.thermal/1`; `thermal_atmosphere(perfil, altitude_m, T_sl_C=)` — dias quente/frio MIL-HDBK-310 (desde 1.3.0; [TERMICA.md](TERMICA.md)) |
 | gelo | `icing(spec)` — envelopes do 14 CFR 25 Ap. C, captação, fração de congelação, espessura, potência de proteção e penalização a partir de uma especificação genérica `acdt.icing/1`; `icing_envelope(tipo, T_C, mvd_um, horizontal_extent_nmi=, altitude_m=)` — LWC de projeto e estado face ao envelope (desde 1.4.0; [GELO.md](GELO.md)) |

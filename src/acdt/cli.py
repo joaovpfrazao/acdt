@@ -1780,8 +1780,9 @@ def _cmd_vv(a) -> int:
 
 
 def _cmd_report(a) -> int:
-    """Relatório de revisão de projeto SRR/PDR/CDR (docs/RELATORIOS.md): critérios NPR 7123.1D Ap. G avaliados sobre
-    o estado de projeto e os registos (verificação, proveniência, UQ, MDO, V&V, calibração) → JSON + MD + HTML."""
+    """Relatório de revisão de projeto SRR/PDR/CDR/MDR/TRR/PRR (docs/RELATORIOS.md): critérios NPR 7123.1D Ap. G
+    avaliados sobre o estado de projeto e os registos (verificação, proveniência, UQ, MDO, V&V, calibração)
+    → JSON + MD + HTML."""
     from acdt.core import review as R
 
     dp = Path(a.design)
@@ -2242,11 +2243,12 @@ def build_parser() -> argparse.ArgumentParser:
     vvp.add_argument("--list", action="store_true", help="listar os casos registados")
     vvp.add_argument("--strict", action="store_true", help="código 1 também com nao_avaliado/desconhecido")
     vvp.set_defaults(fn=_cmd_vv)
-    rp = sub.add_parser("report", help="relatório de revisão de projeto SRR/PDR/CDR (NPR 7123.1D Ap. G): requisitos, "
+    rp = sub.add_parser("report", help="relatório de revisão SRR/PDR/CDR/MDR/TRR/PRR (NPR 7123.1D Ap. G): requisitos, "
                                        "fidelidade, itens em aberto, UQ, MDO, V&V, calibração, rastreabilidade e "
                                        "veredito pronto/nao_pronto/insuficiente; docs/RELATORIOS.md")
     rp.add_argument("design", help="design.json ou a pasta que o contém (acdt.design/1)")
-    rp.add_argument("--level", required=True, type=str.upper, choices=["SRR", "PDR", "CDR"], help="revisão")
+    rp.add_argument("--level", required=True, type=str.upper,
+                    choices=["SRR", "PDR", "CDR", "MDR", "TRR", "PRR"], help="revisão")
     rp.add_argument("-o", "--output", help="pasta de saída (omissão <pasta do design>/revisao_<nível>)")
     rp.add_argument("--uq", action="append", help="uq.json ou pasta (repetível; além dos encontrados na pasta)")
     rp.add_argument("--mdo", action="append", help="mdo.json ou pasta (repetível)")

@@ -1,0 +1,178 @@
+{
+ "schema": "acdt.relatorios_figuras/1",
+ "date": "2026-11-19",
+ "parent": "e9726e401e75fe7a04ebe97ca0e20940d811bddc",
+ "branch": "relatorios-figuras-revisao",
+ "fonte": "tests/data/review_small",
+ "nota_fonte": "exemplo analítico de teste; não é um projeto de aeronave",
+ "example_yaml_edited": false,
+ "applied": false,
+ "veredicto": "validado",
+ "calibracao": "nao_aplicar",
+ "comparacao_externa": "nao_aplicar",
+ "desvios": [],
+ "nota_desvios": "Não há grandeza de referência externa. A figura repete os pontos do registo. A lista vazia não é um ensaio que passou.",
+ "significado": "validado = a frente desenhada é a dos pontos guardados e os excertos MDR/TRR/PRR estão no HTML do NODIS da NPR 7123.1D Apêndice G, conferido em 2026-11-19. Não é uma calibração nem a decisão de um painel.",
+ "norma": {
+  "id": "NPR 7123.1D",
+  "apendice": "G",
+  "efetiva": "2023-07-05",
+  "url": "https://nodis3.gsfc.nasa.gov/displayDir.cfm?Internal_ID=N_PR_7123_001D_&page_name=AppendixG",
+  "excertos_presentes": true
+ },
+ "pareto": {
+  "veredicto": "validado",
+  "calibracao": "nao_aplicar",
+  "file": "mdo/mdo.json",
+  "sha256": "5f04f2824b7e6e62ce65e5d185c286c9bee9c53f2904668f4f867c5843c9251f",
+  "n": 9,
+  "n_front": 9,
+  "front": [
+   7,
+   8,
+   2,
+   4,
+   0,
+   1,
+   3,
+   6,
+   5
+  ],
+  "x": "f1",
+  "y": "f2",
+  "x_sense": "min",
+  "y_sense": "min",
+  "out_name": "pareto_mdo_mdo.png"
+ },
+ "histograma": {
+  "veredicto": "nao_avaliado",
+  "calibracao": "nao_aplicar",
+  "file": "uq/uq.json",
+  "sha256": "f91e283dcc27d6f9edaafa15d2886bc308d1e1103c305ae7a752441bf5a1be05",
+  "reason": "o registo UQ não guarda amostras (samples nulo ou ausente); não se desenha uma distribuição",
+  "values": []
+ },
+ "revisoes_do_exemplo": {
+  "MDR": {
+   "veredicto_revisao": "pronto",
+   "motivos": [],
+   "required_level": "L0",
+   "criterios": [
+    {
+     "id": "MDR-E01",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "MDR-E02",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "MDR-S03",
+     "check": "conceito_viavel",
+     "status": "cumpre"
+    },
+    {
+     "id": "MDR-S04",
+     "check": "arvore_requisitos",
+     "status": "cumpre"
+    },
+    {
+     "id": "MDR-S05",
+     "check": "estudos_compromisso",
+     "status": "cumpre"
+    },
+    {
+     "id": "MDR-S06",
+     "check": null,
+     "status": "revisao_humana"
+    }
+   ]
+  },
+  "TRR": {
+   "veredicto_revisao": "nao_pronto",
+   "motivos": [
+    "TRR-E04"
+   ],
+   "required_level": "L0",
+   "criterios": [
+    {
+     "id": "TRR-E01",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "TRR-E02",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "TRR-E03",
+     "check": "linha_de_base",
+     "status": "cumpre"
+    },
+    {
+     "id": "TRR-E04",
+     "check": "requisitos_cumpridos",
+     "status": "nao_cumpre"
+    },
+    {
+     "id": "TRR-S05",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "TRR-S06",
+     "check": null,
+     "status": "revisao_humana"
+    }
+   ]
+  },
+  "PRR": {
+   "veredicto_revisao": "nao_pronto",
+   "motivos": [
+    "PRR-S04"
+   ],
+   "required_level": "L0",
+   "criterios": [
+    {
+     "id": "PRR-E01",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "PRR-E02",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "PRR-E03",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "PRR-S04",
+     "check": "requisitos_cumpridos",
+     "status": "nao_cumpre"
+    },
+    {
+     "id": "PRR-S05",
+     "check": null,
+     "status": "revisao_humana"
+    },
+    {
+     "id": "PRR-S06",
+     "check": null,
+     "status": "revisao_humana"
+    }
+   ]
+  }
+ },
+ "limites": [
+  "SDR de programas que não são de projeto único (Tabela G-2) não está implementada",
+  "espetro, instalações, formação, segurança, custo, calendário, fornecedores, lista de materiais e registo de riscos não passam automaticamente",
+  "nível L0 de MDR, TRR e PRR é PRESSUPOSTO; a NPR não define L0–L3",
+  "o veredicto pronto da MDR neste exemplo cobre só os três avaliadores automáticos do modelo analítico"
+ ]
+}
