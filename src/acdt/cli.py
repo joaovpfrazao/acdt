@@ -215,6 +215,32 @@ def _cmd_db(a) -> int:
         print(f"[acdt] incerteza ligada a {len(rep['ligadas'])} grandezas; sem grandeza no estado: "
               f"{rep['sem_grandeza'] or '—'}; sem resumo válido: {rep['sem_resumo'] or '—'}")
         return 0
+    if a.action in ("add-mdo", "add-vv", "add-hifi"):
+        if len(a.paths) != 2:
+            print(f"[acdt] db {a.action} <design.json> <ficheiro|pasta>", file=sys.stderr)
+            return 2
+        from acdt.core.design_studies import attach_hifi_path, attach_mdo_file, attach_vv_file
+        dst = Path(a.paths[0])
+        dst = dst / D.DEFAULT_FILE if dst.is_dir() else dst
+        try:
+            if a.action == "add-mdo":
+                rep = attach_mdo_file(db, a.paths[1])
+                print(f"[acdt] mdo L2: {rep['veredicto']}; escritas {len(rep['escritas'])}; "
+                      f"omitidas {rep['omitidas'] or '—'}")
+            elif a.action == "add-vv":
+                rep = attach_vv_file(db, a.paths[1])
+                print(f"[acdt] vv L0: {rep['veredicto']}; escritas {len(rep['escritas'])}; "
+                      f"omitidas {rep['omitidas'] or '—'}")
+            else:
+                for passo in attach_hifi_path(db, a.paths[1], step=getattr(a, "step", None)):
+                    extra = f" ({passo['motivo']})" if passo.get("motivo") else \
+                        f" → {passo.get('disciplina')} ({len(passo.get('escritas') or [])})"
+                    print(f"[acdt] hifi {passo.get('passo')}: {passo.get('veredicto')}{extra}")
+        except (D.DesignDBError, OSError, ValueError) as e:
+            print(f"[acdt] {e}", file=sys.stderr)
+            return 2
+        D.save(db, dst)
+        return 0
     if a.action == "get":
         if len(a.paths) < 2:
             print("[acdt] db get <design.json> <caminho|glob|nome> [--unit U]", file=sys.stderr)
@@ -2258,8 +2284,10 @@ def build_parser() -> argparse.ArgumentParser:
     rp.add_argument("--pdf", action="store_true", help="também PDF (requer WeasyPrint, opcional)")
     rp.set_defaults(fn=_cmd_report)
     dbp = sub.add_parser("db", help="estado de projeto único acdt.design/1 (unidades, nível, proveniência): show / "
-                         "get / diff / export / build / validate / add-uq (docs/DADOS.md)")
-    dbp.add_argument("action", choices=["show", "get", "diff", "export", "build", "validate", "add-uq"])
+                         "get / diff / export / build / validate / add-uq / add-mdo / add-vv / add-hifi "
+                         "(docs/DADOS.md)")
+    dbp.add_argument("action", choices=["show", "get", "diff", "export", "build", "validate", "add-uq",
+                                        "add-mdo", "add-vv", "add-hifi"])
     dbp.add_argument("paths", nargs="*", help="design.json ou pasta; get: + caminho/glob/nome; diff: A B; "
                      "export: + filtro opcional; build: missão.yaml pasta")
     dbp.add_argument("-o", "--output")
@@ -2269,6 +2297,7 @@ def build_parser() -> argparse.ArgumentParser:
     dbp.add_argument("--include", help="diff: só caminhos que correspondem a este glob")
     dbp.add_argument("--json", action="store_true")
     dbp.add_argument("--map", action="append", help="add-uq: métrica=nome.da.grandeza (repetível)")
+    dbp.add_argument("--step", help="add-hifi de um ficheiro JSON: nome do passo (fem, flutter, wing_euler, …)")
     dbp.set_defaults(fn=_cmd_db)
     clp = sub.add_parser("calib", help="dados de ensaio (CSV/Parquet/PX4 ULog, unidades, metadados) e calibração de "
                          "fatores/parâmetros com incerteza e decisão aplicar/não aplicar: ingest / fit / show / "

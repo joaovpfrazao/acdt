@@ -2,8 +2,8 @@
 """Perfis de revisão por domínio: disciplinas primárias, grandezas de resumo e a grandeza de viabilidade.
 
 Um domínio regista o seu perfil (:func:`register_profile`); sem perfil usa-se o genérico: todas as disciplinas
-registadas no estado de projeto são primárias (exceto ``outros`` e ``calibracao``), sem grandezas de resumo
-escolhidas, e a viabilidade lê-se de qualquer grandeza chamada ``feasible``.
+registadas no estado de projeto são primárias (exceto ``outros``, ``calibracao``, ``mdo`` e ``vv``), sem
+grandezas de resumo escolhidas, e a viabilidade lê-se de qualquer grandeza chamada ``feasible``.
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from typing import Any, Mapping
 
 from .criteria import DEFAULT_REQUIRED_LEVEL
 
-NON_PRIMARY = ("outros", "calibracao")
+NON_PRIMARY = ("outros", "calibracao", "mdo", "vv")
 
 
 @dataclass(frozen=True)

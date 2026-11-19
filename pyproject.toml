@@ -105,6 +105,7 @@ files = [
   "src/acdt/domains/aircraft/vv_cases.py",
   "src/acdt/core/quantities.py",
   "src/acdt/core/design_db.py",
+  "src/acdt/core/design_studies.py",
   "src/acdt/domains/aircraft/design_db_run.py",
   "src/acdt/core/calibration/__init__.py",
   "src/acdt/core/calibration/ingest.py",

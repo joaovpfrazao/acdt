@@ -2000,3 +2000,14 @@ Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
 | 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |
 | 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |
 | 19 | BAIXA (L0 feito 18 nov 2026, §32u) | **Fiabilidade e manutenção de frota** | fiabilidade de missão, disponibilidade, MMH/FH, sobressalentes, dimensão da frota e custo de manutenção | feito: MIL-HDBK-338B (RBD, k-de-n, Eq. 10.18–10.24, Poisson), Ha 2010; falta espera fria/quente, fases, Weibull, causa comum, METRIC |
+
+## 34. Blocos MDO, V&V e L3 no estado de projeto (19 nov 2026)
+
+* **CLI:** `acdt db add-mdo`, `acdt db add-vv`, `acdt db add-hifi` (um ficheiro hifi avulso leva `--step`). Não há nome novo na API pública (continua 1.7.0).
+* Copiam escalares finitos já gravados. Não dimensionam o avião e não lançam VSPAERO, CalculiX nem pyCycle. Um valor em falta não entra como zero. `nao_avaliado` não passa a `passa`.
+* MDO → `results.mdo.L2` e `definition.derived.mdo` (o `definition.input` mantém-se). PRESSUPOSTO: L2 é a casa pedida em [docs/DADOS.md](docs/DADOS.md), não uma análise L2. Sem `chosen`, não há ótimo inventado. `n_pareto` é o comprimento da lista; os identificadores ficam no `mdo.json`.
+* V&V → um bloco `results.vv.L0`. PRESSUPOSTO: é o relatório `acdt.vv/1` da framework, não a fidelidade do avião. O `delta_rel` é o que o relatório já gravou. Linha `nao_avaliado` ou `desconhecido` não copia erro.
+* L3 por passo de `acdt hifi`, com o nome prefixado pelo passo para dois passos da mesma disciplina se juntarem. PRESSUPOSTO: a pasta do passo escolhe a disciplina. `rans_case` sem `CL` finito não cria aerodinâmica. Passo `skipped` ou desconhecido não escreve números. `inf` e listas ficam de fora. A unidade sai do sufixo da folha.
+* `mdo` e `vv` não são disciplinas primárias da revisão. O diff L1↔L3 continua a ser `acdt db diff`.
+* Itens ainda por fazer em [docs/DADOS.md](docs/DADOS.md): unidades para chaves sem sufixo e YAML com unidades nas specs de `acdt mdo`/`uq`.
+* **Registo:** `examples/output/design_db_blocos/resultado.json`. Veredicto `validado` só para a transcrição do ensaio analítico `tests/data/review_small` (escolha 4, 9 avaliações, frente com 9 pontos, f1 = 0,7190488072346632 e f2 = 1,3271789813488566 com unidade não declarada; caso `ATM-ISA-SL` com `delta_rel` de `rho` = 1,479533701902775×10⁻⁸, unidade `1`). Calibração `nao_aplicar`. O excerto hifi desse registo é sintético e fica `nao_avaliado` como resultado físico. O YAML de exemplo não foi editado e nada foi aplicado.
