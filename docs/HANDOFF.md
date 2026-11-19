@@ -1999,3 +1999,15 @@ Ramo `design-db-mdo-vv-l3`, cortado de `origin/main` `e9726e4`. Comandos `acdt d
 * `mdo` e `vv` não contam como disciplinas primárias. O `definition.input` não é substituído. O YAML de exemplo não foi editado e nada foi aplicado ao L1 ou ao L2.
 * Continuam por fazer as unidades das chaves sem sufixo e a leitura de YAML com unidades nas specs de MDO/UQ.
 * Registo: `examples/output/design_db_blocos/resultado.json`.
+
+## Esteira do painel grosso, 255 iterações (19 nov 2026, ramo `vspaero-esteira-residual`)
+
+Base `e9726e4`. O registo de cinco iterações em `h7_vspaero_painel.json` não foi reescrito. O default documentado da esteira continua WakeNumIter 5, NumWakeNodes 8, WakeRelax 1, FixedWakeFlag 0 e ImplicitWake 0. Esta corrida só pede WakeNumIter 255, o tecto do parâmetro em `VSPAEROMgr.cpp` do OpenVSP 3.56.0 (`Init` 5, 3, 255), lido de volta como 255. Os outros campos ficam no default.
+
+O critério de paragem é o de `src/vsp_aero/Solver/VSP_Solver.C` dessa etiqueta: `log10(MaxResidual_) <= log10(0.001 * NonLinearConvergenceFactor_)`. O factor não é escrito pelo acdt. `wing.vspaero` leu 1,0, logo o limiar é −3. As colunas da história já são log10. O critério do GMRES não entra nesta decisão.
+
+`vspaero.exe` noutro processo, código 0, 255 linhas, 56,6 s. No arranque havia 15,32 GB livres e o limite da guarda era 10,73 GB. O teto de 0,8 GB não mede esta malha. α 9,52057° do AVL de duas secções desta corrida. Iteração 255: CL 0,52875, CDi 0,024911, CDtot 0,039934, CMytot 0,035397, CDiw 0,019907, L2 −2,237, Max −1,182. O tecto esgotou-se e o Max continua acima de −3. O solver não declarou convergência.
+
+AVL desta corrida: CL 0,50293, CDff 0,014536, Cmtot 0,02886. Razões CL 1,051 e Cm 1,227, mesmo sinal, dentro de [0,7, 1,5]. Não se propõe calibração, porque o residual não cumpre o critério. CDi/CDff informativo 1,714 fica fora da banda e é outra grandeza. Veredicto `nao_aplicar`. Calibração `nao_aplicar`. `valid` false, `applied` false, `example_yaml_edited` false. O yaml não muda. O AVL L1 não fica validado nem calibrado.
+
+Números em `examples/output/uav150_flying_wing_tailless_hifi_win/h7_vspaero_esteira.json` e `examples/output/uav150_flying_wing_tailless_hifi_win/h7_vspaero_esteira.csv`.
