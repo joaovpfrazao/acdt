@@ -1,0 +1,155 @@
+{
+ "date": "2026-11-18",
+ "branch": "c172-rans-asa-fuselagem",
+ "decision": "nao_aplicar",
+ "valid": false,
+ "applied": false,
+ "model_L1": "nao_avaliado",
+ "example_yaml_edited": false,
+ "solver_started": false,
+ "mesh_written": false,
+ "imported_by_acdt": false,
+ "status": "nao_corrido",
+ "estimate": {
+  "swet_full_m2": 47.91709302438845,
+  "swet_half_m2": 23.958546512194225,
+  "surface_spacing_m": 0.013802602464351698,
+  "n_surface_tri": 251517,
+  "prism_layers": 42,
+  "cells_estimate": 12072848,
+  "ram_GB": 21.731126792695072,
+  "wall_h": 40.242827393879764,
+  "iters": 8000,
+  "n_alpha": 3,
+  "n_cores": 8,
+  "rate_s_per_cell_iter_per_core": 4e-06,
+  "kB_per_cell": 1.8,
+  "Re_mac": 4872545.763974179,
+  "first_cell_m": 7.463288479681644e-06,
+  "wetted_m2": {
+   "wing": 24.15070316215019,
+   "fuselage": 23.76638986223826
+  },
+  "components": "wing+fuselage",
+  "solid": "ausente",
+  "solid_note": "Não há sólido só de asa e fuselagem. A conta não escreve malha nem .geo.",
+  "prism_layer_checked": false,
+  "prior_measured_rate_s_per_cell_iter_per_thread": 1.63e-05,
+  "prior_measured_rate_note": "PRESSUPOSTO: 1,63e-5 s/célula/iteração por thread é a taxa da malha hex da asa voadora. Não foi medida nesta malha.",
+  "wall_h_6threads_prior_rate": 218.6526955067467
+ },
+ "guard": {
+  "run_here": false,
+  "ram_GB": 21.731126792695072,
+  "ram_available_GB": 16.318668365478516,
+  "limit_GB": 11.42306785583496,
+  "time_min": 2414.5696436327858,
+  "max_time_min": 45.0,
+  "reasons": [
+   "memória estimada 21.7 GB > 70 % de 16.3 GB disponíveis",
+   "tempo estimado 2415 min > limite 45 min"
+  ]
+ },
+ "checkpoints": {
+  "launched": false,
+  "imported_by_acdt": false,
+  "solver_basename": "SU2_CFD",
+  "restart_sol_on_continuation": "YES",
+  "solution_filename": "restart_flow.dat",
+  "restart_filename": "restart_flow.dat",
+  "output_files": [
+   "RESTART",
+   "SURFACE_CSV"
+  ],
+  "source": "su2_euler_cfg",
+  "citation": "Economon et al., AIAA Journal 54(3), 2016",
+  "chunk_iters": null,
+  "chunk_note": "O comprimento de cada bloco não foi escolhido. A corrida não arrancou e não há restart_flow.dat."
+ },
+ "comparison": {
+  "overall": "nao_aplicar",
+  "valid": false,
+  "applied": false,
+  "model_L1": "nao_avaliado",
+  "model_note": "A polar L1 fica registada à parte e não é calibrada. nao_avaliado não é aprovação. O yaml não muda.",
+  "rows": [
+   {
+    "quantity": "CL",
+    "hifi": null,
+    "L1": null,
+    "published": null,
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Não há coeficiente RANS. Em falta não é zero."
+   },
+   {
+    "quantity": "CD",
+    "hifi": null,
+    "L1": null,
+    "published": null,
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Não há coeficiente RANS. Em falta não é zero."
+   },
+   {
+    "quantity": "Cm",
+    "hifi": null,
+    "L1": null,
+    "published": null,
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Não há coeficiente RANS. Em falta não é zero."
+   }
+  ],
+  "l1_polar": {
+   "CD0": 0.038553184542287705,
+   "K": 0.04690767531165392,
+   "CLmax_clean": 1.5417729619233995,
+   "method": "Raymer Eq. 12.5 (CD = CD0 + K CL²) e Eq. 12.15 (CLmax limpo)",
+   "same_as_rans_polar": false,
+   "why": "CD0, K e CLmax limpo não são CL, CD e Cm de um ângulo da malha de asa e fuselagem. Não se forma razão."
+  },
+  "published_polar": {
+   "present": false,
+   "status": "nao_avaliado",
+   "requirements_in_the_example": [
+    "crew_mass",
+    "payload_mass",
+    "range",
+    "cruise_speed",
+    "cruise_altitude",
+    "stall_speed",
+    "takeoff_ground_roll",
+    "landing_distance",
+    "climb_rate",
+    "service_ceiling"
+   ],
+   "absent": [
+    "CL(alpha)",
+    "CD(alpha)",
+    "Cm(alpha)"
+   ],
+   "why": "O exemplo cita o POH 172S para velocidade, perda, subida e distâncias. Não há, no repositório, uma tabela publicada de CL, CD e Cm deste avião em função do ângulo."
+  }
+ },
+ "disk_free_GB": 193.85,
+ "prior_record": "examples/output/cessna172_check_hifi_win/h5_c172_gci.json",
+ "full_aircraft_case_not_rewritten": "examples/output/cessna172_check_hifi_win/rans_case/estimate.json",
+ "coarser_mesh": "nao_repetida",
+ "coarser_note": "A malha engrossada já recusada em h5_c172_gci.json não é este caso e não foi repetida.",
+ "csv": "h5_c172_rans_asa_fuselagem.csv",
+ "citations": [
+  "Economon et al., AIAA Journal 54(3), 2016",
+  "Spalart and Allmaras, AIAA 92-0439",
+  "Raymer, Aircraft Design: A Conceptual Approach, Eq. 12.5 and Eq. 12.15",
+  "Geuzaine and Remacle, International Journal for Numerical Methods in Engineering 79(11), 2009"
+ ],
+ "cpu_count_reported": 12,
+ "cpu_count_note": "os.cpu_count() deste processo. Não é uma nova taxa de cálculo."
+}
