@@ -316,6 +316,12 @@ def noise_stage(res: Any) -> None:
         return
     try:
         res.noise = analyse_noise(res)
+        from .native_disciplines import equipment_effect
+        eq = equipment_effect(res.spec)
+        if eq["present"]:
+            res.noise.setdefault("adapter_notes", []).append(
+                "carga útil e arquitetura elétrica sem espectro declarado: não entram no nível "
+                "(não é 0 dB); o nível continua um limite inferior")
     except Exception as ex:  # noqa: BLE001 — a etapa de ruído nunca parte o pipeline; fica desconhecido
         res.noise = _not_evaluated(f"falhou: {type(ex).__name__}: {ex}")
         res.issues.append(Issue("warning", f"ruído não avaliado: {type(ex).__name__}: {ex}"))
