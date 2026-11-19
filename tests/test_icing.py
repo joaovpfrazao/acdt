@@ -221,6 +221,8 @@ def test_icing_stage_in_pipeline_requirements_and_coupling():
     ic2 = st2["result"].icing
     loop = ic2["coupling_loop"]
     assert loop["converged"] and loop["history"][0]["power_W"] > 0 and loop["history"][0]["mass_kg"] == 0.3
+    assert loop["mission"]["used"] is True
+    assert "desconhecidas" not in loop["history"][0]["duty_note"]
     assert 0.0 < loop["history"][0]["duty"] <= 1.0  # ciclo = fração da missão em gelo (ou 1, conservador)
     assert st2["result"].sizing.W0 > W0
     rows2 = {r["id"]: r for r in st2["verification"]["rows"]}

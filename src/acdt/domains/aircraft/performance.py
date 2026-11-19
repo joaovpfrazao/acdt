@@ -467,6 +467,20 @@ class PerformanceResult:
                 "requirements": self.requirement_compare, "notes": self.notes}
 
 
+def required_mission(res, m: PerfModel | None = None) -> MissionSim:
+    """Missão exigida (pernas pedidas, ``stop='legs'``), a mesma tabela que :func:`performance_analysis` guarda em
+    ``mission_required``. Não integra o envelope nem a pista."""
+    m = m or PerfModel.from_result(res)
+    W0 = res.sizing.W0
+    budget, _note = mission_budget(res)
+    h_c = res.cruise_altitude
+    cruise = [L for L in res.legs if L.kind == "cruise"]
+    loiter = [L for L in res.legs if L.kind != "cruise"]
+    Vc = cruise[0].V if cruise else res.cruise_speed
+    Vl = loiter[0].V if loiter else None
+    return simulate_mission(m, W0, budget, res.legs, h_c, Vc, Vl, stop="legs")
+
+
 def performance_analysis(res, opts: dict | None = None) -> PerformanceResult:
     o = {"fuel_capacity_kg": None, "max_payload_kg": None, "mu_brake": 0.4, "approach_angle_deg": 3.0, **(opts or {})}
     m = PerfModel.from_result(res)
@@ -477,7 +491,7 @@ def performance_analysis(res, opts: dict | None = None) -> PerformanceResult:
     loiter = [L for L in res.legs if L.kind != "cruise"]
     Vc = cruise[0].V if cruise else res.cruise_speed
     Vl = loiter[0].V if loiter else None
-    sim_req = simulate_mission(m, W0, budget, res.legs, h_c, Vc, Vl, stop="legs")
+    sim_req = required_mission(res, m)
     sim = simulate_mission(m, W0, budget, res.legs, h_c, Vc, Vl, stop="budget")
     env = flight_envelope(m, W0 * G0, h_max=max(4 * h_c, 9000.0))
     to = takeoff_distance_integrated(m, W0 * G0)
