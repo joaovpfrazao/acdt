@@ -177,3 +177,4 @@ intervalos, FIKI, API, pipeline com requisitos e acoplamento iterado).
   acoplamento térmico passa também a escrever a carga em `systems.loads`. Falta: perfil de potência por segmento
   no balanço (hoje ciclo médio + pico).
 * Combinação de encontros contínuo + intermitente; temperatura do dia (MIL-HDBK-310 frio) em vez do varrimento.
+* Alta fidelidade: proposta em [proposta-termica-gelo.md](proposta-termica-gelo.md). Não há malha de acreção, o LEWICE não foi instalado e as formas da NASA IRT não estão no repositório. O L0/L1 não fica validado por essa proposta.

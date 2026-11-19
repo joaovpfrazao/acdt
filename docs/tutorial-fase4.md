@@ -27,7 +27,7 @@ export ACDT_HIFI_BIN=/caminho/para/env/bin
 export ACDT_VSP_PYTHON=/caminho/para/python-com-openvsp
 ```
 
-Neste PC, a 18 nov 2026, o Windows continua sem OpenVSP: não há executável e `ACDT_VSP_PYTHON` está vazio. A exportação usou o OpenVSP 3.48.2 que já está no contentor MDO Lab. O visor do VSPAERO não vem nessa imagem. Esse contentor não substitui um instalador no Windows, e não vê o disco do Windows montado: o caso entra por cópia para a pasta partilhada e as saídas voltam à mesma cópia. O processo acdt não importa `openvsp`. O gestor de análises escreve o caso e pára; o binário do solver corre noutro processo, porque o lançamento pelo gestor não regressa.
+Neste PC, a 18 nov 2026, o OpenVSP 3.56.0 está instalado num venv de Python 3.13 e `ACDT_VSP_PYTHON` aponta para esse `python.exe` (`docs/DEV-SETUP-WINDOWS.md` §3–4). O contentor MDO Lab continua com o 3.48.2; essa imagem não vê o disco do Windows montado e não substitui o instalador. O processo acdt não importa `openvsp`. O gestor de análises escreve o caso com `StopBeforeRun` e o `vspaero.exe` corre noutro processo. O painel grosso da asa voadora, com a esteira no default lido de volta, está em `examples/output/uav150_flying_wing_tailless_hifi_win/h7_vspaero_painel.json`. Decisão `nao_aplicar`.
 
 ## 1. Correr
 
@@ -61,7 +61,10 @@ A 18 nov 2026 a quarta malha 2-D da secção do C172 (refine = 2, α = 2°, 1079
 O CD ficou com deriva 0,42 % nas últimas 10 % das iterações, por isso o GCI fino de 3,0 % não é aceite.
 Os α 0° e 4° não foram corridos. O RANS só da asa e da fuselagem estima 1,2×10⁷ células e 22 GB e não
 cabe nesta máquina; o caso do avião completo, e o avião com trem e hélice, continuam por correr.
-Números em `examples/output/cessna172_check_hifi_win/h5_c172_gci.json`. O `gci/gci.json` de três malhas
+Números em `examples/output/cessna172_check_hifi_win/h5_c172_gci.json`. Uma medição nova, com 16,32 GB
+livres e limite 11,42 GB, mantém 21,731 GB e 40,24 h. O solver não arrancou e não se escreveu malha.
+O plano de restart fica em `h5_c172_rans_asa_fuselagem.json`, sem bloco de iterações. A comparação com
+a polar L1 e com o POH fica `nao_avaliado`. O `gci/gci.json` de três malhas
 não foi reescrito.
 
 ## 3. Ler o relatório
@@ -106,7 +109,7 @@ filtro e não como penalidade suave.
 
 ## 6. Limitações
 
-* GCI e Euler 3-D só correm se pedidos e se couberem na máquina; o RANS do avião completo fica preparado. O RANS só da asa e da fuselagem do C172 foi estimado a 18 nov 2026 (22 GB) e não correu.
+* GCI e Euler 3-D só correm se pedidos e se couberem na máquina; o RANS do avião completo fica preparado. O RANS só da asa e da fuselagem do C172 foi estimado a 18 nov 2026 (22 GB) e não correu. A medição seguinte, no mesmo dia, recusou outra vez: 21,731 GB contra um limite de 11,42 GB.
 * O deck Nastran SOL 145 é relido com pyNastran, mas não é corrido (sem MSC/NX Nastran).
 * C_h das superfícies de comando e V_H ≈ 1,1 V_C são pressupostos.
 * Roskam Classe II fora da base estatística (UAV de 25 kg) é só indicativo; as Eqs. 5.12–5.13

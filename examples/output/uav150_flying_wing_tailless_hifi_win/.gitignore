@@ -2,6 +2,8 @@
 *.su2
 *.dat
 *.csv
+# Iteration table of the thick-panel VSPAERO case. Not a mesh dump.
+!h7_vspaero_painel.csv
 *.xyz
 *.fmt
 *.log

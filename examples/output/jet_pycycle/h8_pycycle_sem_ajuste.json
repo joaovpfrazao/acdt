@@ -1,0 +1,263 @@
+{
+ "date": "2026-11-18",
+ "branch": "pycycle-sem-ajuste",
+ "decision": "nao_aplicar",
+ "valid": false,
+ "applied": false,
+ "model_L0": "nao_aplicar",
+ "model_L1": "nao_avaliado",
+ "example_yaml_edited": false,
+ "imported_by_acdt": false,
+ "local_source_patch": false,
+ "published_example": "OpenMDAO/pyCycle tag 4.4.0, example_cycles/simple_turbojet.py",
+ "published_example_host": "raw.githubusercontent.com",
+ "published_example_path": "OpenMDAO/pyCycle/4.4.0/example_cycles/simple_turbojet.py",
+ "published_example_sha256": "ad5a9378b341cc8a8c5e27592c8945e02bf2476c96ad07419e8ddd3ece8d13a4",
+ "versions": {
+  "python": "3.12.0",
+  "om-pycycle": "4.4.0",
+  "openmdao": "3.41.0",
+  "numpy": "1.26.4"
+ },
+ "returncode": 1,
+ "plot_failed_after_solution": true,
+ "plot_note": "O script publicado chama map_plots depois de imprimir os três pontos. Neste venv o matplotlib não está instalado e plot_compressor_maps termina com AttributeError. A solução impressa fica; o gráfico não foi produzido.",
+ "numpy_deprecation": "NumPy 1.26 avisa, na linha de impressão, que converter um vector de ndim > 0 em escalar está descontinuado. Não é um TypeError. O código do pyCycle não foi editado.",
+ "wall_s": 3.662564799655229,
+ "estimate": {
+  "ram_available_GB": 16.8576,
+  "limit_GB": 11.8004,
+  "ram_ceiling_GB": 1.5,
+  "ram_ceiling_note": "Tecto de 1,5 GB herdado da corrida com o ajuste local. Não é a memória medida deste processo.",
+  "disk_free_GB": 193.86,
+  "time_estimate_min": 15.0
+ },
+ "design_inputs": {
+  "mach": 1e-06,
+  "alt_ft": 0.0,
+  "Fn_target_lbf": 11800.0,
+  "T4_target_degR": 2370.0,
+  "comp_PR": 13.5,
+  "comp_eff": 0.83,
+  "turb_eff": 0.86
+ },
+ "points": [
+  {
+   "point": "DESIGN",
+   "mach_input": 1e-06,
+   "alt_ft_input": 0.0,
+   "alt_m": 0.0,
+   "Fn_target_lbf": 11800.0,
+   "printed": {
+    "Mach_printed": "0.00000",
+    "Alt_ft": "0.0",
+    "W_lbm_s": "147.333",
+    "Fn_lbf": "11800.0",
+    "Fg_lbf": "11800.0",
+    "Fram_lbf": "0.0",
+    "OPR": "13.500",
+    "TSFC_lbm_lbf_h": "0.79852"
+   },
+   "Fn_printed_lbf": 11800.0,
+   "TSFC_printed": 0.79852,
+   "L0_TSFC_lb_lbf_h": 0.40000045,
+   "L0_thrust_installed_N": 116342.96400008148,
+   "L0_thrust_note": "Empuxo L0 à classificação máxima, com thrust_sl_N por omissão. O Fn do pyCycle é o alvo comandado. Não se forma razão de empuxo.",
+   "decision": {
+    "quantity": "TSFC_DESIGN",
+    "hifi": 0.79852,
+    "lowfi": 0.40000045,
+    "band": [
+     0.7,
+     1.5
+    ],
+    "decision": "nao_aplicar",
+    "eligible": false,
+    "ratio": null,
+    "reason": "O TSFC do turbojato publicado e o TSFC da correlação L0 de turbofan de alta razão de bypass são classes de motor diferentes.",
+    "valid": false,
+    "reported_ratio": 1.9962977541650266,
+    "reported_ratio_inside_band": false,
+    "band_is_not_an_apply_gate": true
+   }
+  },
+  {
+   "point": "OD0",
+   "mach_input": 1e-06,
+   "alt_ft_input": 0.0,
+   "alt_m": 0.0,
+   "Fn_target_lbf": 11000.0,
+   "printed": {
+    "Mach_printed": "0.00000",
+    "Alt_ft": "0.0",
+    "W_lbm_s": "142.787",
+    "Fn_lbf": "11000.0",
+    "Fg_lbf": "11000.0",
+    "Fram_lbf": "0.0",
+    "OPR": "12.859",
+    "TSFC_lbm_lbf_h": "0.78364"
+   },
+   "Fn_printed_lbf": 11000.0,
+   "TSFC_printed": 0.78364,
+   "L0_TSFC_lb_lbf_h": 0.40000045,
+   "L0_thrust_installed_N": 116342.96400008148,
+   "L0_thrust_note": "Empuxo L0 à classificação máxima, com thrust_sl_N por omissão. O Fn do pyCycle é o alvo comandado. Não se forma razão de empuxo.",
+   "decision": {
+    "quantity": "TSFC_OD0",
+    "hifi": 0.78364,
+    "lowfi": 0.40000045,
+    "band": [
+     0.7,
+     1.5
+    ],
+    "decision": "nao_aplicar",
+    "eligible": false,
+    "ratio": null,
+    "reason": "O TSFC do turbojato publicado e o TSFC da correlação L0 de turbofan de alta razão de bypass são classes de motor diferentes.",
+    "valid": false,
+    "reported_ratio": 1.9590977960149794,
+    "reported_ratio_inside_band": false,
+    "band_is_not_an_apply_gate": true
+   }
+  },
+  {
+   "point": "OD1",
+   "mach_input": 0.2,
+   "alt_ft_input": 5000.0,
+   "alt_m": 1524.0,
+   "Fn_target_lbf": 8000.0,
+   "printed": {
+    "Mach_printed": "0.20000",
+    "Alt_ft": "5000.0",
+    "W_lbm_s": "119.121",
+    "Fn_lbf": "8000.0",
+    "Fg_lbf": "8812.5",
+    "Fram_lbf": "812.5",
+    "OPR": "12.203",
+    "TSFC_lbm_lbf_h": "0.82951"
+   },
+   "Fn_printed_lbf": 8000.0,
+   "TSFC_printed": 0.82951,
+   "L0_TSFC_lb_lbf_h": 0.48150374811438806,
+   "L0_thrust_installed_N": 77765.93069170539,
+   "L0_thrust_note": "Empuxo L0 à classificação máxima, com thrust_sl_N por omissão. O Fn do pyCycle é o alvo comandado. Não se forma razão de empuxo.",
+   "decision": {
+    "quantity": "TSFC_OD1",
+    "hifi": 0.82951,
+    "lowfi": 0.48150374811438806,
+    "band": [
+     0.7,
+     1.5
+    ],
+    "decision": "nao_aplicar",
+    "eligible": false,
+    "ratio": null,
+    "reason": "O TSFC do turbojato publicado e o TSFC da correlação L0 de turbofan de alta razão de bypass são classes de motor diferentes.",
+    "valid": false,
+    "reported_ratio": 1.7227487911536217,
+    "reported_ratio_inside_band": false,
+    "band_is_not_an_apply_gate": true
+   }
+  }
+ ],
+ "comparison": {
+  "overall": "nao_aplicar",
+  "same_engine": false,
+  "model_note": "A correlação L0 não fica validada nem calibrada: a razão de TSFC é uma diferença de classe de motor. O deck termodinâmico L1 não existe, por isso essa comparação fica nao_avaliado. O yaml não muda.",
+  "factors": [
+   {
+    "name": "TSFC_DESIGN",
+    "value": null,
+    "valid": false,
+    "invalid_reason": "O TSFC do turbojato publicado e o TSFC da correlação L0 de turbofan de alta razão de bypass são classes de motor diferentes.",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+    "reported_ratio": 1.9962977541650266,
+    "reported_ratio_inside_band": false
+   },
+   {
+    "name": "TSFC_OD0",
+    "value": null,
+    "valid": false,
+    "invalid_reason": "O TSFC do turbojato publicado e o TSFC da correlação L0 de turbofan de alta razão de bypass são classes de motor diferentes.",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+    "reported_ratio": 1.9590977960149794,
+    "reported_ratio_inside_band": false
+   },
+   {
+    "name": "TSFC_OD1",
+    "value": null,
+    "valid": false,
+    "invalid_reason": "O TSFC do turbojato publicado e o TSFC da correlação L0 de turbofan de alta razão de bypass são classes de motor diferentes.",
+    "eligible": false,
+    "decision": "nao_aplicar",
+    "band": [
+     0.7,
+     1.5
+    ],
+    "note": "H1_RATIO_BAND é [0.7, 1.5]. Não altera calibration.RATIO_BAND.",
+    "reported_ratio": 1.7227487911536217,
+    "reported_ratio_inside_band": false
+   }
+  ]
+ },
+ "l1_deck": {
+  "l1_thermodynamic_deck_present": false,
+  "status": "nao_avaliado",
+  "source": "src/acdt/domains/aircraft/jet/engine_map.py and jet/turbofan.py",
+  "why": "engine_map declara que não há deck de ciclo e não corre pyCycle, NPSS, GasTurb, T-MATS nem CFD. Sem mapa, engine_point chama turbofan_point, que é a correlação L0. Não existe no repositório uma grelha table nem corrected_table deste turbojato.",
+  "table_fields_accepted_and_absent": [
+   "source",
+   "mach",
+   "altitude_m",
+   "throttle",
+   "thrust_lapse",
+   "thrust_installed_N",
+   "TSFC_kg_N_s"
+  ],
+  "corrected_table_fields_accepted_and_absent": [
+   "source",
+   "mach",
+   "altitude_m",
+   "throttle",
+   "F_over_delta",
+   "SFC_over_sqrt_theta",
+   "totals"
+  ],
+  "cycle_fields_the_map_cannot_store": [
+   "OPR",
+   "W",
+   "Fg",
+   "Fram",
+   "FAR",
+   "Wfuel",
+   "T4",
+   "comp_eff",
+   "turb_eff",
+   "Nmech",
+   "station tot:P",
+   "station tot:T"
+  ],
+  "illustrative_map_not_this_engine": "examples/jet/engine_map_table.yaml é uma tabela PRESSUPOSTO de transporte, amostrada da correlação L0. Não é o turbojato de PR 13,5 e T4 2370 R, e não foi editada.",
+  "l0_not_relabelled": true
+ },
+ "prior_patched_run": "examples/output/jet_pycycle/h8_pycycle.json",
+ "csv": "h8_pycycle_sem_ajuste.csv",
+ "citations": [
+  "Hendricks and Gray, Aerospace 2019, 6, 87, doi 10.3390/aerospace6080087",
+  "Mattingly, Heiser and Pratt 2002, Ch. 2",
+  "Ihme 2025, Eq. 2.77",
+  "NIST SP 811, 2008, Appendix B, via acdt.core.units: 1 ft = 0.3048 m"
+ ]
+}

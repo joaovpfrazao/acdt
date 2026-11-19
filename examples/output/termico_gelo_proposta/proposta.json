@@ -1,0 +1,143 @@
+{
+ "date": "2026-11-18",
+ "branch": "termico-gelo-proposta",
+ "kind": "proposta",
+ "ran": false,
+ "decision": "nao_aplicar",
+ "valid": false,
+ "applied": false,
+ "model_L0": "nao_avaliado",
+ "model_L1": "nao_avaliado",
+ "example_yaml_edited": false,
+ "thermal": {
+  "mesh": {
+   "solid": "ausente",
+   "solid_note": "O compartimento L0/L1 é um nó. Não há sólido da baía, por isso não se escreve malha.",
+   "if_a_solid_exists": "Na pele exterior, a primeira célula viscosa usaria first_cell com y+ = 1, já em hifi/cfd.py. O interior do compartimento e a condução na parede não têm receita neste repositório.",
+   "cells": null,
+   "cells_status": "nao_avaliado"
+  },
+  "solver": {
+   "name": "SU2_CFD",
+   "process": "separado",
+   "imported_by_acdt": false,
+   "started": false,
+   "current_case": "MARKER_HEATFLUX = 0",
+   "conjugate_case_in_repo": false,
+   "openfoam": {
+    "role": "stub",
+    "license": "GPL-3.0",
+    "process": "separado",
+    "started": false
+   }
+  },
+  "cost": {
+   "ram_GB": null,
+   "cpu_h": null,
+   "status": "nao_avaliado",
+   "gate": "tools.budget recusa memória acima de 70 % da RAM livre ou tempo acima de 45 min. Sem malha, essa conta não se faz.",
+   "why": "Não há sólido nem malha. Uma contagem de células não é inventada.",
+   "pressuposto": null
+  }
+ },
+ "icing": {
+  "mesh": {
+   "solid": "ausente",
+   "clean_section": "Os casos ICING-AND-B1 e ICING-AND-B2 e o raio do NACA 0012 já estão no V&V L1. Não se escreveu malha de bordo de ataque.",
+   "accreted_surface": "nao_construida",
+   "cells": null,
+   "cells_status": "nao_avaliado",
+   "appendix_O": "fora_desta_proposta"
+  },
+  "solver": {
+   "name": "LEWICE",
+   "process": "separado",
+   "imported_by_acdt": false,
+   "started": false,
+   "in_third_party": false,
+   "license_in_repo": null,
+   "license_note": "A licença não está em THIRD_PARTY.md. Não se instala nem se importa neste ramo.",
+   "role": "Referência já citada para o desvio de β₀ em docs/GELO.md. Não é um cálculo novo."
+  },
+  "cost": {
+   "ram_GB": null,
+   "cpu_h": null,
+   "status": "nao_avaliado",
+   "gate": "tools.budget recusa memória acima de 70 % da RAM livre ou tempo acima de 45 min. Sem malha, essa conta não se faz.",
+   "why": "Não há sólido nem malha. Uma contagem de células não é inventada.",
+   "pressuposto": null
+  },
+  "irt_shapes": {
+   "present": false,
+   "status": "nao_avaliado",
+   "why": "Não há formas medidas da NASA IRT neste repositório."
+  }
+ },
+ "comparison": {
+  "overall": "nao_aplicar",
+  "valid": false,
+  "applied": false,
+  "model_L0": "nao_avaliado",
+  "model_L1": "nao_avaliado",
+  "recomputed": false,
+  "rows": [
+   {
+    "quantity": "thermal_bay_temperature",
+    "hifi": null,
+    "lower_level": "compartimento do exemplo, cruzeiro 50–52 °C; subida e solo 64–70 °C",
+    "lower_source": "docs/HANDOFF.md, Gestão térmica L0/L1",
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "O L0/L1 é uma rede de dois nós. Não há campo de temperatura."
+   },
+   {
+    "quantity": "thermal_wall_heat_flux",
+    "hifi": null,
+    "lower_level": "MARKER_HEATFLUX = 0 nos .cfg de RANS já escritos",
+    "lower_source": "hifi/cfd.py, hifi/cfd3d.py, hifi/wing_bl.py",
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Parede adiabática não é o balanço de energia do compartimento."
+   },
+   {
+    "quantity": "ice_thickness_stagnation",
+    "hifi": null,
+    "lower_level": "exemplo: estabilizador 14,1–57,2 mm; asa 11,3–45,4 mm",
+    "lower_source": "docs/HANDOFF.md, Gelo L0/L1; Messinger via Anderson",
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "Espessura de estagnação em geometria limpa. Não há forma acrescida."
+   },
+   {
+    "quantity": "ice_beta0",
+    "hifi": null,
+    "lower_level": "β₀ de Langmuir e Blodgett, Eq. (3.13) de Anderson",
+    "lower_source": "docs/GELO.md",
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "β₀ é o valor na estagnação. β local não está implementado."
+   },
+   {
+    "quantity": "ice_appendix_O",
+    "hifi": null,
+    "lower_level": null,
+    "lower_source": "docs/GELO.md: tabelas do Apêndice O não verificadas",
+    "ratio": null,
+    "same_quantity": false,
+    "decision": "nao_aplicar",
+    "status": "nao_avaliado",
+    "why": "SLD não entra como zero. Não há proposta numérica enquanto as tabelas não forem verificadas."
+   }
+  ],
+  "model_note": "A proposta não avalia o L0 nem o L1. nao_avaliado não é aprovação. O yaml dos exemplos não muda."
+ },
+ "csv": "proposta.csv"
+}
