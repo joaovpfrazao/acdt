@@ -1904,3 +1904,18 @@ reutilização do `result.json` em `size_fleet(run_id=…)`. Pormenor em [QUALID
 ## Melhorias futuras em espera
 
 Ver `docs/FUTURE_IMPROVEMENTS.md`: ideias registadas mas não aprovadas (forma defletida a 1g, laminados por componente e aeroelastic tailoring).
+
+## Espera inativa, Weibull e fator β (19 nov 2026)
+
+Ramo `fiabilidade-standby-weibull`, cortado de `e9726e4`. Bloco lateral em `acdt.core.reliability.standby`
+(MIL-HDBK-338B §7.5.5.3 com R_S = 1, e Eq. 5.50–5.51 com γ = 0). Não substitui o RBD ativo. O yaml dos
+exemplos não foi alterado.
+
+* **Veredicto**: `validado` para as identidades transcritas (n = 4 em t/θ = 1 fica acima do requisito 0,98;
+  h(100 h) = 0,0002). Calibração L1/L2: `nao_aplicar` (não há medida de voo).
+* **nao_avaliado**: comutador com taxa (a p. 7-116 não dá equação), γ ≠ 0, fator β. O §7.5.5.4 é partilha
+  de carga com k, não β; essa fórmula não foi aplicada.
+* **FTA**: evento básico com q = 1 − R. Porta AND = redundância ativa; porta OR = série. Nenhuma é a espera.
+* **Resultado**: `examples/output/fiabilidade_standby_weibull/resultado.json`. Casos
+  `FIAB-338B-STANDBY-N4` e `FIAB-338B-WEIBULL-5361`. Pormenor em [FIABILIDADE.md](FIABILIDADE.md) §9.
+* **Ainda em aberto** (já estavam no §8): reparação em missão, fases, espera quente, METRIC.

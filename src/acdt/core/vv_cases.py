@@ -720,6 +720,46 @@ def _fb_parallel() -> Mapping[str, float | None]:
             "delta_n3": None if (m2 is None or m3 is None) else (m3 - m2) / m1}
 
 
+@_fb("FIAB-338B-STANDBY-N4", "Espera inativa idêntica (MIL-HDBK-338B §7.5.5.3, Fig. 7.5-17)",
+     "n elementos idênticos, comutador perfeito (R_S = 1): R(t) = e^{−λt} Σ_{r=0}^{n−1} (λt)^r / r! e MTBF = n/λ. "
+     "O exemplo da p. 7-116 (θ = 100 h, t/θ = 1) diz que n = 4 satisfaz R_g = 0,98. Com taxas iguais, a p. 7-113 "
+     "dá MTBF = 2θ (a expressão de dois λ diferentes é singular).",
+     "verificacao",
+     [Reference("R_n4", 0.98, "-", M338 + ", §7.5.5.3 p. 7-116 (n = 4 satisfaz R_g = 0,98 em t/θ = 1)",
+                tol_abs=1e-9, kind="min",
+                tol_source="requisito impresso; a fórmula da Fig. 7.5-17 fica acima de 0,98 (não é um R arredondado)"),
+      Reference("mtbf_ratio_n4", 4.0, "-", M338 + ", p. 7-114 (MTBF = n/λ = nθ)",
+                tol_abs=1e-12, tol_source="identidade impressa"),
+      Reference("mtbf_ratio_equal", 2.0, "-", M338 + ", p. 7-113 (taxas iguais: MTBF = 2θ)",
+                tol_abs=1e-12, tol_source="identidade impressa")],
+     tests=("tests/test_reliability.py::test_inactive_standby_identities",))
+def _fb_standby() -> Mapping[str, float | None]:
+    from acdt.core.reliability.standby import (
+        inactive_standby_mtbf_h, inactive_standby_mtbf_two_h, inactive_standby_reliability)
+
+    lam = 0.01
+    r = inactive_standby_reliability(lam, 4, 100.0)
+    m4 = inactive_standby_mtbf_h(lam, 4)
+    m2 = inactive_standby_mtbf_two_h(lam, lam)
+    return {"R_n4": r, "mtbf_ratio_n4": None if m4 is None else m4 * lam,
+            "mtbf_ratio_equal": None if m2 is None else m2 * lam}
+
+
+@_fb("FIAB-338B-WEIBULL-5361", "Weibull de dois parâmetros (MIL-HDBK-338B §5.3.6.1)",
+     "Tubo emissor: β = 2, η = 1000 h, t = 100 h. Eq. 5.50: R(100) = exp(−(0,1)^2) ≈ 0,99. Eq. 5.51: "
+     "h(100) = 0,0002 avarias/h. γ = 0 (a Eq. 5.50 não tem localização).",
+     "verificacao",
+     [Reference("R_100", 0.99, "-", M338 + ", §5.3.6.1 (≈ 0,99)", tol_abs=5e-4,
+                tol_source="impresso com 2 casas decimais (e^{−0,01} = 0,99005)"),
+      Reference("h_100", 0.0002, "1/h", M338 + ", §5.3.6.1 (igualdade impressa)", tol_abs=1e-12,
+                tol_source="o exemplo iguala h(100) a 0,0002")],
+     tests=("tests/test_reliability.py::test_weibull_handbook_example",))
+def _fb_weibull() -> Mapping[str, float | None]:
+    from acdt.core.reliability.standby import weibull_hazard_per_h, weibull_reliability
+
+    return {"R_100": weibull_reliability(100.0, 2.0, 1000.0), "h_100": weibull_hazard_per_h(100.0, 2.0, 1000.0)}
+
+
 # ------------------------------------------------------------------------------------------------ custo de série
 FAA18 = ("FAA Pricing Handbook (1998), Cap. 18 «The Learning Curve» (fast.faa.gov/pricing/98-30c18.htm; cópia "
          "web.archive.org 2007-11-27)")

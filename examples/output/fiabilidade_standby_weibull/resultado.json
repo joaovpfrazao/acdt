@@ -1,0 +1,146 @@
+{
+  "schema": "acdt.fiabilidade_standby_weibull/1",
+  "date": "2026-11-19",
+  "parent": "e9726e401e75fe7a04ebe97ca0e20940d811bddc",
+  "branch": "fiabilidade-standby-weibull",
+  "example_yaml_edited": false,
+  "applied": false,
+  "veredicto": "validado",
+  "calibracao": "nao_aplicar",
+  "nota_veredicto": "Válido para as identidades transcritas: espera inativa com R_S = 1 e Weibull com γ = 0. Não é calibração contra medida de voo. O comutador imperfeito, γ ≠ 0 e o fator β ficam nao_avaliado.",
+  "fontes": [
+    "MIL-HDBK-338B (1 out. 1998) §7.5.5.3 p. 7-113",
+    "MIL-HDBK-338B p. 7-114",
+    "MIL-HDBK-338B Fig. 7.5-17 p. 7-116",
+    "MIL-HDBK-338B §7.5.5.4 p. 7-117 (partilha de carga com k; sem fator β)",
+    "MIL-HDBK-338B Eq. 5.50, Eq. 5.51, §5.3.6.1 p. 5-23",
+    "ARP4761 / NUREG-0492 via acdt.core.safety.fta"
+  ],
+  "standby": {
+    "n4_t_sobre_theta_1": {
+      "lambda_per_h": 0.01,
+      "n": 4,
+      "t_h": 100.0,
+      "R": 0.9810118431238462,
+      "mtbf_h": 400.0,
+      "R_S": 1.0
+    },
+    "dois_elementos": {
+      "lambda_a_per_h": 0.01,
+      "lambda_b_per_h": 0.02,
+      "t_h": 100.0,
+      "R": 0.600423599106272,
+      "mtbf_h": 150.0
+    },
+    "n2_taxas_iguais": {
+      "R": 0.7357588823428847,
+      "mtbf_h": 200.0
+    }
+  },
+  "weibull": {
+    "shape": 2,
+    "scale_h": 1000,
+    "t_h": 100,
+    "location_h": 0,
+    "R": 0.9900498337491681,
+    "hazard_per_h": 0.0002,
+    "gama_nao_nulo": {
+      "location_h": 10,
+      "R": null,
+      "veredicto": "nao_avaliado"
+    }
+  },
+  "comutador_imperfeito": {
+    "veredicto": "nao_avaliado",
+    "applied": false,
+    "rate_per_h": null,
+    "nota": "A Fig. 7.5-17 declara R_S = 1. A p. 7-116 diz que a taxa dos dispositivos de comutação tem de ser considerada e não dá equação. A taxa declarada não entra em R."
+  },
+  "fator_beta": {
+    "evaluated": false,
+    "veredicto": "nao_avaliado",
+    "calibracao": "nao_aplicar",
+    "beta": null,
+    "method": null,
+    "source": "MIL-HDBK-338B §7.5.5.4 p. 7-117 descreve partilha de carga com fator k (θ′ = θ/k), não um fator β de causa comum. A equação λ_cc = β λ não está na página e não foi aplicada."
+  },
+  "fta": {
+    "evento": "SB",
+    "q": 0.26424111765711533,
+    "P_topo": 0.26424111765711533,
+    "cortes": [
+      [
+        "SB"
+      ]
+    ],
+    "P_AND_redundancia_ativa": 0.39957640089372803,
+    "P_OR_serie": 0.8646647167633873,
+    "nota": "AND e OR não são a espera inativa."
+  },
+  "confrontos": [
+    {
+      "nome": "R_n4_vs_soma",
+      "obtido": 0.9810118431238462,
+      "referencia": 0.9810118431238462,
+      "tolerancia": 1e-12,
+      "fonte": "Fig. 7.5-17, soma até r = 3 em λt = 1"
+    },
+    {
+      "nome": "R_n4_satisfaz_0_98",
+      "obtido": 0.9810118431238462,
+      "referencia": 0.98,
+      "criterio": "min",
+      "fonte": "p. 7-116: n = 4 satisfaz R_g = 0,98"
+    },
+    {
+      "nome": "MTBF_n4_sobre_theta",
+      "obtido": 4.0,
+      "referencia": 4.0,
+      "tolerancia": 1e-12,
+      "fonte": "p. 7-114, MTBF = n/λ"
+    },
+    {
+      "nome": "MTBF_igual_sobre_theta",
+      "obtido": 2.0,
+      "referencia": 2.0,
+      "tolerancia": 1e-12,
+      "fonte": "p. 7-113, taxas iguais: MTBF = 2θ"
+    },
+    {
+      "nome": "R_dois_elementos",
+      "obtido": 0.600423599106272,
+      "referencia": 0.600423599106272,
+      "tolerancia": 1e-12,
+      "fonte": "p. 7-113, λ_a = 0,01/h, λ_b = 0,02/h, t = 100 h"
+    },
+    {
+      "nome": "R_weibull",
+      "obtido": 0.9900498337491681,
+      "referencia": 0.9900498337491681,
+      "tolerancia": 1e-12,
+      "fonte": "Eq. 5.50"
+    },
+    {
+      "nome": "R_weibull_impresso",
+      "obtido": 0.9900498337491681,
+      "referencia": 0.99,
+      "tolerancia": 0.0005,
+      "fonte": "§5.3.6.1, ≈ 0,99"
+    },
+    {
+      "nome": "h_weibull",
+      "obtido": 0.0002,
+      "referencia": 0.0002,
+      "tolerancia": 1e-12,
+      "fonte": "§5.3.6.1, h(100) = 0,0002"
+    },
+    {
+      "nome": "P_topo_igual_a_q",
+      "obtido": 0.26424111765711533,
+      "referencia": 0.26424111765711533,
+      "tolerancia": 1e-12,
+      "fonte": "evento básico, q = 1 − R"
+    }
+  ],
+  "desvios": []
+}

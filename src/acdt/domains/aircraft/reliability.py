@@ -64,7 +64,8 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     notes.append(f"duração da missão: {'?' if t is None else f'{t:.3g} h'} ({src})")
     spec: dict[str, Any] = {k: copy.deepcopy(o.get(k)) for k in ("components", "rbd", "accept_assumptions",
                                                                  "preventive", "logistics", "utilization", "fleet",
-                                                                 "spares", "operating_cost", "labour_rate_per_h")
+                                                                 "spares", "operating_cost", "labour_rate_per_h",
+                                                                 "standby", "weibull")
                             if o.get(k) is not None}
     spec["schema"] = "acdt.reliability/1"
     spec["mission_duration_h"] = t
