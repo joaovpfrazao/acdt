@@ -183,11 +183,11 @@ intervalos, FIKI, API, pipeline com requisitos e acoplamento iterado).
 O ciclo `coupling: iterar` corre dentro do dimensionamento, antes da etapa de desempenho. Passa a calcular a missão exigida com o mesmo `simulate_mission(..., stop="legs")` da térmica e do desempenho. As condições de gelo (altitude, velocidade, duração) saem dessa tabela. O ciclo da carga de proteção (`power_schedule: exposicao`) usa essas durações. Se a missão não fechar, volta-se ao ponto de projeto e a duração desconhecida mantém o ciclo 1 (majorante); `coupling_loop.mission.source` regista a falta. Não se inventa duração zero.
 * Alta fidelidade: proposta em [proposta-termica-gelo.md](proposta-termica-gelo.md). Não há malha de acreção, o LEWICE não foi instalado e as formas da NASA IRT não estão no repositório. O L0/L1 não fica validado por essa proposta.
 
-## 8. Adaptador nativo (19 nov 2026)
+## 9. Adaptador nativo (19 nov 2026)
 
 O VTOL só avalia gelo com superfícies declaradas: o L0 não traz corda nem t/c, e não são inventados. O pairar (V = 0) e a transição (V desconhecida) ficam de fora; se algum segmento propulsado for omitido, o veredicto é `nao_avaliado`. No jato, sem superfícies do utilizador e com S, alongamento e `wave.thickness_ratio`, usa-se uma asa de corda média √(S/AR) e o t/c declarado. O fecho L0 não tem subida, por isso a espessura é só o cruzeiro e o veredicto fica `nao_avaliado`. A carga útil e a arquitetura elétrica não são uma superfície de gelo. Medida de ensaio: `examples/output/adaptadores_vtol_jato/adaptadores.json`.
 
-## 9. Verificação da potência por exposição e encontros mistos (23 nov 2026)
+## 10. Verificação da potência por exposição e encontros mistos (23 nov 2026)
 
 **Potência só durante a exposição: confirmado.** `exposure_duty` (`domains/aircraft/icing.py`) com
 `power_schedule: exposicao` (omissão) usa como ciclo a fração da missão em segmentos dentro do envelope do Ap. C
@@ -200,4 +200,4 @@ e 4 do Ap. C num só gráfico LWC × extensão horizontal, multiplicando o LWC p
 equivalente aos fatores F que já estão em `core/icing/envelopes.py`: muda a apresentação, não dá um procedimento
 para somar um encontro intermitente e um contínuo seguidos. Não se encontrou outro método citado e verificável que
 coubesse numa tarefa leve. A acumulação continua a ser a do maior encontro isolado (minorante) e a de todas as
-condições (majorante), como na §4. O intermitente continua limitado a 5 nmi (fim da Fig. 6).
+condições (majorante), como na §3. O intermitente continua limitado a 5 nmi (fim da Fig. 6).
