@@ -305,3 +305,47 @@ Verificação (`tests/test_common_cause.py`): para m = 2, Q_t = 10⁻³ e β = 0
 [(1 − β) Q_t]² + β Q_t = 5,09025×10⁻⁵ e o exato 5,0902455×10⁻⁵; com β = 0 reduz-se ao k-de-n independente.
 Veredicto: aplicação das Eq. A.10–A.13 **validado**; o valor de β é da fonte declarada e não é verificado aqui.
 Calibração: **nao_aplicar**. O yaml dos exemplos não foi alterado.
+
+## 12. MGL e fator α de causa comum (23 nov 2026)
+
+Fonte conferida nas páginas (imagem do PDF público, não só o texto extraído): NUREG/CR-5485 (Mosleh, Rasmuson e
+Marshall, NRC, 1998), §5.3, pp. 40–42, Eq. 5.6–5.13, e Apêndice A, pp. A-9–A-11, Eq. A.21–A.26 e Tabela A-2.
+Q_k é a probabilidade de um evento de causa comum que envolve k componentes específicos de um grupo de m.
+
+* **MGL** (Eq. 5.13): Q_k = (Π_{i=1..k} ρ_i)(1 − ρ_{k+1}) Q_t / C(m−1, k−1), com ρ_1 = 1, ρ_2 = β, ρ_3 = γ,
+  ρ_4 = δ, …, ρ_{m+1} = 0. Para m = 3: Q_1 = (1 − β) Q_t, Q_2 = ½ β (1 − γ) Q_t, Q_3 = β γ Q_t (Eq. 5.11).
+* **Fator α, ensaio escalonado** (Eq. 5.6): Q_k = α_k Q_t / C(m−1, k−1).
+* **Fator α, ensaio não escalonado** (Eq. 5.7; igual à Eq. A.23 porque m/C(m, k) = k/C(m−1, k−1)):
+  Q_k = k/C(m−1, k−1) · (α_k/α_t) Q_t, com α_t = Σ k α_k (Eq. 5.9 / A.24).
+* **Conversão** MGL ↔ α escalonado (Tabela A-2): α_k = (Π_{i≤k} ρ_i)(1 − ρ_{k+1}).
+
+Nota sobre a fonte: no exemplo da Eq. 5.10 (marcado «escalonado») aparece Q_3 = 3 α_3 Q_t, que não bate com a
+Eq. 5.6 geral (α_3 Q_t) e é o resultado da Eq. 5.7 (não escalonado). Usam-se as equações gerais.
+
+Ligação à FTA (`apply_multi_ccf`): cada evento do grupo passa a OR(independente com Q_1, eventos CCF de todos os
+subconjuntos de k ≥ 2 componentes que o contêm, cada um com Q_k). São 2^m − m − 1 eventos CCF, por isso o limite é
+m = 6 (57 eventos) para a avaliação exata; acima disso `nao_avaliado`.
+
+```yaml
+assumptions:
+  reliability:
+    common_cause:
+      groups:
+        - {id: SENS, m: 3, k_fail: 2, lambda_per_h: 2.0e-5, model: mgl, mgl: [0.05, 0.3],
+           params_source: "<fonte de β e γ>"}
+        - {id: BOMB, m: 2, k_fail: 2, q_total: 1.0e-3, model: alpha, alpha: [0.97, 0.03],
+           testing: escalonado, params_source: "<fonte dos α>"}
+```
+
+* Sem omissões: sem `params_source` o topo com causa comum fica desconhecido e só existe o limite inferior
+  (avarias independentes); o fator α exige `testing` (o esquema de ensaio muda as equações) e Σ α_k = 1.
+* Saídas por grupo: `Q_k`, `sum_check_Q_t` (= Σ C(m−1, k−1) Q_k, igual a Q_t pelas definições), `q_top` exato,
+  `q_top_rare_event`, cortes mínimos; para MGL também `alpha_escalonado` (Tabela A-2).
+* IEC 61508-6 Anexo D (tabelas de β por pontuação): `nao_avaliado`. A norma é paga e não há fonte pública que
+  permita conferir as tabelas; não se transcreveram valores de fontes secundárias.
+
+Verificação (`tests/test_common_cause_mgl_alpha.py`): Eq. 5.11 e 5.12 (2-de-3: eventos raros
+3 Q_1² + 3 Q_2 + Q_3 igual ao valor da árvore até 10⁻¹²); identidade de soma até m = 6; α escalonado ≡ MGL pela
+Tabela A-2 e a inversa; Eq. A.25 + Eq. 5.13 ≡ Eq. 5.7 ≡ Eq. A.23 para m = 3. Veredicto: aplicação das equações
+**validado**; valores dos parâmetros da fonte declarada, não verificados aqui. Calibração: **nao_aplicar**. O yaml
+dos exemplos não foi alterado.

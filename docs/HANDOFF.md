@@ -2046,6 +2046,14 @@ A queda do worker na CI Ubuntu era o `--timeout=900` (método thread → `os._ex
 ## `thinwalled.solve` vectorizado (23 nov 2026, ramo `thinwalled-vectorizado`)
 
 Secção multicélula de Megson 5,4× mais rápida (2,05 → 0,38 ms por secção): idealização e sistema vectorizados, LU em vez de SVD quando o sistema é quadrado depois de retirar a linha de nó redundante (`lstsq` como recurso). Mesmos resultados (regressão contra a referência congelada, 10⁻⁹). Teste pesado da asa voadora 281 → 174 s. Pormenor em [QUALIDADE.md](QUALIDADE.md).
+## MGL e fator α de causa comum (23 nov 2026, ramo `ccf-mgl-alfa`)
+
+NUREG/CR-5485 §5.3 Eq. 5.6–5.13 e Ap. A Eq. A.21–A.26 / Tabela A-2, conferidos nas imagens das páginas 40–42 e A-9–A-11 do PDF público. `common_cause.groups[].model: mgl | alpha` com `params_source` obrigatório; FTA com um evento CCF por subconjunto (m ≤ 6). Exemplo da Eq. 5.10 da fonte inconsistente com a Eq. 5.6 (documentado; usa-se a geral). IEC 61508-6 Anexo D: `nao_avaliado` (sem fonte pública verificável). Pormenor em [FIABILIDADE.md](FIABILIDADE.md) §12.
+
+## MDO de sistema com as disciplinas novas (23 nov 2026, ramo `mdo-global-disciplinas`)
+
+Estudo `examples/studies/mdo_disciplinas` (`applied: false`), resultados em `examples/output/mdo_disciplinas`. Frente de 3 projetos (2,0 h, AR 7,9–9,4, W0 27,9–28,2 kg). Corrigidos o `t_eval` do transitório térmico e a matriz final do MDO que ignorava `mdo.fixed`. Margem quente da baia −64 K em todo o domínio e `REQ-mtow` falha com a proteção anti-gelo: ficam como achados do caso de teste. Pormenor em [MDO.md](MDO.md).
+
 ## Incerteza com as disciplinas novas (23 nov 2026, ramo `uq-disciplinas`)
 
 `uncertainty.fixed` novo; estudo `examples/studies/uq_disciplinas` (`applied: false`). Substituto rejeitado para W0/LCC/CO₂e (W0 não suave: espiral de massa a bateria/η baixos); rastreio por postos de Spearman em vez de Sobol'. Por fazer: isolar o NaN do `brentq` em `solve_bay_steady` (2/28 corridas; entradas em `examples/output/uq_disciplinas/uq.json`). Pormenor em [INCERTEZA.md](INCERTEZA.md).
