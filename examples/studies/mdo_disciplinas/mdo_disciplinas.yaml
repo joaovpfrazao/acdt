@@ -1,0 +1,100 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Estudo de demonstração (applied: false) — MDO de sistema (docs/MDO.md) com as disciplinas novas (térmica, gelo,
+# fiabilidade, custo de série, ciclo de vida) como objetivos e restrições, sobre o exemplo de teste
+# examples/uav_endurance_payload.yaml (o yaml do exemplo NÃO muda: tudo entra por `fixed`).
+#   acdt mdo examples/uav_endurance_payload.yaml --spec examples/studies/mdo_disciplinas/mdo_disciplinas.yaml \
+#       -o examples/output/mdo_disciplinas
+# Os blocos `fixed` são os dados de TESTE já usados em tests/test_thermal.py, tests/test_icing.py,
+# tests/test_reliability.py e tests/test_life_cycle.py (rótulo "teste"): não são dados de projeto. Os resultados
+# servem para demonstrar a ligação das disciplinas ao MDO, não para dimensionar o avião.
+applied: false
+mdo:
+  fixed:
+    assumptions.aero.fidelity: handbook
+    assumptions.stability.use_avl: false
+    assumptions.thermal:
+      coupling: iterar
+      ground_time_s: 300
+      electric: {eta_esc: 0.97, eta_motor: 0.9}          # teste (tests/test_thermal.py)
+      bays:
+        - id: fuselagem
+          skin_area_m2: 1.0
+          flow_length_m: 1.6
+          height_m: 0.2
+          eps_ext: 0.85
+          alpha_solar: 0.3
+          eps_int: [0.1, 0.9]
+          sources: [avionica, bateria, esc]
+          capacity_J_K: 9000.0
+          components:
+            - {id: bateria_pack, source: bateria, conductance_W_K: 10.0, T_max_C: 60, T_min_C: -20,
+               limit_source: "teste (limite declarado)"}
+          ram_air: {size_for: cruzeiro_quente, ram_recovery: 0.8, duct_loss_q: 0.5,
+                    duct: {length_m: 0.4, areal_density_kg_m2: 1.0}}
+    assumptions.icing:
+      coupling: iterar
+      surfaces:                                           # teste (tests/test_icing.py)
+        - {id: asa, chord_m: 0.3, t_c: 0.12, lifting: true, protection: deice_electrothermal,
+           protected_area_m2: 0.2, duty_cycle: 0.1, power_density_W_m2: 10000, mass_kg: 0.3}
+    assumptions.reliability:                              # teste (tests/test_reliability.py::_spec)
+      components:
+        - {id: motor, lambda_per_h: 1.0e-4, source: teste, mttr_h: 2.0, mmh_per_action: 3.0, replacement_cost: 500.0}
+        - {id: servo, lambda_per_h: 5.0e-4, source: teste, mttr_h: 0.5, mmh_per_action: 1.0, replacement_cost: 200.0}
+      rbd: {type: series, blocks: [motor, {type: k_of_n, k: 3, n: 4, block: servo}]}
+      preventive: [{id: inspecao, interval_fh: 50.0, duration_h: 1.0, mmh: 2.0}]
+      logistics: {mean_logistic_delay_h: 4.0, mean_admin_delay_h: 1.0}
+      fleet: {mode: sorties, sorties_per_day: 3, turnaround_h: 1.0, operating_hours_per_day: 16}
+    assumptions.series_cost: {quantity: 50, price: 60000}  # teste (tests/test_life_cycle.py)
+    assumptions.life_cycle:                                # teste (tests/test_life_cycle.py)
+      service_life_years: 10
+      production_rate_per_year: 20
+      rdte_years: 2
+      fh_per_aircraft_per_year: {lo: 300, hi: 500}
+      cost_per_fh_USD: {lo: 40, hi: 90}
+      disposal_per_aircraft_USD: 0.0       # PRESSUPOSTO do estudo: abate fora do âmbito (no teste: desconhecido)
+      discount_rate: 0.05
+      environment:
+        grid_intensity_kgCO2e_per_kWh: {lo: 0.1, hi: 0.4, source: teste}
+        charge_efficiency: 0.9
+        battery_footprint: ivl_c444_2019
+        battery_cycle_life: 400
+        flights_per_fh: 0.25
+  design_variables:
+    # AR até 7: com a proteção anti-gelo o W0 sobe ~10 kg e, com a perda limitada a 13 m/s, a envergadura de 4,2 m
+    # só fecha com AR ≲ 9 (primeira corrida, AR 10–16: nenhum viável).
+    - {path: assumptions.aero.AR, lower: 7, upper: 13, x0: 9,
+       source: "PRESSUPOSTO: banda de AR do estudo"}
+    # autonomia discreta em múltiplos de 10 s: a missão verificada integra em passos de 10 s e um requisito
+    # contínuo (p. ex. 2,43 h) ficava sempre 1e-3 abaixo do limiar (inviável pela política 'limiar').
+    - {path: requirements.endurance, type: discrete, values: [2.0, 2.5, 3.0], placement: inner,
+       source: "PRESSUPOSTO: troca de autonomia em torno do requisito de 2,5 h"}
+  result_metrics:
+    lcc_pv_hi_USD: life_cycle.present_value_USD.total.hi
+    lcc_pv_lo_USD: life_cycle.present_value_USD.total.lo
+    co2e_fh_hi_kg: life_cycle.co2e_per_flight_hour_kg.hi
+    co2e_ciclo_hi_kg: life_cycle.life_cycle_co2e_kg.hi
+    unit_cost_USD: series_cost.average_unit_cost_USD
+    mission_reliability_lo: reliability.mission_reliability.lo
+    availability_op_lo: reliability.operational_availability.lo
+    fleet_size_hi: reliability.fleet_size.hi
+    hot_margin_min_C: thermal.hot_margin_min_C
+    cold_margin_min_C: thermal.cold_margin_min_C
+    cooling_drag_area_hi_m2: thermal.cooling.drag_area_m2.hi
+    ice_power_hi_W: icing.protection.electrical_power_W.hi
+  objectives:
+    - {metric: W0_kg, sense: min, ref: 35}
+    - {metric: lcc_pv_hi_USD, sense: min, ref: 16000000}
+  constraints:
+    requirements: all
+    exclude: [REQ-mtow]    # com a proteção anti-gelo declarada o W0 passa os 25 kg em todo o domínio (ver relatório)
+    policy: limiar
+    metrics:
+      - {metric: mission_reliability_lo, lower: 0.99, source: "PRESSUPOSTO do estudo (requisito RL-01 de tests/test_reliability.py)"}
+      - {metric: availability_op_lo, lower: 0.5, source: "PRESSUPOSTO do estudo (requisito RL-02 de tests/test_reliability.py)"}
+      - {metric: ice_power_hi_W, upper: 1000, source: "PRESSUPOSTO do estudo (requisito IC-03 de tests/test_icing.py)"}
+  strategy: nsga2
+  options: {pop_size: 6, max_gen: 1, seed: 20261123}   # orçamento mínimo: 12 corridas
+  model:
+    fidelity: handbook
+    skip_stages: [aeroelasticity]
+    workers: 3

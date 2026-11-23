@@ -76,7 +76,9 @@ def run_mdo_mission(mission: str | Path, outdir: str | Path | None = None, *, md
     model = AircraftSystemModel(raw, str(Path(mission)), mopts)
 
     def final_matrix(rec: Record) -> Mapping[str, Any] | None:
-        over = dict(rec.extra.get("overrides") or {})
+        # as sobreposições fixas do estudo (mdo.fixed) também entram na matriz final: sem elas a matriz do projeto
+        # escolhido era a da missão sem os blocos do estudo (achado no MDO de demonstração das disciplinas novas)
+        over = {**dict(spec.fixed), **dict(rec.extra.get("overrides") or {})}
         pt: dict[str, float] = {}
         for k, v in rec.x.items():
             if isinstance(v, (int, float)) and not isinstance(v, bool):

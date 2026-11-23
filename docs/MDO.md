@@ -154,6 +154,39 @@ examples/mdo/uav150_tailless_mdo.yaml -o /workspace/mdo_tailless`; ficheiros for
 * 12 avaliações é um orçamento de teste da camada, não uma frente convergida: as conclusões de projeto pedem
   população e gerações maiores no PC do João.
 
+## Estudo de demonstração: disciplinas novas no MDO (23 nov 2026)
+
+Estudo `examples/studies/mdo_disciplinas/mdo_disciplinas.yaml` (`applied: false`) sobre o exemplo de teste
+`uav_endurance_payload` (o yaml do exemplo não muda: térmica com `coupling: iterar`, gelo com proteção eletrotérmica
+na asa e `coupling: iterar`, fiabilidade, custo de série e ciclo de vida entram por `mdo.fixed`, com os dados de teste
+de `tests/test_thermal.py`, `tests/test_icing.py`, `tests/test_reliability.py` e `tests/test_life_cycle.py`).
+Resultados em `examples/output/mdo_disciplinas/` (`mdo.json`, `evaluations.csv`, `pareto.png`, `provenance.json`).
+
+* Variáveis: AR ∈ [7, 13] (contínua) e autonomia exigida ∈ {2,0; 2,5; 3,0} h (discreta). Objetivos: min W0 e min
+  LCC em valor atual (majorante, `life_cycle.present_value_USD.total.hi`). Restrições: todos os requisitos numéricos
+  da missão exceto `REQ-mtow` (política `limiar`), fiabilidade de missão ≥ 0,99, disponibilidade operacional ≥ 0,5,
+  potência de proteção anti-gelo ≤ 1 kW (limiares dos testes, PRESSUPOSTO do estudo). NSGA-II, população 6, 1
+  geração, semente 20261123: 10 corridas do pipeline (fidelidade handbook, sem aeroelasticidade).
+* Resultado: 4 viáveis, frente com 3 projetos, todos com 2,0 h: AR 7,90 (W0 28,17 kg, LCC ≤ 15,87 M USD),
+  AR 9,00 (27,98 kg, 15,89 M USD; joelho) e AR 9,40 (27,91 kg, 15,89 M USD). AR mais baixo baixa o custo unitário
+  (34,0 → 34,7 k USD) e o LCC; AR mais alto baixa o W0 até ≈ 9,4 e depois a envergadura (≤ 4,2 m) corta.
+* Com 2,5 h nenhum projeto é viável: W0 36–38 kg, envergadura > 4,2 m para AR ≥ 11 e, com AR ≈ 7,4, a missão
+  verificada fica 10 s (0,11 %) abaixo das 9000 s.
+* As disciplinas novas pesam: a proteção anti-gelo (≈ 250 W durante a exposição) e o arrefecimento levam o W0 do
+  joelho a 27,98 kg contra os 23,42 kg do exemplo sem estes blocos; `REQ-mtow` (25 kg) falha em todo o domínio,
+  por isso ficou fora das restrições e aparece como `falha` na matriz final. A margem quente da baia das baterias é
+  −64 a −65 K em todos os projetos (a entrada de ar está dimensionada para o cruzeiro quente e a subida não fecha):
+  é reportada e não restringe, porque nenhuma variável deste estudo a move. O O&S domina o LCC (custo por hora de
+  voo declarado, independente do projeto), por isso o LCC varia só 0,6 % na frente.
+* Fiabilidade de missão 0,99977 e CO₂e ≤ 1,22–1,79 kg por hora de voo em todas as avaliações.
+
+Defeitos de integração encontrados e corrigidos neste estudo: (1) o transitório térmico chamava o `solve_ivp` com
+um `t_eval` 1 ulp acima da duração da fase (d·n/n > d), o que fazia falhar a avaliação (`ValueError`); (2) a matriz
+de verificação final do projeto escolhido ignorava `mdo.fixed` (dava W0 18,69 kg em vez de 27,98 kg). Testes em
+`tests/test_thermal.py` e `tests/test_mdo_fixed_final_matrix.py`. Veredicto: ligação das disciplinas ao MDO
+**validado** (as métricas entram por `result_metrics` e as restrições funcionam); os números são de um caso de teste
+com dados de teste e orçamento mínimo (frente não convergida): `nao_aplicar` ao projeto.
+
 ## Limites
 
 * Derivadas por diferenças finitas do sistema (sem parciais analíticas; o pipeline tem fechos iterativos com ruído
