@@ -21,11 +21,27 @@ em todas as portas, por isso a probabilidade exata do topo (decomposição de Sh
 β não tem omissão: tem de vir declarado com a sua fonte (``beta_source``). Sem β o resultado com causa comum fica
 desconhecido; o valor só com avarias independentes é um limite inferior da probabilidade de falha, não o resultado.
 O grupo tem de ter Q_t iguais (o modelo é para componentes semelhantes); Q_t diferentes → ``nao_avaliado``.
-Os modelos de mais parâmetros (MGL, fator α) não estão aqui.
+
+Modelos de vários parâmetros (mesma fonte, conferidos nas páginas 40–42 e A-9–A-11 do PDF público):
+
+* MGL (Multiple Greek Letter), Eq. 5.13: Q_k = 1/C(m−1, k−1) · (Π_{i=1..k} ρ_i) · (1 − ρ_{k+1}) · Q_t, com
+  ρ_1 = 1, ρ_2 = β, ρ_3 = γ, ρ_4 = δ, …, ρ_{m+1} = 0 (Eq. 5.11 para m = 3). O fator β é o caso particular.
+* Fator α, ensaio escalonado, Eq. 5.6: Q_k = α_k Q_t / C(m−1, k−1).
+* Fator α, ensaio não escalonado, Eq. 5.7 (= Eq. A.23, porque m/C(m, k) = k/C(m−1, k−1)):
+  Q_k = k/C(m−1, k−1) · α_k/α_t · Q_t, com α_t = Σ k α_k (Eq. 5.9 / A.24).
+* Conversão MGL ↔ α (ensaio escalonado), Tabela A-2: α_k = (Π_{i≤k} ρ_i)(1 − ρ_{k+1}).
+
+Q_k é a probabilidade de um evento de causa comum que envolve k componentes específicos. Na FTA cada evento do
+grupo passa a OR(independente Q_1, todos os eventos CCF de ordem k ≥ 2 que o contêm), um evento partilhado por
+cada subconjunto de k componentes (o modelo de parâmetros básicos da secção 5.3). O exemplo numérico da Eq. 5.10
+(Q_3 = 3 α_3 Q_t «escalonado») não bate com a Eq. 5.6 (dá α_3 Q_t); usa-se a equação geral e o 3 α_3/α_t Q_t é
+o resultado da Eq. 5.7 (não escalonado). Os α e os ρ têm de vir declarados com fonte; não há omissão. Os valores
+de β da IEC 61508-6 Anexo D não estão aqui: a norma não é pública e não foi possível conferi-los.
 """
 from __future__ import annotations
 
 import math
+from itertools import combinations
 from typing import Any, Mapping, Sequence
 
 from acdt.core.safety.fta import BasicEvent, FaultTree, Gate
@@ -33,6 +49,11 @@ from acdt.core.safety.fta import BasicEvent, FaultTree, Gate
 SOURCE = ("NUREG/CR-5485 (Mosleh, Rasmuson e Marshall, NRC, nov. 1998) Apêndice A, Eq. A.10–A.13, p. A-5 "
           "(modelo do fator β de Fleming, 1975)")
 _REL_EQUAL = 1e-9
+SOURCE_MGL = ("NUREG/CR-5485 (NRC, 1998) §5.3, Eq. 5.11 e 5.13, pp. 41–42 (modelo MGL); conversão α↔MGL "
+              "Tabela A-2, p. A-11")
+SOURCE_ALPHA = ("NUREG/CR-5485 (NRC, 1998) §5.3, Eq. 5.6–5.9, pp. 40–41; Ap. A Eq. A.21–A.24, p. A-9 "
+                "(modelo do fator α)")
+M_MAX_FTA = 6          # 2^m − m − 1 eventos CCF na árvore (57 para m = 6): avaliação exata ainda barata
 
 
 def _prob(x: Any) -> float | None:
@@ -123,6 +144,11 @@ def _group(raw: Mapping[str, Any], mission_h: float | None) -> dict[str, Any]:
     base = redundancy_tree(gid, q, m, k)
     out["q_top_independent_only"] = base.top_probability()
     out["m"], out["k_fail"], out["Q_t"] = m, k, q
+    if raw.get("model") in ("mgl", "alpha"):
+        return _multi_group(raw, out, gid, q, m, k)
+    if raw.get("model") not in (None, "beta"):
+        out["notes"].append("model desconhecido (beta | mgl | alpha)")
+        return out
     b = raw.get("beta")
     src = raw.get("beta_source")
     if b is None:
@@ -162,5 +188,145 @@ def common_cause_block(raw: Any, mission_h: float | None) -> dict[str, Any]:
     ok = all(r["evaluated"] for r in rows)
     return {"evaluated": ok, "veredicto": "validado" if ok else "nao_avaliado", "calibracao": "nao_aplicar",
             "method": SOURCE, "groups": rows,
-            "nota": ("Valida a aplicação das Eq. A.10–A.13 com o β declarado; o valor de β vem da fonte declarada "
-                     "pelo utilizador e não é verificado aqui. Não substitui o RBD ativo.")}
+            "nota": ("Valida a aplicação das Eq. A.10–A.13 (β), 5.13 (MGL) ou 5.6/5.7 (fator α) com os parâmetros "
+                     "declarados; os valores vêm da fonte declarada pelo utilizador e não são verificados aqui. "
+                     "Não substitui o RBD ativo.")}
+
+
+# ------------------------------------------------------------------ MGL e fator α (NUREG/CR-5485 §5.3, Ap. A)
+def _floats(xs: Any, n: int) -> list[float] | None:
+    if not isinstance(xs, (list, tuple)) or len(xs) != n:
+        return None
+    out = [_prob(x) for x in xs]
+    return None if any(v is None for v in out) else [float(v) for v in out]  # type: ignore[arg-type]
+
+
+def mgl_q(q_total: float, m: int, greek: Sequence[float]) -> list[float] | None:
+    """Eq. 5.13: [Q_1, …, Q_m] para m componentes com ρ_2…ρ_m = ``greek`` (β, γ, δ, …). Inválido → ``None``."""
+    q = _prob(q_total)
+    if q is None or not isinstance(m, int) or m < 2:
+        return None
+    g = _floats(list(greek), m - 1)
+    if g is None:
+        return None
+    rho = [1.0] + g + [0.0]                      # ρ_1 = 1, ρ_2 … ρ_m, ρ_{m+1} = 0
+    out = []
+    for k in range(1, m + 1):
+        prod = math.prod(rho[:k])
+        out.append(prod * (1.0 - rho[k]) * q / math.comb(m - 1, k - 1))
+    return out
+
+
+def alpha_q(q_total: float, alphas: Sequence[float], staggered: bool) -> list[float] | None:
+    """Eq. 5.6 (escalonado) ou 5.7 (não escalonado): [Q_1, …, Q_m] com α_1…α_m = ``alphas`` (Σ α_k = 1)."""
+    q = _prob(q_total)
+    m = len(alphas) if isinstance(alphas, (list, tuple)) else 0
+    a = _floats(list(alphas), m) if m >= 2 else None
+    if q is None or a is None or abs(sum(a) - 1.0) > 1e-6:
+        return None
+    if staggered:
+        return [a[k - 1] * q / math.comb(m - 1, k - 1) for k in range(1, m + 1)]
+    a_t = sum(k * a[k - 1] for k in range(1, m + 1))           # Eq. 5.9
+    return [k / math.comb(m - 1, k - 1) * a[k - 1] / a_t * q for k in range(1, m + 1)]
+
+
+def mgl_to_alpha_staggered(greek: Sequence[float]) -> list[float]:
+    """Tabela A-2 (escalonado): α_k = (Π_{i≤k} ρ_i)(1 − ρ_{k+1}), ρ_1 = 1, ρ_{m+1} = 0."""
+    rho = [1.0] + [float(x) for x in greek] + [0.0]
+    return [math.prod(rho[:k]) * (1.0 - rho[k]) for k in range(1, len(greek) + 2)]
+
+
+def alpha_to_mgl_staggered(alphas: Sequence[float]) -> list[float]:
+    """Tabela A-2 (escalonado): ρ_k = Σ_{j≥k} α_j / Σ_{j≥k−1} α_j (β = α_2 + … + α_m para Σ α = 1)."""
+    a = [float(x) for x in alphas]
+    tail = [sum(a[i:]) for i in range(len(a))]
+    return [tail[k] / tail[k - 1] if tail[k - 1] > 0 else 0.0 for k in range(1, len(a))]
+
+
+def apply_multi_ccf(tree: FaultTree, group_events: Sequence[str], qk: Sequence[float], *, group_id: str,
+                    source: str, t_flight: float = 1.0) -> dict[str, Any]:
+    """Modelo de parâmetros básicos na árvore: cada evento do grupo → OR(independente Q_1, CCF dos subconjuntos
+    de ordem k ≥ 2 que o contêm, cada um com Q_k). Altera ``tree``. Q_t diferentes, m > M_MAX_FTA ou ids
+    ocupados → árvore intacta e ``nao_avaliado``."""
+    ids = list(dict.fromkeys(group_events))
+    m = len(ids)
+    out: dict[str, Any] = {"group": group_id, "events": ids, "method": source, "evaluated": False,
+                           "veredicto": "nao_avaliado", "notes": []}
+    if m < 2 or len(qk) != m:
+        out["notes"].append("grupo com menos de dois eventos ou Q_k com tamanho diferente de m")
+        return out
+    if m > M_MAX_FTA:
+        out["notes"].append(f"m = {m} > {M_MAX_FTA}: árvore com demasiados eventos CCF para avaliação exata")
+        return out
+    missing = [e for e in ids if e not in tree.events]
+    if missing:
+        out["notes"].append("eventos fora da árvore: " + ", ".join(missing))
+        return out
+    qs = [tree.events[e].q(t_flight) for e in ids]
+    if max(qs) - min(qs) > _REL_EQUAL * max(max(qs), 1e-300):
+        out["notes"].append("Q_t diferentes no grupo: o modelo é para componentes semelhantes")
+        return out
+    subsets = [c for k in range(2, m + 1) for c in combinations(range(m), k)]
+    names = {c: f"{group_id}.CCF" + "".join(f".{i + 1}" for i in c) for c in subsets}
+    if any(n in tree.events or n in tree.gates for n in names.values()):
+        out["notes"].append("identificadores CCF já existem na árvore")
+        return out
+    for c, n in names.items():
+        tree.add_event(BasicEvent(id=n, name=f"causa comum {group_id} ({len(c)} de {m})", prob=float(qk[len(c) - 1]),
+                                  source=source))
+    for i, e in enumerate(ids):
+        old = tree.events.pop(e)
+        ind = f"{e}.I"
+        tree.add_event(BasicEvent(id=ind, name=(old.name or e) + " (independente)", prob=float(qk[0]),
+                                  source=source, latent=old.latent))
+        tree.add_gate(Gate(id=e, kind="OR", inputs=[ind] + [names[c] for c in subsets if i in c],
+                           name=(old.name or e) + " (CCF)"))
+    out.update({"evaluated": True, "veredicto": "validado", "Q_k": [float(x) for x in qk],
+                "n_ccf_events": len(subsets)})
+    return out
+
+
+def _multi_group(raw: Mapping[str, Any], out: dict[str, Any], gid: str, q: float, m: int, k: int) -> dict[str, Any]:
+    model = raw.get("model")
+    src = raw.get("params_source")
+    if model == "mgl":
+        out["method"] = SOURCE_MGL
+        greek = raw.get("mgl")
+        qk = mgl_q(q, m, greek) if isinstance(greek, (list, tuple)) else None
+        if qk is None or not isinstance(greek, (list, tuple)):
+            out["notes"].append("mgl: lista [β, γ, δ, …] com m − 1 valores em [0, 1] em falta ou inválida")
+            return out
+        out["mgl"] = [float(x) for x in greek]
+        out["alpha_escalonado"] = mgl_to_alpha_staggered(greek)
+    else:
+        out["method"] = SOURCE_ALPHA
+        alphas, testing = raw.get("alpha"), raw.get("testing")
+        if testing not in ("escalonado", "nao_escalonado"):
+            out["notes"].append("testing (escalonado | nao_escalonado) em falta: o fator α depende do esquema de "
+                                "ensaio (§5.3) e não tem omissão")
+            return out
+        qk = alpha_q(q, alphas, testing == "escalonado") if isinstance(alphas, (list, tuple)) and \
+            len(alphas) == m else None
+        if qk is None or not isinstance(alphas, (list, tuple)):
+            out["notes"].append("alpha: lista [α_1, …, α_m] em [0, 1] com Σ α_k = 1 em falta ou inválida")
+            return out
+        out["alpha"], out["testing"] = [float(x) for x in alphas], testing
+    if not src:
+        out["notes"].append("params_source em falta: os parâmetros não se aplicam sem fonte declarada")
+        out["q_top_bounds"] = {"lo": out["q_top_independent_only"], "hi": None}
+        return out
+    tree = redundancy_tree(gid, q, m, k)
+    blk = apply_multi_ccf(tree, [f"{gid}.{i + 1}" for i in range(m)], qk, group_id=gid, source=out["method"])
+    out["ccf_block"] = blk
+    if not blk["evaluated"]:
+        out["notes"] += blk["notes"]
+        return out
+    out["Q_k"] = qk
+    out["sum_check_Q_t"] = sum(math.comb(m - 1, j - 1) * qk[j - 1] for j in range(1, m + 1))
+    out["q_top"] = tree.top_probability()
+    out["q_top_rare_event"] = tree.rare_event()
+    out["minimal_cut_sets"] = [sorted(s) for s in tree.minimal_cut_sets()]
+    out["params_source"] = str(src)
+    out["model"] = model
+    out["evaluated"], out["veredicto"] = True, "validado"
+    return out
