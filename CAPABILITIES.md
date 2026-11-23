@@ -15,6 +15,10 @@ Detalhes em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). O workflow de design p
 N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nível, está em
 [docs/DESIGN_WORKFLOW.md](docs/DESIGN_WORKFLOW.md).
 
+Numeração: as secções seguem a ordem de entrada, de 1 a 39. As sub-secções 32b a 32y ficam entre a 32 e a 33
+para manter as referências já existentes (por exemplo, §32d-bis ou §32r). O roadmap e as sugestões ficam no fim.
+Secções novas entram antes do roadmap, com o número seguinte.
+
 > Ferramenta de apoio ao projeto. Os resultados não substituem a análise de engenharia nem a certificação.
 
 ---
@@ -763,7 +767,6 @@ N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nív
 
 ---
 
-
 ## 24. Matriz morfológica N1 e poda por conjuntos (P2)
 
 * **Módulos**: `domains/aircraft/morphology/` (`matrix`, `generate`, `evaluate`, `prune`).
@@ -783,7 +786,6 @@ N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nív
 * **Exemplo / tutorial**: `examples/morphology/n1_uav_isr_matrix.json`, `docs/tutorial-p2-morfologico.md`.
 * **Limite atual**: asas/caudas/fuselagens ainda sem mapa geométrico no `size` (HANDOFF P1); ficam no
   registo da arquitetura. O juiz de missão usa a polar do dimensionamento da missão base.
-
 
 ## 25. Arquitetura elétrica e trade de carga útil (P4)
 
@@ -817,7 +819,6 @@ N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nív
     `cost-fh` de agregação directa mantém-se; L2 BOM com cotações reais continua bloqueado
     (HANDOFF MÉDIA §5).
 
-
 ## 26. Registo de decisões (P5)
 
 * **O que faz**:
@@ -841,7 +842,6 @@ N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nív
   * checks têm de ser fornecidos pelo chamador (`ok: null` → unassessed, nunca pass);
   * acoplamento UQ opt-in (10 nov 2026): `--uq` / `require_uq` consome resumos MC/Sobol;
     UQ em falta ou `unassessed` ≠ pass; sem vencedor ponderado.
-
 
 ## 27. Sensibilidade OAT / Sobol e fidelidade por necessidade (P7)
 
@@ -868,7 +868,6 @@ N2 forma → N3+ fecho), com o mapa destas capacidades e as lacunas de cada nív
   * Sobol/MC: evidência em falta → `unassessed` (nunca 0 silencioso);
   * `pipeline`/`sobol`/`mc` por omissão handbook + sem systems; N pequeno = smoke;
   * dicas de disciplina são heurísticas por caminho.
-
 
 ## 28. Forma OML N2 leve — aero/RCS/packaging (P6 light)
 
@@ -1042,7 +1041,6 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * [Tutorial e contrato de contabilização](docs/tutorial-onboard.md), exemplos em `examples/onboard/`;
   todos os novos valores exemplificativos são PRESSUPOSTOS.
 
-
 ## 32b. Juiz comum de missão jet/VTOL — L0 opt-in (9 nov 2026)
 
 * **API**: `simulate_common_mission` / frota `operations.common_sim.enabled`.
@@ -1062,7 +1060,6 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * Examples: `examples/uav_inverted_v_shortcut.yaml`, `examples/uav_twin_boom_shortcut.yaml`.
 * Flying-wing winglet sizing + gear on that layout: see §32d (9 nov 2026).
 
-
 ## 32d. Asa voadora — winglets/deriva + trem — L0 opt-in (9 nov 2026)
 
 * **API**: `assumptions.assembly.options.flying_wing` (off by default). Shortcuts mutate the generic
@@ -1080,7 +1077,6 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   `examples/integration/flying_wing_pusher_closed.json`. Baseline
   `examples/heavy/uav150_flying_wing.yaml` (no flag) unchanged.
 * Named types remain shortcuts that assemble generic components, never a closed list.
-
 
 ## 32d-bis. Asa voadora sem superfícies verticais — split ailerons + SAS — L1 opt-in (10 nov 2026)
 
@@ -1370,7 +1366,6 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * No gerador morfológico: dimensão extra `yaw_control` (não é semente); `split_aileron` liga a opção na
   montagem da base; regra física `yaw_control=rudder` × `tail=tailless` cortada.
 
-
 ## 32d-ter. GCI RANS-SA da asa sem deriva — um α (13 nov 2026)
 
 * **O que correu**: meia asa de estibordo do exemplo tailless, controlos alinhados, sem corpo, trem ou hélice.
@@ -1431,7 +1426,6 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   See §32d-bis.
 * Examples: `examples/integration/conventional_taildragger.json`, `ski_gear_demo.json`.
 * Tricycle path and examples that omit the new options stay unchanged.
-
 
 ## 32f. Formas de equipamento + corpos rodados no AVL — L0 opt-in (9 nov 2026)
 
@@ -1889,6 +1883,25 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
 * **Limites**: sem fabrico da estrutura/motores, fim de vida nem efeitos não-CO₂. Pormenor em
   [docs/CICLO_VIDA.md](docs/CICLO_VIDA.md).
 
+## 32x. Ponto de operação da missão na térmica e no gelo (19 nov 2026)
+
+* **O que faz**: nos modos `coupling: iterar` da térmica e do gelo, o ponto de funcionamento passa a sair da missão exigida (`simulate_mission`, `stop=legs`), a mesma tabela do desempenho. A entrada NACA do compartimento pode ser dimensionada com `ram_air.size_for: pior_segmento` (maior `A = ṁ/(MFR·ρ·V)` nos segmentos em voo). A entrada do motor térmico usa sempre essa área.
+* **Métodos**: missão por segmentos já usada no desempenho (Raymer cap. 17, com as frações da Tabela 3.2 onde o modelo as cita); caudal e área da entrada, NACA RM A8I29 (MFR 0,60) e arrasto interno de Anderson, como em §32s.
+* **Completude**: missão que não fecha → ponto de projeto, com a falta escrita em `coupling_loop.mission.source` (não é duração zero). Segmento em voo que não fecha a entrada → área e arrasto desconhecidos; não se usa o máximo dos outros.
+* **PRESSUPOSTO**: no motor térmico o MFR de projeto mantém-se fora do segmento de dimensionamento; a curva de recuperação versus MFR do NACA RM A8I29 não é aplicada.
+* **Validado**: `tests/test_thermal.py`, `tests/test_icing.py`. O yaml dos exemplos não muda. Veredicto e números em `examples/output/uav_endurance_payload_missao_termica/acoplamento.json`. No UAV elétrico o arrasto de cruzeiro do ciclo `iterar` coincide com o da missão final; face ao ponto de projeto a diferença medida é 7,88 %. Com `pior_segmento` a subida desse caso não fecha (ar de entrada acima do limite do compartimento) e a área fica desconhecida. No UAV a gasolina, com o aumento de temperatura do ar declarado só no teste, a entrada do motor é a da subida.
+
+## 32y. Adaptadores nativos de VTOL e jato para as disciplinas (19 nov 2026)
+
+O VTOL e o jato passam a chamar as mesmas disciplinas da asa fixa a partir do resultado nativo (`size_vtol` / `size_jet`), em `domains/aircraft/native_disciplines.py`. A carga útil e a arquitetura elétrica entram nos três tipos. A massa fechada não muda: `mass_kg`, `payload_kg` e W0 já são a massa dimensionada.
+
+* **Potência.** Modo arquitetura (MIL-E-7016F; Moir & Seabridge Cap. 5): o hotel é o máximo entre o valor declarado e a média da arquitetura. Modo carga útil: a média soma-se ao hotel. Um `power_w_avg` em falta torna a média desconhecida. `duty` omisso é 1 (PRESSUPOSTO). `distribution_eta` em falta deixa o calor das perdas em [0; desconhecido]; não é η = 1.
+* **Térmica e gelo.** Só com baías ou superfícies declaradas, ou, no jato, com S, alongamento e `wave.thickness_ratio` (corda média √(S/AR); PRESSUPOSTO NACA de 4 dígitos já usado no tipo fixo). A transição VTOL e a subida do jato L0 não têm velocidade única: o estudo corre e o veredicto fica `nao_avaliado`. Heywood não é aplicado ao jato.
+* **Ruído.** Rotor com pás, rpm de funcionamento (`rotors.rpm` ou `hover.rpm_bemt`; nunca `rpm_max`) e `noise.flyover_altitude_m`: Gutin + Schlegel-King-Mull. O nível é limite inferior. O jato fica `nao_avaliado` (SAE ARP876 não verificado).
+* **Fiabilidade, custo de série e ciclo de vida.** Cada item entra no RBD. λ sem fonte, ou com fonte `EXAMPLE`, fica desconhecido (R de missão com minorante 0). Custo unitário incompleto abre o majorante do custo de série. No VTOL a energia por hora de voo já traz o hotel; não é somada outra vez. Num jato não há modelo de extração de combustível para a potência elétrica: o CO₂e fica em aberto.
+* **Veredicto.** `validado` quando o método citado correu e o resultado fecha. `nao_avaliado` quando falta um dado. `calibracao_L1_L2`: `nao_aplicar`. Fonte `EXAMPLE` entra no número e fica marcada; não é ficha de fornecedor.
+* **Medida** (ensaio, 19 nov 2026, `examples/output/adaptadores_vtol_jato/adaptadores.json`; o YAML de exemplo não foi editado): multirrotor de 5 kg, 25 W durante 600 s, +4,17 Wh e a massa de entrada inalterada; calor de pairar +25,0 W; perda de distribuição de 40 W com η = 0,9 igual a 4,44 W; ruído de pairar a 3000 rpm, 12,1 dB(A), limite inferior; MTOW do jato ilustrativo 67 856 kg com e sem a carga declarada. Este ramo não depende do PR #28.
+
 ## 33. Feedback missão–propulsão–frota N0→N1 — L0 opt-in
 
 * **CLI / MCP:** `acdt fleet study --input estudo.yaml` / `mission_fleet_study`.
@@ -1934,91 +1947,6 @@ unassessed. Conformidade CS-25 e VMCG de ensaio continuam unassessed.
   `flown|allowance|lumped:<fase>|supplied_duration|not_applicable|not_modeled`; `mission.required_phases`
   torna por avaliar (nunca aprovado) um candidato cujo adaptador não representa uma fase exigida.
 * [Contrato/limites](docs/tutorial-mission-fleet.md), exemplos `examples/fleet/`.
-
-## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
-
-### Já planeado
-
-1. ~~**Superfícies de comando + simulador de missão 6-DOF**~~ — feito (Fase 8, secção 17). Próximo:
-   C_h por DATCOM / Roskam VI, inércias calibradas, modelo de hélice de passo fixo, efeito de solo.
-   **Próxima etapa**: flaps de curvatura (*camber flaps*) como opção de projeto avaliada pelo otimizador contra
-   as alternativas (princípio: soluções são opções selecionadas só quando os requisitos as justificam).
-2. **Jatos de transporte subsónicos** — **L0 feito 6 nov 2026 (§30)**:
-   * Korn/Mason, turbofan L0, We Raymer, V-n de manobra, check público A320 e fecho
-     de massa acoplado a geometria/motores fixos (`jet size`, sem fallback GA);
-   * triagem L0 de corrida AEO/subida AEO-OEI ligada à massa feita 7 nov 2026
-     (`jet performance`); campo ASD/TOD/BFL de triagem opt-in 9 nov 2026; trajetória contínua
-     com rotação/transição e conformidade CS-25 pendentes;
-   * build-up parcial opt-in feito 7 nov 2026 e alargado 9 nov 2026 (fuselagem/trem/sistemas
-     Raymer + W_press + extração fornecida); `engines_dry` continua fornecido;
-   * adiado L2: pyCycle/OpenMDAO, fecho MDA, Torenbeek completo, mapas ECS;
-   * faltam validação CFD/ensaio e 737, rajadas/Mach/buffet; sem afirmar conformidade CS-25.
-3. **Corridas de alta fidelidade pendentes**: CFD 3-D grande e FEM fino preparados para correr no PC do
-   utilizador, com a sua autorização. Os fatores de calibração voltam ao L1/L2.
-4. **Fabrico**: exemplo L2 com dados reais (cotações), Roskam VIII se as equações forem verificadas na fonte,
-   modelo de montagem final.
-
-### Prioridade ALTA
-
-5. ~~Matriz de conformidade de certificação~~ e 6. ~~Segurança e fiabilidade (ARP4761)~~ — feitos na Fase 10 (§19).
-7. ~~**Peso e centragem / envelope de CG** e **trem de aterragem: dimensionamento e cargas** (Currey)~~ — feitos na §20, dentro de `acdt size`.
-8. ~~**Exportação CAD paramétrica**~~ — feito: `acdt cad` escreve o DXF e, com `acdt[cad]`, o STEP da
-   estrutura interna. A casca exterior entra com `--oml`. Ver `docs/cad-parametrico.md`.
-
-### Prioridade MÉDIA
-
-9. **Configurações VTOL, híbrido e eVTOL.** — L0 feito (6 nov 2026, §29, `acdt vtol`); fecho de massa opt-in feito (9 nov 2026); despacho híbrido L0 por regras + fases comuns no estudo de frota 1.2 feitos (9 nov 2026); BEMT axial/pairar opt-in feito (10 nov 2026); falta massa híbrida fechada, BEMT em voo avançado, ruído no `acdt vtol` (a `acdt.api.rotor_noise` já aceita rotores dados, §32r), ECMS/DP.
-
-### Prioridade BAIXA (útil, mais tarde)
-
-10. Restantes sugestões, por esta ordem: projeto de hélice, fadiga e tolerância ao dano, UQ e modelos
-    substitutos, calibração com ensaio em voo, ruído, gelo, gestão térmica, LCA/LCC, BOM com preços em direto,
-    gémeo digital (e a pressurização da fuselagem, que vem com os jatos).
-
-Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
-
-## Sugestões de capacidades (por prioridade)
-
-| # | prioridade | capacidade | valor | método clássico / open source a reutilizar |
-|---|---|---|---|---|
-| 1 | ALTA | **Matriz de conformidade de certificação** | rastrear cada requisito CS-23, CS-25, STANAG 4671 ou SORA (UAV) até à análise do acdt que o demonstra | tabelas de cláusulas (a partir das checklists atuais) + ligação aos runs; SORA JARUS para a categoria específica UAS |
-| 2 | ALTA | **Segurança e fiabilidade** | FHA, FTA e FMEA ligadas à arquitetura de sistemas; taxa de falha vs categoria | SAE ARP4761 / ARP4754A; árvores de falhas (por exemplo a biblioteca `scram`, executável externo) |
-| 3 | feita | **Peso e centragem / envelope de CG** | ferramenta de carregamento operacional, limites dianteiro e traseiro, combustível e carga (§20) | Raymer Sec. 15.1; Roskam II Cap. 10 (expande `core/systems/mass.py`) |
-| 4 | feita | **Trem de aterragem: dimensionamento e cargas** | posição vs CG, ângulos de tombo e capotagem, cargas de aterragem, curso do amortecedor (§20) | Currey, *Aircraft Landing Gear Design*; Raymer Cap. 11; 14 CFR 23.473 (25 jul 2017). Spin-up, carga lateral e travões ficam de fora |
-| 5 | feita | **Exportação CAD paramétrica** | DXF da planta e da secção do caixão; STEP da estrutura interna (`acdt cad`) | CadQuery 2.8 (Apache-2.0) noutro processo. A casca OpenVSP entra com `--oml` |
-| 6 | L0 feita | **Configurações VTOL, híbrido e eVTOL** | multirrotor, lift + cruise, tilt-rotor; dimensionamento da potência de pairar e da transição | teoria da quantidade de movimento; Johnson, *Helicopter Theory*; métodos de dimensionamento eVTOL (NDARC como referência) |
-| 7 | BAIXA (L0 opt-in no ciclo de sistemas 10 nov 2026) | **Hélice: projeto e análise** | substitui a hélice estatística quando pedido; rendimento em cruzeiro; base para o ruído | BEMT McCormick/Ning já no repositório; Adkins & Liebeck 1994 (passo/corda auto); QPROP/XROTOR (Drela, executáveis externos) ficam de fora |
-| 8 | BAIXA | **Fadiga e tolerância ao dano** | vida da estrutura e intervalos de inspeção | Miner (dano acumulado); Paris/NASGRO (propagação de fendas); espetros de carga FAA/ESDU |
-| 9 | BAIXA | **UQ e projeto robusto** | bandas nos resultados (W0, custo, margens) em vez de pontos; projeto pouco sensível | Monte Carlo / LHS; caos polinomial (Chaospy, MIT); OpenMDAO + UQ |
-| 10 | BAIXA | **Modelos substitutos / ML** para MDO rápido | MDO com L1/L3 a custo L0; exploração de espaço de projeto | krigagem (SMT, BSD); redes neuronais; multifidelidade (co-krigagem) |
-| 11 | BAIXA | **Ingestão de dados de ensaio em voo** | calibrar polares, desempenho e estabilidade com dados reais (como a Fase 4 faz com CFD) | identificação de sistemas (output-error, Klein & Morelli); logs PX4/ArduPilot |
-| 12 | BAIXA (L0 feito 18 nov 2026, §32r) | **Ruído** | ruído de hélice para certificação e aceitação (UAV urbano) | feito: Gutin, Schlegel-King-Mull, ISO 9613-1, IEC 61672-1, ISO 226, Parte 36 Ap. G; falta Hanson, espessura, motor, ICAO Anexo 16 |
-| 13 | BAIXA (L0/L1 feito 18 nov 2026, §32t) | **Gelo** | penalização aerodinâmica e necessidade de proteção | feito: 14 CFR 25 Ap. C (Jeck), Langmuir & Blodgett, Messinger (Anderson), potência de proteção, penalização em intervalo (Broeren); falta Ap. O (SLD), gelo de retorno, formas de gelo (LEWICE só como referência externa) |
-| 14 | BAIXA (L0/L1 feito 18 nov 2026, §32s) | **Gestão térmica** de aviónica e baterias | temperatura de células e eletrónica; dimensionamento de arrefecimento | feito: parâmetros concentrados (Incropera), MIL-HDBK-310, entradas NACA; falta modelo térmico de Bernardi (baterias), permutadores líquidos |
-| 15 | ~~BAIXA~~ L0 feito (§32w) | **Custo do ciclo de vida, carbono e LCA** | custo total de posse e pegada (fabrico, operação, fim de vida) | feito: OSD CAPE 2020, NIST HB 135, ICAO Anexo 16 Vol. IV/CORSIA, IVL C 444; falta: fabrico da estrutura, fim de vida, ISO 14040/44 completa |
-| 16 | BAIXA | **Cadeia de abastecimento / BOM com preços em direto** | L2 do custo alimentado por preços atuais de distribuidores | pesquisa da IA com proveniência (já é a regra) + cache datada de cotações |
-| 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |
-| 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |
-| 19 | BAIXA (L0 feito 18 nov 2026, §32u) | **Fiabilidade e manutenção de frota** | fiabilidade de missão, disponibilidade, MMH/FH, sobressalentes, dimensão da frota e custo de manutenção | feito: MIL-HDBK-338B (RBD, k-de-n, Eq. 10.18–10.24, Poisson), Ha 2010; falta espera fria/quente, fases, Weibull, causa comum, METRIC |
-
-## 32x. Ponto de operação da missão na térmica e no gelo (19 nov 2026)
-
-* **O que faz**: nos modos `coupling: iterar` da térmica e do gelo, o ponto de funcionamento passa a sair da missão exigida (`simulate_mission`, `stop=legs`), a mesma tabela do desempenho. A entrada NACA do compartimento pode ser dimensionada com `ram_air.size_for: pior_segmento` (maior `A = ṁ/(MFR·ρ·V)` nos segmentos em voo). A entrada do motor térmico usa sempre essa área.
-* **Métodos**: missão por segmentos já usada no desempenho (Raymer cap. 17, com as frações da Tabela 3.2 onde o modelo as cita); caudal e área da entrada, NACA RM A8I29 (MFR 0,60) e arrasto interno de Anderson, como em §32s.
-* **Completude**: missão que não fecha → ponto de projeto, com a falta escrita em `coupling_loop.mission.source` (não é duração zero). Segmento em voo que não fecha a entrada → área e arrasto desconhecidos; não se usa o máximo dos outros.
-* **PRESSUPOSTO**: no motor térmico o MFR de projeto mantém-se fora do segmento de dimensionamento; a curva de recuperação versus MFR do NACA RM A8I29 não é aplicada.
-* **Validado**: `tests/test_thermal.py`, `tests/test_icing.py`. O yaml dos exemplos não muda. Veredicto e números em `examples/output/uav_endurance_payload_missao_termica/acoplamento.json`. No UAV elétrico o arrasto de cruzeiro do ciclo `iterar` coincide com o da missão final; face ao ponto de projeto a diferença medida é 7,88 %. Com `pior_segmento` a subida desse caso não fecha (ar de entrada acima do limite do compartimento) e a área fica desconhecida. No UAV a gasolina, com o aumento de temperatura do ar declarado só no teste, a entrada do motor é a da subida.
-
-## 32y. Adaptadores nativos de VTOL e jato para as disciplinas (19 nov 2026)
-
-O VTOL e o jato passam a chamar as mesmas disciplinas da asa fixa a partir do resultado nativo (`size_vtol` / `size_jet`), em `domains/aircraft/native_disciplines.py`. A carga útil e a arquitetura elétrica entram nos três tipos. A massa fechada não muda: `mass_kg`, `payload_kg` e W0 já são a massa dimensionada.
-
-* **Potência.** Modo arquitetura (MIL-E-7016F; Moir & Seabridge Cap. 5): o hotel é o máximo entre o valor declarado e a média da arquitetura. Modo carga útil: a média soma-se ao hotel. Um `power_w_avg` em falta torna a média desconhecida. `duty` omisso é 1 (PRESSUPOSTO). `distribution_eta` em falta deixa o calor das perdas em [0; desconhecido]; não é η = 1.
-* **Térmica e gelo.** Só com baías ou superfícies declaradas, ou, no jato, com S, alongamento e `wave.thickness_ratio` (corda média √(S/AR); PRESSUPOSTO NACA de 4 dígitos já usado no tipo fixo). A transição VTOL e a subida do jato L0 não têm velocidade única: o estudo corre e o veredicto fica `nao_avaliado`. Heywood não é aplicado ao jato.
-* **Ruído.** Rotor com pás, rpm de funcionamento (`rotors.rpm` ou `hover.rpm_bemt`; nunca `rpm_max`) e `noise.flyover_altitude_m`: Gutin + Schlegel-King-Mull. O nível é limite inferior. O jato fica `nao_avaliado` (SAE ARP876 não verificado).
-* **Fiabilidade, custo de série e ciclo de vida.** Cada item entra no RBD. λ sem fonte, ou com fonte `EXAMPLE`, fica desconhecido (R de missão com minorante 0). Custo unitário incompleto abre o majorante do custo de série. No VTOL a energia por hora de voo já traz o hotel; não é somada outra vez. Num jato não há modelo de extração de combustível para a potência elétrica: o CO₂e fica em aberto.
-* **Veredicto.** `validado` quando o método citado correu e o resultado fecha. `nao_avaliado` quando falta um dado. `calibracao_L1_L2`: `nao_aplicar`. Fonte `EXAMPLE` entra no número e fica marcada; não é ficha de fornecedor.
-* **Medida** (ensaio, 19 nov 2026, `examples/output/adaptadores_vtol_jato/adaptadores.json`; o YAML de exemplo não foi editado): multirrotor de 5 kg, 25 W durante 600 s, +4,17 Wh e a massa de entrada inalterada; calor de pairar +25,0 W; perda de distribuição de 40 W com η = 0,9 igual a 4,44 W; ruído de pairar a 3000 rpm, 12,1 dB(A), limite inferior; MTOW do jato ilustrativo 67 856 kg com e sem a carga declarada. Este ramo não depende do PR #28.
 
 ## 34. Atenuação de solo ISO 9613-2:1996 e ruído de espessura (19 nov 2026)
 
@@ -2089,7 +2017,7 @@ geométrica: `nao_avaliado`. Medição em `examples/output/ruido_solo_iso9613/so
 * Itens ainda por fazer em [docs/DADOS.md](docs/DADOS.md): unidades para chaves sem sufixo e YAML com unidades nas specs de `acdt mdo`/`uq`.
 * **Registo:** `examples/output/design_db_blocos/resultado.json`. Veredicto `validado` só para a transcrição do ensaio analítico `tests/data/review_small` (escolha 4, 9 avaliações, frente com 9 pontos, f1 = 0,7190488072346632 e f2 = 1,3271789813488566 com unidade não declarada; caso `ATM-ISA-SL` com `delta_rel` de `rho` = 1,479533701902775×10⁻⁸, unidade `1`). Calibração `nao_aplicar`. O excerto hifi desse registo é sintético e fica `nao_avaliado` como resultado físico. O YAML de exemplo não foi editado e nada foi aplicado.
 
-## Esteira do painel grosso até ao limite do parâmetro (19 nov 2026)
+## 38. Esteira do painel grosso até ao limite do parâmetro (19 nov 2026)
 
 O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_hifi_win/h7_vspaero_painel.json` fica como está. Esta secção é outra corrida, no mesmo OpenVSP 3.56.0, com o mesmo conjunto grosso e os mesmos `NumWakeNodes`, `WakeRelax`, `FixedWakeFlag` e `ImplicitWake`. Só `WakeNumIter` sobe do default lido 5 para o tecto do parâmetro.
 
@@ -2100,10 +2028,76 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Veredicto**: `nao_aplicar`. Calibração `nao_aplicar`. `valid` false, `applied` false, `example_yaml_edited` false. O AVL L1 não fica validado nem calibrado. Não se propõe factor.
 * **Registo**: `examples/output/uav150_flying_wing_tailless_hifi_win/h7_vspaero_esteira.json` e `examples/output/uav150_flying_wing_tailless_hifi_win/h7_vspaero_esteira.csv`. Estado em [docs/HANDOFF.md](docs/HANDOFF.md).
 
-## RANS de um ângulo, asa e fuselagem do C172 (19 nov 2026)
+## 39. RANS de um ângulo, asa e fuselagem do C172 (19 nov 2026)
 
 * **O que correu**: sólido só de asa e fuselagem do exemplo `cessna172_check`, OpenVSP 3.56.0 noutro processo. As caudas saem do spec. O corpo é o POD conceptual (comprimento e finura), não um loft do C172. O STEP da asa já é a meia asa de estibordo. A união booleana desse par falhou; o sólido do fluido é `BooleanFragments` seguido da caixa de campo em y ≥ 0. Malha Gmsh de tetraedros, sem camada de prismas, h = corda/8 = 0,1725 m, campo a 12 cordas, 59958 células, marcadores aircraft/symmetry/farfield 8/1/5. SU2 OpenMP, 6 threads, sem `mpiexec`, um só α = 0°. Blocos de 400 iterações com `restart_flow.dat`. Código: `src/acdt/domains/aircraft/hifi/c172_wf_rans.py`. O acdt não importa o OpenVSP, o Gmsh nem o SU2.
 * **Guarda**: no arranque havia 17,35 GB livres e o limite de 70 % era 12,14 GB. O tecto que prende é o tempo: 124233 células, para 8000 iterações, 6 threads e 45 min, à taxa PRESSUPOSTO 1,63×10⁻⁵ s/célula/iteração por thread da malha hex da asa voadora. A mesma origem dá o factor de conjunto de trabalho 3,23 (8,4 GB medidos contra 2,6 GB da fórmula de 1,8 kB/célula). Nesta malha a fórmula dá 0,108 GB e o factor dá 0,349 GB; o conjunto de trabalho medido do `SU2_CFD` ficou em 0,125 GB. A taxa e o factor não foram medidos nesta malha de tetraedros e não são recalibrados. A estimativa de 21,7 min para 8000 iterações não se cumpriu: os blocos de 400 iterações passaram de 22 s para cerca de 305 s. A guarda de 45 min parou o bloco seguinte.
 * **Decisão**: `nao_aplicar`, `valid` false, `applied` false, `iterative_ok` false. O histórico acaba em Inner_Iter 6399, com rms[Rho] −2,201. CL 0,03291, CD 0,05123 e CMy −0,02572 ficam registados e não validam o L1. O critério de Cauchy do deck (CL, CD e CMy, janela de 200, 2×10⁻⁶) não foi cumprido. CD0 0,03855, K 0,04691 e CLmax limpo 1,542 (Raymer Eq. 12.5 e Eq. 12.15) não são CL, CD e Cm deste ângulo; não há razão. O modelo L1 fica `nao_avaliado`. Não se propõe calibração. O yaml não muda.
 * **Não é esta corrida**: y+ ≈ 1, as 42 camadas e as 1,207×10⁷ células do registo de 18 nov, os ângulos 2° e 4°, e uma polar. Esses registos não foram reescritos.
 * **Registo**: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.csv`. Narrativa em [docs/HANDOFF.md](docs/HANDOFF.md).
+
+## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
+
+### Já planeado
+
+1. ~~**Superfícies de comando + simulador de missão 6-DOF**~~ — feito (Fase 8, secção 17). Próximo:
+   C_h por DATCOM / Roskam VI, inércias calibradas, modelo de hélice de passo fixo, efeito de solo.
+   **Próxima etapa**: flaps de curvatura (*camber flaps*) como opção de projeto avaliada pelo otimizador contra
+   as alternativas (princípio: soluções são opções selecionadas só quando os requisitos as justificam).
+2. **Jatos de transporte subsónicos** — **L0 feito 6 nov 2026 (§30)**:
+   * Korn/Mason, turbofan L0, We Raymer, V-n de manobra, check público A320 e fecho
+     de massa acoplado a geometria/motores fixos (`jet size`, sem fallback GA);
+   * triagem L0 de corrida AEO/subida AEO-OEI ligada à massa feita 7 nov 2026
+     (`jet performance`); campo ASD/TOD/BFL de triagem opt-in 9 nov 2026; trajetória contínua
+     com rotação/transição e conformidade CS-25 pendentes;
+   * build-up parcial opt-in feito 7 nov 2026 e alargado 9 nov 2026 (fuselagem/trem/sistemas
+     Raymer + W_press + extração fornecida); `engines_dry` continua fornecido;
+   * adiado L2: pyCycle/OpenMDAO, fecho MDA, Torenbeek completo, mapas ECS;
+   * faltam validação CFD/ensaio e 737, rajadas/Mach/buffet; sem afirmar conformidade CS-25.
+3. **Corridas de alta fidelidade pendentes**: CFD 3-D grande e FEM fino preparados para correr no PC do
+   utilizador, com a sua autorização. Os fatores de calibração voltam ao L1/L2.
+4. **Fabrico**: exemplo L2 com dados reais (cotações), Roskam VIII se as equações forem verificadas na fonte,
+   modelo de montagem final.
+
+### Prioridade ALTA
+
+5. ~~Matriz de conformidade de certificação~~ e 6. ~~Segurança e fiabilidade (ARP4761)~~ — feitos na Fase 10 (§19).
+7. ~~**Peso e centragem / envelope de CG** e **trem de aterragem: dimensionamento e cargas** (Currey)~~ — feitos na §20, dentro de `acdt size`.
+8. ~~**Exportação CAD paramétrica**~~ — feito: `acdt cad` escreve o DXF e, com `acdt[cad]`, o STEP da
+   estrutura interna. A casca exterior entra com `--oml`. Ver `docs/cad-parametrico.md`.
+
+### Prioridade MÉDIA
+
+9. **Configurações VTOL, híbrido e eVTOL.** — L0 feito (6 nov 2026, §29, `acdt vtol`); fecho de massa opt-in feito (9 nov 2026); despacho híbrido L0 por regras + fases comuns no estudo de frota 1.2 feitos (9 nov 2026); BEMT axial/pairar opt-in feito (10 nov 2026); falta massa híbrida fechada, BEMT em voo avançado, ruído no `acdt vtol` (a `acdt.api.rotor_noise` já aceita rotores dados, §32r), ECMS/DP.
+
+### Prioridade BAIXA (útil, mais tarde)
+
+10. Restantes sugestões, por esta ordem: projeto de hélice, fadiga e tolerância ao dano, UQ e modelos
+    substitutos, calibração com ensaio em voo, ruído, gelo, gestão térmica, LCA/LCC, BOM com preços em direto,
+    gémeo digital (e a pressurização da fuselagem, que vem com os jatos).
+
+Detalhe de cada sugestão (valor e método a reutilizar) na tabela seguinte.
+
+## Sugestões de capacidades (por prioridade)
+
+| # | prioridade | capacidade | valor | método clássico / open source a reutilizar |
+|---|---|---|---|---|
+| 1 | ALTA | **Matriz de conformidade de certificação** | rastrear cada requisito CS-23, CS-25, STANAG 4671 ou SORA (UAV) até à análise do acdt que o demonstra | tabelas de cláusulas (a partir das checklists atuais) + ligação aos runs; SORA JARUS para a categoria específica UAS |
+| 2 | ALTA | **Segurança e fiabilidade** | FHA, FTA e FMEA ligadas à arquitetura de sistemas; taxa de falha vs categoria | SAE ARP4761 / ARP4754A; árvores de falhas (por exemplo a biblioteca `scram`, executável externo) |
+| 3 | feita | **Peso e centragem / envelope de CG** | ferramenta de carregamento operacional, limites dianteiro e traseiro, combustível e carga (§20) | Raymer Sec. 15.1; Roskam II Cap. 10 (expande `core/systems/mass.py`) |
+| 4 | feita | **Trem de aterragem: dimensionamento e cargas** | posição vs CG, ângulos de tombo e capotagem, cargas de aterragem, curso do amortecedor (§20) | Currey, *Aircraft Landing Gear Design*; Raymer Cap. 11; 14 CFR 23.473 (25 jul 2017). Spin-up, carga lateral e travões ficam de fora |
+| 5 | feita | **Exportação CAD paramétrica** | DXF da planta e da secção do caixão; STEP da estrutura interna (`acdt cad`) | CadQuery 2.8 (Apache-2.0) noutro processo. A casca OpenVSP entra com `--oml` |
+| 6 | L0 feita | **Configurações VTOL, híbrido e eVTOL** | multirrotor, lift + cruise, tilt-rotor; dimensionamento da potência de pairar e da transição | teoria da quantidade de movimento; Johnson, *Helicopter Theory*; métodos de dimensionamento eVTOL (NDARC como referência) |
+| 7 | BAIXA (L0 opt-in no ciclo de sistemas 10 nov 2026) | **Hélice: projeto e análise** | substitui a hélice estatística quando pedido; rendimento em cruzeiro; base para o ruído | BEMT McCormick/Ning já no repositório; Adkins & Liebeck 1994 (passo/corda auto); QPROP/XROTOR (Drela, executáveis externos) ficam de fora |
+| 8 | BAIXA | **Fadiga e tolerância ao dano** | vida da estrutura e intervalos de inspeção | Miner (dano acumulado); Paris/NASGRO (propagação de fendas); espetros de carga FAA/ESDU |
+| 9 | BAIXA | **UQ e projeto robusto** | bandas nos resultados (W0, custo, margens) em vez de pontos; projeto pouco sensível | Monte Carlo / LHS; caos polinomial (Chaospy, MIT); OpenMDAO + UQ |
+| 10 | BAIXA | **Modelos substitutos / ML** para MDO rápido | MDO com L1/L3 a custo L0; exploração de espaço de projeto | krigagem (SMT, BSD); redes neuronais; multifidelidade (co-krigagem) |
+| 11 | BAIXA | **Ingestão de dados de ensaio em voo** | calibrar polares, desempenho e estabilidade com dados reais (como a Fase 4 faz com CFD) | identificação de sistemas (output-error, Klein & Morelli); logs PX4/ArduPilot |
+| 12 | BAIXA (L0 feito 18 nov 2026, §32r) | **Ruído** | ruído de hélice para certificação e aceitação (UAV urbano) | feito: Gutin, Schlegel-King-Mull, ISO 9613-1, IEC 61672-1, ISO 226, Parte 36 Ap. G; falta Hanson, espessura, motor, ICAO Anexo 16 |
+| 13 | BAIXA (L0/L1 feito 18 nov 2026, §32t) | **Gelo** | penalização aerodinâmica e necessidade de proteção | feito: 14 CFR 25 Ap. C (Jeck), Langmuir & Blodgett, Messinger (Anderson), potência de proteção, penalização em intervalo (Broeren); falta Ap. O (SLD), gelo de retorno, formas de gelo (LEWICE só como referência externa) |
+| 14 | BAIXA (L0/L1 feito 18 nov 2026, §32s) | **Gestão térmica** de aviónica e baterias | temperatura de células e eletrónica; dimensionamento de arrefecimento | feito: parâmetros concentrados (Incropera), MIL-HDBK-310, entradas NACA; falta modelo térmico de Bernardi (baterias), permutadores líquidos |
+| 15 | ~~BAIXA~~ L0 feito (§32w) | **Custo do ciclo de vida, carbono e LCA** | custo total de posse e pegada (fabrico, operação, fim de vida) | feito: OSD CAPE 2020, NIST HB 135, ICAO Anexo 16 Vol. IV/CORSIA, IVL C 444; falta: fabrico da estrutura, fim de vida, ISO 14040/44 completa |
+| 16 | BAIXA | **Cadeia de abastecimento / BOM com preços em direto** | L2 do custo alimentado por preços atuais de distribuidores | pesquisa da IA com proveniência (já é a regra) + cache datada de cotações |
+| 17 | BAIXA | **Gémeo digital** | modelo calibrado continuamente com dados de operação | depende de #11 e #9; registo de runs como base de proveniência |
+| 18 | BAIXA | **Pressurização da fuselagem** | a viga L1 (casca SP-8007, sem pressão) já entra no dimensionamento; falta a casca pressurizada para jatos | Niu Cap. 12; Megson (cascas pressurizadas) |
+| 19 | BAIXA (L0 feito 18 nov 2026, §32u) | **Fiabilidade e manutenção de frota** | fiabilidade de missão, disponibilidade, MMH/FH, sobressalentes, dimensão da frota e custo de manutenção | feito: MIL-HDBK-338B (RBD, k-de-n, Eq. 10.18–10.24, Poisson), Ha 2010; falta espera fria/quente, fases, Weibull, causa comum, METRIC |
