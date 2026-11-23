@@ -200,6 +200,11 @@ Substituto quadrático com 28 corridas do modelo verdadeiro (LHS, semente 202611
   `core/thermal/network.solve_bay_steady`); as entradas estão em `uq.json` (`training_samples`, `ok: false`).
   Contam como não-passa. Causa isolada depois (TERMICA §10): o dimensionamento não converge (espiral de massa) e
   chega NaN à térmica. Agora estas corridas ficam `nao_avaliado` com o motivo, em vez do erro do `brentq`.
+  **Estudo corrido outra vez a 23 nov 2026** (main 5160049 + ramo `avl-espiral-e-uq`, 105 s): as mesmas 2
+  amostras (11 e 14) falham, agora com «dimensionamento não convergiu» e sem métricas. Os percentis, os índices de
+  Sobol' do arrasto de arrefecimento, os P(passa) e o rastreio de Spearman ficam iguais até ao último dígito. Na
+  matriz só muda a cobertura: `check:hq:spiral` passa a existir como linha desconhecida (correção do teste instável
+  da espiral, QUALIDADE).
 
 Veredicto: ligação das disciplinas novas à UQ **validado** (saídas por `result_metrics`, `fixed` testado em
 `tests/test_uq_fixed.py`); sensibilidade global de W0/LCC/CO₂e por Sobol' **nao_avaliado** (substituto rejeitado),

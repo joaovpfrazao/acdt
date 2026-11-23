@@ -1,8 +1,8 @@
 {
  "schema": "acdt.provenance/1",
  "created": {
-  "utc": "2026-11-23T20:28:17+00:00",
-  "europe_lisbon": "2026-11-23T20:28:17+00:00"
+  "utc": "2026-11-23T22:36:54+00:00",
+  "europe_lisbon": "2026-11-23T22:36:54+00:00"
  },
  "entry_point": {
   "command": "acdt uq",
@@ -12,16 +12,16 @@
    "--spec",
    "examples/studies/uq_disciplinas/uq_disciplinas.yaml",
    "-o",
-   "examples/output/uq_disciplinas"
+   "/tmp/uq_rerun"
   ],
-  "cwd": "/workspace/acdt-wt-uq"
+  "cwd": "/workspace/acdt"
  },
  "acdt": {
   "version": "0.2.0",
   "git": {
-   "commit": "6545c30f42cbe8d4fed66b3379147a92c9b63794",
+   "commit": "a3eb553b86f93db6ad55d8ce2f4dbcdd93a3e4a3",
    "dirty": false,
-   "branch": "uq-disciplinas",
+   "branch": "avl-espiral-e-uq",
    "dirty_diff_sha256": null
   }
  },
@@ -54,14 +54,14 @@
  "tools": {},
  "inputs": [
   {
-   "path": "/workspace/acdt-wt-uq/examples/studies/uq_disciplinas/uq_disciplinas.yaml",
+   "path": "/workspace/acdt/examples/studies/uq_disciplinas/uq_disciplinas.yaml",
    "sha256_bytes": "7a0ceeaad0f30c43e47ad59d68d8c44edb7038b777b576cb09b55c84689dab7c",
    "size_bytes": 5589,
    "kind": "yaml-canonical",
    "sha256": "abfe003035e2c60f6de049c6bbcb139e90166700092ecdca7dc5a92a761f57e8"
   },
   {
-   "path": "/workspace/acdt-wt-uq/examples/uav_endurance_payload.yaml",
+   "path": "/workspace/acdt/examples/uav_endurance_payload.yaml",
    "sha256_bytes": "cb4b8cb6038e9f3aa89949c71c6ff57f522f8586a1af412bb3facd25d4a85637",
    "size_bytes": 4110,
    "kind": "yaml-canonical",
@@ -79,9 +79,9 @@
  "outputs": [
   {
    "path": "uq.json",
-   "size_bytes": 260485,
+   "size_bytes": 260396,
    "written_this_run": true,
-   "sha256": "3e30d8dfd59c9e97eefe9baac29d63193c91874f33ef3fd3700d976fa767add0"
+   "sha256": "f505243f0b6a1b39ba67927523b91e2d90e49c0751c0980e7d55cc161128a930"
   },
   {
    "path": "uq.md",
@@ -153,19 +153,19 @@
    "path": "verification_matrix.csv",
    "size_bytes": 4208,
    "written_this_run": true,
-   "sha256": "3ace9a12d0aa622e8aa360bf86d39e4d42ef206b865f35bb79eadebc328848ae"
+   "sha256": "0138d819b53eb3453a0578bff845db92dd7f3ac5a85c8243326e73d799f9edbd"
   },
   {
    "path": "verification_matrix.json",
-   "size_bytes": 13497,
+   "size_bytes": 13519,
    "written_this_run": true,
-   "sha256": "af53cdd77388266531ef59a3f0d49fef2e3eb1334cca81c2e44c6f47dbb4c09e"
+   "sha256": "65b5ceb7d6dd20bc8e0b1b65a3a8a591054aeabc17feddb5372eafd2aad6b855"
   },
   {
    "path": "verification_matrix.md",
-   "size_bytes": 4032,
+   "size_bytes": 4051,
    "written_this_run": true,
-   "sha256": "db8aceadb8de1d54e6541b7354af550c929bfa6534ebb0cb7845fcc2f847e849"
+   "sha256": "acac78dd2913979f7f57d6ef25caea560f10b0f5ef1447056de0bd8aba2dea05"
   }
  ]
 }
