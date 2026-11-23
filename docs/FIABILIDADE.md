@@ -268,3 +268,40 @@ face a medida de voo ou a L1/L2: **nao_aplicar**. Comutador imperfeito, γ ≠ 0
 **nao_avaliado**. O resultado versionado está em
 `examples/output/fiabilidade_standby_weibull/resultado.json`. O yaml dos exemplos não foi
 alterado e o bloco não foi aplicado ao projeto.
+
+## 11. Fator β de causa comum ligado à árvore de falhas (23 nov 2026)
+
+Fonte conferida na página: NUREG/CR-5485 (Mosleh, Rasmuson e Marshall, NRC, nov. 1998), Apêndice A, p. A-5,
+Eq. A.10–A.13 (modelo de Fleming, 1975). Para um grupo de m componentes semelhantes com probabilidade total Q_t:
+
+    Q_1 = (1 − β) Q_t,   Q_m = β Q_t,   Q_k = 0 para 1 < k < m,   Q_t = Q_1 + Q_m
+
+O texto da norma diz que o modelo assume que o evento de causa comum faz falhar todos os componentes do grupo.
+
+Ligação à FTA (`acdt.core.reliability.common_cause.apply_beta_factor`): cada evento básico do grupo passa a
+OR(independente com (1 − β) Q_t, evento CCF partilhado com β Q_t). O mesmo evento CCF entra em todas as portas, e a
+probabilidade exata do topo (Shannon, `acdt.core.safety.fta`) conta-o uma vez. Funciona com AND, OR e k-de-n e
+com as árvores do ARP4761 que já existem.
+
+Na especificação de fiabilidade (bloco lateral, não substitui o RBD ativo):
+
+```yaml
+assumptions:
+  reliability:
+    common_cause:
+      groups:
+        - {id: FCC, m: 2, k_fail: 2, lambda_per_h: 1.0e-4, beta: 0.05, beta_source: "<fonte do β>"}
+        # ou q_total em vez de lambda_per_h (t_h por omissão = duração da missão)
+```
+
+* β não tem omissão. Sem β, ou sem `beta_source`, o topo com causa comum fica desconhecido (`q_top: null`) e o valor
+  só com avarias independentes é apenas o limite inferior (`q_top_bounds.lo`, regime de eventos raros).
+* Q_t diferentes no grupo → `nao_avaliado` (o modelo é para componentes semelhantes).
+* O §7.5.5.4 do MIL-HDBK-338B continua a ser partilha de carga e não foi codificado.
+* MGL e fator α (também no NUREG/CR-5485) não estão implementados. Os valores de β da IEC 61508-6 Anexo D não
+  foram transcritos.
+
+Verificação (`tests/test_common_cause.py`): para m = 2, Q_t = 10⁻³ e β = 0,05 o valor de eventos raros é
+[(1 − β) Q_t]² + β Q_t = 5,09025×10⁻⁵ e o exato 5,0902455×10⁻⁵; com β = 0 reduz-se ao k-de-n independente.
+Veredicto: aplicação das Eq. A.10–A.13 **validado**; o valor de β é da fonte declarada e não é verificado aqui.
+Calibração: **nao_aplicar**. O yaml dos exemplos não foi alterado.
