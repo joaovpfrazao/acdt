@@ -2036,6 +2036,13 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Não é esta corrida**: y+ ≈ 1, as 42 camadas e as 1,207×10⁷ células do registo de 18 nov, os ângulos 2° e 4°, e uma polar. Esses registos não foram reescritos.
 * **Registo**: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.csv`. Narrativa em [docs/HANDOFF.md](docs/HANDOFF.md).
 
+## 41. Fator β de causa comum ligado à FTA (23 nov 2026)
+
+* **O que faz**: `acdt.core.reliability.common_cause`: modelo do fator β do NUREG/CR-5485 Ap. A, Eq. A.10–A.13 (Q_1 = (1−β)Q_t, Q_m = βQ_t). `apply_beta_factor` liga-o a qualquer árvore ARP4761 (`acdt.core.safety.fta`): cada evento do grupo passa a OR(independente, CCF partilhado); topo exato por Shannon.
+* **Uso**: `assumptions.reliability.common_cause.groups: [{id, m, k_fail, q_total | lambda_per_h (+ t_h), beta, beta_source}]` — bloco lateral em `standby_weibull.common_cause`; não substitui o RBD.
+* **Desconhecido ≠ zero**: sem β ou sem `beta_source` → `q_top: null`, `q_top_bounds.lo` = só independentes. Q_t diferentes → `nao_avaliado`.
+* **Veredicto**: aplicação das equações `validado`; valor de β da fonte declarada, não verificado. Pormenor em [docs/FIABILIDADE.md](docs/FIABILIDADE.md) §11.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado
