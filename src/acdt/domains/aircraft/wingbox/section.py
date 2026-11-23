@@ -141,8 +141,8 @@ def wing_section(chord: float, contour: Contour, xf: float, xr: float, *, t_up: 
         for x, z in list(zip(bu[1:], zu_s[1:])) + list(zip(bu[::-1][1:-1], zl_s[1:-1])):
             ids.append(len(pts))
             pts.append((x * chord, z * chord))
-            area = np.append(area, 0.0)
         ids.append(lo[-1])
+        area = np.concatenate((area, np.zeros(len(pts) - len(area))))
         k0 = len(walls)
         chain(ids, t_le, 1.0)
         nle = len(walls) - k0

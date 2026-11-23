@@ -138,6 +138,28 @@ Correção: `@pytest.mark.timeout(2400)` neste teste e em `tests/test_launch_rec
 (363 s, o mesmo exemplo). O marcador sobrepõe-se ao `--timeout` da linha de comandos. As asserções não mudam e os dois
 testes continuam marcados `slow`, fora do job Windows. Acelerar `thinwalled.solve` fica como melhoria separada.
 
+### `thinwalled.solve` vectorizado (23 nov 2026)
+
+Perfil (cProfile, secção de caixão com célula de bordo de ataque, 300 chamadas): 2,05 ms por secção, dos quais 44 %
+em `idealise` (ciclo Python por parede, 4 iterações do centróide), 20 % em `lstsq` (SVD) e 17 % em `_system`.
+Alterações, sem mudar o método (Megson Eq. 20.1, 16.18, 20.6 e Cap. 18):
+
+* tabela de paredes convertida uma vez em vetores; idealização por `np.bincount`, matriz de equilíbrio por
+  `np.add.at`, momentos e St Venant vectorizados;
+* sistema linear: as linhas de nó têm uma redundante; quando as células fecham todos os ciclos independentes
+  (n_células = n_paredes − n_nós + 1, o caso dos caixões) retira-se uma linha de nó e resolve-se por LU
+  (`np.linalg.solve`), verificando que a linha retirada se cumpre; caso contrário (secção aberta com paredes a mais,
+  células em falta) mantém-se `lstsq`;
+* `wing_section`: sem `np.append` dentro do ciclo do bordo de ataque.
+
+Resultado: 0,38 ms por secção (5,4×). Regressão em `tests/test_thinwalled_regression.py` contra a implementação
+anterior congelada em `tests/thinwalled_reference.py` (32 secções aleatórias de 4 perfis, com e sem célula de bordo
+de ataque, células com a orientação trocada, secção sem células e com célula em falta): x_sc, z_sc, GJ, EI e
+centróide até 10⁻⁹ relativo, fluxos unitários até 10⁻⁸. Teste
+`test_tailless_example_closes_bare_fails_sas_passes` na mesma máquina (8 núcleos, sozinho, outras tarefas leves em
+paralelo): 281 s antes, 174 s depois (1,6×). O resto do tempo é o pipeline (AVL, 6-DOF), fora deste solver. O
+`timeout(2400)` fica.
+
 ### Teste instável de reutilização de `run_id` (18 nov 2026)
 
 `tests/test_size_fleet_mtow_align.py::test_run_id_feed_reuses_size_result` falhou uma vez na suite paralela

@@ -33,27 +33,37 @@ class ThinWalledSection:
     rho_wall: list | None = None       # per-wall density (mass), optional
     rho_boom: np.ndarray | None = None
 
+    # -------------------------------------------------------------- wall arrays (vectorised)
+    def _wall_arrays(self):
+        """Wall table as arrays (i, j, t, G_ratio, E_ratio, direct, length) — built once per section."""
+        Wa = np.asarray([w[:6] for w in self.walls], float).reshape(-1, 6)
+        I, J = Wa[:, 0].astype(int), Wa[:, 1].astype(int)
+        T, Gr, Er, D = Wa[:, 2], Wa[:, 3], Wa[:, 4], Wa[:, 5] != 0
+        dP = self.pts[J] - self.pts[I]
+        L = np.hypot(dP[:, 0], dP[:, 1])
+        return I, J, T, Gr, Er, D, L
+
     # -------------------------------------------------------------- idealisation
     def idealise(self, n_iter: int = 4):
         """Boom areas B_r = concentrated area + Σ walls t b/6 (2 + z₂'/z₁') (pure vertical bending, Megson Eq.
         20.1), iterated on the centroid; ratio guarded (|z₁'| small → t b/2)."""
-        P = self.pts
+        P = np.asarray(self.pts, float)
         B0 = np.asarray(self.boom_area, float).copy()
         zc = float(np.average(P[:, 1], weights=B0 + 1e-12)) if B0.sum() > 0 else float(P[:, 1].mean())
         xc = float(P[:, 0].mean())
+        I, J, T, _g, Er, D, L = self._wall_arrays()
+        # both ends of every direct-stress wall: (a = boom receiving area, c = the other end)
+        a = np.concatenate((I[D], J[D]))
+        c = np.concatenate((J[D], I[D]))
+        etb = np.tile(Er[D] * T[D] * L[D], 2)
+        hz = np.ptp(P[:, 1]) or 1.0
+        B = B0
         for _ in range(n_iter):
-            B = B0.copy()
-            hz = np.ptp(P[:, 1]) or 1.0
-            for (i, j, t, _g, e, direct) in self.walls:
-                if not direct:
-                    continue
-                b = float(np.hypot(*(P[j] - P[i])))
-                for a, c in ((i, j), (j, i)):
-                    z1, z2 = P[a, 1] - zc, P[c, 1] - zc
-                    if abs(z1) > 0.02 * hz:
-                        B[a] += e * t * b / 6 * (2 + z2 / z1)
-                    else:
-                        B[a] += e * t * b / 2 * 0.5
+            z1, z2 = P[a, 1] - zc, P[c, 1] - zc
+            big = np.abs(z1) > 0.02 * hz
+            ratio = np.divide(z2, z1, out=np.zeros_like(z1), where=big)
+            add = np.where(big, etb / 6 * (2 + ratio), etb / 2 * 0.5)
+            B = B0 + np.bincount(a, weights=add, minlength=len(B0))
             A = B.sum()
             xc, zc = float((B * P[:, 0]).sum() / A), float((B * P[:, 1]).sum() / A)
         self.B, self.xc, self.zc = B, xc, zc
@@ -65,38 +75,41 @@ class ThinWalledSection:
 
     # -------------------------------------------------------------- shear-flow system
     def _system(self):
-        P, W = self.pts, self.walls
-        n, ne = len(P), len(W)
+        P = np.asarray(self.pts, float)
+        n, ne = len(P), len(self.walls)
+        I, J, T, Gr, _e, _d, L = self._wall_arrays()
+        k = np.arange(ne)
         Aeq = np.zeros((n + len(self.cells), ne))
-        for k, (i, j, *_r) in enumerate(W):
-            Aeq[i, k] += 1.0      # leaves i
-            Aeq[j, k] -= 1.0      # enters j
+        np.add.at(Aeq, (I, k), 1.0)       # leaves i
+        np.add.at(Aeq, (J, k), -1.0)      # enters j
+        mom = P[I, 1] * P[J, 0] - P[I, 0] * P[J, 1]      # _m(P[i], P[j]) per wall; _m(rj, ri) = −_m(ri, rj)
         self.cell_area = []
         for c, cell in enumerate(self.cells):
-            area = 0.0
-            for s in cell:
-                k, sg = abs(s) - 1, np.sign(s)
-                i, j, t, g, *_r = W[k]
-                L = float(np.hypot(*(P[j] - P[i])))
-                Aeq[n + c, k] += sg * L / (t * g)
-                ri, rj = (P[i], P[j]) if sg > 0 else (P[j], P[i])
-                area += 0.5 * _m(ri, rj)
+            s = np.asarray(cell, int)
+            kk, sg = np.abs(s) - 1, np.sign(s).astype(float)
+            np.add.at(Aeq[n + c], kk, sg * L[kk] / (T[kk] * Gr[kk]))
+            area = float(0.5 * (sg * mom[kk]).sum())
             if area < 0:          # orient the loop nose-up positive
                 Aeq[n + c] *= -1
-                self.cells[c] = [-s for s in cell]
+                self.cells[c] = [-s_ for s_ in cell]
                 area = -area
             self.cell_area.append(area)
         self.cell_area = np.array(self.cell_area)
         self._Aeq = Aeq
-        self._mom = np.array([_m(P[i], P[j]) for (i, j, *_r) in W])
+        self._mom = mom
+        self._L = L
         return Aeq
 
     def solve(self):
         """Idealise, then unit-load shear flows: q_Sz (S_z = 1 N through the shear centre), q_Sx, and
-        q_T (unit twist rate θ' = 1 rad/m × G_ref) — returns self with x_sc, z_sc, GJ, EI."""
+        q_T (unit twist rate θ' = 1 rad/m × G_ref) — returns self with x_sc, z_sc, GJ, EI.
+
+        Linear system: node equilibrium (one row per node, one redundant) + one compatibility row per cell. When the
+        cells close every independent loop (n_cells = n_walls − n_nodes + 1) dropping one node row leaves a square
+        system solved directly (LU); otherwise least squares, as before. Same solution to round-off."""
         if not hasattr(self, "B"):
             self.idealise()
-        P = self.pts
+        P = np.asarray(self.pts, float)
         n = len(P)
         Aeq = self._system()
         d = P - [self.xc, self.zc]
@@ -107,11 +120,22 @@ class ThinWalledSection:
             cz = (Sz * self.Izz - Sx * self.Ixz) / det
             rhs[:n, col] = -self.B * (cx * d[:, 0] + cz * d[:, 1])
         rhs[n:, 2] = 2 * self.cell_area * self.G_ref            # Σ q ds/(G t) = 2 A θ'  (θ' = 1)
-        sol, *_ = np.linalg.lstsq(Aeq, rhs, rcond=None)
+        sol = None
+        if Aeq.shape[0] == Aeq.shape[1] + 1 and n > 0:
+            try:
+                sol = np.linalg.solve(Aeq[1:], rhs[1:])
+            except np.linalg.LinAlgError:
+                sol = None
+            # the dropped node row must hold (consistent loads); else fall back to least squares
+            if sol is not None and np.abs(Aeq[0] @ sol - rhs[0]).max() > 1e-9 * (np.abs(rhs).max() or 1.0):
+                sol = None
+        if sol is None:
+            sol, *_ = np.linalg.lstsq(Aeq, rhs, rcond=None)
         self.q_Sz, self.q_Sx, self.q_T = sol[:, 0], sol[:, 1], sol[:, 2]
         self.x_sc = -float(self._mom @ self.q_Sz)               # S_z = 1 at x_sc: M = −x_sc
         self.z_sc = float(self._mom @ self.q_Sx)                # S_x = 1 at z_sc: M = +z_sc
-        sv = sum(g * self.G_ref * float(np.hypot(*(P[j] - P[i]))) * t**3 / 3 for (i, j, t, g, *_r) in self.walls)
+        _i, _j, T, Gr, *_r = self._wall_arrays()
+        sv = float((Gr * self.G_ref * self._L * T**3 / 3).sum())
         self.GJ = float(self._mom @ self.q_T) + sv
         self.EIxx, self.EIzz, self.EIxz = self.E_ref * self.Ixx, self.E_ref * self.Izz, self.E_ref * self.Ixz
         return self
