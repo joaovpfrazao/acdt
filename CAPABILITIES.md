@@ -2040,6 +2040,17 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 
 * **Potência só na exposição**: confirmado (`exposure_duty`, `power_schedule: exposicao`), já no main desde o PR #19.
 * **Encontro misto contínuo + intermitente**: `nao_avaliado`. Jeck DOT/FAA/AR-00/30 §2.1 só junta as Figuras 1 e 4 num gráfico LWC × extensão horizontal (equivalente aos fatores F já implementados); não dá procedimento de soma. Pormenor em [docs/GELO.md](docs/GELO.md) §10.
+## 41. Fator β de causa comum ligado à FTA (23 nov 2026)
+
+* **O que faz**: `acdt.core.reliability.common_cause`: modelo do fator β do NUREG/CR-5485 Ap. A, Eq. A.10–A.13 (Q_1 = (1−β)Q_t, Q_m = βQ_t). `apply_beta_factor` liga-o a qualquer árvore ARP4761 (`acdt.core.safety.fta`): cada evento do grupo passa a OR(independente, CCF partilhado); topo exato por Shannon.
+* **Uso**: `assumptions.reliability.common_cause.groups: [{id, m, k_fail, q_total | lambda_per_h (+ t_h), beta, beta_source}]` — bloco lateral em `standby_weibull.common_cause`; não substitui o RBD.
+* **Desconhecido ≠ zero**: sem β ou sem `beta_source` → `q_top: null`, `q_top_bounds.lo` = só independentes. Q_t diferentes → `nao_avaliado`.
+* **Veredicto**: aplicação das equações `validado`; valor de β da fonte declarada, não verificado. Pormenor em [docs/FIABILIDADE.md](docs/FIABILIDADE.md) §11.
+## 40. Âmbito da ISO 9613-2 e refração no ruído (23 nov 2026)
+
+* **O que faz**: marca que a ISO 9613-2:1996 §1 não se aplica a aeronaves em voo (frase mantida na edição de 2024). Com `noise.iso9613_ground`, A_gr e C_met entram só como extrapolação fora do âmbito (PRESSUPOSTO): bloco `iso9613_ground.ambito` com `dentro_do_ambito: false`, razão no alcance e pressuposto na etapa.
+* **Refração**: `nao_avaliado`, `correction_dB: null`. Nord2000 e Harmonoise não verificados contra fonte pública; não implementados.
+* **Veredicto**: âmbito documentado; alcance de deteção continua `nao_avaliado` (limite superior das fontes modeladas). Pormenor em [docs/RUIDO.md](docs/RUIDO.md).
 
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 

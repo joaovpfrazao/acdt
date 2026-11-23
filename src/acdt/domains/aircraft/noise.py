@@ -209,7 +209,8 @@ def analyse_noise(res: Any) -> dict[str, Any]:
             assumptions.append(
                 "Atenuação de solo ISO 9613-2:1996 §7.3.1 aplicada com noise.iso9613_ground. "
                 "PRESSUPOSTO: h_s e h_r são os declarados; d_p projeta a distância já usada pela fonte. "
-                "O pressuposto de campo livre acima não cobre A_gr neste resultado.")
+                "O pressuposto de campo livre acima não cobre A_gr neste resultado. PRESSUPOSTO: a ISO 9613-2:1996 §1 "
+                "não se aplica a aeronaves em voo; A_gr e C_met entram aqui como extrapolação fora do âmbito.")
         else:
             if over_c.ground:
                 ground_block.update({k: over_c.ground[k] for k in

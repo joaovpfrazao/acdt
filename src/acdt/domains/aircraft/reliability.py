@@ -70,7 +70,7 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     spec: dict[str, Any] = {k: copy.deepcopy(o.get(k)) for k in ("components", "rbd", "accept_assumptions",
                                                                  "preventive", "logistics", "utilization", "fleet",
                                                                  "spares", "operating_cost", "labour_rate_per_h",
-                                                                 "standby", "weibull")
+                                                                 "standby", "weibull", "common_cause")
                             if o.get(k) is not None}
     spec["schema"] = "acdt.reliability/1"
     spec["mission_duration_h"] = t
