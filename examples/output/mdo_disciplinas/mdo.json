@@ -1,0 +1,1935 @@
+{
+ "schema": "acdt.mdo/1",
+ "warnings": [],
+ "fixed": {
+  "assumptions.aero.fidelity": "handbook",
+  "assumptions.stability.use_avl": false,
+  "assumptions.thermal": {
+   "coupling": "iterar",
+   "ground_time_s": 300,
+   "electric": {
+    "eta_esc": 0.97,
+    "eta_motor": 0.9
+   },
+   "bays": [
+    {
+     "id": "fuselagem",
+     "skin_area_m2": 1.0,
+     "flow_length_m": 1.6,
+     "height_m": 0.2,
+     "eps_ext": 0.85,
+     "alpha_solar": 0.3,
+     "eps_int": [
+      0.1,
+      0.9
+     ],
+     "sources": [
+      "avionica",
+      "bateria",
+      "esc"
+     ],
+     "capacity_J_K": 9000.0,
+     "components": [
+      {
+       "id": "bateria_pack",
+       "source": "bateria",
+       "conductance_W_K": 10.0,
+       "T_max_C": 60,
+       "T_min_C": -20,
+       "limit_source": "teste (limite declarado)"
+      }
+     ],
+     "ram_air": {
+      "size_for": "cruzeiro_quente",
+      "ram_recovery": 0.8,
+      "duct_loss_q": 0.5,
+      "duct": {
+       "length_m": 0.4,
+       "areal_density_kg_m2": 1.0
+      }
+     }
+    }
+   ]
+  },
+  "assumptions.icing": {
+   "coupling": "iterar",
+   "surfaces": [
+    {
+     "id": "asa",
+     "chord_m": 0.3,
+     "t_c": 0.12,
+     "lifting": true,
+     "protection": "deice_electrothermal",
+     "protected_area_m2": 0.2,
+     "duty_cycle": 0.1,
+     "power_density_W_m2": 10000,
+     "mass_kg": 0.3
+    }
+   ]
+  },
+  "assumptions.reliability": {
+   "components": [
+    {
+     "id": "motor",
+     "lambda_per_h": 0.0001,
+     "source": "teste",
+     "mttr_h": 2.0,
+     "mmh_per_action": 3.0,
+     "replacement_cost": 500.0
+    },
+    {
+     "id": "servo",
+     "lambda_per_h": 0.0005,
+     "source": "teste",
+     "mttr_h": 0.5,
+     "mmh_per_action": 1.0,
+     "replacement_cost": 200.0
+    }
+   ],
+   "rbd": {
+    "type": "series",
+    "blocks": [
+     "motor",
+     {
+      "type": "k_of_n",
+      "k": 3,
+      "n": 4,
+      "block": "servo"
+     }
+    ]
+   },
+   "preventive": [
+    {
+     "id": "inspecao",
+     "interval_fh": 50.0,
+     "duration_h": 1.0,
+     "mmh": 2.0
+    }
+   ],
+   "logistics": {
+    "mean_logistic_delay_h": 4.0,
+    "mean_admin_delay_h": 1.0
+   },
+   "fleet": {
+    "mode": "sorties",
+    "sorties_per_day": 3,
+    "turnaround_h": 1.0,
+    "operating_hours_per_day": 16
+   }
+  },
+  "assumptions.series_cost": {
+   "quantity": 50,
+   "price": 60000
+  },
+  "assumptions.life_cycle": {
+   "service_life_years": 10,
+   "production_rate_per_year": 20,
+   "rdte_years": 2,
+   "fh_per_aircraft_per_year": {
+    "lo": 300,
+    "hi": 500
+   },
+   "cost_per_fh_USD": {
+    "lo": 40,
+    "hi": 90
+   },
+   "disposal_per_aircraft_USD": 0.0,
+   "discount_rate": 0.05,
+   "environment": {
+    "grid_intensity_kgCO2e_per_kWh": {
+     "lo": 0.1,
+     "hi": 0.4,
+     "source": "teste"
+    },
+    "charge_efficiency": 0.9,
+    "battery_footprint": "ivl_c444_2019",
+    "battery_cycle_life": 400,
+    "flights_per_fh": 0.25
+   }
+  }
+ },
+ "model": {
+  "domain": "aircraft",
+  "mission": "examples/uav_endurance_payload.yaml",
+  "fidelity": "handbook",
+  "skip_stages": [
+   "aeroelasticity"
+  ],
+  "workers": 3,
+  "result_metrics": {
+   "lcc_pv_hi_USD": "life_cycle.present_value_USD.total.hi",
+   "lcc_pv_lo_USD": "life_cycle.present_value_USD.total.lo",
+   "co2e_fh_hi_kg": "life_cycle.co2e_per_flight_hour_kg.hi",
+   "co2e_ciclo_hi_kg": "life_cycle.life_cycle_co2e_kg.hi",
+   "unit_cost_USD": "series_cost.average_unit_cost_USD",
+   "mission_reliability_lo": "reliability.mission_reliability.lo",
+   "availability_op_lo": "reliability.operational_availability.lo",
+   "fleet_size_hi": "reliability.fleet_size.hi",
+   "hot_margin_min_C": "thermal.hot_margin_min_C",
+   "cold_margin_min_C": "thermal.cold_margin_min_C",
+   "cooling_drag_area_hi_m2": "thermal.cooling.drag_area_m2.hi",
+   "ice_power_hi_W": "icing.protection.electrical_power_W.hi"
+  },
+  "text": "pipeline aircraft L0/L1 (`uav_endurance_payload.yaml`), fidelidade handbook, sem aeroelasticity; um pipeline por amostra"
+ },
+ "strategy": "nsga2",
+ "options": {
+  "pop_size": 6,
+  "max_gen": 1,
+  "seed": 20261123
+ },
+ "design_variables": [
+  {
+   "path": "assumptions.aero.AR",
+   "type": "continuous",
+   "placement": "inner",
+   "source": "PRESSUPOSTO: banda de AR do estudo",
+   "lower": 7.0,
+   "upper": 13.0,
+   "x0": 9.0
+  },
+  {
+   "path": "requirements.endurance",
+   "type": "discrete",
+   "placement": "inner",
+   "source": "PRESSUPOSTO: troca de autonomia em torno do requisito de 2,5 h",
+   "values": [
+    2.0,
+    2.5,
+    3.0
+   ]
+  }
+ ],
+ "objectives": [
+  {
+   "metric": "W0_kg",
+   "sense": "min",
+   "ref": 35.0
+  },
+  {
+   "metric": "lcc_pv_hi_USD",
+   "sense": "min",
+   "ref": 16000000.0
+  }
+ ],
+ "constraints": [
+  {
+   "name": "req:REQ-payload_mass",
+   "kind": "requisito",
+   "note": "target = 4.0 kg (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "req:REQ-endurance",
+   "kind": "requisito",
+   "note": "min ≥ 2.5 h (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "req:REQ-cruise_speed",
+   "kind": "requisito",
+   "note": "target = 22 m/s (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "req:REQ-cruise_altitude",
+   "kind": "requisito",
+   "note": "target = 600 m (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "req:REQ-stall_speed",
+   "kind": "requisito",
+   "note": "max ≤ 13 m/s (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "req:REQ-climb_rate",
+   "kind": "requisito",
+   "note": "min ≥ 3.0 m/s (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "req:REQ-service_ceiling",
+   "kind": "requisito",
+   "note": "min ≥ 3000 m (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "req:REQ-wing_span",
+   "kind": "requisito",
+   "note": "max ≤ 4.2 m (tol ±0); política limiar",
+   "offset": 0.0
+  },
+  {
+   "name": "met:mission_reliability_lo",
+   "kind": "metrica",
+   "note": "PRESSUPOSTO do estudo (requisito RL-01 de tests/test_reliability.py)",
+   "offset": 0.0
+  },
+  {
+   "name": "met:availability_op_lo",
+   "kind": "metrica",
+   "note": "PRESSUPOSTO do estudo (requisito RL-02 de tests/test_reliability.py)",
+   "offset": 0.0
+  },
+  {
+   "name": "met:ice_power_hi_W",
+   "kind": "metrica",
+   "note": "PRESSUPOSTO do estudo (requisito IC-03 de tests/test_icing.py)",
+   "offset": 0.0
+  }
+ ],
+ "filters": [
+  {
+   "id": "REQ-propulsion_type",
+   "comparison": "categoria",
+   "text": "propulsion_type target electric",
+   "nota": "requisito não numérico: filtro (estado reportado por projeto), não restrição"
+  },
+  {
+   "id": "REQ-regulatory_category",
+   "comparison": "categoria",
+   "text": "regulatory_category target easa_specific",
+   "nota": "requisito não numérico: filtro (estado reportado por projeto), não restrição"
+  }
+ ],
+ "policy": "limiar",
+ "derived": {},
+ "constants": {},
+ "closure": null,
+ "loops": [
+  {
+   "combo": {},
+   "iterations": [
+    {
+     "combo": {},
+     "phase": "c0",
+     "inner": {
+      "driver": "NSGA-II (Deb et al. 2002; driver OpenMDAO do acdt)",
+      "n_eval": 10,
+      "pop_size": 6,
+      "max_gen": 1,
+      "seed": 20261123
+     },
+     "front": [
+      6,
+      0,
+      7
+     ],
+     "knee": {
+      "id": 0,
+      "method": "Das 1999: maior distância à reta entre extremos (frente normalizada)"
+     },
+     "chosen": 0,
+     "closure_pick": {
+      "id": 0,
+      "feasible": true
+     },
+     "robust": null
+    }
+   ],
+   "closure_status": null
+  }
+ ],
+ "n_evaluations": 10,
+ "n_model_calls": 10,
+ "n_failed": 0,
+ "n_feasible": 4,
+ "pareto": [
+  6,
+  0,
+  7
+ ],
+ "knee": {
+  "id": 0,
+  "method": "Das 1999: maior distância à reta entre extremos (frente normalizada)"
+ },
+ "best": {
+  "W0_kg": 6,
+  "lcc_pv_hi_USD": 7
+ },
+ "chosen": 0,
+ "least_violation": 0,
+ "pressupostos": [
+  "viabilidade com margem relativa ≥ −1e-6 (ruído numérico dos fechos iterativos; options.feas_tol)",
+  "fidelidade handbook em todas as avaliações (mais barata; muda o modelo)"
+ ],
+ "evaluations": [
+  {
+   "id": 0,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 9.0,
+    "requirements.endurance": 2.0
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "W0_kg": 27.979909983188552,
+    "lcc_pv_hi_USD": 15885156.65563154
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 1.6646561492213627e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": 0.11067397546923805,
+    "met:mission_reliability_lo": 0.009871285942467589,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7490323927359235
+   },
+   "metrics": {
+    "W0_kg": 27.979909983188552,
+    "We_kg": 10.122639188244609,
+    "E_Wh": 2692.0719627115286,
+    "Wf_kg": 13.460359813557643,
+    "CD0": 0.021053925464718657,
+    "K": 0.045162411188559015,
+    "V_cruise_mps": 22.0,
+    "S_m2": 1.5501655246990713,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 7200.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.0000004993968448,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 3.7351693030292004,
+    "req:REQ-mtow": 27.979909983188552,
+    "lcc_pv_hi_USD": 15885156.65563154,
+    "lcc_pv_lo_USD": 5293406.644530533,
+    "co2e_fh_hi_kg": 1.2860846848723437,
+    "co2e_ciclo_hi_kg": 192912.70273085157,
+    "unit_cost_USD": 34489.54658304388,
+    "mission_reliability_lo": 0.9997725730830429,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -64.56111221391723,
+    "cold_margin_min_C": -21.912329943296072,
+    "cooling_drag_area_hi_m2": 0.002553092003145328,
+    "ice_power_hi_W": 250.9676072640765
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 7200.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.0000004993968448
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "passa",
+     "value": 3.7351693030292004
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 27.979909983188552
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 5,
+    "no_limite": 3,
+    "falha": 1
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 1,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 10.194598092732615,
+    "requirements.endurance": 2.0
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "W0_kg": 28.040333907713876,
+    "lcc_pv_hi_USD": 15909932.565232482
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 3.984459938285075e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": 0.052469419705297886,
+    "met:mission_reliability_lo": 0.009870385545132447,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7517543076169584
+   },
+   "metrics": {
+    "W0_kg": 28.040333907713876,
+    "We_kg": 10.53525052599026,
+    "E_Wh": 2622.170377296601,
+    "Wf_kg": 13.110851886483005,
+    "CD0": 0.02104640813028469,
+    "K": 0.041544782251368054,
+    "V_cruise_mps": 22.0,
+    "S_m2": 1.553513179667313,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 7200.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.0000011953379815,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 3.979628437237749,
+    "req:REQ-mtow": 28.040333907713876,
+    "lcc_pv_hi_USD": 15909932.565232482,
+    "lcc_pv_lo_USD": 5318182.554131473,
+    "co2e_fh_hi_kg": 1.2493525266398589,
+    "co2e_ciclo_hi_kg": 187402.8789959788,
+    "unit_cost_USD": 35079.20628805009,
+    "mission_reliability_lo": 0.9997716816896811,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -64.02672870289274,
+    "cold_margin_min_C": -22.017476067586955,
+    "cooling_drag_area_hi_m2": 0.002410966613501608,
+    "ice_power_hi_W": 248.2456923830416
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 7200.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.0000011953379815
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "passa",
+     "value": 3.979628437237749
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 28.040333907713876
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 5,
+    "no_limite": 3,
+    "falha": 1
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 2,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 12.07619215886587,
+    "requirements.endurance": 2.0
+   },
+   "ok": true,
+   "feasible": false,
+   "violation": 0.04155735059819355,
+   "objectives": {
+    "W0_kg": 28.60244644681859,
+    "lcc_pv_hi_USD": 15956048.375417609
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 3.9976013225621426e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": -0.04155735059819355,
+    "met:mission_reliability_lo": 0.009869166347139042,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7518047774364093
+   },
+   "metrics": {
+    "W0_kg": 28.60244644681859,
+    "We_kg": 11.314183652603852,
+    "E_Wh": 2579.0962913301723,
+    "Wf_kg": 12.895481456650861,
+    "CD0": 0.020971026357051083,
+    "K": 0.037433445577226526,
+    "V_cruise_mps": 22.0,
+    "S_m2": 1.5846557916215593,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 7200.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.0000011992803968,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 4.374540872512413,
+    "req:REQ-mtow": 28.60244644681859,
+    "lcc_pv_hi_USD": 15956048.375417609,
+    "lcc_pv_lo_USD": 5364298.364316601,
+    "co2e_fh_hi_kg": 1.224424475291127,
+    "co2e_ciclo_hi_kg": 183663.67129366903,
+    "unit_cost_USD": 36176.718865822986,
+    "mission_reliability_lo": 0.9997704746836676,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -64.0272297474894,
+    "cold_margin_min_C": -22.08505020758608,
+    "cooling_drag_area_hi_m2": 0.002335882925464424,
+    "ice_power_hi_W": 248.19522256359073
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 7200.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.0000011992803968
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "falha",
+     "value": 4.374540872512413
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 28.60244644681859
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 4,
+    "no_limite": 3,
+    "falha": 2
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 3,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 7.395407219729083,
+    "requirements.endurance": 2.5
+   },
+   "ok": true,
+   "feasible": false,
+   "violation": 0.0011111111111111111,
+   "objectives": {
+    "W0_kg": 38.34807112295109,
+    "lcc_pv_hi_USD": 16022100.139605118
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": -0.0011111111111111111,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": -3.070003657216584e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": 0.05622297957839274,
+    "met:mission_reliability_lo": 0.009818596437251149,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7421734607500636
+   },
+   "metrics": {
+    "W0_kg": 38.34807112295109,
+    "We_kg": 12.453786149515956,
+    "E_Wh": 4291.20050153636,
+    "Wf_kg": 21.456002507681802,
+    "CD0": 0.019674579707462097,
+    "K": 0.05199936126492565,
+    "V_cruise_mps": 22.0,
+    "S_m2": 2.1245907449031907,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 8990.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 2.999999078998903,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 3.9638634857707506,
+    "req:REQ-mtow": 38.34807112295109,
+    "lcc_pv_hi_USD": 16022100.139605118,
+    "lcc_pv_lo_USD": 5430350.1285041105,
+    "co2e_fh_hi_kg": 1.7889298352308416,
+    "co2e_ciclo_hi_kg": 268339.47528462624,
+    "unit_cost_USD": 37748.62182881033,
+    "mission_reliability_lo": 0.9997204104728786,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -65.45865665784174,
+    "cold_margin_min_C": -20.874226541572824,
+    "cooling_drag_area_hi_m2": 0.005208873578282347,
+    "ice_power_hi_W": 257.8265392499363
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "falha",
+     "value": 8990.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 2.999999078998903
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "passa",
+     "value": 3.9638634857707506
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 38.34807112295109
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 5,
+    "falha": 2,
+    "no_limite": 2
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 4,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 11.39018112754868,
+    "requirements.endurance": 2.5
+   },
+   "ok": true,
+   "feasible": false,
+   "violation": 0.14195917694119425,
+   "objectives": {
+    "W0_kg": 36.45334175675272,
+    "lcc_pv_hi_USD": 16086500.618750177
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 2.735276812456296e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": -0.14195917694119425,
+    "met:mission_reliability_lo": 0.009815041008756771,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7514000671024453
+   },
+   "metrics": {
+    "W0_kg": 36.45334175675272,
+    "We_kg": 13.590917732862598,
+    "E_Wh": 3690.9268644028402,
+    "Wf_kg": 18.4546343220142,
+    "CD0": 0.019345314888924253,
+    "K": 0.03875274760525018,
+    "V_cruise_mps": 22.0,
+    "S_m2": 2.019617421404995,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 9000.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.0000008205830437,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 4.796228543153016,
+    "req:REQ-mtow": 36.45334175675272,
+    "lcc_pv_hi_USD": 16086500.618750177,
+    "lcc_pv_lo_USD": 5494750.607649169,
+    "co2e_fh_hi_kg": 1.526508191114181,
+    "co2e_ciclo_hi_kg": 228976.2286671271,
+    "unit_cost_USD": 39281.156481692626,
+    "mission_reliability_lo": 0.9997168905986692,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -63.950387705379285,
+    "cold_margin_min_C": -21.520145133215067,
+    "cooling_drag_area_hi_m2": 0.0031436960189180642,
+    "ice_power_hi_W": 248.59993289755477
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 9000.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.0000008205830437
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "falha",
+     "value": 4.796228543153016
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 36.45334175675272
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 4,
+    "no_limite": 3,
+    "falha": 2
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 5,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 12.73767574350668,
+    "requirements.endurance": 2.5
+   },
+   "ok": true,
+   "feasible": false,
+   "violation": 0.2184269292978534,
+   "objectives": {
+    "W0_kg": 37.108688759253155,
+    "lcc_pv_hi_USD": 16131072.351513332
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 2.639647152709775e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": -0.2184269292978534,
+    "met:mission_reliability_lo": 0.009814220183893921,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7521991156324936
+   },
+   "metrics": {
+    "W0_kg": 37.108688759253155,
+    "We_kg": 14.392388297921723,
+    "E_Wh": 3661.9303357297576,
+    "Wf_kg": 18.309651678648788,
+    "CD0": 0.019278170391752295,
+    "K": 0.03631969625255316,
+    "V_cruise_mps": 22.0,
+    "S_m2": 2.055925484247279,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 9000.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.000000791894146,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 5.1173931030509845,
+    "req:REQ-mtow": 37.108688759253155,
+    "lcc_pv_hi_USD": 16131072.351513332,
+    "lcc_pv_lo_USD": 5539322.340412324,
+    "co2e_fh_hi_kg": 1.5117688955688575,
+    "co2e_ciclo_hi_kg": 226765.33433532866,
+    "unit_cost_USD": 40341.78876727274,
+    "mission_reliability_lo": 0.999716077982055,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -63.950387705379285,
+    "cold_margin_min_C": -21.555958956456777,
+    "cooling_drag_area_hi_m2": 0.0030767813292259805,
+    "ice_power_hi_W": 247.80088436750634
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 9000.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.000000791894146
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "falha",
+     "value": 5.1173931030509845
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 37.108688759253155
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 4,
+    "no_limite": 3,
+    "falha": 2
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 6,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 9.40390891398071,
+    "requirements.endurance": 2.0
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "W0_kg": 27.911728505493315,
+    "lcc_pv_hi_USD": 15892130.58170618
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 2.2678413591492586e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": 0.09204533745175221,
+    "met:mission_reliability_lo": 0.00987097027375801,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.750025020466263
+   },
+   "metrics": {
+    "W0_kg": 27.911728505493315,
+    "We_kg": 10.238358902483709,
+    "E_Wh": 2655.603807761062,
+    "Wf_kg": 13.278019038805308,
+    "CD0": 0.02105878274100669,
+    "K": 0.04382785888528193,
+    "V_cruise_mps": 22.0,
+    "S_m2": 1.5463880795175213,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 7200.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.0000006803524077,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 3.813409582702641,
+    "req:REQ-mtow": 27.911728505493315,
+    "lcc_pv_hi_USD": 15892130.58170618,
+    "lcc_pv_lo_USD": 5300380.570605172,
+    "co2e_fh_hi_kg": 1.2674745278126107,
+    "co2e_ciclo_hi_kg": 190121.1791718916,
+    "unit_cost_USD": 34655.52526605302,
+    "mission_reliability_lo": 0.9997722605710204,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -64.02672870289274,
+    "cold_margin_min_C": -21.967205454572735,
+    "cooling_drag_area_hi_m2": 0.0024698900087933404,
+    "ice_power_hi_W": 249.97497953373704
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 7200.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.0000006803524077
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "passa",
+     "value": 3.813409582702641
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 27.911728505493315
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 5,
+    "no_limite": 3,
+    "falha": 1
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 7,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 7.904144583377126,
+    "requirements.endurance": 2.0
+   },
+   "ok": true,
+   "feasible": true,
+   "violation": 0.0,
+   "objectives": {
+    "W0_kg": 28.172773085328817,
+    "lcc_pv_hi_USD": 15866255.219209816
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 2.2347460741182582e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": 0.16370629699869543,
+    "met:mission_reliability_lo": 0.009872209892046162,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7459472281503647
+   },
+   "metrics": {
+    "W0_kg": 28.172773085328817,
+    "We_kg": 9.810686810260513,
+    "E_Wh": 2792.2476687655567,
+    "Wf_kg": 13.961238343827784,
+    "CD0": 0.021030074972758057,
+    "K": 0.049517008596195414,
+    "V_cruise_mps": 22.0,
+    "S_m2": 1.5608506817315275,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 7200.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.0000006704238222,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 3.5124335526054793,
+    "req:REQ-mtow": 28.172773085328817,
+    "lcc_pv_hi_USD": 15866255.219209816,
+    "lcc_pv_lo_USD": 5274505.208108809,
+    "co2e_fh_hi_kg": 1.3376182537921193,
+    "co2e_ciclo_hi_kg": 200642.73806881785,
+    "unit_cost_USD": 34039.68965499039,
+    "mission_reliability_lo": 0.9997734877931257,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -65.1570914837348,
+    "cold_margin_min_C": -21.76635984835721,
+    "cooling_drag_area_hi_m2": 0.002771164238519295,
+    "ice_power_hi_W": 254.05277184963535
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 7200.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.0000006704238222
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "passa",
+     "value": 3.5124335526054793
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 28.172773085328817
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 5,
+    "no_limite": 3,
+    "falha": 1
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 8,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 13.0,
+    "requirements.endurance": 2.5
+   },
+   "ok": true,
+   "feasible": false,
+   "violation": 0.23354294675918927,
+   "objectives": {
+    "W0_kg": 37.26765068735697,
+    "lcc_pv_hi_USD": 16140330.532824181
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": 0.0,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": 3.1526984830184307e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": -0.23354294675918927,
+    "met:mission_reliability_lo": 0.009814073776966263,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7521991156324936
+   },
+   "metrics": {
+    "W0_kg": 37.26765068735697,
+    "We_kg": 14.560311237197526,
+    "E_Wh": 3660.155361206292,
+    "Wf_kg": 18.30077680603146,
+    "CD0": 0.019263135608516797,
+    "K": 0.035916116639153055,
+    "V_cruise_mps": 22.0,
+    "S_m2": 2.0647324211114175,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 9000.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 3.000000945809545,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 5.180880376388595,
+    "req:REQ-mtow": 37.26765068735697,
+    "lcc_pv_hi_USD": 16140330.532824181,
+    "lcc_pv_lo_USD": 5548580.521723174,
+    "co2e_fh_hi_kg": 1.5105480776739764,
+    "co2e_ciclo_hi_kg": 226582.21165109647,
+    "unit_cost_USD": 40562.09330434843,
+    "mission_reliability_lo": 0.9997159330391966,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -63.950387705379285,
+    "cold_margin_min_C": -21.558699899150923,
+    "cooling_drag_area_hi_m2": 0.003071773049360175,
+    "ice_power_hi_W": 247.80088436750634
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "no_limite",
+     "value": 9000.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 3.000000945809545
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "falha",
+     "value": 5.180880376388595
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 37.26765068735697
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 4,
+    "no_limite": 3,
+    "falha": 2
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  },
+  {
+   "id": 9,
+   "phase": "c0",
+   "combo": {},
+   "x": {
+    "assumptions.aero.AR": 7.439766895902084,
+    "requirements.endurance": 2.5
+   },
+   "ok": true,
+   "feasible": false,
+   "violation": 0.0011111111111111111,
+   "objectives": {
+    "W0_kg": 38.25016260052479,
+    "lcc_pv_hi_USD": 16021550.614751011
+   },
+   "constraints": {
+    "req:REQ-payload_mass": 0.0,
+    "req:REQ-endurance": -0.0011111111111111111,
+    "req:REQ-cruise_speed": 0.0,
+    "req:REQ-cruise_altitude": 0.0,
+    "req:REQ-stall_speed": 0.0,
+    "req:REQ-climb_rate": -2.729674976424216e-07,
+    "req:REQ-service_ceiling": 2.0,
+    "req:REQ-wing_span": 0.05460587923851454,
+    "met:mission_reliability_lo": 0.009818550408897406,
+    "met:availability_op_lo": 0.7672528055138288,
+    "met:ice_power_hi_W": 0.7422937498932701
+   },
+   "metrics": {
+    "W0_kg": 38.25016260052479,
+    "We_kg": 12.444191942306269,
+    "E_Wh": 4273.76534478646,
+    "Wf_kg": 21.368826723932305,
+    "CD0": 0.01965630416047142,
+    "K": 0.05176889845698261,
+    "V_cruise_mps": 22.0,
+    "S_m2": 2.119166338029449,
+    "ws_Pa": 177.00637761886898,
+    "req:REQ-payload_mass": 4.0,
+    "req:REQ-endurance": 8990.0,
+    "req:REQ-cruise_speed": 22.0,
+    "req:REQ-cruise_altitude": 600.0,
+    "req:REQ-stall_speed": 13.0,
+    "req:REQ-climb_rate": 2.999999181097507,
+    "req:REQ-service_ceiling": 9000.0,
+    "req:REQ-wing_span": 3.970655307198239,
+    "req:REQ-mtow": 38.25016260052479,
+    "lcc_pv_hi_USD": 16021550.614751011,
+    "lcc_pv_lo_USD": 5429800.603650003,
+    "co2e_fh_hi_kg": 1.7814765998801443,
+    "co2e_ciclo_hi_kg": 267221.4899820216,
+    "unit_cost_USD": 37735.54452120515,
+    "mission_reliability_lo": 0.9997203649048084,
+    "availability_op_lo": 0.8836264027569144,
+    "fleet_size_hi": 1.0,
+    "hot_margin_min_C": -65.42335315123984,
+    "cold_margin_min_C": -20.892102705108528,
+    "cooling_drag_area_hi_m2": 0.0051190376360958755,
+    "ice_power_hi_W": 257.70625010672984
+   },
+   "requirements": {
+    "REQ-propulsion_type": {
+     "status": "nao_avaliado",
+     "value": null
+    },
+    "REQ-regulatory_category": {
+     "status": "desconhecido",
+     "value": null
+    },
+    "REQ-payload_mass": {
+     "status": "passa",
+     "value": 4.0
+    },
+    "REQ-endurance": {
+     "status": "falha",
+     "value": 8990.0
+    },
+    "REQ-cruise_speed": {
+     "status": "passa",
+     "value": 22.0
+    },
+    "REQ-cruise_altitude": {
+     "status": "passa",
+     "value": 600.0
+    },
+    "REQ-stall_speed": {
+     "status": "no_limite",
+     "value": 13.0
+    },
+    "REQ-climb_rate": {
+     "status": "no_limite",
+     "value": 2.999999181097507
+    },
+    "REQ-service_ceiling": {
+     "status": "passa",
+     "value": 9000.0
+    },
+    "REQ-wing_span": {
+     "status": "passa",
+     "value": 3.970655307198239
+    },
+    "REQ-mtow": {
+     "status": "falha",
+     "value": 38.25016260052479
+    }
+   },
+   "status_counts": {
+    "nao_avaliado": 1,
+    "desconhecido": 1,
+    "passa": 5,
+    "falha": 2,
+    "no_limite": 2
+   },
+   "message": "",
+   "overrides": {},
+   "nao_avaliado_pelo_modelo": []
+  }
+ ],
+ "verification_matrix": {
+  "schema": "acdt.verification/1",
+  "domain": "aircraft",
+  "evidence_file": "",
+  "evidence_sha256": null,
+  "provenance": {
+   "fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+   "file": null,
+   "sha256": null
+  },
+  "statuses": [
+   "passa",
+   "falha",
+   "no_limite",
+   "nao_avaliado",
+   "desconhecido"
+  ],
+  "tree_issues": [],
+  "coverage": {
+   "requisitos": 11,
+   "por_estado": {
+    "passa": 5,
+    "falha": 1,
+    "no_limite": 3,
+    "nao_avaliado": 1,
+    "desconhecido": 1
+   },
+   "requisitos_sem_avaliador": [
+    "REQ-propulsion_type"
+   ],
+   "avaliadores_nao_registados": [],
+   "avaliadores_sem_requisito": [
+    "check:hq:CAP",
+    "check:hq:phugoid",
+    "check:hq:scissor",
+    "check:hq:short_period",
+    "check:mtow",
+    "check:static_margin",
+    "check:trim",
+    "check:wb:envelope",
+    "check:wing_span",
+    "ciclo_vida:co2e_per_flight_hour_kg",
+    "ciclo_vida:cost_per_flight_hour_USD",
+    "ciclo_vida:life_cycle_co2e_kg",
+    "ciclo_vida:life_cycle_cost_USD",
+    "custo_serie:break_even_quantity",
+    "custo_serie:flyaway_cost_USD",
+    "custo_serie:unit_cost_at_quantity_USD",
+    "fiabilidade:maintenance.mmh_per_fh",
+    "fiabilidade:mission_reliability",
+    "fiabilidade:mtbcf_s",
+    "fiabilidade:operational_availability",
+    "gelo:fiki",
+    "gelo:max_thickness_m",
+    "gelo:protection.power_W",
+    "termica:cold_margin_C",
+    "termica:cooling.drag_area_m2",
+    "termica:hot_margin_C"
+   ],
+   "fracao_avaliada": 0.8181818181818182
+  },
+  "rows": [
+   {
+    "id": "REQ-propulsion_type",
+    "text": "propulsion_type target electric",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "propulsion_type",
+    "comparison": "categoria",
+    "threshold": "electric",
+    "display": "electric",
+    "unit": "",
+    "goal": null,
+    "value": null,
+    "value_display": "",
+    "margin": null,
+    "tolerance": 0.0,
+    "status": "nao_avaliado",
+    "meets_goal": null,
+    "evaluator": null,
+    "method": "analise",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": null,
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "sem avaliador declarado",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-regulatory_category",
+    "text": "regulatory_category target easa_specific",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "regulatory_category",
+    "comparison": "categoria",
+    "threshold": "easa_specific",
+    "display": "easa_specific",
+    "unit": "",
+    "goal": null,
+    "value": null,
+    "value_display": "",
+    "margin": null,
+    "tolerance": 0.0,
+    "status": "desconhecido",
+    "meets_goal": null,
+    "evaluator": "check:regulatory_category",
+    "method": "analise",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": "N1",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "easa_specific: no numeric limit",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-payload_mass",
+    "text": "payload_mass target 4.0 kg",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "payload_mass",
+    "comparison": "target",
+    "threshold": 4.0,
+    "display": "= 4.0 kg",
+    "unit": "kg",
+    "goal": null,
+    "value": 4.0,
+    "value_display": "",
+    "margin": 0.0,
+    "tolerance": 0.0,
+    "status": "passa",
+    "meets_goal": null,
+    "evaluator": "entrada:payload_mass",
+    "method": "inspecao",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": "N0",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "entrada do dimensionamento (cumprida por construção)",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-endurance",
+    "text": "endurance min 2.0 h",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "endurance",
+    "comparison": "min",
+    "threshold": 7200.0,
+    "display": "≥ 2.0 h",
+    "unit": "s",
+    "goal": null,
+    "value": 7200.0,
+    "value_display": "2 h",
+    "margin": 0.0,
+    "tolerance": 0.0,
+    "status": "no_limite",
+    "meets_goal": null,
+    "evaluator": "perf:endurance",
+    "method": "analise",
+    "fidelity_required": "N1",
+    "fidelity_evaluated": "N1",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "tempo em espera (segmentos); dentro da banda ±0.001 (resolução do avaliador 0.001 (performance_analysis: comparação a 0,1 %))",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-cruise_speed",
+    "text": "cruise_speed target 22 m/s",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "cruise_speed",
+    "comparison": "target",
+    "threshold": 22.0,
+    "display": "= 22 m/s",
+    "unit": "m/s",
+    "goal": null,
+    "value": 22.0,
+    "value_display": "",
+    "margin": 0.0,
+    "tolerance": 0.0,
+    "status": "passa",
+    "meets_goal": null,
+    "evaluator": "entrada:cruise_speed",
+    "method": "inspecao",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": "N0",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "entrada do dimensionamento (cumprida por construção)",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-cruise_altitude",
+    "text": "cruise_altitude target 600 m",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "cruise_altitude",
+    "comparison": "target",
+    "threshold": 600.0,
+    "display": "= 600 m",
+    "unit": "m",
+    "goal": null,
+    "value": 600.0,
+    "value_display": "",
+    "margin": 0.0,
+    "tolerance": 0.0,
+    "status": "passa",
+    "meets_goal": null,
+    "evaluator": "entrada:cruise_altitude",
+    "method": "inspecao",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": "N0",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "entrada do dimensionamento (cumprida por construção)",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-stall_speed",
+    "text": "stall_speed max 13 m/s",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "stall_speed",
+    "comparison": "max",
+    "threshold": 13.0,
+    "display": "≤ 13 m/s",
+    "unit": "m/s",
+    "goal": null,
+    "value": 13.0,
+    "value_display": "",
+    "margin": 0.0,
+    "tolerance": 0.0,
+    "status": "no_limite",
+    "meets_goal": null,
+    "evaluator": "sizing:stall_speed",
+    "method": "analise",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": "N0",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "V_s = √(2 (W/S) f_ater / (ρ C_Lmax,ater)) = 13.000 m/s (Raymer Eq. 5.6; W/S 177.0 N/m², f_ater 1, C_Lmax,ater 1.710, h 0 m); dentro da banda ±1e-05 (resolução do avaliador 1e-05 (fecho do MDA (assumptions.mda.tol)))",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-climb_rate",
+    "text": "climb_rate min 3.0 m/s",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "climb_rate",
+    "comparison": "min",
+    "threshold": 3.0,
+    "display": "≥ 3.0 m/s",
+    "unit": "m/s",
+    "goal": null,
+    "value": 3.0000004993968448,
+    "value_display": "3 m/s",
+    "margin": 1.6646561492213627e-07,
+    "tolerance": 0.0,
+    "status": "no_limite",
+    "meets_goal": null,
+    "evaluator": "perf:climb_rate",
+    "method": "analise",
+    "fidelity_required": "N1",
+    "fidelity_evaluated": "N1",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "ROC máx. ao nível do mar; dentro da banda ±0.001 (resolução do avaliador 0.001 (performance_analysis: comparação a 0,1 %))",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-service_ceiling",
+    "text": "service_ceiling min 3000 m",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "service_ceiling",
+    "comparison": "min",
+    "threshold": 3000.0,
+    "display": "≥ 3000 m",
+    "unit": "m",
+    "goal": null,
+    "value": 9000.0,
+    "value_display": "9000 m",
+    "margin": 2.0,
+    "tolerance": 0.0,
+    "status": "passa",
+    "meets_goal": null,
+    "evaluator": "perf:service_ceiling",
+    "method": "analise",
+    "fidelity_required": "N1",
+    "fidelity_evaluated": "N1",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "teto de serviço (Anderson) > 9000 m (não atingido)",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-wing_span",
+    "text": "wing_span max 4.2 m",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "wing_span",
+    "comparison": "max",
+    "threshold": 4.2,
+    "display": "≤ 4.2 m",
+    "unit": "m",
+    "goal": null,
+    "value": 3.7351693030292004,
+    "value_display": "",
+    "margin": 0.11067397546923805,
+    "tolerance": 0.0,
+    "status": "passa",
+    "meets_goal": null,
+    "evaluator": "resultado:geometry.wing.span_m",
+    "method": "analise",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": "N0",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "",
+    "aggregated_from_children": false,
+    "children_worst": null
+   },
+   {
+    "id": "REQ-mtow",
+    "text": "mtow max 25 kg",
+    "source": "missao",
+    "source_kind": "missao",
+    "parents": [],
+    "children": [],
+    "quantity": "mtow",
+    "comparison": "max",
+    "threshold": 25.0,
+    "display": "≤ 25 kg",
+    "unit": "kg",
+    "goal": null,
+    "value": 27.979909983188552,
+    "value_display": "",
+    "margin": -0.11919639932754209,
+    "tolerance": 0.0,
+    "status": "falha",
+    "meets_goal": null,
+    "evaluator": "resultado:weights.W0_kg",
+    "method": "analise",
+    "fidelity_required": "N0",
+    "fidelity_evaluated": "N0",
+    "evidence": "",
+    "evidence_sha256": null,
+    "provenance_fingerprint": "2e68a5908d9387d4f72e4c6087506b10e44cf016452e7c1bcc3759599a0c97c1",
+    "provenance_sha256": null,
+    "message": "",
+    "aggregated_from_children": false,
+    "children_worst": null
+   }
+  ]
+ }
+}

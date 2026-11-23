@@ -2060,6 +2060,12 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Potência só na exposição**: confirmado (`exposure_duty`, `power_schedule: exposicao`), já no main desde o PR #19.
 * **Encontro misto contínuo + intermitente**: `nao_avaliado`. Jeck DOT/FAA/AR-00/30 §2.1 só junta as Figuras 1 e 4 num gráfico LWC × extensão horizontal (equivalente aos fatores F já implementados); não dá procedimento de soma. Pormenor em [docs/GELO.md](docs/GELO.md) §10.
 
+## 45. MDO de sistema com as disciplinas novas (23 nov 2026)
+
+* **O que faz**: estudo de demonstração `examples/studies/mdo_disciplinas/` (`applied: false`): térmica, gelo, fiabilidade, custo de série e ciclo de vida como objetivos (LCC) e restrições (fiabilidade, disponibilidade, potência anti-gelo) no `acdt mdo`, por `mdo.fixed` + `result_metrics`, sem mudar o exemplo.
+* **Medida (uav_endurance_payload, NSGA-II 10 corridas)**: frente de 3 projetos a 2,0 h, AR 7,9–9,4, W0 27,9–28,2 kg, LCC ≤ 15,87–15,89 M USD; 2,5 h inviável; margem quente −64 K em todos (reportada). Pormenor em [docs/MDO.md](docs/MDO.md).
+* **Correções**: `t_eval` do transitório térmico (1 ulp) e matriz final do MDO sem `mdo.fixed`. Veredicto: ligação `validado`; números `nao_aplicar`.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

@@ -2046,4 +2046,7 @@ A queda do worker na CI Ubuntu era o `--timeout=900` (método thread → `os._ex
 ## `thinwalled.solve` vectorizado (23 nov 2026, ramo `thinwalled-vectorizado`)
 
 Secção multicélula de Megson 5,4× mais rápida (2,05 → 0,38 ms por secção): idealização e sistema vectorizados, LU em vez de SVD quando o sistema é quadrado depois de retirar a linha de nó redundante (`lstsq` como recurso). Mesmos resultados (regressão contra a referência congelada, 10⁻⁹). Teste pesado da asa voadora 281 → 174 s. Pormenor em [QUALIDADE.md](QUALIDADE.md).
+## MDO de sistema com as disciplinas novas (23 nov 2026, ramo `mdo-global-disciplinas`)
+
+Estudo `examples/studies/mdo_disciplinas` (`applied: false`), resultados em `examples/output/mdo_disciplinas`. Frente de 3 projetos (2,0 h, AR 7,9–9,4, W0 27,9–28,2 kg). Corrigidos o `t_eval` do transitório térmico e a matriz final do MDO que ignorava `mdo.fixed`. Margem quente da baia −64 K em todo o domínio e `REQ-mtow` falha com a proteção anti-gelo: ficam como achados do caso de teste. Pormenor em [MDO.md](MDO.md).
 
