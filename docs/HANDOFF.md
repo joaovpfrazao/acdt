@@ -2028,6 +2028,9 @@ Dezasseis blocos, todos com código 0, alvos 400 a 6400. O histórico acumulou a
 
 Registo: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `h5_c172_rans_um_angulo.csv`. O que a ferramenta passa a fazer está em [../CAPABILITIES.md](../CAPABILITIES.md).
 
+## Fator β de causa comum (23 nov 2026, ramo `fiabilidade-fator-beta`)
+
+NUREG/CR-5485 Ap. A p. A-5, Eq. A.10–A.13, conferido no PDF público do INL. Módulo `core/reliability/common_cause.py`, ligado a `evaluate_extensions` e ao adaptador aircraft (`common_cause`). Verificação: m = 2, Q_t = 10⁻³, β = 0,05 → eventos raros 5,09025×10⁻⁵, exato 5,0902455×10⁻⁵. Sem β declarado: limite inferior. MGL, fator α e os β da IEC 61508-6 Anexo D: não feitos.
 ## Âmbito ISO 9613-2 e refração (23 nov 2026, ramo `ruido-ambito-iso9613`)
 
 ISO 9613-2:1996 §1 (conferido na transcrição KM Exhibit 9 e na página ISO de 2024): não se aplica a aeronaves em voo. A_gr/C_met passam a ser marcados como extrapolação (PRESSUPOSTO). Refração por traçado de raios, Nord2000 e Harmonoise: `nao_avaliado`, parado aqui por falta de método citado e verificável numa tarefa leve. Comportamento por omissão inalterado (A_gr só com `iso9613_ground`).
