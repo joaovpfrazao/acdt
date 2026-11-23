@@ -155,7 +155,7 @@ def laue_direct_W_m2(h_m: float, air_mass: float = 1.0) -> float:
     if air_mass < 1.0 or h_m < 0.0:
         raise ValueError("AM ≥ 1 e h ≥ 0")
     ah = 0.14 * h_m / 1000.0
-    return SOLAR_CONSTANT_W_M2 * ((1.0 - ah) * 0.7 ** (air_mass ** 0.678) + ah)
+    return float(SOLAR_CONSTANT_W_M2 * ((1.0 - ah) * 0.7 ** (air_mass ** 0.678) + ah))
 
 
 def solar_hot_day(h_m: float) -> tuple[float, str]:
