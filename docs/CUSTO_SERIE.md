@@ -113,3 +113,30 @@ os desconhecidos, a API e a etapa do pipeline com requisitos e `design.json`.
 ## 7. Adaptador nativo (19 nov 2026)
 
 `size_vtol` e `size_jet` só correm o custo de série se o bloco `series_cost` estiver declarado. Não se inventam We nem entradas Eastlake. O custo unitário do equipamento soma-se ao unitário quando todos os itens o trazem. Se algum falta, `average_unit_cost_USD`, `flyaway_cost_USD` e `unit_cost_at_quantity_USD` ficam só com minorante e o veredicto é `nao_avaliado`. Na asa fixa a mesma regra corre no fim de `analyse_series_cost`. Medida de ensaio (aprendizagem, T1 = 1000 USD, N = 10, declive 0,85, NRE = 0): 711,61 USD, e 761,61 USD com 50 USD declarados na carga. Ficheiro: `examples/output/adaptadores_vtol_jato/adaptadores.json`.
+
+## T1 a partir do plano de fabrico (23 nov 2026)
+
+Com `series_cost.method: learning` e sem `learning.T1` declarado, T1 sai do plano de fabrico da Fase 7 quando a
+missão traz `assumptions.manufacturing` (ou com `learning.T1_from: manufacturing`). Um T1 declarado tem sempre
+prioridade.
+
+* O plano (`manufacturing/plan.py`, `hours_basis: first_unit`) toma as horas dos processos como as da 1.ª unidade e
+  aplica o fator médio LF(N) da curva de Crawford. Aqui desfaz-se só esse fator: T1 = custo de mão de obra do plano
+  / LF = Σ horas × taxa da 1.ª unidade. Com a mesma curva, a média de N unidades da rota `learning` devolve
+  exatamente o custo de mão de obra do plano (verificado em `tests/test_series_cost_t1_plan.py`).
+* Material, fixadores, máquina, comprados e montagem final não têm curva no plano. Entram como itens por aeronave,
+  constantes por unidade, como no estudo de fabrico.
+* As ferramentas do plano são não recorrentes. Ficam reportadas em `T1_from_plan.tooling_USD` e não entram em T1
+  nem no NRE: o NRE continua a ser só o declarado.
+* Declive: o do plano (`manufacturing.learning`, por omissão 85 % NASA JSC), salvo se `series_cost.learning.slope`
+  vier declarado.
+* Recusa (fica `nao_avaliado`, nunca zero): sem plano, com `hours_basis: standard` (horas maduras; a inversão para
+  a 1.ª unidade precisaria de uma curva inversa citada) ou com peças sem opção resolvida.
+* Sem `final_assembly_hours` no plano, T1 e o custo de saída de fábrica são limites inferiores (`{lo, hi: null}`).
+
+Medida no C172 de verificação (`examples/manufacturing/cessna172_manufacturing.yaml`, N = 820, LF = 0,2701):
+T1 de mão de obra 2,13 M USD, itens por aeronave 76,9 k USD (material, fixadores e máquina 18,3 k; comprados 58,5 k),
+ferramentas 10,8 M USD fora de T1, montagem final não declarada → limite inferior. As horas brutas do processo
+(FOPV) já estavam assinaladas como sobrestimadas neste exemplo (`bottom_up_hours_per_unit` > Eastlake), e T1 herda
+isso. Veredicto: ligação **validada** (identidade com o plano); nível absoluto de T1 **calibrar** (o do plano).
+O yaml dos exemplos não foi alterado.

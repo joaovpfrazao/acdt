@@ -9,6 +9,8 @@ um requisito ``unit_cost_at_quantity`` / ``flyaway_cost`` / ``break_even_quantit
   V_H = ``max_speed`` ou cruzeiro, motor, compósito, atuadores) — só N varia;
 * ``method: dapca4``: We e V do dimensionamento; ``series_cost.dapca`` dá o resto (cpi, taxas, FTA, motor…);
 * ``method: learning``: rota de baixo para cima com ``series_cost.learning: {T1, slope, theory, nre, lots}``.
+  Sem T1 declarado e com ``assumptions.manufacturing`` (ou ``learning.T1_from: manufacturing``), T1 sai do plano de
+  fabrico (:func:`t1_from_manufacturing`).
 
 Requisitos com qualificador ``quantity`` são avaliados nessa quantidade. Não muda W0 (sem acoplamento ao
 dimensionamento); alimenta o ciclo de vida (custo de aquisição, RDT&E).
@@ -80,10 +82,69 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
         spec["inputs"] = d
         notes.append(f"DAPCA IV: We {d['We_kg']:.1f} kg, V {d['V_kt']:.1f} kt")
     elif method == "learning":
-        spec["learning"] = dict(o.get("learning") or {})
+        lc = dict(o.get("learning") or {})
+        src = lc.get("T1_from")
+        mcfg = res.spec.assumptions.get("manufacturing") if isinstance(res.spec.assumptions, dict) else None
+        if lc.get("T1") is None and (src == "manufacturing" or (src is None and isinstance(mcfg, dict) and mcfg)):
+            t1 = t1_from_manufacturing(res, mcfg if isinstance(mcfg, dict) else None)
+            spec["T1_from_plan"] = t1
+            notes += t1["notes"]
+            lc["T1"] = t1["T1_USD"]
+            lc["per_aircraft_items"] = float(lc.get("per_aircraft_items", 0.0)) + t1["per_aircraft_items_USD"]
+            if "slope" not in lc:
+                lc["slope"], lc["theory"] = t1["slope"], t1["theory"]
+                lc.setdefault("slope_source", t1["slope_source"])
+        spec["learning"] = lc
     else:
         raise ValueError(f"series_cost.method {method!r} desconhecido (eastlake, dapca4, learning)")
     return spec, notes
+
+
+def t1_from_manufacturing(res: Any, mcfg: dict[str, Any] | None) -> dict[str, Any]:
+    """T1 (custo recorrente da 1.ª unidade sujeito a aprendizagem) a partir do plano de fabrico (Fase 7).
+
+    O plano (:func:`.manufacturing.plan.plan`, ``hours_basis: first_unit``) toma as horas dos processos como as da
+    1.ª unidade e aplica o fator médio LF(N). Aqui desfaz-se só esse fator: T1 = custo de mão de obra do plano / LF,
+    isto é Σ horas × taxa da 1.ª unidade. Material, fixadores, máquina, comprados e montagem final não têm curva no
+    plano e entram como itens por aeronave (constantes por unidade), como no estudo de fabrico. As ferramentas são
+    não recorrentes: ficam reportadas e não entram em T1. Sem ``assumptions.manufacturing`` ou com
+    ``hours_basis: standard`` (horas maduras, LF = 1) → ``ValueError`` (T1 não sai do plano; não se inventa)."""
+    from .manufacturing.study import study
+
+    if not mcfg:
+        raise ValueError("series_cost.learning.T1_from: manufacturing pede assumptions.manufacturing")
+    if mcfg.get("hours_basis", "first_unit") != "first_unit":
+        raise ValueError("plano de fabrico com hours_basis: standard (horas maduras): T1 da 1.ª unidade não é "
+                         "derivável sem uma curva inversa citada — declare learning.T1")
+    st = study(res, {**mcfg, "_base": mcfg.get("_base")} if "_base" in mcfg else mcfg, out=None, plots=False)
+    pl = st["plan"]
+    tot = pl["totals"]
+    LF = float(pl["learning_factor"])
+    if pl.get("unresolved_parts"):
+        raise ValueError("plano de fabrico com peças sem opção resolvida: " + ", ".join(pl["unresolved_parts"]))
+    labour_T1 = float(tot["labour_cost"]) / LF if LF > 0 else float("nan")
+    non_learning = float(tot["material_cost"]) + float(tot["fastener_cost"]) + float(tot["machine_cost"])
+    bu = st["bottom_up"]
+    purchased = float(sum(bu["purchased"].values()))
+    fa = bu.get("final_assembly")
+    lc = {"slope": 0.85, "theory": "crawford", **(mcfg.get("learning") or {})}
+    notes = [f"T1 do plano de fabrico (N = {pl['N']}, LF = {LF:.4f}): mão de obra da 1.ª unidade "
+             f"{labour_T1:,.0f} USD = custo de mão de obra do plano / LF",
+             f"itens por aeronave do plano: material + fixadores + máquina {non_learning:,.0f} USD, comprados "
+             f"{purchased:,.0f} USD" + ("" if fa is None else f", montagem final {float(fa):,.0f} USD"),
+             f"ferramentas do plano (não recorrente, fora de T1): {float(tot['tooling_per_unit']) * pl['N']:,.0f} USD"]
+    complete = fa is not None
+    if not complete:
+        notes.append("montagem final não declarada no plano (final_assembly_hours): T1 e o custo de saída de fábrica "
+                     "são limites inferiores")
+    return {"T1_USD": labour_T1, "per_aircraft_items_USD": non_learning + purchased + (float(fa) if fa else 0.0),
+            "labour_first_unit_USD": labour_T1, "non_learning_USD": non_learning, "purchased_USD": purchased,
+            "final_assembly_USD": None if fa is None else float(fa),
+            "tooling_USD": float(tot["tooling_per_unit"]) * pl["N"], "plan_N": pl["N"], "plan_learning_factor": LF,
+            "slope": float(lc["slope"]), "theory": str(lc["theory"]),
+            "slope_source": "plano de fabrico: " + str(lc.get("source") or "LEARNING_DEFAULT (NASA JSC 85 %)"),
+            "complete": complete, "notes": notes,
+            "source": "acdt.domains.aircraft.manufacturing.plan (Fase 7, hours_basis first_unit)"}
 
 
 def _at(spec: dict[str, Any], q: int) -> dict[str, Any]:
@@ -101,6 +162,12 @@ def analyse_series_cost(res: Any) -> dict[str, Any]:
     spec, notes = build_spec(res, o)
     out = analyse(spec)
     nre_unknown = out.get("nre_declared") is False
+    t1p = spec.get("T1_from_plan")
+    if t1p is not None:
+        out["T1_from_plan"] = {k: v for k, v in t1p.items() if k != "notes"}
+        out.setdefault("sources", {})["T1"] = t1p["source"]
+        if not t1p["complete"]:  # montagem final em falta: recorrente é limite inferior
+            nre_unknown = True
     # valores nos qualificadores de quantidade dos requisitos
     for r in _requested(res.spec):
         q = r.params.get("quantity")
@@ -116,6 +183,8 @@ def analyse_series_cost(res: Any) -> dict[str, Any]:
     if nre_unknown:  # custo médio só é limite inferior: num requisito max nunca passa
         out["unit_cost_at_quantity_USD"] = {"lo": out["unit_cost_at_quantity_USD"], "hi": None}
         out["average_unit_cost_USD"] = {"lo": out.get("average_unit_cost_USD"), "hi": None}
+        if t1p is not None and not t1p["complete"]:
+            out["flyaway_cost_USD"] = {"lo": out.get("flyaway_cost_USD"), "hi": None}
     out.update({"level": LEVEL, "adapter_notes": notes,
                 "currency": "USD (CER: 2012 × cpi; learning: T1 e NRE declarados em USD)"})
     from .native_disciplines import fold_series_cost
