@@ -2028,6 +2028,9 @@ Dezasseis blocos, todos com código 0, alvos 400 a 6400. O histórico acumulou a
 
 Registo: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `h5_c172_rans_um_angulo.csv`. O que a ferramenta passa a fazer está em [../CAPABILITIES.md](../CAPABILITIES.md).
 
+## Gelo: exposição e encontros mistos (23 nov 2026, ramo `gelo-exposicao-encontros`)
+
+Só documentação. Ciclo de proteção = fração da missão em segmentos dentro do envelope, confirmado no código e nos testes. Encontro misto contínuo+intermitente fica `nao_avaliado` (Jeck 2002 §2.1 não dá procedimento de combinação).
 ## Fator β de causa comum (23 nov 2026, ramo `fiabilidade-fator-beta`)
 
 NUREG/CR-5485 Ap. A p. A-5, Eq. A.10–A.13, conferido no PDF público do INL. Módulo `core/reliability/common_cause.py`, ligado a `evaluate_extensions` e ao adaptador aircraft (`common_cause`). Verificação: m = 2, Q_t = 10⁻³, β = 0,05 → eventos raros 5,09025×10⁻⁵, exato 5,0902455×10⁻⁵. Sem β declarado: limite inferior. MGL, fator α e os β da IEC 61508-6 Anexo D: não feitos.
