@@ -2028,6 +2028,9 @@ Dezasseis blocos, todos com código 0, alvos 400 a 6400. O histórico acumulou a
 
 Registo: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `h5_c172_rans_um_angulo.csv`. O que a ferramenta passa a fazer está em [../CAPABILITIES.md](../CAPABILITIES.md).
 
+## T1 do plano de fabrico no custo de série (23 nov 2026, ramo `custo-serie-t1-plano`)
+
+`series_cost.t1_from_manufacturing`. Identidade verificada: com a mesma curva, a média de N unidades da rota learning devolve o custo de mão de obra do plano. C172 de verificação: T1 2,13 M USD (LF 0,2701 em N = 820) — as horas FOPV já estavam assinaladas como sobrestimadas, por isso o nível absoluto fica `calibrar`. Montagem final não declarada no exemplo → limite inferior. O yaml dos exemplos não mudou.
 ## Gelo: exposição e encontros mistos (23 nov 2026, ramo `gelo-exposicao-encontros`)
 
 Só documentação. Ciclo de proteção = fração da missão em segmentos dentro do envelope, confirmado no código e nos testes. Encontro misto contínuo+intermitente fica `nao_avaliado` (Jeck 2002 §2.1 não dá procedimento de combinação).
