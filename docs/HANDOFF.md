@@ -2043,3 +2043,7 @@ ISO 9613-2:1996 §1 (conferido na transcrição KM Exhibit 9 e na página ISO de
 ## Teste pesado da asa voadora sem deriva (23 nov 2026, ramo `tailless-teste-robusto`)
 
 A queda do worker na CI Ubuntu era o `--timeout=900` (método thread → `os._exit`), não memória (pico 238 MB). Os dois testes pesados do exemplo sem deriva levam `@pytest.mark.timeout(2400)`; asserções inalteradas. Pormenor em [QUALIDADE.md](QUALIDADE.md). Acelerar `thinwalled.solve` (68 % do dimensionamento) fica por fazer.
+## `thinwalled.solve` vectorizado (23 nov 2026, ramo `thinwalled-vectorizado`)
+
+Secção multicélula de Megson 5,4× mais rápida (2,05 → 0,38 ms por secção): idealização e sistema vectorizados, LU em vez de SVD quando o sistema é quadrado depois de retirar a linha de nó redundante (`lstsq` como recurso). Mesmos resultados (regressão contra a referência congelada, 10⁻⁹). Teste pesado da asa voadora 281 → 174 s. Pormenor em [QUALIDADE.md](QUALIDADE.md).
+
