@@ -24,8 +24,8 @@ R(t) = exp[−(t/η)^β], h(t) = (β/η) (t/η)^{β−1}. γ ≠ 0 não foi tran
 gama não está na página lida e não é calculado.
 
 Causa comum: o §7.5.5.4 (p. 7-117) dá partilha de carga com fator k (θ′ = θ/k), não um fator β.
-A equação λ_cc = β λ não está nessa página e não é aplicada. A partilha de carga também não
-foi codificada: não é o fator pedido.
+A partilha de carga não foi codificada. O fator β vem de NUREG/CR-5485 Ap. A (Eq. A.10–A.13), em
+:mod:`.common_cause`, só com ``common_cause`` declarado.
 
 Ligação ARP4761: um evento básico da FTA com q = 1 − R(t). Uma porta AND é a falha da
 redundância ativa; uma porta OR é a falha em série. Nenhuma das duas é este modelo.
@@ -209,7 +209,7 @@ def switching_status(switch_rate_per_h: float | None) -> dict[str, Any]:
 
 
 def common_cause_status() -> dict[str, Any]:
-    """O fator β não está no §7.5.5.4. Não se inventa λ_cc = β λ."""
+    """Sem ``common_cause`` declarado: o fator β não entra (o §7.5.5.4 do MIL-HDBK-338B não o dá)."""
     return {
         "evaluated": False,
         "veredicto": "nao_avaliado",
@@ -217,6 +217,8 @@ def common_cause_status() -> dict[str, Any]:
         "beta": None,
         "method": None,
         "source": _SOURCE_BETA,
+        "available": ("common_cause: {groups: [{id, m, k_fail, q_total | lambda_per_h + t_h, beta, beta_source}]} "
+                      "— NUREG/CR-5485 Ap. A, Eq. A.10–A.13 (acdt.core.reliability.common_cause)"),
     }
 
 
@@ -400,20 +402,26 @@ def evaluate_extensions(spec: Mapping[str, Any], mission_h: float | None) -> dic
         "veredicto": "nao_pedido", "evaluated": False, "R": None, "replaces_rbd": False}
     weibull = _weibull_block(spec["weibull"], mission_h) if "weibull" in spec else {
         "veredicto": "nao_pedido", "evaluated": False, "items": []}
+    from .common_cause import common_cause_block
+
+    ccf = common_cause_block(spec.get("common_cause"), mission_h) if "common_cause" in spec else None
     asked = [b for b in (standby, weibull) if b.get("veredicto") != "nao_pedido"]
+    if ccf is not None:
+        asked.append(ccf)
     ok = bool(asked) and all(b.get("veredicto") == "validado" for b in asked)
     return {
         "veredicto": "validado" if ok else "nao_avaliado",
         "calibracao": "nao_aplicar",
         "nota_veredicto": (
             "Válido só para as identidades transcritas (espera com R_S = 1 e Weibull com γ = 0). "
-            "O comutador imperfeito, γ ≠ 0 e o fator β ficam nao_avaliado."
+            "O comutador imperfeito e γ ≠ 0 ficam nao_avaliado. O fator β só entra com common_cause "
+            "declarado (NUREG/CR-5485 Eq. A.10–A.13, β e a sua fonte dados pelo utilizador)."
         ),
         "standby": standby,
         "weibull": weibull,
-        "common_cause": common_cause_status(),
+        "common_cause": ccf if ccf is not None else common_cause_status(),
         "comutador_imperfeito": "nao_avaliado",
-        "fator_beta": "nao_avaliado",
+        "fator_beta": ccf["veredicto"] if ccf is not None else "nao_avaliado",
         "weibull_gama_nao_nulo": "nao_avaliado",
         "replaces_rbd": False,
     }

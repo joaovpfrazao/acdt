@@ -335,7 +335,7 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
 
 def _standby_weibull(spec: Mapping[str, Any], t_m: float | None) -> dict[str, Any] | None:
     """Só quando a especificação pede ``standby`` ou ``weibull``. Não mexe no RBD."""
-    if "standby" not in spec and "weibull" not in spec:
+    if "standby" not in spec and "weibull" not in spec and "common_cause" not in spec:
         return None
     from .standby import evaluate_extensions
 
