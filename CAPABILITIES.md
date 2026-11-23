@@ -2036,6 +2036,11 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Não é esta corrida**: y+ ≈ 1, as 42 camadas e as 1,207×10⁷ células do registo de 18 nov, os ângulos 2° e 4°, e uma polar. Esses registos não foram reescritos.
 * **Registo**: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.csv`. Narrativa em [docs/HANDOFF.md](docs/HANDOFF.md).
 
+## 43. Gelo: potência por exposição verificada e encontros mistos (23 nov 2026)
+
+* **Potência só na exposição**: confirmado (`exposure_duty`, `power_schedule: exposicao`), já no main desde o PR #19.
+* **Encontro misto contínuo + intermitente**: `nao_avaliado`. Jeck DOT/FAA/AR-00/30 §2.1 só junta as Figuras 1 e 4 num gráfico LWC × extensão horizontal (equivalente aos fatores F já implementados); não dá procedimento de soma. Pormenor em [docs/GELO.md](docs/GELO.md) §10.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado
