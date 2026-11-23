@@ -1,6 +1,6 @@
 # Matriz de verificação
 
-Formato `acdt.verification/1`. Evidência: `` (SHA-256 `—`). Proveniência: impressão digital `df103d3d76c5` (registo escrito no fim da corrida).
+Formato `acdt.verification/1`. Evidência: `` (SHA-256 `—`). Proveniência: impressão digital `b24e8ea0918e` (registo escrito no fim da corrida).
 
 Estados: **passa**, **falha**, **no_limite** (dentro da tolerância declarada), **nao_avaliado** (sem avaliador ou etapa não correu), **desconhecido** (correu sem valor). Não avaliado ≠ passa.
 
@@ -30,4 +30,4 @@ Estados: **passa**, **falha**, **no_limite** (dentro da tolerância declarada), 
 
 * Requisitos sem avaliador (nem filhos): REQ-propulsion_type
 * Avaliadores não registados: nenhum
-* Evidência sem requisito (26): `check:hq:CAP`, `check:hq:phugoid`, `check:hq:scissor`, `check:hq:short_period`, `check:mtow`, `check:static_margin`, `check:trim`, `check:wb:envelope`, `check:wing_span`, `ciclo_vida:co2e_per_flight_hour_kg`, `ciclo_vida:cost_per_flight_hour_USD`, `ciclo_vida:life_cycle_co2e_kg`, `ciclo_vida:life_cycle_cost_USD`, `custo_serie:break_even_quantity`, `custo_serie:flyaway_cost_USD`, `custo_serie:unit_cost_at_quantity_USD`, `fiabilidade:maintenance.mmh_per_fh`, `fiabilidade:mission_reliability`, `fiabilidade:mtbcf_s`, `fiabilidade:operational_availability`, `gelo:fiki`, `gelo:max_thickness_m`, `gelo:protection.power_W`, `termica:cold_margin_C`, `termica:cooling.drag_area_m2`, `termica:hot_margin_C`
+* Evidência sem requisito (27): `check:hq:CAP`, `check:hq:phugoid`, `check:hq:scissor`, `check:hq:short_period`, `check:hq:spiral`, `check:mtow`, `check:static_margin`, `check:trim`, `check:wb:envelope`, `check:wing_span`, `ciclo_vida:co2e_per_flight_hour_kg`, `ciclo_vida:cost_per_flight_hour_USD`, `ciclo_vida:life_cycle_co2e_kg`, `ciclo_vida:life_cycle_cost_USD`, `custo_serie:break_even_quantity`, `custo_serie:flyaway_cost_USD`, `custo_serie:unit_cost_at_quantity_USD`, `fiabilidade:maintenance.mmh_per_fh`, `fiabilidade:mission_reliability`, `fiabilidade:mtbcf_s`, `fiabilidade:operational_availability`, `gelo:fiki`, `gelo:max_thickness_m`, `gelo:protection.power_W`, `termica:cold_margin_C`, `termica:cooling.drag_area_m2`, `termica:hot_margin_C`
