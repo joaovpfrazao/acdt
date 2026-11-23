@@ -1,0 +1,340 @@
+{
+ "metodo": "Spearman ρ (Spearman 1904; Helton & Davis 2003 §6)",
+ "n": 26,
+ "n_falhadas": 2,
+ "applied": false,
+ "saidas": {
+  "W0_kg": {
+   "min": 31.380556092453222,
+   "max": 88.22902982774173,
+   "ranking": [
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": -0.8406837606837606,
+     "p": 7.635831365084317e-08
+    },
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": -0.576068376068376,
+     "p": 0.00207128632372396
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": -0.362051282051282,
+     "p": 0.06913463057521195
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": 0.3483760683760683,
+     "p": 0.08113729122379161
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": -0.1288888888888889,
+     "p": 0.5303244428479801
+    },
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": 0.1158974358974359,
+     "p": 0.572887073891802
+    },
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": 0.09128205128205127,
+     "p": 0.6574145699161672
+    }
+   ]
+  },
+  "lcc_pv_USD": {
+   "min": 6771996.909043567,
+   "max": 15639345.711540475,
+   "ranking": [
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": 0.7948717948717947,
+     "p": 1.2315263928505196e-06
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": 0.35999999999999993,
+     "p": 0.07084228282488048
+    },
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": -0.24376068376068374,
+     "p": 0.2301328748593555
+    },
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": 0.23487179487179485,
+     "p": 0.24810613571794263
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": -0.2198290598290598,
+     "p": 0.2805640835575299
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": 0.18769230769230769,
+     "p": 0.35852718374297227
+    },
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": -0.03931623931623932,
+     "p": 0.8487699839770572
+    }
+   ]
+  },
+  "co2e_fh_kg": {
+   "min": 0.409137283660356,
+   "max": 1.580329713314822,
+   "ranking": [
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": 0.7121367521367521,
+     "p": 4.491767144243178e-05
+    },
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": -0.6779487179487179,
+     "p": 0.00014146238598260926
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": -0.3641025641025641,
+     "p": 0.06745878790326955
+    },
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": -0.28683760683760684,
+     "p": 0.1553992259706017
+    },
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": -0.2745299145299145,
+     "p": 0.17470670866998356
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": -0.21435897435897436,
+     "p": 0.29300602632589595
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": 0.06324786324786325,
+     "p": 0.7588825923276494
+    }
+   ]
+  },
+  "co2e_ciclo_kg": {
+   "min": 62912.07851995544,
+   "max": 286873.087314485,
+   "ranking": [
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": 0.6622222222222223,
+     "p": 0.00022844330093234108
+    },
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": -0.4858119658119658,
+     "p": 0.011866159080490905
+    },
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": -0.3531623931623932,
+     "p": 0.07676884671105765
+    },
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": -0.32512820512820506,
+     "p": 0.10508577824144766
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": -0.31418803418803415,
+     "p": 0.11801850055996224
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": 0.20068376068376068,
+     "p": 0.3256013780226861
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": -0.0030769230769230765,
+     "p": 0.9880978710589009
+    }
+   ]
+  },
+  "unit_cost_USD": {
+   "min": 38324.670890498106,
+   "max": 65125.98961041945,
+   "ranking": [
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": -0.8406837606837606,
+     "p": 7.635831365084317e-08
+    },
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": -0.576068376068376,
+     "p": 0.00207128632372396
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": -0.362051282051282,
+     "p": 0.06913463057521195
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": 0.3483760683760683,
+     "p": 0.08113729122379161
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": -0.1288888888888889,
+     "p": 0.5303244428479801
+    },
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": 0.1158974358974359,
+     "p": 0.572887073891802
+    },
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": 0.09128205128205127,
+     "p": 0.6574145699161672
+    }
+   ]
+  },
+  "hot_margin_min_C": {
+   "min": -286.39197525464715,
+   "max": -63.950387705379285,
+   "ranking": [
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": 0.5060307204094672,
+     "p": 0.008350995412555018
+    },
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": 0.4097321020698797,
+     "p": 0.037640582013083124
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": 0.15139253940887082,
+     "p": 0.4603568293342339
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": -0.1282438330772392,
+     "p": 0.5324017269962948
+    },
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": 0.11435460927826022,
+     "p": 0.5780405305007151
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": 0.06666827423509906,
+     "p": 0.7462527872499936
+    },
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": 0.03611198187734533,
+     "p": 0.8609724258992714
+    }
+   ]
+  },
+  "ice_power_W": {
+   "min": 247.80088436750634,
+   "max": 248.88272115450602,
+   "ranking": [
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": -0.5537762945887342,
+     "p": 0.0033353134698136163
+    },
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": -0.4108662830819641,
+     "p": 0.037063044612682186
+    },
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": -0.11395841434807101,
+     "p": 0.5793672134708321
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": 0.08069487718701243,
+     "p": 0.6951553320085352
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": 0.06467910003539165,
+     "p": 0.7535902431986482
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": -0.03880746002123499,
+     "p": 0.8507053254539928
+    },
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": 0.036343494305601014,
+     "p": 0.8600897050669758
+    }
+   ]
+  },
+  "cooling_drag_area_m2": {
+   "veredicto": "nao_avaliado",
+   "nota": "sem variância ou valores em falta"
+  },
+  "mission_reliability": {
+   "min": 0.9997148776840946,
+   "max": 0.9997170930037248,
+   "ranking": [
+    {
+     "entrada": "assumptions.propulsion.battery_Wh_kg",
+     "rho": 0.47008547008547,
+     "p": 0.01538079564110689
+    },
+    {
+     "entrada": "assumptions.propulsion.eta_total",
+     "rho": -0.401025641025641,
+     "p": 0.042316231737863017
+    },
+    {
+     "entrada": "assumptions.life_cycle.fh_per_aircraft_per_year",
+     "rho": -0.38051282051282054,
+     "p": 0.05515338769630161
+    },
+    {
+     "entrada": "assumptions.life_cycle.cost_per_fh_USD",
+     "rho": -0.30871794871794866,
+     "p": 0.12490632250807673
+    },
+    {
+     "entrada": "assumptions.life_cycle.discount_rate",
+     "rho": -0.15829059829059827,
+     "p": 0.4399250583834971
+    },
+    {
+     "entrada": "assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh",
+     "rho": 0.09264957264957263,
+     "p": 0.6525964207176219
+    },
+    {
+     "entrada": "assumptions.thermal.electric.eta_esc",
+     "rho": 0.005811965811965812,
+     "p": 0.9775202047741482
+    }
+   ]
+  }
+ }
+}

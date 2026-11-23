@@ -1,0 +1,94 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Estudo de demonstração (applied: false) — incerteza e sensibilidade global (docs/INCERTEZA.md) com as disciplinas
+# novas (térmica, gelo, fiabilidade, custo de série, ciclo de vida) sobre o exemplo de teste
+# examples/uav_endurance_payload.yaml (o yaml do exemplo NÃO muda: tudo entra por `fixed`).
+#   acdt uq examples/uav_endurance_payload.yaml --spec examples/studies/uq_disciplinas/uq_disciplinas.yaml \
+#       -o examples/output/uq_disciplinas
+# `fixed` = dados de TESTE de tests/test_thermal.py, tests/test_icing.py, tests/test_reliability.py e
+# tests/test_life_cycle.py (os mesmos do estudo examples/studies/mdo_disciplinas). Não são dados de projeto.
+applied: false
+uncertainty:
+  fixed:
+    assumptions.aero.fidelity: handbook
+    assumptions.stability.use_avl: false
+    assumptions.thermal:
+      coupling: iterar
+      ground_time_s: 300
+      electric: {eta_esc: 0.97, eta_motor: 0.9}          # teste (tests/test_thermal.py)
+      bays:
+        - id: fuselagem
+          skin_area_m2: 1.0
+          flow_length_m: 1.6
+          height_m: 0.2
+          eps_ext: 0.85
+          alpha_solar: 0.3
+          eps_int: [0.1, 0.9]
+          sources: [avionica, bateria, esc]
+          capacity_J_K: 9000.0
+          components:
+            - {id: bateria_pack, source: bateria, conductance_W_K: 10.0, T_max_C: 60, T_min_C: -20,
+               limit_source: "teste (limite declarado)"}
+          ram_air: {size_for: cruzeiro_quente, ram_recovery: 0.8, duct_loss_q: 0.5,
+                    duct: {length_m: 0.4, areal_density_kg_m2: 1.0}}
+    assumptions.icing:
+      coupling: iterar
+      surfaces:                                           # teste (tests/test_icing.py)
+        - {id: asa, chord_m: 0.3, t_c: 0.12, lifting: true, protection: deice_electrothermal,
+           protected_area_m2: 0.2, duty_cycle: 0.1, power_density_W_m2: 10000, mass_kg: 0.3}
+    assumptions.reliability:                              # teste (tests/test_reliability.py::_spec)
+      components:
+        - {id: motor, lambda_per_h: 1.0e-4, source: teste, mttr_h: 2.0, mmh_per_action: 3.0, replacement_cost: 500.0}
+        - {id: servo, lambda_per_h: 5.0e-4, source: teste, mttr_h: 0.5, mmh_per_action: 1.0, replacement_cost: 200.0}
+      rbd: {type: series, blocks: [motor, {type: k_of_n, k: 3, n: 4, block: servo}]}
+      preventive: [{id: inspecao, interval_fh: 50.0, duration_h: 1.0, mmh: 2.0}]
+      logistics: {mean_logistic_delay_h: 4.0, mean_admin_delay_h: 1.0}
+      fleet: {mode: sorties, sorties_per_day: 3, turnaround_h: 1.0, operating_hours_per_day: 16}
+    assumptions.series_cost: {quantity: 50, price: 60000}  # teste (tests/test_life_cycle.py)
+    assumptions.life_cycle:                                # teste (tests/test_life_cycle.py)
+      service_life_years: 10
+      production_rate_per_year: 20
+      rdte_years: 2
+      fh_per_aircraft_per_year: 400        # nominal do intervalo de teste 300–500; varia na UQ
+      cost_per_fh_USD: {value: 65}            # nominal; varia na UQ (intervalo de teste 40–90)
+      disposal_per_aircraft_USD: 0.0       # PRESSUPOSTO do estudo: abate fora do âmbito (no teste: desconhecido)
+      discount_rate: 0.05
+      environment:
+        grid_intensity_kgCO2e_per_kWh: {value: 0.25, source: teste}   # varia na UQ (0,1–0,4)
+        charge_efficiency: 0.9
+        battery_footprint: ivl_c444_2019
+        battery_cycle_life: 400
+        flights_per_fh: 0.25
+  method: lhs
+  n: 400
+  seed: 20261123
+  confidence: 0.95
+  metrics: [W0_kg, lcc_pv_USD, co2e_fh_kg, co2e_ciclo_kg, unit_cost_USD, hot_margin_min_C, ice_power_W,
+            cooling_drag_area_m2, mission_reliability]
+  result_metrics:
+    lcc_pv_USD: life_cycle.present_value_USD.total.hi
+    co2e_fh_kg: life_cycle.co2e_per_flight_hour_kg.hi
+    co2e_ciclo_kg: life_cycle.life_cycle_co2e_kg.hi
+    unit_cost_USD: series_cost.average_unit_cost_USD
+    hot_margin_min_C: thermal.hot_margin_min_C
+    ice_power_W: icing.protection.electrical_power_W.hi
+    cooling_drag_area_m2: thermal.cooling.drag_area_m2.hi
+    mission_reliability: reliability.mission_reliability.lo
+  model: {workers: 4, fidelity: handbook, skip_stages: [aeroelasticity]}
+  inputs:
+    - {path: assumptions.propulsion.battery_Wh_kg, dist: uniform, low: 180, high: 220,
+       pressuposto: "±10 % em torno do nível de pack do exemplo (200 Wh/kg)"}
+    - {path: assumptions.propulsion.eta_total, dist: uniform, low: 0.58, high: 0.66,
+       pressuposto: "banda em torno do produto de rendimentos do exemplo (0,62)"}
+    - {path: assumptions.thermal.electric.eta_esc, dist: uniform, low: 0.95, high: 0.98,
+       pressuposto: "banda em torno do valor de teste 0,97"}
+    - {path: assumptions.life_cycle.cost_per_fh_USD, dist: uniform, low: 40, high: 90,
+       source: "intervalo de teste de tests/test_life_cycle.py (40–90 USD/h)"}
+    - {path: assumptions.life_cycle.fh_per_aircraft_per_year, dist: uniform, low: 300, high: 500,
+       source: "intervalo de teste de tests/test_life_cycle.py (300–500 h/ano)"}
+    - {path: assumptions.life_cycle.environment.grid_intensity_kgCO2e_per_kWh, dist: uniform, low: 0.1, high: 0.4,
+       source: "intervalo de teste de tests/test_life_cycle.py (0,1–0,4 kg CO2e/kWh)"}
+    - {path: assumptions.life_cycle.discount_rate, dist: uniform, low: 0.03, high: 0.07,
+       pressuposto: "banda em torno do valor de teste 0,05"}
+  surrogate: {n_train: 28, q2_min: 0.95, seed: 20261123}
+  sobol: {n: 2048, bootstrap: 200, seed: 20261123}
+  morris: {r: 20, levels: 4, seed: 20261123}

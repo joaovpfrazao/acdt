@@ -2054,3 +2054,7 @@ NUREG/CR-5485 §5.3 Eq. 5.6–5.13 e Ap. A Eq. A.21–A.26 / Tabela A-2, conferi
 
 Estudo `examples/studies/mdo_disciplinas` (`applied: false`), resultados em `examples/output/mdo_disciplinas`. Frente de 3 projetos (2,0 h, AR 7,9–9,4, W0 27,9–28,2 kg). Corrigidos o `t_eval` do transitório térmico e a matriz final do MDO que ignorava `mdo.fixed`. Margem quente da baia −64 K em todo o domínio e `REQ-mtow` falha com a proteção anti-gelo: ficam como achados do caso de teste. Pormenor em [MDO.md](MDO.md).
 
+## Incerteza com as disciplinas novas (23 nov 2026, ramo `uq-disciplinas`)
+
+`uncertainty.fixed` novo; estudo `examples/studies/uq_disciplinas` (`applied: false`). Substituto rejeitado para W0/LCC/CO₂e (W0 não suave: espiral de massa a bateria/η baixos); rastreio por postos de Spearman em vez de Sobol'. Por fazer: isolar o NaN do `brentq` em `solve_bay_steady` (2/28 corridas; entradas em `examples/output/uq_disciplinas/uq.json`). Pormenor em [INCERTEZA.md](INCERTEZA.md).
+

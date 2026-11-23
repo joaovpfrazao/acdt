@@ -1,0 +1,171 @@
+{
+ "schema": "acdt.provenance/1",
+ "created": {
+  "utc": "2026-11-23T20:28:17+00:00",
+  "europe_lisbon": "2026-11-23T20:28:17+00:00"
+ },
+ "entry_point": {
+  "command": "acdt uq",
+  "argv": [
+   "uq",
+   "examples/uav_endurance_payload.yaml",
+   "--spec",
+   "examples/studies/uq_disciplinas/uq_disciplinas.yaml",
+   "-o",
+   "examples/output/uq_disciplinas"
+  ],
+  "cwd": "/workspace/acdt-wt-uq"
+ },
+ "acdt": {
+  "version": "0.2.0",
+  "git": {
+   "commit": "6545c30f42cbe8d4fed66b3379147a92c9b63794",
+   "dirty": false,
+   "branch": "uq-disciplinas",
+   "dirty_diff_sha256": null
+  }
+ },
+ "python": {
+  "version": "3.13.5",
+  "implementation": "CPython",
+  "executable": "/workspace/.venv-acdt/bin/python"
+ },
+ "packages": {
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "matplotlib": "3.11.2",
+  "pyyaml": "6.0.3",
+  "openmdao": "3.45.1",
+  "openaerostruct": "2.12.0",
+  "aerosandbox": "4.2.10",
+  "neuralfoil": "0.3.3",
+  "pyNastran": "1.3.4",
+  "PanelAero": "2025.8",
+  "jsbsim": "1.3.3",
+  "mcp": "2.3.0"
+ },
+ "platform": {
+  "system": "Linux",
+  "release": "6.12.113+",
+  "version": "#1 SMP PREEMPT_DYNAMIC Thu Nov 19 19:32:43 UTC 2026",
+  "machine": "x86_64",
+  "platform": "Linux-6.12.113+-x86_64-with-glibc2.41"
+ },
+ "tools": {},
+ "inputs": [
+  {
+   "path": "/workspace/acdt-wt-uq/examples/studies/uq_disciplinas/uq_disciplinas.yaml",
+   "sha256_bytes": "7a0ceeaad0f30c43e47ad59d68d8c44edb7038b777b576cb09b55c84689dab7c",
+   "size_bytes": 5589,
+   "kind": "yaml-canonical",
+   "sha256": "abfe003035e2c60f6de049c6bbcb139e90166700092ecdca7dc5a92a761f57e8"
+  },
+  {
+   "path": "/workspace/acdt-wt-uq/examples/uav_endurance_payload.yaml",
+   "sha256_bytes": "cb4b8cb6038e9f3aa89949c71c6ff57f522f8586a1af412bb3facd25d4a85637",
+   "size_bytes": 4110,
+   "kind": "yaml-canonical",
+   "sha256": "7599207a0889bc64f141260f7a28d58e99d91e0df722db63b7b2b72d9e3065a4"
+  }
+ ],
+ "seeds": {
+  "seed": null,
+  "uq.seed": 20261123,
+  "uq.surrogate.seed": 20261123,
+  "uq.sobol.seed": 20261123,
+  "uq.morris.seed": 20261123
+ },
+ "notes": [],
+ "outputs": [
+  {
+   "path": "uq.json",
+   "size_bytes": 260485,
+   "written_this_run": true,
+   "sha256": "3e30d8dfd59c9e97eefe9baac29d63193c91874f33ef3fd3700d976fa767add0"
+  },
+  {
+   "path": "uq.md",
+   "size_bytes": 13205,
+   "written_this_run": true,
+   "sha256": "416982fe890d59685712183809f3f2c86029d0ed9de6efbfa630777c7249f64b"
+  },
+  {
+   "path": "uq_hist_W0_kg.png",
+   "size_bytes": 12606,
+   "written_this_run": true,
+   "sha256": "2c9728fdf86f4b9dea6ce2114b8238b48ab649f68551db4d111f2e2e0c04ca6b"
+  },
+  {
+   "path": "uq_hist_co2e_ciclo_kg.png",
+   "size_bytes": 15196,
+   "written_this_run": true,
+   "sha256": "a50b5c92010568e2a04cb5d74452dfedfbe7bbd97db41356ea0c944574c77a6f"
+  },
+  {
+   "path": "uq_hist_co2e_fh_kg.png",
+   "size_bytes": 13802,
+   "written_this_run": true,
+   "sha256": "fbc76fa994048e184f48f1f06be0b75cfb510825a817de188272ce55087f8166"
+  },
+  {
+   "path": "uq_hist_cooling_drag_area_m2.png",
+   "size_bytes": 14798,
+   "written_this_run": true,
+   "sha256": "6878d5e4d6e50f99e9e028e8cc39ede71787f29bd7590b36c53aaca4efeb9188"
+  },
+  {
+   "path": "uq_hist_hot_margin_min_C.png",
+   "size_bytes": 15803,
+   "written_this_run": true,
+   "sha256": "54e59d66537445888e15e4aa7eb0d1e2fdf755d1471e6beda23f6e2a44ac606f"
+  },
+  {
+   "path": "uq_hist_ice_power_W.png",
+   "size_bytes": 14329,
+   "written_this_run": true,
+   "sha256": "508e45f8b7aedc4696d9a90f249870ddcdd79d2660b0163ef302cd470870f487"
+  },
+  {
+   "path": "uq_hist_lcc_pv_USD.png",
+   "size_bytes": 13964,
+   "written_this_run": true,
+   "sha256": "996e7dffb54879eda719e67b0cfd5b3a332b3796469d276d102144dea5690241"
+  },
+  {
+   "path": "uq_hist_mission_reliability.png",
+   "size_bytes": 13640,
+   "written_this_run": true,
+   "sha256": "d9e1cf0b76f99c6bba7ef674db6bbd63f28d2b06d9a7d4d38f01f12a1edfce6c"
+  },
+  {
+   "path": "uq_hist_unit_cost_USD.png",
+   "size_bytes": 13317,
+   "written_this_run": true,
+   "sha256": "45f32e249a953591ce4527310f8a0789486fc760a9f9a519860430cbfdb014f8"
+  },
+  {
+   "path": "uq_sobol_cooling_drag_area_m2.png",
+   "size_bytes": 29140,
+   "written_this_run": true,
+   "sha256": "0db2a2c7ebefe832067acca9eba6b6ff9a4882160fcbc1757e3e0885a4e94528"
+  },
+  {
+   "path": "verification_matrix.csv",
+   "size_bytes": 4208,
+   "written_this_run": true,
+   "sha256": "3ace9a12d0aa622e8aa360bf86d39e4d42ef206b865f35bb79eadebc328848ae"
+  },
+  {
+   "path": "verification_matrix.json",
+   "size_bytes": 13497,
+   "written_this_run": true,
+   "sha256": "af53cdd77388266531ef59a3f0d49fef2e3eb1334cca81c2e44c6f47dbb4c09e"
+  },
+  {
+   "path": "verification_matrix.md",
+   "size_bytes": 4032,
+   "written_this_run": true,
+   "sha256": "db8aceadb8de1d54e6541b7354af550c929bfa6534ebb0cb7845fcc2f847e849"
+  }
+ ]
+}
