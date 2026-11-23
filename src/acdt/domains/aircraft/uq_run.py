@@ -274,10 +274,28 @@ def load_uq(mission: str | Path, uq_file: str | Path | None = None) -> tuple[dic
     return raw, dict(u)
 
 
+def apply_fixed(raw: Mapping[str, Any], fixed: Mapping[str, Any]) -> dict[str, Any]:
+    """Cópia da missão com ``fixed`` aplicado (número → :func:`set_path`; texto ou bloco YAML → substitui)."""
+    from acdt.core.sensitivity.oat import _set_path
+
+    out = copy.deepcopy(dict(raw))
+    for pth, v in fixed.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            set_path(out, str(pth), float(v))
+        else:
+            _set_path(out, str(pth), copy.deepcopy(v))
+    return out
+
+
 def run_uq(mission: str | Path, outdir: str | Path | None = None, *, uq_file: str | Path | None = None,
            overrides: Mapping[str, Any] | None = None, plots: bool = True) -> dict[str, Any]:
     """Missão + ``uncertainty`` → estudo completo (nominal + propagação + P(passa) + Sobol/Morris)."""
     raw, u = load_uq(mission, uq_file)
+    fixed = u.pop("fixed", None)
+    if fixed:  # sobreposições fixas do estudo (como mdo.fixed): o yaml da missão não muda
+        if not isinstance(fixed, Mapping):
+            raise D.UncertaintySpecError("uncertainty.fixed: mapa caminho → valor")
+        raw = apply_fixed(raw, fixed)
     ov = dict(overrides or {})
     sens = dict(u.pop("sensitivity", None) or {})
     for kind in ("sobol", "morris"):
