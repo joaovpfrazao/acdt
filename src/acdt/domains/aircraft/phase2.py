@@ -36,8 +36,8 @@ def stability_stage(res) -> None:
             l1 = getattr(res, "structures_l1", None)
             if l1 is not None and l1.elastic is not None and l1.elastic.applied:
                 twist = l1.elastic.twist_deg
-            avl = run_avl_case(res.config, CL=CL, mach=res.cruise_speed / at.a, trim_elevator=True,
-                               x_ref=_aft_cg_avl_frame(st0, st0.x_wing_apex), wing_twist_deg=twist)
+            avl = _avl_stability_case(run_avl_case, res.config, CL=CL, mach=res.cruise_speed / at.a,
+                                      x_ref=_aft_cg_avl_frame(st0, st0.x_wing_apex), wing_twist_deg=twist)
         except Exception as ex:  # pragma: no cover
             res.issues.append(Issue("warning", f"AVL falhou no estágio de estabilidade: {ex}"))
             avl = None
@@ -136,6 +136,37 @@ def _assembly(res) -> None:
     res.assembly["checks_from_assembly"] = assembly_checks(res, spec, out)
 
 
+def _avl_stability_case(run_avl_case, config, **kw):
+    """Corrida AVL do estágio de estabilidade, repetida uma vez com tempo-limite maior (``lowfi.AVL_TIMEOUTS_S``).
+
+    Um tempo-limite transitório (máquina sobrecarregada) deixava ``avl = None`` e os modos laterais por avaliar, e a
+    linha ``hq:spiral`` desaparecia (teste instável de 23 nov 2026, reproduzido por injeção de falha)."""
+    from .aero.avl import ToolNotAvailable
+    from .aero.lowfi import AVL_TIMEOUTS_S
+    last: Exception | None = None
+    for tmo in AVL_TIMEOUTS_S:
+        try:
+            return run_avl_case(config, trim_elevator=True, timeout=tmo, **kw)
+        except ToolNotAvailable:
+            raise
+        except Exception as ex:  # noqa: BLE001 - qualquer falha da corrida externa conta como tentativa falhada
+            last = ex
+    assert last is not None
+    raise last
+
+
+def _spiral_unassessed_row(res, reason: str) -> None:
+    """Sem modos laterais a espiral fica desconhecida, com a linha presente (desconhecido ≠ passa, nunca omitida)."""
+    if any(c.key == "hq:spiral" for c in res.checks):
+        return
+    A = getattr(getattr(res, "spec", None), "assumptions", None)
+    geo = (A.get("geometry") if isinstance(A, dict) else None) or {}
+    dih = "" if geo.get("dihedral_deg") is not None else (
+        "; declare também assumptions.geometry.dihedral_deg (Clβ/espiral precisam de um diedro explícito — "
+        "Etkin & Reid 1996 Ch. 6 / MIL-F-8785C Table VIII)")
+    res.checks.append(CheckResult("hq:spiral", None, f"espiral unassessed: {reason}{dih}"))
+
+
 def _dynamics(res, st, avl, o) -> None:
     """Phase 3: scissor plot, dynamic modes and MIL-F-8785C levels (verification checks ``hq:*``)."""
     from .stability import dynamic_modes, handling_qualities, tail_sizing_scissor
@@ -184,8 +215,11 @@ def _dynamics(res, st, avl, o) -> None:
                    f"(N1: {r['limite N1']}; {r['ref']}, Classe I, Cat. {cat})"
                    + extra + (" — UAV: indicativo" if uav else ""))
             res.checks.append(CheckResult("hq:" + r["key"], ok, msg))
+        if md.get("lateral") is None:
+            _spiral_unassessed_row(res, "modos laterais não avaliados (" + "; ".join(md.get("notes") or []) + ")")
     except Exception as ex:  # pragma: no cover
         res.issues.append(Issue("warning", f"Modos dinâmicos falharam: {ex}"))
+        _spiral_unassessed_row(res, f"modos dinâmicos falharam ({ex})")
     res.dynamics = out
 
 

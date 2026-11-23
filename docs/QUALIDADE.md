@@ -218,6 +218,21 @@ paralela (ramo `uq-disciplinas`, carga média 16 em 8 núcleos, com estudos MDO/
 (11 s) e na repetição da suite completa (1542 passed). O ramo não toca nesse caminho (só `uq_run.apply_fixed`).
 O teste corre o pipeline completo com AVL e não tem marcador `requires_avl`; a hipótese mais provável, ainda não
 confirmada (o rasto não ficou no registo), é o mesmo tempo-limite transitório do AVL descrito em «Teste instável de
-reutilização de `run_id`», que faz desaparecer a linha `hq:spiral`. Não corrigido: fica por confirmar com o rasto
-completo na próxima ocorrência.
+reutilização de `run_id`», que faz desaparecer a linha `hq:spiral`.
+
+**Causa confirmada e corrigida (23 nov 2026, ramo `avl-espiral-e-uq`).** Sob carga (16 processos do teste + 8
+ciclos de CPU, carga ~24 em 8 núcleos, 66–68 s por teste) não voltou a falhar em 16 corridas. A injeção de falha
+reproduz a falha: um `TimeoutExpired` de 60 s só na corrida AVL do estágio de estabilidade (`trim_elevator`) deixa
+`avl = None`. Os modos laterais ficam por avaliar e a lista `hq:*` fica sem a linha `hq:spiral`
+(`hq:scissor, short_period, CAP, phugoid`), o que dá a asserção «hq:spiral row expected». O teste já tinha
+`requires_avl`, e os diretórios do AVL são `mkdtemp`, por isso não há colisão de ficheiros. Correções em
+`phase2.py`:
+
+1. a corrida AVL da estabilidade repete uma vez com tempo-limite de 180 s (`lowfi.AVL_TIMEOUTS_S`, como o modelo
+   de faixas);
+2. sem modos laterais (AVL falhou de vez ou os modos rebentaram), `hq:spiral` fica presente como desconhecida com o
+   motivo, e com a nota do diedro quando este não é declarado. Desconhecido ≠ passa, e a linha nunca é omitida.
+
+Teste: `tests/test_spiral_avl_timeout.py` (repetição com 60 → 180 s; pipeline com o AVL da estabilidade sempre em
+tempo-limite → uma linha `hq:spiral` desconhecida).
 
