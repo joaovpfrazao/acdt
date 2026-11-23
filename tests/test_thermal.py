@@ -123,6 +123,11 @@ def test_transient_ventilated_bay_matches_analytic_lumped_solution():
     assert tr2["T_end_K"] == pytest.approx(ss.T_bay_K, abs=0.05)
     with pytest.raises(ValueError):
         solve_bay_transient(_bay(), [Phase(cond, 10.0, Q)], amb.T_K, hot=True)
+    # duração em que d·40/40 > d por 1 ulp (encontrada no MDO de demonstração): já não falha no t_eval
+    d = 103.01752
+    assert d * 40 / 40 > d
+    tr3 = solve_bay_transient(b, [Phase(cond, d, Q)], amb.T_K, hot=True)
+    assert math.isfinite(tr3["T_end_K"])
     assert losses(b, cond, amb.T_K, True) == pytest.approx(0.0, abs=1e-6)
 
 
