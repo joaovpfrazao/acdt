@@ -62,6 +62,17 @@ from typing import Any, Mapping
 
 NOMINAL_HZ: tuple[float, ...] = (63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0)
 ISO9613_2 = ("ISO 9613-2:1996 §7.3.1 (método geral, Tabela 3, Eq. 9) e §8 (Eq. 6, 21 e 22)")
+#: ISO 9613-2:1996 §1 (âmbito), conferido na transcrição pública KM Exhibit 9 (PUC EL19-003); a edição de 2024
+#: mantém a frase: o método é para fontes no solo e «não se aplica ao som de aeronaves em voo».
+SCOPE_NOTE = ("ISO 9613-2:1996 §1: o método é para fontes no solo (estrada, ferrovia, indústria, construção) e não se "
+              "aplica ao som de aeronaves em voo. Aqui a fonte é uma aeronave em voo, por isso A_gr e C_met entram só "
+              "como extrapolação fora do âmbito (PRESSUPOSTO), nunca como resultado validado da norma.")
+
+
+def scope_block() -> dict[str, Any]:
+    """Âmbito da ISO 9613-2 para uma fonte em voo: fora do âmbito, aplicado só como PRESSUPOSTO."""
+    return {"dentro_do_ambito": False, "fonte": "aeronave em voo", "referencia": "ISO 9613-2:1996 §1",
+            "nota": SCOPE_NOTE}
 _SQRT2 = math.sqrt(2.0)
 
 
@@ -263,8 +274,11 @@ def refraction_status() -> dict[str, Any]:
             "no §8: sem C_met o nível é o de propagação favorável (vento a favor ou inversão moderada) e a média "
             "de longo prazo é L_AT(LT) = L_AT(DW) − C_met (Eq. 6). C_met só entra com C_0 declarado (Eq. 21–22). "
             "Barreiras (A_bar), reflexões e folhagem não foram verificadas e não entram como 0 dB. A forma de 2024 "
-            "com K_geo não é a Tabela 3 de 1996 e não está aplicada."
+            "com K_geo não é a Tabela 3 de 1996 e não está aplicada. A ISO 9613-2 (§1) não se aplica a aeronaves "
+            "em voo. Nord2000 e Harmonoise não foram verificados equação a equação contra uma fonte pública e não "
+            "estão implementados."
         ),
+        "ambito_iso9613_2": scope_block(),
     }
 
 
@@ -295,6 +309,7 @@ def annotate_ground(block: dict[str, Any], *, applied: bool, c0_declared: bool, 
         "reasons": range_bound_notes(ground_applied=applied, c0_declared=c0_declared,
                                     components_omitted=components_omitted),
     }
+    block["ambito"] = scope_block()
     block["veredicto"] = block["tabela"]["veredicto"]
     block["calibracao"] = "nao_aplicar"
     block["range_bound"] = "superior"
@@ -319,6 +334,9 @@ def range_bound_notes(*, ground_applied: bool, c0_declared: bool, components_omi
         notes.append(
             "Há componentes fora das oito bandas ou com geometria inconsistente. Não entram no alcance corrigido: "
             "desconhecido não é audível nem silêncio.")
+    if ground_applied:
+        notes.append("A ISO 9613-2:1996 §1 não se aplica a aeronaves em voo: A_gr entrou como extrapolação "
+                     "(PRESSUPOSTO), não como distância da norma.")
     notes.append(
         "Ruído de espessura não modelado: o nível das fontes que entram é um limite inferior, e o alcance da "
         "espessura não está avaliado.")

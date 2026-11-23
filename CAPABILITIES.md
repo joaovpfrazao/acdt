@@ -2036,6 +2036,12 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Não é esta corrida**: y+ ≈ 1, as 42 camadas e as 1,207×10⁷ células do registo de 18 nov, os ângulos 2° e 4°, e uma polar. Esses registos não foram reescritos.
 * **Registo**: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.csv`. Narrativa em [docs/HANDOFF.md](docs/HANDOFF.md).
 
+## 40. Âmbito da ISO 9613-2 e refração no ruído (23 nov 2026)
+
+* **O que faz**: marca que a ISO 9613-2:1996 §1 não se aplica a aeronaves em voo (frase mantida na edição de 2024). Com `noise.iso9613_ground`, A_gr e C_met entram só como extrapolação fora do âmbito (PRESSUPOSTO): bloco `iso9613_ground.ambito` com `dentro_do_ambito: false`, razão no alcance e pressuposto na etapa.
+* **Refração**: `nao_avaliado`, `correction_dB: null`. Nord2000 e Harmonoise não verificados contra fonte pública; não implementados.
+* **Veredicto**: âmbito documentado; alcance de deteção continua `nao_avaliado` (limite superior das fontes modeladas). Pormenor em [docs/RUIDO.md](docs/RUIDO.md).
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

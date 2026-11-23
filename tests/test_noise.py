@@ -241,6 +241,12 @@ def test_rotor_ground_spec_does_not_change_api_and_keeps_free_field_when_incompl
     assert corr["overhead_LA_dBA"] == pytest.approx(free["overhead_LA_dBA"] + 3.0)
     assert corr["iso9613_ground"]["status"] == "aplicado"
     assert corr["iso9613_ground"]["alcance"]["veredicto"] == "nao_avaliado"
+    # ISO 9613-2:1996 §1: não se aplica a aeronaves em voo → extrapolação marcada, nunca dentro do âmbito
+    amb = corr["iso9613_ground"]["ambito"]
+    assert amb["dentro_do_ambito"] is False and "aeronaves em voo" in amb["nota"] and "PRESSUPOSTO" in amb["nota"]
+    assert any("extrapolação" in r for r in corr["iso9613_ground"]["range_bound_reasons"])
+    assert corr["refraction"]["veredicto"] == "nao_avaliado" and corr["refraction"]["correction_dB"] is None
+    assert corr["refraction"]["ambito_iso9613_2"]["dentro_do_ambito"] is False
     assert corr["detection_ground_range_quiet_m"] > free["detection_ground_range_quiet_m"]
     missing = rotor_noise(**common, altitude_m=100.0, ground_spec={"hs_m": 10.0, "hr_m": 1.5})
     assert missing["overhead_LA_dBA"] == pytest.approx(free["overhead_LA_dBA"])
