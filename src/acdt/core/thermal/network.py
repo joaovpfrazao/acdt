@@ -240,7 +240,8 @@ def solve_bay_transient(bay: Bay, phases: Sequence[Phase], T0_K: float, *, hot: 
             return [(q - ss) / C]
 
         sol = solve_ivp(rhs, (0.0, ph.duration_s), [T], method="RK45", max_step=max(ph.duration_s / 50.0, 1.0),
-                        t_eval=[ph.duration_s * i / n_out for i in range(n_out + 1)], rtol=1e-6, atol=1e-6)
+                        t_eval=[min(ph.duration_s * i / n_out, ph.duration_s) for i in range(n_out + 1)],
+                        rtol=1e-6, atol=1e-6)  # min(): d·n/n pode exceder d por 1 ulp (falha do solve_ivp)
         if not sol.success:
             raise RuntimeError(f"transitório falhou na fase {ph.condition.name}: {sol.message}")
         t_all += [t0 + float(x) for x in sol.t]
