@@ -2031,3 +2031,6 @@ Registo: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` 
 ## Âmbito ISO 9613-2 e refração (23 nov 2026, ramo `ruido-ambito-iso9613`)
 
 ISO 9613-2:1996 §1 (conferido na transcrição KM Exhibit 9 e na página ISO de 2024): não se aplica a aeronaves em voo. A_gr/C_met passam a ser marcados como extrapolação (PRESSUPOSTO). Refração por traçado de raios, Nord2000 e Harmonoise: `nao_avaliado`, parado aqui por falta de método citado e verificável numa tarefa leve. Comportamento por omissão inalterado (A_gr só com `iso9613_ground`).
+## Teste pesado da asa voadora sem deriva (23 nov 2026, ramo `tailless-teste-robusto`)
+
+A queda do worker na CI Ubuntu era o `--timeout=900` (método thread → `os._exit`), não memória (pico 238 MB). Os dois testes pesados do exemplo sem deriva levam `@pytest.mark.timeout(2400)`; asserções inalteradas. Pormenor em [QUALIDADE.md](QUALIDADE.md). Acelerar `thinwalled.solve` (68 % do dimensionamento) fica por fazer.
