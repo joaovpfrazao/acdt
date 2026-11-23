@@ -2046,4 +2046,7 @@ A queda do worker na CI Ubuntu era o `--timeout=900` (método thread → `os._ex
 ## `thinwalled.solve` vectorizado (23 nov 2026, ramo `thinwalled-vectorizado`)
 
 Secção multicélula de Megson 5,4× mais rápida (2,05 → 0,38 ms por secção): idealização e sistema vectorizados, LU em vez de SVD quando o sistema é quadrado depois de retirar a linha de nó redundante (`lstsq` como recurso). Mesmos resultados (regressão contra a referência congelada, 10⁻⁹). Teste pesado da asa voadora 281 → 174 s. Pormenor em [QUALIDADE.md](QUALIDADE.md).
+## Incerteza com as disciplinas novas (23 nov 2026, ramo `uq-disciplinas`)
+
+`uncertainty.fixed` novo; estudo `examples/studies/uq_disciplinas` (`applied: false`). Substituto rejeitado para W0/LCC/CO₂e (W0 não suave: espiral de massa a bateria/η baixos); rastreio por postos de Spearman em vez de Sobol'. Por fazer: isolar o NaN do `brentq` em `solve_bay_steady` (2/28 corridas; entradas em `examples/output/uq_disciplinas/uq.json`). Pormenor em [INCERTEZA.md](INCERTEZA.md).
 

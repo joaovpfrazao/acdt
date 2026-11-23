@@ -2060,6 +2060,11 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Potência só na exposição**: confirmado (`exposure_duty`, `power_schedule: exposicao`), já no main desde o PR #19.
 * **Encontro misto contínuo + intermitente**: `nao_avaliado`. Jeck DOT/FAA/AR-00/30 §2.1 só junta as Figuras 1 e 4 num gráfico LWC × extensão horizontal (equivalente aos fatores F já implementados); não dá procedimento de soma. Pormenor em [docs/GELO.md](docs/GELO.md) §10.
 
+## 46. Incerteza e sensibilidade com as disciplinas novas (23 nov 2026)
+
+* **O que faz**: `uncertainty.fixed` (sobreposições fixas do estudo, como `mdo.fixed`) e estudo de demonstração `examples/studies/uq_disciplinas/` (`applied: false`) com W0, LCC, CO₂e, custo unitário, margem térmica, potência anti-gelo e fiabilidade como saídas.
+* **Medida (uav_endurance_payload, 28 corridas)**: substituto aceite só para o arrasto de arrefecimento (Sobol': η_total S1 0,94). W0, LCC e CO₂e com substituto rejeitado (espiral de massa com bateria/η baixos) → rastreio de Spearman: W0 ← bateria (ρ −0,84) e η_total (−0,58); LCC ← custo por hora de voo (+0,79); CO₂e/h ← intensidade da rede (+0,71) e η_total (−0,68). 2 corridas falharam na baia térmica (NaN no `brentq`), por isolar. Pormenor em [docs/INCERTEZA.md](docs/INCERTEZA.md).
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

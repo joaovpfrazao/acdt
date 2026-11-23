@@ -168,6 +168,42 @@ substituto, aviónica 5–7 kg como intervalo (resultados em [mín, máx] sobre 
   `no_limite` (antes `prob_falha`) e o Sobol' (antes ΣS1 = 1,01 e 1,15, S1 > ST no trem e S1 negativos na
   autonomia, por falta de centragem).
 
+## Estudo de demonstração: disciplinas novas na incerteza (23 nov 2026)
+
+Estudo `examples/studies/uq_disciplinas/uq_disciplinas.yaml` (`applied: false`) sobre o exemplo de teste
+`uav_endurance_payload`; os blocos das disciplinas novas entram pela chave nova **`uncertainty.fixed`** (como
+`mdo.fixed`: caminho → número, texto ou bloco YAML; o yaml da missão não muda), com os dados de teste dos testes
+unitários. Sete entradas uniformes (energia específica da bateria 180–220 Wh/kg, η_total 0,58–0,66, η do ESC
+0,95–0,98, custo por hora de voo 40–90 USD, 300–500 h/ano, intensidade da rede 0,1–0,4 kg CO₂e/kWh, taxa de
+desconto 3–7 %; as três primeiras e a taxa como PRESSUPOSTO, as outras com o intervalo de teste como origem).
+Substituto quadrático com 28 corridas do modelo verdadeiro (LHS, semente 20261123). Resultados em
+`examples/output/uq_disciplinas/` (`uq.json`, `uq.md`, histogramas, `provenance.json`, `rastreio_postos.json`).
+
+* **Substituto**: aceite só para a área de arrasto de arrefecimento (Q² = 0,97). Rejeitado (Q² < 0,95) para W0,
+  LCC (0,92), CO₂e, custo unitário, margem quente, potência anti-gelo e fiabilidade. Causa: o W0 não é suave nesta
+  caixa — com bateria e η_total baixos o fecho de massa entra em espiral (W0 60 e 88 kg em duas corridas, contra
+  31–47 kg nas restantes) e a margem quente cai de −64 K para −166 a −286 K. O Sobol' e o Morris dessas saídas
+  ficam `nao_avaliado` (nunca se usa um substituto rejeitado).
+* **Sobol' (área de arrasto de arrefecimento)**: η_total S1 = 0,94 (IC [0,88; 0,98]); o resto ≤ 0,02.
+* **Rastreio por postos** (Spearman 1904; Helton & Davis 2003 §6, sobre as 26 corridas verdadeiras válidas;
+  `examples/studies/uq_disciplinas/rastreio_postos.py`): ordena influências monótonas, não decompõe a variância.
+  * W0 (31–88 kg): energia específica da bateria ρ = −0,84 (p < 0,001), η_total −0,58 (p = 0,002).
+  * LCC em valor atual (6,8–15,6 M USD): custo por hora de voo ρ = +0,79 (p < 0,001); h/ano +0,36 (p = 0,07);
+    o projeto (W0) quase não entra, porque a operação e suporte vêm do custo por hora declarado.
+  * CO₂e por hora de voo (0,41–1,58 kg): intensidade da rede ρ = +0,71, η_total −0,68 (ambos p < 0,001).
+  * CO₂e do ciclo de vida: intensidade da rede +0,66, η_total −0,49 (p = 0,012).
+  * Custo unitário e margem quente seguem o W0 (bateria e η_total). Fiabilidade de missão 0,99971–0,99972: varia
+    só pela duração da missão.
+* **Requisitos**: `REQ-mtow` e `REQ-wing_span` com P(passa) = 0 (o mesmo achado do MDO: a proteção anti-gelo e o
+  arrefecimento passam o W0 dos 25 kg).
+* **Falhas**: 2 das 28 corridas falharam no transitório/regime da baia térmica (`brentq` com f(242,15 K) = NaN em
+  `core/thermal/network.solve_bay_steady`); as entradas estão em `uq.json` (`training_samples`, `ok: false`).
+  Contam como não-passa. Causa não isolada neste PR: fica para a próxima tarefa leve.
+
+Veredicto: ligação das disciplinas novas à UQ **validado** (saídas por `result_metrics`, `fixed` testado em
+`tests/test_uq_fixed.py`); sensibilidade global de W0/LCC/CO₂e por Sobol' **nao_avaliado** (substituto rejeitado),
+substituída por rastreio de postos. Números de um caso de teste com dados de teste: `nao_aplicar` ao projeto.
+
 ## Limites
 
 * O modelo por amostra é o pipeline L0/L1 do `acdt size` (sem `acdt simulate`/`certify`/`integration`): o 6-DOF,
