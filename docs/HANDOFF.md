@@ -2031,6 +2031,9 @@ Registo: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` 
 ## T1 do plano de fabrico no custo de série (23 nov 2026, ramo `custo-serie-t1-plano`)
 
 `series_cost.t1_from_manufacturing`. Identidade verificada: com a mesma curva, a média de N unidades da rota learning devolve o custo de mão de obra do plano. C172 de verificação: T1 2,13 M USD (LF 0,2701 em N = 820) — as horas FOPV já estavam assinaladas como sobrestimadas, por isso o nível absoluto fica `calibrar`. Montagem final não declarada no exemplo → limite inferior. O yaml dos exemplos não mudou.
+## Gelo: exposição e encontros mistos (23 nov 2026, ramo `gelo-exposicao-encontros`)
+
+Só documentação. Ciclo de proteção = fração da missão em segmentos dentro do envelope, confirmado no código e nos testes. Encontro misto contínuo+intermitente fica `nao_avaliado` (Jeck 2002 §2.1 não dá procedimento de combinação).
 ## Fator β de causa comum (23 nov 2026, ramo `fiabilidade-fator-beta`)
 
 NUREG/CR-5485 Ap. A p. A-5, Eq. A.10–A.13, conferido no PDF público do INL. Módulo `core/reliability/common_cause.py`, ligado a `evaluate_extensions` e ao adaptador aircraft (`common_cause`). Verificação: m = 2, Q_t = 10⁻³, β = 0,05 → eventos raros 5,09025×10⁻⁵, exato 5,0902455×10⁻⁵. Sem β declarado: limite inferior. MGL, fator α e os β da IEC 61508-6 Anexo D: não feitos.
