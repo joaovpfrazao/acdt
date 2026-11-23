@@ -1,0 +1,619 @@
+{
+ "schema": "acdt.estudo_rajada_cheio/1",
+ "applied": false,
+ "example": "examples/heavy/uav150_flying_wing_tailless.yaml",
+ "case": "cheio",
+ "W0_kg": 149.66698928125118,
+ "V_m_s": 45.0,
+ "h_m": 3000.0,
+ "baseline": {
+  "rate_deg_s": 83.53566656422923,
+  "bias_deg": 2.0,
+  "k_beta": 0.0,
+  "k_r": 0.075,
+  "gust": {
+   "veredicto": "falha",
+   "settled": true,
+   "saturated": false,
+   "rate_limited": true,
+   "rate_limited_fraction": 0.005414410662224073,
+   "peak_rate_deg_s": 83.53566656422923,
+   "rate_required_deg_s": 99.90946307345588,
+   "beta_peak_deg": 21.443194941131733,
+   "beta_final_deg": 0.024741634972727737,
+   "split_peak_deg": 9.34178012279588,
+   "elevon_peak_deg": 11.014288863135004,
+   "issue": "limite de taxa tocado em 0.54 % do tempo; sem limite o pico seria 100 °/s contra 84 °/s disponíveis na superfície — falha pelo critério estrito"
+  },
+  "robustness": {
+   "level_cruise": 1,
+   "level_approach": 1,
+   "zeta_dr_cruise": 0.14913335313915255,
+   "delay_margin_level1_s": 0.23446179304664838,
+   "turb_dCn_3sigma": 0.003798962961105958,
+   "turb_capacity_dCn": 0.0214669030970628,
+   "turb_authority_ok": true
+  },
+  "servo": {
+   "ok": true,
+   "servo": "Volz DA 30",
+   "n_per_surface": 2,
+   "rate_at_surface_deg_s": 83.53566656422923,
+   "mass_split_kg": 5.04,
+   "P_mech_per_leaf_W": 25.304230665079707,
+   "issue": null
+  },
+  "bias_dCD_over_CD0_pct": 0.7436683153981121
+ },
+ "criterion": "critério estrito de hq:lateral_gust no 6-DOF (sem saturação, sem limite de taxa, β amortecido ≤ 10 % do pico no último quarto)",
+ "a_servo": {
+  "100": {
+   "rate_deg_s": 100.0,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 99.90946307345588,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039444,
+    "split_peak_deg": 9.336508958527181,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "servo": {
+    "ok": true,
+    "servo": "Volz DA 30-HT",
+    "n_per_surface": 2,
+    "rate_at_surface_deg_s": 111.38088875230564,
+    "mass_split_kg": 8.8,
+    "P_mech_per_leaf_W": 30.291529002912416,
+    "issue": null
+   }
+  },
+  "110": {
+   "rate_deg_s": 110.0,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 99.90946307345588,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039444,
+    "split_peak_deg": 9.336508958527181,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "servo": {
+    "ok": true,
+    "servo": "Volz DA 30-HT",
+    "n_per_surface": 2,
+    "rate_at_surface_deg_s": 111.38088875230564,
+    "mass_split_kg": 8.8,
+    "P_mech_per_leaf_W": 33.320681903203656,
+    "issue": null
+   }
+  },
+  "120": {
+   "rate_deg_s": 120.0,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 99.90946307345588,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039444,
+    "split_peak_deg": 9.336508958527181,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "servo": {
+    "ok": true,
+    "servo": "Volz DA 58-D",
+    "n_per_surface": 1,
+    "rate_at_surface_deg_s": 278.4522218807641,
+    "mass_split_kg": 22.4,
+    "P_mech_per_leaf_W": 36.34983480349489,
+    "issue": null
+   }
+  },
+  "150": {
+   "rate_deg_s": 150.0,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 99.90946307345588,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039444,
+    "split_peak_deg": 9.336508958527181,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "servo": {
+    "ok": true,
+    "servo": "Volz DA 58-D",
+    "n_per_surface": 1,
+    "rate_at_surface_deg_s": 278.4522218807641,
+    "mass_split_kg": 22.4,
+    "P_mech_per_leaf_W": 45.437293504368625,
+    "issue": null
+   }
+  },
+  "200": {
+   "rate_deg_s": 200.0,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 99.90946307345588,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039444,
+    "split_peak_deg": 9.336508958527181,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "servo": {
+    "ok": true,
+    "servo": "Volz DA 58-D",
+    "n_per_surface": 1,
+    "rate_at_surface_deg_s": 278.4522218807641,
+    "mass_split_kg": 22.4,
+    "P_mech_per_leaf_W": 60.58305800582483,
+    "issue": null
+   }
+  }
+ },
+ "b_bias": {
+  "3": {
+   "bias_deg": 3.0,
+   "gust": {
+    "veredicto": "falha",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": true,
+    "rate_limited_fraction": 0.00041649312786339027,
+    "peak_rate_deg_s": 83.53566656422923,
+    "rate_required_deg_s": 89.53306609159701,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024731529117506448,
+    "split_peak_deg": 8.33650895852718,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": "limite de taxa tocado em 0.04 % do tempo; sem limite o pico seria 90 °/s contra 84 °/s disponíveis na superfície — falha pelo critério estrito"
+   },
+   "capacity_unchanged": true,
+   "dCD_over_CD0_pct": 1.6724043094406513
+  },
+  "4": {
+   "bias_deg": 4.0,
+   "gust": {
+    "veredicto": "falha",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": true,
+    "rate_limited_fraction": 0.00041649312786339027,
+    "peak_rate_deg_s": 83.53566656422923,
+    "rate_required_deg_s": 89.53306609159701,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024731529117506392,
+    "split_peak_deg": 7.336508958527178,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": "limite de taxa tocado em 0.04 % do tempo; sem limite o pico seria 90 °/s contra 84 °/s disponíveis na superfície — falha pelo critério estrito"
+   },
+   "capacity_unchanged": true,
+   "dCD_over_CD0_pct": 2.9710501843131065
+  },
+  "5": {
+   "bias_deg": 5.0,
+   "gust": {
+    "veredicto": "falha",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": true,
+    "rate_limited_fraction": 0.00041649312786339027,
+    "peak_rate_deg_s": 83.53566656422923,
+    "rate_required_deg_s": 88.81524916198549,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.02473146388344675,
+    "split_peak_deg": 6.33650895852718,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": "limite de taxa tocado em 0.04 % do tempo; sem limite o pico seria 89 °/s contra 84 °/s disponíveis na superfície — falha pelo critério estrito"
+   },
+   "capacity_unchanged": true,
+   "dCD_over_CD0_pct": 4.638023740058006
+  },
+  "5.5": {
+   "bias_deg": 5.5,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 80.92375891016117,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039402,
+    "split_peak_deg": 5.836508958527179,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "capacity_unchanged": true,
+   "dCD_over_CD0_pct": 5.609016191610134
+  },
+  "6": {
+   "bias_deg": 6.0,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 74.11967452143158,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039464,
+    "split_peak_deg": 5.355311868113218,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "capacity_unchanged": true,
+   "dCD_over_CD0_pct": 6.671294026175272
+  },
+  "8": {
+   "bias_deg": 8.0,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 55.654776956332555,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.024730983403039454,
+    "split_peak_deg": 4.029267063425215,
+    "elevon_peak_deg": 11.014288863135004,
+    "issue": null
+   },
+   "capacity_unchanged": true,
+   "dCD_over_CD0_pct": 11.826372624934265
+  }
+ },
+ "c_gains": {
+  "kr×0.5": {
+   "k_beta": 0.0,
+   "k_r": 0.0375,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 66.29127808856578,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.2313519638488885,
+    "split_peak_deg": 6.3896517800161545,
+    "elevon_peak_deg": 11.014141682801046,
+    "issue": null
+   },
+   "robustness": {
+    "level_cruise": 2,
+    "level_approach": 2,
+    "zeta_dr_cruise": 0.0633815042983081,
+    "delay_margin_level1_s": null,
+    "turb_dCn_3sigma": 0.0024479767508633968,
+    "turb_capacity_dCn": 0.0214669030970628,
+    "turb_authority_ok": true
+   },
+   "level1_kept": false,
+   "veredicto": "falha"
+  },
+  "kr×0.6": {
+   "k_beta": 0.0,
+   "k_r": 0.045,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 71.9765841859364,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.14911255667446666,
+    "split_peak_deg": 7.106168845256657,
+    "elevon_peak_deg": 11.014171118888093,
+    "issue": null
+   },
+   "robustness": {
+    "level_cruise": 2,
+    "level_approach": 2,
+    "zeta_dr_cruise": 0.07990665829391154,
+    "delay_margin_level1_s": null,
+    "turb_dCn_3sigma": 0.0027624354102183052,
+    "turb_capacity_dCn": 0.0214669030970628,
+    "turb_authority_ok": true
+   },
+   "level1_kept": false,
+   "veredicto": "falha"
+  },
+  "kr×0.7": {
+   "k_beta": 0.0,
+   "k_r": 0.0525,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 77.84104204045842,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.09558201697968935,
+    "split_peak_deg": 7.744453488180041,
+    "elevon_peak_deg": 11.014200554965011,
+    "issue": null
+   },
+   "robustness": {
+    "level_cruise": 1,
+    "level_approach": 1,
+    "zeta_dr_cruise": 0.09672467798741816,
+    "delay_margin_level1_s": 0.10380477059698023,
+    "turb_dCn_3sigma": 0.003050357323456944,
+    "turb_capacity_dCn": 0.0214669030970628,
+    "turb_authority_ok": true
+   },
+   "level1_kept": true,
+   "veredicto": "passa"
+  },
+  "kr×0.75": {
+   "k_beta": 0.0,
+   "k_r": 0.056249999999999994,
+   "gust": {
+    "veredicto": "passa",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": false,
+    "rate_limited_fraction": 0.0,
+    "peak_rate_deg_s": 80.99703183120859,
+    "rate_required_deg_s": null,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.07641013933781984,
+    "split_peak_deg": 8.039065269143306,
+    "elevon_peak_deg": 11.014215272999673,
+    "issue": null
+   },
+   "robustness": {
+    "level_cruise": 1,
+    "level_approach": 1,
+    "zeta_dr_cruise": 0.10524935954784007,
+    "delay_margin_level1_s": 0.149854756195964,
+    "turb_dCn_3sigma": 0.0031860039712685584,
+    "turb_capacity_dCn": 0.0214669030970628,
+    "turb_authority_ok": true
+   },
+   "level1_kept": true,
+   "veredicto": "passa"
+  },
+  "kr×0.8": {
+   "k_beta": 0.0,
+   "k_r": 0.06,
+   "gust": {
+    "veredicto": "falha",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": true,
+    "rate_limited_fraction": 0.0008329862557267805,
+    "peak_rate_deg_s": 83.53566656422923,
+    "rate_required_deg_s": 85.6410587230447,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.06103777567543172,
+    "split_peak_deg": 8.31927577152421,
+    "elevon_peak_deg": 11.0142299910318,
+    "issue": "limite de taxa tocado em 0.08 % do tempo; sem limite o pico seria 86 °/s contra 84 °/s disponíveis na superfície — falha pelo critério estrito"
+   },
+   "robustness": {
+    "level_cruise": 1,
+    "level_approach": 1,
+    "zeta_dr_cruise": 0.11385447001371847,
+    "delay_margin_level1_s": 0.1773177251116067,
+    "turb_dCn_3sigma": 0.00331678838301328,
+    "turb_capacity_dCn": 0.0214669030970628,
+    "turb_authority_ok": true
+   },
+   "level1_kept": true,
+   "veredicto": "falha"
+  },
+  "kr×0.9": {
+   "k_beta": 0.0,
+   "k_r": 0.0675,
+   "gust": {
+    "veredicto": "falha",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": true,
+    "rate_limited_fraction": 0.003331945022907122,
+    "peak_rate_deg_s": 83.53566656422923,
+    "rate_required_deg_s": 92.53853512410753,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.0388869663256107,
+    "split_peak_deg": 8.841762819853525,
+    "elevon_peak_deg": 11.014259427088465,
+    "issue": "limite de taxa tocado em 0.33 % do tempo; sem limite o pico seria 93 °/s contra 84 °/s disponíveis na superfície — falha pelo critério estrito"
+   },
+   "robustness": {
+    "level_cruise": 1,
+    "level_approach": 1,
+    "zeta_dr_cruise": 0.13131656916690734,
+    "delay_margin_level1_s": 0.21229896948443638,
+    "turb_dCn_3sigma": 0.003565402585916307,
+    "turb_capacity_dCn": 0.0214669030970628,
+    "turb_authority_ok": true
+   },
+   "level1_kept": true,
+   "veredicto": "falha"
+  },
+  "kr×1.5": {
+   "k_beta": 0.0,
+   "k_r": 0.11249999999999999,
+   "gust": {
+    "veredicto": "falha",
+    "settled": true,
+    "saturated": false,
+    "rate_limited": true,
+    "rate_limited_fraction": 0.019575177009579343,
+    "peak_rate_deg_s": 83.53566656422923,
+    "rate_required_deg_s": 132.65275734557866,
+    "beta_peak_deg": 21.443194941131733,
+    "beta_final_deg": 0.0024667214879966694,
+    "split_peak_deg": 11.930560726789212,
+    "elevon_peak_deg": 11.014439518587386,
+    "issue": "limite de taxa tocado em 1.96 % do tempo; sem limite o pico seria 133 °/s contra 84 °/s disponíveis na superfície — falha pelo critério estrito"
+   },
+   "robustness": {
+    "level_cruise": 1,
+    "level_approach": 1,
+    "zeta_dr_cruise": 0.24448565206807238,
+    "delay_margin_level1_s": 0.2789037936945533,
+    "turb_dCn_3sigma": 0.004802195508202035,
+    "turb_capacity_dCn": 0.0214669030970628,
+    "turb_authority_ok": true
+   },
+   "level1_kept": true,
+   "veredicto": "falha"
+  }
+ },
+ "all_cases_check": {
+  "a": {
+   "option": {
+    "rate_deg_s": 111.38088875230564
+   },
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "peak_rate_deg_s": 43.10152579587879,
+     "rate_margin": 2.5841518761954236
+    },
+    "carga": {
+     "ok": true,
+     "peak_rate_deg_s": 72.75972654482648,
+     "rate_margin": 1.530804114329444
+    },
+    "combustível": {
+     "ok": true,
+     "peak_rate_deg_s": 53.05868978640637,
+     "rate_margin": 2.0992016425713063
+    },
+    "cheio": {
+     "ok": true,
+     "peak_rate_deg_s": 99.90946307345588,
+     "rate_margin": 1.1148182096666428
+    }
+   },
+   "all_pass": true,
+   "rate_margin_min": 1.1148182096666428
+  },
+  "b": {
+   "option": {
+    "bias_deg": 5.5
+   },
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "peak_rate_deg_s": 15.75696579219484,
+     "rate_margin": 5.301507134426117
+    },
+    "carga": {
+     "ok": true,
+     "peak_rate_deg_s": 50.06216023003527,
+     "rate_margin": 1.668638871762294
+    },
+    "combustível": {
+     "ok": true,
+     "peak_rate_deg_s": 26.62880585156845,
+     "rate_margin": 3.1370414065829744
+    },
+    "cheio": {
+     "ok": true,
+     "peak_rate_deg_s": 80.92375891016117,
+     "rate_margin": 1.0322761533725555
+    }
+   },
+   "all_pass": true,
+   "rate_margin_min": 1.0322761533725555
+  },
+  "c": {
+   "option": {
+    "kr": 0.056249999999999994
+   },
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "peak_rate_deg_s": 32.32592911991292,
+     "rate_margin": 2.5841690815553657
+    },
+    "carga": {
+     "ok": true,
+     "peak_rate_deg_s": 63.21589708974212,
+     "rate_margin": 1.321434487367013
+    },
+    "combustível": {
+     "ok": true,
+     "peak_rate_deg_s": 47.12944516289066,
+     "rate_margin": 1.77247294712488
+    },
+    "cheio": {
+     "ok": true,
+     "peak_rate_deg_s": 80.99703183120859,
+     "rate_margin": 1.0313423180532215
+    }
+   },
+   "all_pass": true,
+   "rate_margin_min": 1.0313423180532215
+  }
+ },
+ "actuator_mass_baseline": {
+  "parts": [
+   {
+    "surface": "split_aileron",
+    "n": 8,
+    "servo": "Volz DA 30",
+    "unit_mass_kg": 0.63,
+    "mass_kg": 5.04
+   },
+   {
+    "surface": "elevon",
+    "n": 2,
+    "servo": "Volz DA 30",
+    "unit_mass_kg": 0.63,
+    "mass_kg": 1.26
+   }
+  ],
+  "unknown_surfaces": [],
+  "total_known_kg": 6.3,
+  "budget_items": [
+   "atuadores split aileron (8x Volz DA 30",
+   "atuadores elevon (2x Volz DA 30"
+  ],
+  "budget_declared_kg": 6.3,
+  "within_budget": true,
+  "note": "massas do datasheet do servo (sem hastes/suportes); orçamento = itens de weights.components.items com 'servo'/'atuador' no nome"
+ },
+ "elapsed_s": 188.38821935653687
+}

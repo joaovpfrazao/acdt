@@ -2062,3 +2062,7 @@ Estudo `examples/studies/mdo_disciplinas` (`applied: false`), resultados em `exa
 
 O NaN no `brentq` da UQ vinha do dimensionamento sem convergência (espiral de massa): V e P_SL NaN. A térmica e o gelo ficam agora `nao_avaliado` com o motivo. Feito com método citado: sol em altitude (Laue 1970 via SAND2012-2389 Eq. 24; PRESSUPOSTO validade 3 km, acima majorante 1353 W/m²), majorante de Meredith (Brayton ideal + NACA 1135 Eq. 43, não creditado), perdas do gerador onboard em motor térmico (P_veio·(1 − η)) e ventilador acoplado como extração de veio P/η e caudal P/η·BSFC. Fica `nao_avaliado`: escape do motor de pistão (sem método público verificável) e o gerador em propulsão híbrida no pipeline (sem despacho). Pormenor em [TERMICA.md](TERMICA.md) §10 e CAPABILITIES §47.
 
+## Rajada lateral do caso «cheio»: estudo de decisão (23 nov 2026, ramo `rajada-cheio-estudo`)
+
+`examples/studies/rajada_cheio` (`applied: false`). (a) servo 2× DA 30-HT (111,4 °/s, +3,76 kg), (b) δ0 5,5–6° (ΔC_D0 5,6–6,7 % do C_D0) e (c) k_r × 0,75 (margem de atraso 0,150 s) passam os 4 casos. Recomendação (a), com a decisão para o João. Nada aplicado. Tabela em [tutorial-asa-voadora-sem-deriva.md](tutorial-asa-voadora-sem-deriva.md) §5 e CAPABILITIES §48.
+
