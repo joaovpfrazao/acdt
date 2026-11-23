@@ -2087,6 +2087,13 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Veredicto**: NaN **corrigido** (desconhecido em vez de erro); sol em altitude, Meredith, gerador e ventilador **validados** contra os valores das fontes e por testes de balanço; escape e híbrido **nao_avaliado**.
 * **Ficheiros**: `core/thermal/{air,cooling,network,study}.py`, `domains/aircraft/{thermal,icing,onboard_bridge}.py`, `tests/test_thermal_followups.py`, `tests/test_thermal_nan_regression.py`, `docs/TERMICA.md` §10.
 
+## 48. Estudo de decisão da rajada lateral do caso «cheio» (asa voadora sem deriva, 23 nov 2026)
+
+* **O que faz**: `examples/studies/rajada_cheio/` (`applied: false`) quantifica três opções no 6-DOF não linear com o critério estrito de `hq:lateral_gust`: (a) servo mais rápido, (b) pré-deflexão maior, (c) outros ganhos do SAS. Também dá o servo e a massa (`select_servo`, catálogo Volz do exemplo), o Nível e a margem de atraso (MIL-F-8785C 3.5.3), a autoridade 3σ e o arrasto (McCormick Eq. 3.45).
+* **Medida**: base falha (83,5 °/s disponíveis contra 99,9 °/s exigidos). As menores opções que passam os 4 casos: (a) 2× DA 30-HT por folha, 111,4 °/s, margem de taxa 1,115, +3,76 kg; (b) δ0 5,5°, margem 1,032, ΔC_D0 5,6 % do C_D0; (c) k_r × 0,75, margem 1,031, margem de atraso 0,234 → 0,150 s. k_r × 0,5–0,6 dá Nível 2.
+* **Veredicto**: estudo **validado** como comparação (reprodutível: duas corridas iguais). **Recomendação** (a), marcada como recomendação; a decisão é do João. Nada é aplicado ao exemplo nem aos valores por omissão. W0 não redimensionado; potência elétrica do servo **desconhecida**.
+* **Ficheiros**: `examples/studies/rajada_cheio/{rajada_cheio.yaml,estudo_rajada_cheio.py}`, `examples/output/rajada_cheio/`, `docs/tutorial-asa-voadora-sem-deriva.md` §5, `tests/test_rajada_cheio_estudo.py`.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

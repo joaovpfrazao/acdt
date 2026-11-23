@@ -1,0 +1,10 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Estudo de decisão da rajada lateral 6-DOF do caso «cheio» (asa voadora sem deriva). Não aplica nada: o exemplo
+# examples/heavy/uav150_flying_wing_tailless.yaml e os valores por omissão ficam iguais. A decisão é do João.
+applied: false
+example: examples/heavy/uav150_flying_wing_tailless.yaml
+case: cheio
+options:
+  a_servo_rates_deg_s: [100, 110, 120, 150, 200]    # taxa na superfície; servo escolhido do catálogo do exemplo
+  b_bias_deg: [3, 4, 5, 5.5, 6, 8]                    # pré-deflexão simétrica dos split ailerons
+  c_kr_factors: [0.5, 0.6, 0.7, 0.75, 0.8, 0.9, 1.5]  # k_r do SAS × fator (k_β do exemplo é 0)

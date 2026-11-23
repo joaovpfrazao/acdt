@@ -244,3 +244,45 @@ Alley 2007.
   trem, hélice e a deflexão dos comandos ficam por avaliar. A onda completa não correu. Nenhum
   factor entra. Números em `h6_rcs_bounces2.json`.
 * **OpenVSP (18 nov 2026)**. O mesmo loft, com a torção de ponta −10° no bordo de ataque e t/c 0,15/0,12, foi exportado pelo OpenVSP 3.48.2 do contentor. O Windows não tem OpenVSP. O VSPAERO de superfície fina, no α do AVL, dá CL 0,494 contra 0,503 e CDi 0,0143 contra o CDff 0,0145. O momento é 0,042 contra 0,029, com o mesmo sinal. A malha e as cinco iterações de esteira não são as do AVL. Nenhum factor entra. Números em `h7_openvsp.json`.
+
+
+## 5. Decisão da rajada lateral no caso «cheio» (23 nov 2026, estudo `applied: false`)
+
+No 6-DOF não linear, o caso `cheio` falha a rajada lateral de 14 CFR 23.443 pelo critério estrito de
+`hq:lateral_gust`: sem saturação, sem limite de taxa e β amortecido. O limite de taxa é tocado em 0,54 % do tempo, e
+sem limite o pico seria 99,9 °/s contra 83,5 °/s na superfície (2× Volz DA 30 por folha). O estudo
+`examples/studies/rajada_cheio/` quantifica as três opções com as ferramentas que já existem: `lateral_test`,
+`select_servo` com o catálogo Volz do exemplo, `actuator_dynamics` (MIL-F-8785C 3.5.3), autoridade 3σ em turbulência e
+o arrasto da pré-deflexão (McCormick Eq. 3.45). **Nada é aplicado**: o yaml do exemplo e os valores por omissão
+ficam iguais. Resultados em `examples/output/rajada_cheio/rajada_cheio.json`. A escolha é do João.
+
+| Opção (menor que passa) | `cheio` | 4 casos | Margem de taxa mín. (disponível / pico) | Massa dos servos do split | Arrasto (ΔC_D0 / C_D0) | Rolamento holandês cruzeiro / aprox. | Margem de atraso Nível 1 |
+|---|---|---|---|---|---|---|---|
+| Base: 83,5 °/s, δ0 2°, k_r 0,075 | **falha** (0,54 % em limite; pede 99,9 °/s) | — | — | 5,04 kg (8× DA 30) | 0,74 % | Nível 1 / 1 (ζ 0,149) | 0,234 s |
+| (a) servo 2× Volz DA 30-HT por folha, 111,4 °/s | passa | passa | 1,115 (`cheio`) | 8,80 kg (+3,76 kg, +2,5 % do W0) | 0,74 % (igual) | igual | igual (0,234 s) |
+| (b) pré-deflexão δ0 = 5,5° | passa | passa | 1,032 (`cheio`) | 5,04 kg | 5,61 % | igual | igual |
+| (b') δ0 = 6° | passa | não corrido | 1,127 (`cheio`) | 5,04 kg | 6,67 % | igual | igual |
+| (c) k_r × 0,75 = 0,0563 | passa | passa | 1,031 (`cheio`) | 5,04 kg | 0,74 % | Nível 1 / 1 (ζ 0,105) | 0,150 s |
+
+Pormenores:
+
+* **(a) Servo mais rápido.** 100 e 110 °/s passam com 2× DA 30-HT por folha (G que dá 111,4 °/s na superfície). A
+  partir de 120 °/s o catálogo só tem o DA 58-D (22,4 kg nas 4 folhas). A potência mecânica por folha à taxa exigida,
+  P = FoS·|H_op|·ω, sobe de 25,3 W (83,5 °/s) para 30,3 W (100 °/s). A potência elétrica fica **desconhecida**,
+  porque o datasheet não dá rendimento. O modelo linear do SAS não depende da taxa, por isso o Nível e a margem de
+  atraso não mudam. O W0 não foi redimensionado com a massa extra.
+* **(b) Pré-deflexão maior.** δ0 = 3, 4 e 5° continuam a tocar o limite (0,04 % do tempo; pedem 88,8–89,5 °/s).
+  5,5° passa, com 3 % de margem; 6° dá 12,7 %; 8° dá 50 % mas custa 11,8 % do C_D0. A capacidade de guinada fica
+  igual (2δ0 ≤ δ_max = 60°). O arrasto entraria no polar de dimensionamento, e o W0 e o combustível não foram
+  redimensionados.
+* **(c) Outros ganhos.** k_β do exemplo é 0, por isso só k_r conta. A janela é estreita e não monótona: k_r × 0,7 e
+  × 0,75 passam; × 0,8, × 0,9 e × 1,5 voltam a tocar o limite; × 0,5 e × 0,6 passam a rajada mas o rolamento
+  holandês desce para o Nível 2 (falha). Com × 0,75 a margem de atraso cai de 0,234 para 0,150 s (o projeto usa
+  0,10 s, porque a Volz não dá largura de banda) e a margem de taxa é de 3 %. A autoridade 3σ em turbulência cumpre
+  em todas as variantes de ganho (ΔC_n 0,0024–0,0048 contra a capacidade de 0,0215).
+
+**Recomendação (só recomendação; a decisão fica com o João):** a opção (a). É a única que passa os 4 casos com uma
+margem de taxa de dois dígitos (11,5 %) sem mexer no SAS nem no arrasto. Custa +3,76 kg de servos (≈ 2,5 % do W0),
+que obrigam a redimensionar e a atualizar o orçamento de massa. As opções (b) e (c) passam com margens de ~3 %. A (c)
+depende do atraso real do atuador, que é desconhecido, e de uma janela de ganhos não monótona. A (b) com 6° é a
+alternativa sem massa extra, a ~6,7 % de C_D0 de arrasto.
