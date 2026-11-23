@@ -75,6 +75,7 @@ class Condition:
     ambient: Ambient
     V_m_s: float
     solar_W_m2: float = 0.0
+    solar_source: str = ""
 
 
 @dataclass

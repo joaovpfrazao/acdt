@@ -25,6 +25,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Any
 
+from acdt.core.atmosphere import GAMMA, R_AIR
+
 from .air import CP_AIR
 
 NACA_RM_A8I29 = ("Hall, C. F. & Frank, J. L., Ram-Recovery Characteristics of NACA Submerged Inlets at High Subsonic "
@@ -105,6 +107,27 @@ def size_ram_duct(Q_W: float, T_limit_K: float, T_in_K: float, rho: float, V: fl
         mass = 2.0 * math.sqrt(math.pi * A) * duct_length_m * areal_density_kg_m2 + fixed_mass_kg
     notes.append("arrasto externo da entrada (transbordo/rampa) não incluído; efeito de Meredith desprezado")
     return RamDuct(m, A, lo, hi, Ve, zeta, fan, mass, notes)
+
+
+MEREDITH_REF = ("majorante ideal do efeito de Meredith: ciclo de Brayton ideal η = 1 − T∞/T_t (compressão "
+                 "isentrópica pela pressão dinâmica, calor a pressão constante, expansão isentrópica) com "
+                 "T/T_t = (1 + (γ−1)/2·M²)⁻¹, NACA Report 1135 (1953) Eq. (43); empuxo F ≤ η·Q/V (todo o trabalho "
+                 "do ciclo em potência propulsiva)")
+
+
+def meredith_thrust_bound(Q_W: float, V: float, T_K: float) -> dict[str, Any]:
+    """Majorante do empuxo recuperado pelo aquecimento do ar na conduta (efeito de Meredith).
+
+    η_ideal = 1 − 1/(1 + (γ−1)/2·M²); F_max = η_ideal·Q/V. É um limite superior (sem perdas na entrada, no
+    permutador nem no bocal; rendimento propulsivo 1): **não é creditado** no arrasto — o arrasto interno continua a
+    ser o majorante sem Meredith. Serve para mostrar quanto se poderia recuperar, no máximo."""
+    if not (V > 0 and T_K > 0 and Q_W >= 0 and math.isfinite(Q_W)):
+        return {"status": "nao_avaliado", "reason": "V, T ou Q inválidos", "thrust_upper_N": None}
+    M = V / math.sqrt(GAMMA * R_AIR * T_K)
+    tr = 1.0 + 0.5 * (GAMMA - 1.0) * M * M
+    eta = 1.0 - 1.0 / tr
+    return {"status": "majorante", "mach": M, "eta_cycle_ideal": eta, "thrust_upper_N": eta * Q_W / V,
+            "credited": False, "method": MEREDITH_REF}
 
 
 def fan_power(m_dot: float, rho: float, pressure_rise_Pa: float | None, efficiency: float | None) -> float | None:

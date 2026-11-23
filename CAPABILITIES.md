@@ -2077,6 +2077,16 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **O que faz**: `uncertainty.fixed` (sobreposições fixas do estudo, como `mdo.fixed`) e estudo de demonstração `examples/studies/uq_disciplinas/` (`applied: false`) com W0, LCC, CO₂e, custo unitário, margem térmica, potência anti-gelo e fiabilidade como saídas.
 * **Medida (uav_endurance_payload, 28 corridas)**: substituto aceite só para o arrasto de arrefecimento (Sobol': η_total S1 0,94). W0, LCC e CO₂e com substituto rejeitado (espiral de massa com bateria/η baixos) → rastreio de Spearman: W0 ← bateria (ρ −0,84) e η_total (−0,58); LCC ← custo por hora de voo (+0,79); CO₂e/h ← intensidade da rede (+0,71) e η_total (−0,68). 2 corridas falharam na baia térmica (NaN no `brentq`), por isolar. Pormenor em [docs/INCERTEZA.md](docs/INCERTEZA.md).
 
+## 47. Térmica: NaN da UQ, sol em altitude, Meredith, gerador e ventilador em motor térmico (23 nov 2026)
+
+* **NaN**: o dimensionamento sem convergência (espiral de massa) dava V/P NaN à térmica e o `brentq` falhava. Agora `sizing_unusable` → térmica e gelo `nao_avaliado` com o motivo; `solve_bay_steady` recusa entradas não finitas. Teste com a amostra 1 de `examples/output/uq_disciplinas/uq.json`.
+* **Sol em altitude**: Laue (1970), I = I0·[(1 − 0,14h)·0,7^(AM^0,678) + 0,14h] (SAND2012-2389 Eq. 24; PVEducation AM 1,5 → 846 W/m² verificado). PRESSUPOSTO: MIL-HDBK-310 1120 W/m² × I(h)/I(0) com AM 1, válido até 3 km; acima 1353 W/m² como majorante. A 3000 m: 1321,6 W/m².
+* **Meredith**: majorante F ≤ η·Q/V, η = 1 − 1/(1 + (γ−1)/2·M²) (Brayton ideal; NACA 1135 Eq. 43). É reportado, não creditado. A 25 m/s: η ≈ 10⁻³.
+* **Gerador onboard em pistão/turbo-hélice**: perdas P_veio − P_terminal (400 W, entrega 0,9, η 0,75 → 148,1 W) na fuselagem, e a carga onboard no calor da aviónica. Ventilador no modo `iterar` como extração de veio P/η e caudal P/η·BSFC: Δp 3000 Pa → 599 W, W0 152,45 → 159,69 kg.
+* **Não avaliado**: ruído do escape do motor de pistão (sem método público verificável; use `noise.engine_noise` medido); perdas do gerador em propulsão híbrida no pipeline (sem despacho híbrido).
+* **Veredicto**: NaN **corrigido** (desconhecido em vez de erro); sol em altitude, Meredith, gerador e ventilador **validados** contra os valores das fontes e por testes de balanço; escape e híbrido **nao_avaliado**.
+* **Ficheiros**: `core/thermal/{air,cooling,network,study}.py`, `domains/aircraft/{thermal,icing,onboard_bridge}.py`, `tests/test_thermal_followups.py`, `tests/test_thermal_nan_regression.py`, `docs/TERMICA.md` §10.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado
