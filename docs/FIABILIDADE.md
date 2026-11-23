@@ -251,7 +251,7 @@ singular: fica desconhecida, não zero.
 O §7.5.5.4 (p. 7-117) trata falhas dependentes como partilha de carga com fator k (θ′ = θ/k e
 θ_s = θ/k + θ/2), não como fator β de causa comum. A equação λ_cc = β λ não está nessa página e
 não foi aplicada. A partilha de carga também não foi codificada: não é o fator pedido. Veredicto
-do fator β: `nao_avaliado`. Calibração: `nao_aplicar`.
+do fator β nesta secção: `nao_avaliado`. O fator β entrou depois pelo NUREG/CR-5485 (§11).
 
 ### 10.4 Ligação à árvore de falhas (ARP4761)
 
