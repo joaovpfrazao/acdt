@@ -210,3 +210,14 @@ cada executável usado, o SO e o commit.
 * Gmsh/CalculiX na CI (pacotes do sistema no Linux) — 5 testes saltam.
 * Limiar de cobertura e mypy não estrito no pacote inteiro (secções 2 e 3).
 * Testes de propriedades/invariantes (`hypothesis`).
+
+### Falha isolada de `test_spiral_unassessed_without_explicit_dihedral` (23 nov 2026)
+
+`tests/test_config_shortcuts.py::test_spiral_unassessed_without_explicit_dihedral` falhou uma vez na suite local
+paralela (ramo `uq-disciplinas`, carga média 16 em 8 núcleos, com estudos MDO/UQ a correr ao lado) e passou sozinho
+(11 s) e na repetição da suite completa (1542 passed). O ramo não toca nesse caminho (só `uq_run.apply_fixed`).
+O teste corre o pipeline completo com AVL e não tem marcador `requires_avl`; a hipótese mais provável, ainda não
+confirmada (o rasto não ficou no registo), é o mesmo tempo-limite transitório do AVL descrito em «Teste instável de
+reutilização de `run_id`», que faz desaparecer a linha `hq:spiral`. Não corrigido: fica por confirmar com o rasto
+completo na próxima ocorrência.
+
