@@ -180,9 +180,28 @@ def operating_points(res: Any) -> dict[str, dict[str, Any]]:
     return out
 
 
+def generator_of(res: Any) -> dict[str, Any] | None:
+    """Gerador da extração de veio (prop térmico com bloco ``onboard``): perdas, η e combustível por J de veio.
+
+    Perdas = P_veio − P_terminal = P_veio·(1 − η_gerador) — conservação de energia com o η declarado no bloco
+    onboard (mesma identidade de :func:`acdt.core.thermal.sources.generator_loss`). Sem gerador → ``None``."""
+    ob = getattr(res, "onboard_bridge", None) or (res.spec.assumptions or {}).get("onboard_bridge") or {}
+    if not ob.get("applied") or ob.get("model") != "prop" or ob.get("generator_loss_W") is None:
+        return None
+    return {"loss_W": float(ob["generator_loss_W"]), "terminal_W": float(ob["generator_terminal_W"]),
+            "shaft_W": float(ob["generator_shaft_W"]), "eta": ob.get("generator_eta_effective"),
+            "fuel_per_shaft_kg_J": ob.get("generator_fuel_per_shaft_kg_J"),
+            "method": "perdas do gerador onboard P_veio − P_terminal = P_veio·(1 − η) (η e BSFC declarados no bloco "
+                      "onboard; acdt.core.onboard)"}
+
+
 def hotel_power(res: Any) -> tuple[float | None, str]:
     p = res.spec.assumptions["propulsion"]
     a = float(p.get("systems_power_W", 0.0) or 0.0) + float(p.get("onboard_power_W", 0.0) or 0.0)
+    g = generator_of(res)
+    if g is not None and a == 0.0:  # prop térmico: o bloco onboard vira extração de veio; a carga dissipa-se a bordo
+        a = g["terminal_W"]
+        return a, "carga onboard servida pelo gerador (P_terminal, acdt.core.onboard)"
     b = None
     s = getattr(res, "systems", None)
     pb = getattr(s, "power_budget", None) if s is not None else None
@@ -290,6 +309,15 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
                                        _f(eng.get("cooling_fraction")), _f(eng.get("heat_rejection_W")))
         srcs["motor_termico"] = {"heat_W": dict(engine_q) | {"default": 0.0},
                                  "method": f"balanço de energia do motor; PCI {lhv} MJ/kg ({lhv_src}); BSFC {bs_src}"}
+        gl = generator_of(res)
+        if gl is not None:
+            srcs["gerador"] = {"heat_W": gl["loss_W"], "method": gl["method"]}
+            chain_ids.append("gerador")
+            notes.append("gerador onboard: perdas no compartimento por omissão (PRESSUPOSTO: gerador dentro da "
+                         "fuselagem; conservativo — declare thermal.bays se estiver no motor)")
+    elif kind.startswith("hybrid") or "hybrid" in kind:
+        notes.append("híbrido no pipeline: perdas do gerador nao_avaliado (sem despacho híbrido no dimensionamento); "
+                     "use a especificação genérica com uma fonte 'generator' (P_veio·(1 − η) declarado)")
     else:
         notes.append(f"propulsão '{kind}': calor do motor para compartimentos adjacentes não modelado — declare-o em "
                      "thermal.sources (fica desconhecido, nunca zero, se o compartimento o listar)")
@@ -410,7 +438,28 @@ def _engine_cooling(res: Any, o: dict[str, Any], spec: dict[str, Any], th: dict[
     return out
 
 
+def sizing_unusable(res: Any) -> str | None:
+    """Motivo pelo qual o dimensionamento não serve de entrada às análises acopladas (``None`` = serve).
+
+    Sem convergência (p.ex. espiral de massa a baixa densidade da bateria) o ``DesignResult`` traz NaN na
+    velocidade/potência; a térmica não tem solução de regime para entradas não finitas — fica ``nao_avaliado``."""
+    sz = getattr(res, "sizing", None)
+    if sz is None or not getattr(sz, "converged", False):
+        return "dimensionamento não convergiu (sem solução: p.ex. espiral de massa)"
+    for nm in ("cruise_speed", "power_sl"):
+        v = getattr(res, nm, None)
+        if v is not None and not math.isfinite(float(v)):
+            return f"dimensionamento com {nm} não finito"
+    W0 = getattr(sz, "W0", None)
+    if W0 is None or not math.isfinite(float(W0)):
+        return "dimensionamento com W0 não finito"
+    return None
+
+
 def analyse_thermal(res: Any) -> dict[str, Any]:
+    why = sizing_unusable(res)
+    if why is not None:
+        raise ValueError(f"{why}; térmica sem solução de regime — nao_avaliado")
     o = _opts(res.spec)
     spec, notes = build_spec(res, o)
     th = analyse(spec)
@@ -442,6 +491,7 @@ def analyse_thermal(res: Any) -> dict[str, Any]:
                                     "hi": None}
             cool["delta_CD0"] = {"lo": cool["delta_CD0"]["lo"] if cool.get("delta_CD0") else None, "hi": None}
     ops = operating_points(res)
+    th["generator"] = generator_of(res)
     th.update({"evaluated": True, "level": LEVEL, "operating_points": ops, "engine_cooling": ec,
                "adapter_notes": notes, "coupling_mode": o["coupling"], "inputs": {
                    k: o[k] for k in ("hot_atmosphere", "cold_atmosphere", "radiated_fraction", "electric", "engine")}})
@@ -492,8 +542,16 @@ def coupling_increments(th: dict[str, Any], kind: str) -> dict[str, Any]:
     elif kind == "electric":
         inc["power_W"] = float(fp)
     elif fp:
-        inc["not_coupled"].append("potência do ventilador em motor térmico: declare-a como carga onboard (BSFC/η do "
-                                  "gerador)")
+        gen = th.get("generator") or {}
+        if gen.get("eta") and gen.get("fuel_per_shaft_kg_J") is not None:
+            # motor térmico com gerador onboard: o ventilador é extração de veio P/η e caudal P/η·BSFC (identidades
+            # do modelo onboard; PRESSUPOSTO conservador: corre em todo o cruzeiro, como no elétrico)
+            inc["power_W"] = float(fp)
+            inc["shaft_W"] = float(fp) / float(gen["eta"])
+            inc["fuel_flow_kg_s"] = inc["shaft_W"] * float(gen["fuel_per_shaft_kg_J"])
+        else:
+            inc["not_coupled"].append("potência do ventilador em motor térmico sem gerador onboard (η/BSFC): "
+                                      "nao_avaliado")
     return inc
 
 
@@ -503,6 +561,8 @@ def size_with_thermal(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]
     base_mass = float(spec.assumptions["weights"].get("fixed_mass_kg", 0.0) or 0.0)
     base_P = float(spec.assumptions["propulsion"].get("systems_power_W", 0.0) or 0.0)
     base_areas = dict(spec.assumptions["aero"].get("extra_drag_areas_m2") or {})
+    base_shaft = float(spec.assumptions["propulsion"].get("auxiliary_shaft_W", 0.0) or 0.0)
+    base_ff = float(spec.assumptions["propulsion"].get("auxiliary_fuel_flow_kg_s", 0.0) or 0.0)
     hist: list[dict[str, Any]] = []
     cur = {"drag_area_m2": 0.0, "mass_kg": 0.0, "power_W": 0.0}
     sp = spec
@@ -511,6 +571,10 @@ def size_with_thermal(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]
     mission: dict[str, Any] = {"used": False, "source": "ciclo não arrancou"}
     for it in range(int(o["max_iter"])):
         res, sysr = run_fn(sp)
+        why = sizing_unusable(res)
+        if why is not None:  # sem solução: o ciclo para; a etapa térmica regista nao_avaliado com o motivo
+            hist.append({"iter": it, "W0_kg": None, "status": "nao_avaliado", "reason": why})
+            break
         mission = ensure_required_mission(res)
         th = analyse_thermal(res)
         inc = coupling_increments(th, spec.propulsion_kind)
@@ -527,6 +591,10 @@ def size_with_thermal(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]
         sp.assumptions = copy.deepcopy(spec.assumptions)
         sp.assumptions["aero"]["extra_drag_areas_m2"] = {**base_areas, "arrefecimento_termico": new["drag_area_m2"]}
         sp.assumptions["weights"]["fixed_mass_kg"] = base_mass + new["mass_kg"]
+        if spec.propulsion_kind in ("piston_prop", "turboprop") and inc.get("shaft_W"):
+            pa = sp.assumptions["propulsion"]
+            pa["auxiliary_shaft_W"] = base_shaft + float(inc["shaft_W"])
+            pa["auxiliary_fuel_flow_kg_s"] = base_ff + float(inc["fuel_flow_kg_s"])
         if spec.propulsion_kind == "electric":
             sp.assumptions["propulsion"]["systems_power_W"] = base_P + new["power_W"]
             # com power budget em malha fechada (systems_integration.run_with_systems) systems_power_W é substituído

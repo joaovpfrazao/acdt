@@ -75,6 +75,7 @@ class Condition:
     ambient: Ambient
     V_m_s: float
     solar_W_m2: float = 0.0
+    solar_source: str = ""
 
 
 @dataclass
@@ -176,6 +177,11 @@ def solve_bay_steady(bay: Bay, cond: Condition, Q_W: float, *, hot: "bool | Corn
     ``hot=True``: ε_ext mínimo, α_s máximo, ε_int mínimo, camada limite laminar/mista; ``hot=False``: o oposto;
     ou um vértice explícito (``Corner``). Para limites rigorosos use :func:`solve_bay_bounds`."""
     a = cond.ambient
+    if not (math.isfinite(Q_W) and math.isfinite(cond.V_m_s) and math.isfinite(a.T_K)):
+        # sem isto o NaN chegava ao brentq ("function value ... is NaN"): entrada não finita não tem solução —
+        # quem chama trata como desconhecido (a etapa térmica fica nao_avaliado com este motivo)
+        raise ValueError(f"compartimento '{cond.name}': entrada não finita (Q={Q_W}, V={cond.V_m_s}, "
+                         f"T_amb={a.T_K}) — sem solução de regime; desconhecido")
     T_in = ram_temperature(a.T_K, cond.V_m_s)
 
     def f(T_b: float) -> float:

@@ -34,6 +34,11 @@ MIL310 = ("MIL-HDBK-310, Global Climatic Data for Developing Military Products (
 CP_AIR = GAMMA * R_AIR / (GAMMA - 1.0)
 SIGMA_SB = 5.670374419e-8  # W/(m²·K⁴), CODATA 2018 (valor exato derivado das constantes do SI de 2019)
 SOLAR_HOT_DAY_W_M2 = 1120.0  # MIL-HDBK-310 Tabela I, 12–13 h
+SOLAR_CONSTANT_W_M2 = 1353.0  # I0 usado por Meinel & Meinel (1976) e Laue (1970) nas fontes abaixo
+LAUE_REF = ("Laue, E. G., The measurement of solar spectral irradiance at different terrestrial elevations, Solar "
+            "Energy 13 (1970) 43–57 — modelo transcrito de Reno, Hansen & Stein, SAND2012-2389 (Sandia, 2012), "
+            "Eq. (24), e de PVEducation, 'Air Mass' (a = 0,14 km⁻¹, h em km; 'exato até alguns km')")
+LAUE_MAX_KM = 3.0  # PRESSUPOSTO: leitura conservadora de "alguns km" (a fonte não dá um limite numérico)
 
 # MIL-HDBK-310 §5.3.1.1.2: (altitude geométrica km, T °C, ρ kg/m³) — 1 % quente
 _HOT_1 = [(0, 49, 1.081), (1, 40, 1.007), (2, 30, 0.919), (4, 17, 0.757), (6, 6, 0.613), (8, -5, 0.497),
@@ -142,6 +147,32 @@ def ambient(profile: str, altitude_m: float, *, T_sl_C: float | None = None, lap
         return Ambient(profile, h, T, p, p / (R_AIR * T), f"utilizador: T_sl = {T_sl_C} °C, gradiente {lapse_K_m} K/m, "
                        "pressão ISA (PRESSUPOSTO)")
     raise ValueError(f"perfil de atmosfera desconhecido '{profile}' (use {', '.join(PROFILES)})")
+
+
+def laue_direct_W_m2(h_m: float, air_mass: float = 1.0) -> float:
+    """Feixe direto normal ao sol (W/m²), modelo de Laue (1970): I = I0·[(1 − a·h)·0,7^(AM^0,678) + a·h],
+    a = 0,14 km⁻¹, h em km (Reno et al., SAND2012-2389, Eq. 24). Com h = 0 é o modelo de Meinel & Meinel (1976)."""
+    if air_mass < 1.0 or h_m < 0.0:
+        raise ValueError("AM ≥ 1 e h ≥ 0")
+    ah = 0.14 * h_m / 1000.0
+    return float(SOLAR_CONSTANT_W_M2 * ((1.0 - ah) * 0.7 ** (air_mass ** 0.678) + ah))
+
+
+def solar_hot_day(h_m: float) -> tuple[float, str]:
+    """Irradiância solar de projeto do dia quente à altitude ``h_m``.
+
+    Nível do solo: 1120 W/m² (MIL-HDBK-310 Tabela I). Em altitude, PRESSUPOSTO: escala-se esse valor pela razão
+    de Laue I(h)/I(0) com o sol no zénite (AM = 1, caso quente), i.e. 1 + 0,06·h[km]; acima de ``LAUE_MAX_KM`` o
+    modelo sai da validade declarada e usa-se a constante solar (1353 W/m²) como majorante — não zero."""
+    h = max(0.0, float(h_m))
+    if h <= 0.0:
+        return SOLAR_HOT_DAY_W_M2, "MIL-HDBK-310 Tabela I (1120 W/m², nível do solo)"
+    if h / 1000.0 <= LAUE_MAX_KM:
+        f = laue_direct_W_m2(h) / laue_direct_W_m2(0.0)
+        return min(SOLAR_HOT_DAY_W_M2 * f, SOLAR_CONSTANT_W_M2), (
+            f"MIL-HDBK-310 Tabela I × razão de Laue I(h)/I(0) = {f:.4f} (AM = 1); {LAUE_REF}")
+    return SOLAR_CONSTANT_W_M2, (f"acima de {LAUE_MAX_KM:g} km (fora da validade do modelo de Laue): constante solar "
+                                 f"{SOLAR_CONSTANT_W_M2:g} W/m² como majorante")
 
 
 def ram_temperature(T_K: float, V: float) -> float:

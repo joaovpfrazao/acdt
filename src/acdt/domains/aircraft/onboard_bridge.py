@@ -120,8 +120,22 @@ def apply_onboard_to_size_dict(d: dict) -> tuple[dict, dict]:
     if isinstance(out.get("assumptions"), dict):
         out["assumptions"].pop("onboard", None)
     out.setdefault("assumptions", {}).setdefault("onboard_bridge", {})
+    # gerador(es) da extração de veio (prop térmico): perdas P_veio − P_terminal = P_veio·(1 − η) e coeficientes
+    # efetivos para acoplar cargas extra (ventilador) — identidades do próprio modelo onboard (η e BSFC são entradas)
+    gens = [r for r in a.get("sources") or [] if r.get("kind") not in ("main_battery", "battery")]
+    gen_term = gen_loss = gen_shaft = gen_fuel = None
+    if model == "prop" and gens and all(r.get("shaft_extraction_W") is not None for r in gens):
+        gen_term = float(sum(r["terminal_average_W"] for r in gens))
+        gen_shaft = float(sum(r["shaft_extraction_W"] for r in gens))
+        gen_fuel = float(sum(r["fuel_flow_kg_s"] for r in gens))
+        gen_loss = gen_shaft - gen_term
     report = {
         "applied": True,
+        "generator_terminal_W": gen_term,
+        "generator_shaft_W": gen_shaft,
+        "generator_loss_W": gen_loss,
+        "generator_eta_effective": (gen_term / gen_shaft) if gen_term and gen_shaft else None,
+        "generator_fuel_per_shaft_kg_J": (gen_fuel / gen_shaft) if gen_fuel and gen_shaft else None,
         "status": "assessed",
         "model": model,
         "load_average_W": a["load_average_W"],

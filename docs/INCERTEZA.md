@@ -198,7 +198,8 @@ Substituto quadrático com 28 corridas do modelo verdadeiro (LHS, semente 202611
   arrefecimento passam o W0 dos 25 kg).
 * **Falhas**: 2 das 28 corridas falharam no transitório/regime da baia térmica (`brentq` com f(242,15 K) = NaN em
   `core/thermal/network.solve_bay_steady`); as entradas estão em `uq.json` (`training_samples`, `ok: false`).
-  Contam como não-passa. Causa não isolada neste PR: fica para a próxima tarefa leve.
+  Contam como não-passa. Causa isolada depois (TERMICA §10): o dimensionamento não converge (espiral de massa) e
+  chega NaN à térmica. Agora estas corridas ficam `nao_avaliado` com o motivo, em vez do erro do `brentq`.
 
 Veredicto: ligação das disciplinas novas à UQ **validado** (saídas por `result_metrics`, `fixed` testado em
 `tests/test_uq_fixed.py`); sensibilidade global de W0/LCC/CO₂e por Sobol' **nao_avaliado** (substituto rejeitado),

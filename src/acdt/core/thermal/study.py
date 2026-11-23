@@ -11,9 +11,9 @@ from __future__ import annotations
 import math
 from typing import Any, Mapping, Sequence
 
-from .air import MIL310, SOLAR_HOT_DAY_W_M2, ambient
+from .air import MIL310, ambient, solar_hot_day
 from .convection import INCROPERA, vertical_plate_natural
-from .cooling import (MOMENTUM_REF, NACA_MFR_DESIGN, NACA_RM_A8I29, WORST_SEGMENT, fan_power,
+from .cooling import (MOMENTUM_REF, NACA_MFR_DESIGN, NACA_RM_A8I29, WORST_SEGMENT, fan_power, meredith_thrust_bound,
                        size_ram_duct)
 from .network import Bay, Bound, Condition, Phase, corners, solve_bay_bounds, solve_bay_transient
 from .sources import HeatSource, from_spec, total
@@ -56,9 +56,13 @@ def build_condition(c: Mapping[str, Any]) -> Condition:
     prof = str(c.get("atmosphere", "isa"))
     amb = ambient(prof, float(c.get("altitude_m", 0.0)), T_sl_C=_num(c.get("T_sl_C")))
     sol = c.get("solar_W_m2")
+    src = "declarado"
     if sol is None:
-        sol = SOLAR_HOT_DAY_W_M2 if (c.get("case") == "hot" and c.get("sun", True)) else 0.0
-    return Condition(str(c["name"]), amb, float(c.get("V_m_s", 0.0)), float(sol))
+        if c.get("case") == "hot" and c.get("sun", True):
+            sol, src = solar_hot_day(float(c.get("altitude_m", 0.0)))
+        else:
+            sol, src = 0.0, "sem sol (caso frio/noite)"
+    return Condition(str(c["name"]), amb, float(c.get("V_m_s", 0.0)), float(sol), src)
 
 
 def build_bay(b: Mapping[str, Any]) -> Bay:
@@ -179,6 +183,7 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                               areal_density_kg_m2=_num(duct.get("areal_density_kg_m2")),
                               fixed_mass_kg=float(ram_spec.get("hx_mass_kg", 0.0) or 0.0))
             return {"condition": cn, "T_limit_air_C": T_lim - 273.15, "Q_W": Qhi, **d.to_dict(),
+                    "meredith": meredith_thrust_bound(Qhi, cond.V_m_s, cond.ambient.T_K),
                     "note": "PRESSUPOSTO: todo o calor sai pelo ar (pele ignorada; conservativo)"}
 
         if ram is not None and A_in is None and ram.get("size_for"):
@@ -236,7 +241,7 @@ def analyse(spec: Mapping[str, Any]) -> dict[str, Any]:
                 "case": case, "ambient": {"profile": cond.ambient.profile, "T_C": cond.ambient.T_C,
                                           "p_Pa": cond.ambient.p_Pa, "rho": cond.ambient.rho,
                                           "altitude_m": cond.ambient.altitude_m, "source": cond.ambient.source},
-                "V_m_s": cond.V_m_s, "solar_W_m2": cond.solar_W_m2, "Q_W": _iv(Qlo, Qhi), "sources": det,
+                "V_m_s": cond.V_m_s, "solar_W_m2": cond.solar_W_m2, "solar_source": cond.solar_source, "Q_W": _iv(Qlo, Qhi), "sources": det,
                 "vent_m_dot_kg_s": bay.vent_m_dot_kg_s,
                 "T_bay_C": _iv(_C(cold.T_bay_K), _C(hot.T_bay_K if hot else None)),
                 "T_skin_C": _iv(_C(cold.T_skin_K), _C(hot.T_skin_K if hot else None)),

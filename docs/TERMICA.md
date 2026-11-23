@@ -79,9 +79,9 @@ Segue o padrão da disciplina de ruído ([RUIDO.md](RUIDO.md)):
 * No dimensionamento do conduto, todo o calor sai pelo ar (pele ignorada) — conservativo.
 * No transitório a pele é quase-estacionária; a capacidade tem de ser declarada (`capacity_J_K` ou
   `mass_kg` + `cp_J_kgK`).
-* Efeito Meredith (impulso do ar aquecido) desprezado; arrasto externo da entrada só se declarado
-  (`external_drag_N`).
-* Sol de projeto 1120 W/m² ao nível do mar a qualquer altitude (subestima a irradiância em altitude).
+* Efeito Meredith (impulso do ar aquecido) não creditado; o majorante ideal é reportado (§10). Arrasto externo da
+  entrada só se declarado (`external_drag_N`).
+* Sol de projeto: 1120 W/m² ao nível do solo (MIL-HDBK-310), escalado em altitude pela razão de Laue (§10).
 * MIL-HDBK-310 frio 20 % só até 10 km; acima usa-se o 1 %.
 * Jatos: calor do motor para compartimentos adjacentes não modelado — declare-o como fonte.
 * Fidelidade L0/L1: sem condução multidimensional, sem permutadores líquidos, sem ciclos de refrigeração.
@@ -170,10 +170,11 @@ com acoplamento iterado e pipeline a gasolina).
 ## 7. Seguimentos
 
 * Adaptadores nativos VTOL/jato no pipeline (hoje pela especificação genérica).
-* Perdas do gerador híbrido a partir do bloco `onboard`; potência do ventilador acoplada em aeronaves com motor
-  térmico (via `onboard`).
-* Efeito Meredith e arrasto externo da entrada (dados NACA de entradas submersas).
-* Dados de capacidade térmica por componente; permutadores líquidos; irradiância solar em altitude.
+* Perdas do gerador em propulsão híbrida no pipeline (`nao_avaliado`: sem despacho híbrido no dimensionamento).
+  Motor térmico com gerador `onboard` já feito (§10).
+* Empuxo de Meredith creditado (precisa de perdas da entrada/permutador/bocal citadas); arrasto externo da entrada
+  (dados NACA de entradas submersas).
+* Dados de capacidade térmica por componente; permutadores líquidos.
 * Alta fidelidade: proposta em [proposta-termica-gelo.md](proposta-termica-gelo.md), sem malha e sem corrida. O L0/L1 não fica validado por essa proposta.
 
 ## 8. Ponto de operação da missão e entrada no pior segmento (19 nov 2026)
@@ -189,3 +190,39 @@ No UAV elétrico de exemplo, com a baía de teste e `pior_segmento`, a subida qu
 ## 9. Adaptador nativo (19 nov 2026)
 
 `native_disciplines.py` monta o estudo térmico do VTOL e do jato quando há `thermal.bays`. A área da fuselagem não é inventada. A carga útil soma-se ao hotel; a arquitetura elétrica substitui-o pelo máximo (MIL-E-7016F; Moir & Seabridge Cap. 5). As perdas de distribuição são P·(1/η − 1) só com η declarado; sem η o calor fica [0; desconhecido] e o veredicto é `nao_avaliado`. A transição VTOL e a subida do jato L0 não têm um ponto de velocidade: o estudo dos segmentos conhecidos corre e a missão não fecha. O calor do turbofan só entra com `thermal.engine.heat_rejection_W`. Heywood não é aplicado ao jato. Na asa fixa as mesmas regras entram em `hotel_power` e na fonte `perdas_distribuicao`. A massa não é acoplada. Medida de ensaio: `examples/output/adaptadores_vtol_jato/adaptadores.json`.
+
+## 10. Sol em altitude, Meredith, gerador onboard, ventilador no motor térmico e NaN da UQ (23 nov 2026)
+
+* **NaN no `brentq` de `solve_bay_steady`** (2/28 corridas de `examples/studies/uq_disciplinas`): causa isolada. Com
+  bateria ~194–206 Wh/kg e η_total ~0,59–0,60 o ciclo `iterar` entra em espiral de massa (W0 35,7 → 39,0 → 42,1 kg …),
+  o dimensionamento não converge e o `DesignResult` traz V de cruzeiro e P_SL = NaN. A térmica recebia Q e V NaN. Não
+  há solução de regime. Agora: `sizing_unusable(res)` para os ciclos térmico e de gelo, e as etapas ficam
+  `nao_avaliado` com o motivo («dimensionamento não convergiu»). O gelo também deixou de marcar como avaliado um
+  resultado com T_tot NaN. `solve_bay_steady` recusa entradas não finitas com uma mensagem clara. Teste:
+  `tests/test_thermal_nan_regression.py` (amostra 1 de `uq.json`).
+* **Sol em altitude**: modelo de Laue (1970), I = I0·[(1 − a·h)·0,7^(AM^0,678) + a·h], I0 = 1353 W/m²,
+  a = 0,14 km⁻¹, h em km. Transcrito de Reno, Hansen & Stein, SAND2012-2389 (Sandia, 2012), Eq. (24), e de
+  PVEducation, «Air Mass», que também dá o valor de verificação AM 1,5 → 0,846 kW/m² (testado). O artigo original
+  (Solar Energy 13, 1970) não foi consultado. PRESSUPOSTO: o valor de solo da MIL-HDBK-310 (1120 W/m²) é escalado
+  pela razão I(h)/I(0) com AM = 1 (sol no zénite, caso quente), i.e. 1 + 0,06·h[km]. A fonte diz «exato até alguns
+  km». PRESSUPOSTO: validade até 3 km. Acima disso usa-se a constante solar 1353 W/m² como majorante (não zero).
+  `solar_W_m2` declarado continua a ganhar; a origem fica em `solar_source`. Medida: UAV a gasolina a 3000 m →
+  1321,6 W/m² no cruzeiro quente (+18 %).
+* **Efeito Meredith**: majorante ideal F ≤ η·Q/V, η = 1 − 1/(1 + (γ−1)/2·M²). É o ciclo de Brayton ideal: compressão
+  pela pressão dinâmica, com T/T_t de NACA Report 1135, Eq. (43); calor a pressão constante; expansão isentrópica;
+  todo o trabalho em potência propulsiva. Reportado em `ram_sizing` (`meredith`), com `credited: false`. O arrasto
+  continua a ser o majorante sem Meredith. Medida: 25 m/s, 49 °C → η = 9,6·10⁻⁴, 200 W → 0,008 N. A recuperação é
+  desprezável nos UAV lentos.
+* **Perdas do gerador onboard (motor térmico)**: P_veio − P_terminal = P_veio·(1 − η), com η e BSFC declarados no
+  bloco `onboard` (conservação de energia; a mesma identidade de `sources.generator_loss`). A fonte `gerador` entra
+  por omissão no compartimento da fuselagem. PRESSUPOSTO conservativo: declare `thermal.bays` se o gerador estiver
+  no motor. A carga onboard servida pelo gerador passa a contar no calor da aviónica (antes 0 W em motor térmico).
+  Medida: 400 W de carga, entrega 0,9, η 0,75 → 148,1 W de perdas. A propulsão híbrida no pipeline fica
+  `nao_avaliado`, porque o dimensionamento não tem despacho híbrido. A especificação genérica aceita uma fonte
+  `generator`.
+* **Ventilador em motor térmico (pistão/turbo-hélice)**: com gerador `onboard`, o modo `iterar` acopla o ventilador
+  como extração de veio P/η e caudal P/η·BSFC (`auxiliary_shaft_W`, `auxiliary_fuel_flow_kg_s`). PRESSUPOSTO
+  conservativo: o ventilador corre em todo o cruzeiro, como no elétrico. Sem gerador fica `nao_avaliado`. Medida
+  (UAV a gasolina, ventilador 0,05 kg/s): Δp 10 Pa → 2,0 W, W0 152,45 kg; Δp 3000 Pa → 599 W, veio 1392 W, W0
+  159,69 kg; os dois ciclos convergem.
+* Testes: `tests/test_thermal_followups.py`, `tests/test_thermal_nan_regression.py`.

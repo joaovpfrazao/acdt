@@ -2058,3 +2058,7 @@ Estudo `examples/studies/mdo_disciplinas` (`applied: false`), resultados em `exa
 
 `uncertainty.fixed` novo; estudo `examples/studies/uq_disciplinas` (`applied: false`). Substituto rejeitado para W0/LCC/CO₂e (W0 não suave: espiral de massa a bateria/η baixos); rastreio por postos de Spearman em vez de Sobol'. Por fazer: isolar o NaN do `brentq` em `solve_bay_steady` (2/28 corridas; entradas em `examples/output/uq_disciplinas/uq.json`). Pormenor em [INCERTEZA.md](INCERTEZA.md).
 
+## NaN da térmica e seguimentos leves (23 nov 2026, ramo `termica-nan-e-seguimentos`)
+
+O NaN no `brentq` da UQ vinha do dimensionamento sem convergência (espiral de massa): V e P_SL NaN. A térmica e o gelo ficam agora `nao_avaliado` com o motivo. Feito com método citado: sol em altitude (Laue 1970 via SAND2012-2389 Eq. 24; PRESSUPOSTO validade 3 km, acima majorante 1353 W/m²), majorante de Meredith (Brayton ideal + NACA 1135 Eq. 43, não creditado), perdas do gerador onboard em motor térmico (P_veio·(1 − η)) e ventilador acoplado como extração de veio P/η e caudal P/η·BSFC. Fica `nao_avaliado`: escape do motor de pistão (sem método público verificável) e o gerador em propulsão híbrida no pipeline (sem despacho). Pormenor em [TERMICA.md](TERMICA.md) §10 e CAPABILITIES §47.
+

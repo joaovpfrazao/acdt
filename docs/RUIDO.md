@@ -125,7 +125,9 @@ Não há ainda caso de **validação** contra medições de ruído de hélice co
 * Validação contra medições publicadas (p. ex. níveis da Parte 36 de aviões certificados, ou medições de hélices
   de UAV em túnel), com citação.
 * Ruído de espessura (Deming) e efeito do voo (Garrick & Watkins com V ≠ 0) ou Hanson, se verificados.
-* Ruído de motor (escape) por método citado; jatos (SAE ARP876) se verificado.
+* Ruído de motor (escape) por método citado; jatos (SAE ARP876) se verificado. Revisto a 23 nov 2026: não foi
+  encontrado um método público e verificável para o escape do motor de pistão, por isso continua `nao_avaliado`. O
+  caminho suportado é `noise.engine_noise` com espetro medido; sem ele o nível é limite inferior.
 * Modelo de deteção de Fidell et al. (1974) quando o artigo original for consultado (coeficientes exatos).
 * ICAO Anexo 16 Vol. I Cap. 10 quando o texto for verificado.
 * Ligar ao `acdt vtol` (ponto de pairar) e ao estudo de frota.
