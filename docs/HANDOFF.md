@@ -2046,4 +2046,7 @@ A queda do worker na CI Ubuntu era o `--timeout=900` (método thread → `os._ex
 ## `thinwalled.solve` vectorizado (23 nov 2026, ramo `thinwalled-vectorizado`)
 
 Secção multicélula de Megson 5,4× mais rápida (2,05 → 0,38 ms por secção): idealização e sistema vectorizados, LU em vez de SVD quando o sistema é quadrado depois de retirar a linha de nó redundante (`lstsq` como recurso). Mesmos resultados (regressão contra a referência congelada, 10⁻⁹). Teste pesado da asa voadora 281 → 174 s. Pormenor em [QUALIDADE.md](QUALIDADE.md).
+## MGL e fator α de causa comum (23 nov 2026, ramo `ccf-mgl-alfa`)
+
+NUREG/CR-5485 §5.3 Eq. 5.6–5.13 e Ap. A Eq. A.21–A.26 / Tabela A-2, conferidos nas imagens das páginas 40–42 e A-9–A-11 do PDF público. `common_cause.groups[].model: mgl | alpha` com `params_source` obrigatório; FTA com um evento CCF por subconjunto (m ≤ 6). Exemplo da Eq. 5.10 da fonte inconsistente com a Eq. 5.6 (documentado; usa-se a geral). IEC 61508-6 Anexo D: `nao_avaliado` (sem fonte pública verificável). Pormenor em [FIABILIDADE.md](FIABILIDADE.md) §12.
 
