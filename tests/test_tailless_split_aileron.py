@@ -185,6 +185,10 @@ def test_morph_tailless_yaw_rules():
 
 
 @pytest.mark.slow
+# Tempo-limite próprio (17 nov→23 nov 2026): ~375 s na CI Linux sem carga, mas >875 s com 4 workers + cobertura
+# (corrida 44633204257). O --timeout=900 da CI com --timeout-method=thread termina o processo (os._exit) e o xdist
+# reporta «worker crashed» — não é falta de memória (pico RSS medido 238 MB). O teste e as asserções não mudam.
+@pytest.mark.timeout(2400)
 @needs_avl
 def test_tailless_example_closes_bare_fails_sas_passes():
     """Example: W0 loop closes; bare Dutch roll fails (information), SAS within split-aileron capability passes.

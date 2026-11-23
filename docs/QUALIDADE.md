@@ -125,6 +125,19 @@ Política:
 Casos já nesta forma: `tests/test_section_thickness.py::test_avl_cl_cm_at_frozen_references` (PR #64),
 `tests/test_tailless_split_aileron.py` (bandas do `side_load_band`, PR #65).
 
+### Worker que «caiu» na asa voadora sem deriva (23 nov 2026)
+
+`tests/test_tailless_split_aileron.py::test_tailless_example_closes_bare_fails_sas_passes` deitou abaixo um worker do
+xdist na CI Ubuntu (corrida 44633204257, `node down: Not properly terminated`). Causa medida: tempo, não memória.
+Na CI sem carga o teste leva cerca de 375 s; nessa corrida, com 4 workers e cobertura, já ia em mais de 875 s quando
+o worker caiu. O `--timeout=900 --timeout-method=thread` da CI termina o processo com `os._exit`, e o xdist reporta
+isso como queda do worker. Localmente o pico de memória do teste é 238 MB (RSS), e 68 % do tempo é o dimensionamento
+(secção multicélula de Megson em `thinwalled.solve`, 82 mil chamadas).
+
+Correção: `@pytest.mark.timeout(2400)` neste teste e em `tests/test_launch_recovery.py::test_tailless_example_catapult_and_belly`
+(363 s, o mesmo exemplo). O marcador sobrepõe-se ao `--timeout` da linha de comandos. As asserções não mudam e os dois
+testes continuam marcados `slow`, fora do job Windows. Acelerar `thinwalled.solve` fica como melhoria separada.
+
 ### Teste instável de reutilização de `run_id` (18 nov 2026)
 
 `tests/test_size_fleet_mtow_align.py::test_run_id_feed_reuses_size_result` falhou uma vez na suite paralela

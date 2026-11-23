@@ -177,6 +177,19 @@ fontes modeladas). Sem A_gr, essa omissão não tem sinal: nas bandas graves a t
 pelo que faltar o solo não torna o alcance um limite superior. Com A_gr e sem C_0, o alcance é ainda o da
 propagação favorável.
 
+### Âmbito da ISO 9613-2 e refração (23 nov 2026)
+
+A ISO 9613-2:1996 §1 diz que o método é para fontes no solo (estrada, ferrovia, indústria, construção) e que **não
+se aplica ao som de aeronaves em voo**. A edição de 2024 mantém a frase. Foi conferido na mesma transcrição pública
+usada para a Tabela 3 (KM Exhibit 9, PUC EL19-003) e na página da ISO da edição de 2024. Por isso, quando
+`iso9613_ground` é declarado, A_gr e C_met entram só como extrapolação fora do âmbito (PRESSUPOSTO). O bloco
+`iso9613_ground.ambito` regista `dentro_do_ambito: false`, as razões do alcance dizem o mesmo e o pressuposto
+aparece na lista da etapa. A omissão continua a não aplicar A_gr.
+
+Refração: continua `nao_avaliado`, sem correção (`correction_dB: null`). Nord2000 e Harmonoise não foram
+verificados equação a equação contra uma fonte pública, e o próprio C_met da ISO 9613-2 está fora do âmbito para
+uma fonte em voo. Não há outro método citado e verificável que caiba numa tarefa leve, por isso parou aqui.
+
 Veredicto desta secção: `validado` para a transcrição da Tabela 3 e de C_met (caso `NOISE-ISO9613-2-AGR`; não é
 medição de voo). Calibração `nao_aplicar`. Espessura, refração geométrica e o alcance: `nao_avaliado`.
 
