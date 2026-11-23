@@ -2060,6 +2060,12 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Potência só na exposição**: confirmado (`exposure_duty`, `power_schedule: exposicao`), já no main desde o PR #19.
 * **Encontro misto contínuo + intermitente**: `nao_avaliado`. Jeck DOT/FAA/AR-00/30 §2.1 só junta as Figuras 1 e 4 num gráfico LWC × extensão horizontal (equivalente aos fatores F já implementados); não dá procedimento de soma. Pormenor em [docs/GELO.md](docs/GELO.md) §10.
 
+## 44. Causa comum MGL e fator α ligados à árvore de falhas (23 nov 2026)
+
+* **O que faz**: `common_cause.groups[].model: mgl | alpha` (além de `beta`). MGL pela Eq. 5.13 do NUREG/CR-5485 (ρ = β, γ, δ, …); fator α pelas Eq. 5.6 (ensaio escalonado) e 5.7/A.23 (não escalonado), α_t pela Eq. 5.9; conversão MGL ↔ α escalonado pela Tabela A-2. Na FTA, um evento CCF partilhado por cada subconjunto de k ≥ 2 componentes (até m = 6), topo exato por Shannon.
+* **Recusa**: parâmetros sem `params_source`, Σ α ≠ 1, `testing` em falta (fator α), Q_t diferentes ou m > 6 → `nao_avaliado`; sem omissões.
+* **Verificação**: m = 3 reproduz as Eq. 5.11 e 5.12 (2-de-3); Σ C(m−1, k−1) Q_k = Q_t até m = 6; α escalonado ≡ MGL; A.25 + 5.13 ≡ 5.7 para m = 3. Veredicto `validado` (aplicação das equações; os valores dos parâmetros são da fonte declarada). IEC 61508-6 Anexo D: `nao_avaliado` (norma paga, sem fonte pública para conferir as tabelas). Pormenor em [docs/FIABILIDADE.md](docs/FIABILIDADE.md) §12.
+
 ## 45. MDO de sistema com as disciplinas novas (23 nov 2026)
 
 * **O que faz**: estudo de demonstração `examples/studies/mdo_disciplinas/` (`applied: false`): térmica, gelo, fiabilidade, custo de série e ciclo de vida como objetivos (LCC) e restrições (fiabilidade, disponibilidade, potência anti-gelo) no `acdt mdo`, por `mdo.fixed` + `result_metrics`, sem mudar o exemplo.
