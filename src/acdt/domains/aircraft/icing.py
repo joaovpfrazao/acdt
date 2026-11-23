@@ -28,7 +28,7 @@ from typing import Any
 
 from acdt.core.icing.study import analyse
 
-from .thermal import _f, _h_range, _segments, ensure_required_mission, operating_points, with_load
+from .thermal import _f, _h_range, _segments, ensure_required_mission, operating_points, sizing_unusable, with_load
 
 LEVEL = "L0"
 DEFAULTS: dict[str, Any] = {
@@ -122,6 +122,9 @@ def build_spec(res: Any, o: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
 
 
 def analyse_icing(res: Any) -> dict[str, Any]:
+    why = sizing_unusable(res)
+    if why is not None:  # NaN na velocidade daria T_tot NaN marcado como avaliado
+        raise ValueError(f"{why}; gelo sem pontos de funcionamento finitos — nao_avaliado")
     o = _opts(res.spec)
     spec, notes = build_spec(res, o)
     out = analyse(spec)
@@ -209,6 +212,10 @@ def size_with_icing(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]:
     mission: dict[str, Any] = {"used": False, "source": "ciclo não arrancou"}
     for it in range(int(o["max_iter"])):
         res, sysr = run_fn(sp)
+        why = sizing_unusable(res)
+        if why is not None:  # sem solução: o ciclo para; a etapa de gelo regista o motivo
+            hist.append({"iter": it, "W0_kg": None, "status": "nao_avaliado", "reason": why})
+            break
         mission = ensure_required_mission(res)
         ic_spec, _n = build_spec(res, o)
         out = analyse(ic_spec)

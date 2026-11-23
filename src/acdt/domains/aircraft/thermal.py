@@ -410,7 +410,28 @@ def _engine_cooling(res: Any, o: dict[str, Any], spec: dict[str, Any], th: dict[
     return out
 
 
+def sizing_unusable(res: Any) -> str | None:
+    """Motivo pelo qual o dimensionamento não serve de entrada às análises acopladas (``None`` = serve).
+
+    Sem convergência (p.ex. espiral de massa a baixa densidade da bateria) o ``DesignResult`` traz NaN na
+    velocidade/potência; a térmica não tem solução de regime para entradas não finitas — fica ``nao_avaliado``."""
+    sz = getattr(res, "sizing", None)
+    if sz is None or not getattr(sz, "converged", False):
+        return "dimensionamento não convergiu (sem solução: p.ex. espiral de massa)"
+    for nm in ("cruise_speed", "power_sl"):
+        v = getattr(res, nm, None)
+        if v is not None and not math.isfinite(float(v)):
+            return f"dimensionamento com {nm} não finito"
+    W0 = getattr(sz, "W0", None)
+    if W0 is None or not math.isfinite(float(W0)):
+        return "dimensionamento com W0 não finito"
+    return None
+
+
 def analyse_thermal(res: Any) -> dict[str, Any]:
+    why = sizing_unusable(res)
+    if why is not None:
+        raise ValueError(f"{why}; térmica sem solução de regime — nao_avaliado")
     o = _opts(res.spec)
     spec, notes = build_spec(res, o)
     th = analyse(spec)
@@ -511,6 +532,10 @@ def size_with_thermal(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]
     mission: dict[str, Any] = {"used": False, "source": "ciclo não arrancou"}
     for it in range(int(o["max_iter"])):
         res, sysr = run_fn(sp)
+        why = sizing_unusable(res)
+        if why is not None:  # sem solução: o ciclo para; a etapa térmica regista nao_avaliado com o motivo
+            hist.append({"iter": it, "W0_kg": None, "status": "nao_avaliado", "reason": why})
+            break
         mission = ensure_required_mission(res)
         th = analyse_thermal(res)
         inc = coupling_increments(th, spec.propulsion_kind)
