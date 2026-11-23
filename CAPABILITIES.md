@@ -2036,6 +2036,12 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Não é esta corrida**: y+ ≈ 1, as 42 camadas e as 1,207×10⁷ células do registo de 18 nov, os ângulos 2° e 4°, e uma polar. Esses registos não foram reescritos.
 * **Registo**: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.csv`. Narrativa em [docs/HANDOFF.md](docs/HANDOFF.md).
 
+## 42. T1 do custo de série a partir do plano de fabrico (23 nov 2026)
+
+* **O que faz**: com `series_cost.method: learning` sem `learning.T1`, T1 = custo de mão de obra do plano de fabrico (Fase 7, `hours_basis: first_unit`) / LF(N); material, fixadores, máquina, comprados e montagem final entram como itens por aeronave; ferramentas reportadas, fora de T1 e do NRE.
+* **Recusa**: sem plano, `hours_basis: standard` ou peças por resolver → `nao_avaliado`. Sem montagem final → T1 e flyaway limites inferiores.
+* **Medida (C172 de verificação, N = 820)**: T1 2,13 M USD, itens por aeronave 76,9 k USD, ferramentas 10,8 M USD. Veredicto: ligação `validado`; nível absoluto `calibrar` (herda as horas FOPV do plano). Pormenor em [docs/CUSTO_SERIE.md](docs/CUSTO_SERIE.md).
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado
