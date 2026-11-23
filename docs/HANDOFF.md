@@ -2027,3 +2027,7 @@ Dezasseis blocos, todos com código 0, alvos 400 a 6400. O histórico acumulou a
 Áreas molhadas L0 deste dimensionamento: asa 24,151 m², fuselagem 23,766 m². São as do registo, não uma área nova do CompGeom.
 
 Registo: `examples/output/cessna172_check_hifi_win/h5_c172_rans_um_angulo.json` e `h5_c172_rans_um_angulo.csv`. O que a ferramenta passa a fazer está em [../CAPABILITIES.md](../CAPABILITIES.md).
+
+## Âmbito ISO 9613-2 e refração (23 nov 2026, ramo `ruido-ambito-iso9613`)
+
+ISO 9613-2:1996 §1 (conferido na transcrição KM Exhibit 9 e na página ISO de 2024): não se aplica a aeronaves em voo. A_gr/C_met passam a ser marcados como extrapolação (PRESSUPOSTO). Refração por traçado de raios, Nord2000 e Harmonoise: `nao_avaliado`, parado aqui por falta de método citado e verificável numa tarefa leve. Comportamento por omissão inalterado (A_gr só com `iso9613_ground`).
