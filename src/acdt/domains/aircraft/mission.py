@@ -150,6 +150,9 @@ DEFAULT_ASSUMPTIONS: dict = {
     # components: [{id, supplier | rate_key | lambda_per_h | mtbf_h (+ source), n, duty, critical, mttr_h,
     # mmh_per_action, replacement_cost, spares}], rbd, preventive, logistics, utilization, fleet, spares,
     # operating_cost (bloco de manufacturing.costing; manutenção preenchida pela fiabilidade).
+    # Estrutura paramétrica (structure_layout.py; docs/ESTRUTURA_PARAMETRICA.md). Opt-in. Ver DEFAULTS no módulo
+    # (fuselage: cavernas/anteparas/reforçadores/cargas; booms; export do modelo de vigas).
+    "structure_layout": {"enabled": False, "coupling": "relatorio"},
     "reliability": {"enabled": True, "components": None, "rbd": None, "mission_duration_h": None,
                     "accept_assumptions": False, "preventive": None, "logistics": None, "utilization": None,
                     "fleet": None, "spares": None, "operating_cost": None, "labour_rate_per_h": None},
