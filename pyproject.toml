@@ -77,6 +77,7 @@ explicit_package_bases = true
 files = [
   "src/acdt/core/atmosphere.py",
   "src/acdt/core/structures/frames.py",
+  "src/acdt/core/structures/fittings.py",
   "src/acdt/domains/aircraft/structure_layout.py",
   "src/acdt/core/units.py",
   "src/acdt/core/requirements.py",

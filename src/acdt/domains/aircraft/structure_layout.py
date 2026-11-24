@@ -54,6 +54,13 @@ DEFAULTS: dict[str, Any] = {
     "booms_from_assembly": True,      # corpos com papel «boom» na montagem + cauda/rotores que lá se apoiam
     "rotor_thrust_factor": 1.5,       # T_lim/(W0 g/n) dos rotores de elevação — PRESSUPOSTO, declarar
     "tails": {"method": "buckling"},  # buckling: dimensionador por estabilidade da asa; strength: caixão L1
+    "fittings": {"enabled": True, "lug_material": "al7075_t6", "pin_material": "steel_4130",
+                 "fitting_factor": 1.15,      # 14 CFR 23.625
+                 "e_D": 1.5, "w_D": 3.0,      # geometria do olhal (PRESSUPOSTO)
+                 "eps_u": None,               # alongamento de rotura do olhal; None → curva K_n mais baixa (Fig. 9-4)
+                 "wing_root": True, "gear": True, "tails": True,
+                 "engine_mount": {"enabled": True, "material": "steel_4130", "n_cylinders": None, "rpm": None,
+                                  "thrust_N": None, "length_m": None, "firewall_half_m": None, "ring_half_m": None}},
     "export": {"beam_model": True},
 }
 
@@ -609,6 +616,7 @@ def boom_layout(bd: dict[str, Any], o: dict[str, Any], mat: dict[str, Any], nono
     out = analyse_body(bid, s, R, M, V, T, fl, bks, fo, mat, nonopt, float(bd.get("y_m") or 0.0),
                        float(bd.get("z_m") or 0.0), x0)
     out["evaluated"] = True
+    out["id"] = bid
     out["notes"] = [f"cargas do boom LIMITE ({', '.join(str(ld.get('id')) for ld in loads)}); consolas a partir da "
                     f"ligação x = {xa + x0:.3f} m; casca circular de diâmetro equivalente {D:.3f} m (PRESSUPOSTO)"]
     out["root_moment_limit_Nm"] = float(np.max(M))
@@ -707,6 +715,185 @@ def booms_from_assembly(asm_spec: dict[str, Any] | None, W0_kg: float, tails: di
         notes.append(f"rotores de elevação: {len(rotors)} × T_lim = {k:g} × W0 g / n = {T:.0f} N (fator PRESSUPOSTO); "
                      "binário de reação dos rotores não modelado (desconhecido)")
     return booms, notes
+
+
+# ------------------------------------------------------------------------------------------------ fittings
+_TORQUE_FACTOR_CYL = {1: 8.0, 2: 4.0, 3: 3.0, 4: 2.0}    # 14 CFR 23.361(c) (antes da emenda 23-64); ≥ 5 → 1,33
+
+
+def _lug_member(mid: str, comp: str, P_lim: float, n: int, pos: list[tuple[float, float, float]], o: dict[str, Any],
+                why: str) -> list[dict[str, Any]]:
+    """``n`` ligações olhal–garfo–cavilha iguais, cada uma com a carga LIMITE ``P_lim`` → última × FS × fator de
+    ferragem (14 CFR 23.625: 1,15)."""
+    from acdt.core.structures import fittings as ft
+    fo = o["fittings"]
+    lug = material_dict(fo["lug_material"])
+    pin = material_dict(fo["pin_material"])
+    kf = float(fo["fitting_factor"])
+    P_u = _FS_LAYOUT * kf * abs(P_lim)
+    if P_u <= 0:
+        return [member(f"{mid}.{k + 1}", comp, "ferragem", None, *p, verdict="desconhecido",
+                       method=f"ferragem sem carga calculada ({why})") for k, p in enumerate(pos[:n])]
+    s = ft.size_lug(P_u, lug, pin, e_D=float(fo["e_D"]), w_D=float(fo["w_D"]), eps_u=fo.get("eps_u"))
+    r = s["res"]
+    rows = []
+    for k, p in enumerate(pos[:n]):
+        rows.append(member(f"{mid}.{k + 1}", comp, "ferragem", s.get("mass_kg"), *p, RF=r.RF,
+                           verdict=r.verdict if s.get("mass_kg") is not None else "falha",
+                           method=f"olhal + garfo + cavilha {s.get('bolt')} (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; "
+                                  f"Bruhn D1), modo {r.mode}; carga {why}; P_u = {_FS_LAYOUT:g} × {kf:g} × "
+                                  f"{abs(P_lim):.0f} N",
+                           section={"cavilha": s.get("bolt"), "D_m": s.get("D_m"), "t_m": s.get("t_m"),
+                                    "t_garfo_m": s.get("t_clevis_m"), "w_m": s.get("w_m"), "e_m": s.get("e_m"),
+                                    "material_olhal": lug["name"], "material_cavilha": pin["name"]},
+                           P_ult_N=P_u, note="; ".join(dict.fromkeys(r.notes))))
+    return rows
+
+
+_FS_LAYOUT = 1.5
+
+
+def fittings_layout(res: Any, o: dict[str, Any], fus: dict[str, Any], booms: list[dict[str, Any]],
+                    boom_defs: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any], list[str]]:
+    """Ferragens das ligações principais (cargas LIMITE das fontes já existentes, cada uma com a sua origem):
+
+    * asa–fuselagem: binário de raiz da asa (``structures.beam``, asa em consola — PRESSUPOSTO) por banzo,
+      P = M / h, h = 0,9 (t/c) c_raiz, 2 longarinas × (superior, inferior) × 2 lados, partilha igual (PRESSUPOSTO);
+    * trem: reações de aterragem da viga L1 (23.473), 2 olhais por perna; principal com 2 pernas (PRESSUPOSTO);
+    * estabilizador: L_projeto / 4 (2 longarinas × 2 lados, estabilizador contínuo — PRESSUPOSTO);
+    * deriva: binário na raiz T_fin (= L_deriva × z_cp, viga L1) / h_raiz, 2 longarinas;
+    * booms: M na ligação / diâmetro, 2 olhais por boom;
+    * berço do motor: :func:`acdt.core.structures.fittings.engine_mount` com 14 CFR 23.361 (binário) e 23.363
+      (lateral 1,33 g)."""
+    from acdt.core.structures import fittings as ft
+    fo = o["fittings"]
+    notes: list[str] = []
+    rows: list[dict[str, Any]] = []
+    out: dict[str, Any] = {}
+    cfg = res.config
+    R_f = 0.5 * float(cfg.fuselage.max_diameter)
+    st = getattr(res, "structures", None)
+    x_w = float(fus.get("x_wing_m") or 0.35 * cfg.fuselage.length)
+    if st is not None and fo.get("wing_root", True):
+        w = cfg.wing
+        M = abs(float(st.beam.moment[0]))
+        h = 0.9 * float(w.tc_root) * float(w.c_root)
+        x_f = x_w + (w.box.front_spar_xc - 0.25) * w.c_root
+        x_r = x_w + (w.box.rear_spar_xc - 0.25) * w.c_root
+        pos = [(x, s * R_f, zz * h / 2) for x in (x_f, x_r) for s in (1, -1) for zz in (1, -1)]
+        rows += _lug_member("ferragem.asa_fuselagem", "ligacoes", M / h / 2, 8, pos, o,
+                            f"banzo da raiz da asa (M_raiz {M:.0f} N·m / h {h:.3f} m / 2 longarinas)")
+        notes.append("asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a "
+                     "maior parte do binário e estas ferragens ficam do lado conservativo")
+    lr = fus.get("landing_reactions_N") or {}
+    if lr and fo.get("gear", True):
+        z_g = -R_f
+        if lr.get("aft"):
+            xa = float(fus["x_gear_aft_m"])
+            rows += _lug_member("ferragem.trem_principal", "ligacoes", float(lr["aft"]) / 2 / 2, 4,
+                                [(xa, s * R_f, z_g) for s in (1, 1, -1, -1)], o,
+                                "reação do trem principal (aterragem L1) / 2 pernas / 2 olhais")
+        if lr.get("forward"):
+            xf = float(fus["x_gear_fwd_m"])
+            rows += _lug_member("ferragem.trem_frente", "ligacoes", float(lr["forward"]) / 2, 2,
+                                [(xf, 0.0, z_g), (xf, 0.0, z_g)], o, "reação do trem da frente / 2 olhais")
+    tails = (getattr(res.structures_l1, "tails", None) or {}) if getattr(res, "structures_l1", None) else {}
+    has_boom_tail = any(ld.get("kind") == "tail" for b in boom_defs for ld in (b.get("loads") or []))
+    if fo.get("tails", True) and not has_boom_tail:
+        Lt = float(fus.get("L_tail_design_N") or 0.0)
+        x_ht = float(fus.get("x_ht_m") or 0.0)
+        if Lt:
+            rows += _lug_member("ferragem.estabilizador", "ligacoes", Lt / 4, 4,
+                                [(x_ht + dx, s * 0.3 * R_f, 0.0) for dx in (0.0, 0.1) for s in (1, -1)], o,
+                                "sustentação de projeto do estabilizador / 4")
+        Tf = float(fus.get("T_fin_Nm") or 0.0)
+        vb = tails.get("vtail_box") or {}
+        if Tf and vb:
+            tc = float(cfg.vtail.tc)
+            hv = 0.9 * tc * float(vb.get("c_root_m") or 0.0)
+            if hv > 0:
+                x_vt = float(fus.get("x_vt_m") or 0.0)
+                rows += _lug_member("ferragem.deriva", "ligacoes", Tf / hv / 2, 4,
+                                    [(x_vt + dx, s * hv / 2, R_f) for dx in (0.0, 0.1) for s in (1, -1)], o,
+                                    f"binário na raiz da deriva T_fin {Tf:.0f} N·m / h {hv:.3f} m / 2 longarinas")
+    for b in booms:
+        g = b.get("geometry") or {}
+        Mb = b.get("root_moment_limit_Nm")
+        if Mb and g:
+            rows += _lug_member(f"ferragem.{b.get('id', 'boom')}", "ligacoes", float(Mb) / float(g["diameter_m"]), 2,
+                                [(g["x_attach_m"], g["y_m"], g["z_m"] + s * g["diameter_m"] / 2) for s in (1, -1)],
+                                o, "binário do boom na ligação / diâmetro")
+    em = engine_mount_layout(res, o, fus, R_f, ft)
+    if em is not None:
+        out["engine_mount"] = em
+        rows += em.pop("members")
+    out["n"] = len(rows)
+    return rows, out, notes
+
+
+def engine_mount_layout(res: Any, o: dict[str, Any], fus: dict[str, Any], R_f: float, ft: Any
+                        ) -> dict[str, Any] | None:
+    eo = o["fittings"]["engine_mount"]
+    Fe = float(fus.get("F_engine_limit_N") or 0.0)
+    st = getattr(res, "structures", None)
+    if not eo.get("enabled", True) or not Fe or st is None:
+        return None
+    n_lim = float(st.vn.n_limit_pos)
+    We = Fe / n_lim                                     # peso do motor [N]
+    D = 2 * R_f
+    Lm = float(eo.get("length_m") or 0.35 * D)
+    fw = float(eo.get("firewall_half_m") or 0.30 * D)
+    rg = float(eo.get("ring_half_m") or 0.20 * D)
+    x_e = float(fus["x_engine_m"])
+    x_w = float(fus.get("x_wing_m") or 0.0)
+    tractor = x_e < x_w
+    sgn = -1.0 if tractor else 1.0                      # tração no referencial local (motor em −x)
+    notes = [f"motor {We / G0:.1f} kg (F_engine_limit / n_lim); berço de 8 tubos, comprimento {Lm:.3f} m, quadrados "
+             f"{2 * fw:.3f} / {2 * rg:.3f} m (PRESSUPOSTO, fração do diâmetro da fuselagem); CG do motor no plano dos "
+             "apoios (PRESSUPOSTO)"]
+    cases = [("23.337 n_lim vertical", np.array([0.0, 0.0, -Fe]), np.zeros(3)),
+             ("23.363 lateral 1,33 g + 1 g", np.array([0.0, 1.33 * We, -We]), np.zeros(3))]
+    known = True
+    P = None
+    dp = getattr(res, "design_point", None)
+    if dp is not None and getattr(dp, "metric", "") == "P/W":
+        P = float(dp.value) * float(res.sizing.W0) * G0
+    rpm = eo.get("rpm") or ((res.spec.assumptions["propulsion"].get("propeller") or {}).get("rpm_rated"))
+    ncyl = eo.get("n_cylinders")
+    kind = getattr(res.spec, "propulsion_kind", "")
+    if P and rpm and kind == "piston_prop":
+        Tq = P / (2 * math.pi * float(rpm) / 60)
+        if ncyl is None:
+            f_t = 2.0
+            known = False
+            notes.append("n.º de cilindros não declarado: fator 23.361(c) = 2 (4 cilindros, PRESSUPOSTO) — desconhecido")
+        else:
+            f_t = 1.33 if int(ncyl) >= 5 else _TORQUE_FACTOR_CYL[int(ncyl)]
+        cases.append((f"23.361 binário {f_t:g} × {Tq:.0f} N·m + 0,75 n_lim", np.array([0.0, 0.0, -0.75 * Fe]),
+                      np.array([f_t * Tq, 0.0, 0.0])))
+        notes.append(f"binário médio P/ω = {Tq:.0f} N·m (P = {P / 1e3:.0f} kW, {float(rpm):.0f} rpm)")
+    else:
+        known = False
+        notes.append("binário do motor (23.361) não avaliado: falta P/W, rpm ou motor alternativo — desconhecido")
+    if eo.get("thrust_N"):
+        cases.append(("tração declarada", np.array([sgn * float(eo["thrust_N"]), 0.0, -We]), np.zeros(3)))
+    else:
+        notes.append("tração do hélice não incluída (declarar engine_mount.thrust_N)")
+    tube = material_dict(str(eo.get("material") or "steel_4130"))
+    r = ft.engine_mount(np.zeros(3), np.zeros(3), 0.0, fw, rg, Lm, tube, FS=_FS_LAYOUT, cases=cases)
+    x_fw = x_e + Lm if tractor else x_e - Lm
+    ver = r["verdict"] if (r["verdict"] == "falha" or known) else "desconhecido"
+    RFs = [t["RF"] for t in r["tubes"] if t["RF"] is not None]
+    mem = member("berco_motor", "ligacoes", "berco_motor", r["mass_kg"], 0.5 * (x_e + x_fw), 0.0, 0.0,
+                 RF=min(RFs) if RFs else None, verdict=ver, method=r["method"] + "; casos " +
+                 ", ".join(c[0] for c in cases), section={"tubos": r["tubes"], "material": tube["name"]},
+                 note="; ".join(notes))
+    geo = {"x_firewall_m": x_fw, "x_engine_m": x_e, "tractor": tractor,
+           "nodes_firewall": [[x_fw, p[1], p[2]] for p in r["nodes_firewall"]],
+           "nodes_engine": [[x_e, p[1], p[2]] for p in r["nodes_engine"]],
+           "bars": [t["nodes"] for t in r["tubes"]]}
+    return {"members": [mem], "geometry": geo, "tubes": r["tubes"], "cases": [c[0] for c in cases], "notes": notes,
+            "verdict": ver}
 
 
 # ------------------------------------------------------------------------------------------------ beam model
@@ -880,6 +1067,15 @@ def analyse_layout(res: Any) -> dict[str, Any]:
             members.append(member(str(bd.get("id") or "boom"), str(bd.get("id") or "boom"), "boom", None,
                                   float(bd.get("x0_m") or 0.0), float(bd.get("y_m") or 0.0),
                                   float(bd.get("z_m") or 0.0), verdict="desconhecido", method=str(b.get("reason"))))
+    fit_out: dict[str, Any] = {}
+    if o["fittings"].get("enabled", True):
+        try:
+            f_rows, fit_out, f_notes = fittings_layout(res, o, fus_l1, booms, boom_defs)
+            members += f_rows
+            notes += f_notes
+        except Exception as ex:  # noqa: BLE001 — ferragens ficam desconhecidas, com a razão
+            members.append(member("ferragens", "ligacoes", "ferragem", None, 0.0, verdict="desconhecido",
+                                  method=f"ferragens não avaliadas: {type(ex).__name__}: {ex}"))
     bud = budget(members)
     counts: dict[str, int] = {}
     for m in members:
@@ -893,7 +1089,7 @@ def analyse_layout(res: Any) -> dict[str, Any]:
     out: dict[str, Any] = {"evaluated": True, "level": LEVEL, "material": mat, "coupling_mode": o["coupling"],
                            "members": members, "budget": bud, "verdict_counts": counts, "verdict": overall,
                            "fuselage": {k: v for k, v in fus.items() if k not in ("members",)},
-                           "booms": booms, "notes": notes,
+                           "booms": booms, "notes": notes, "fittings": fit_out,
                            "surfaces": {r["comp"]: None if r["box"] is None else
                                         {"mass_kg": r["box"]["masses"].get("total"), "method": r["box"].get("method"),
                                          "section": r["box"].get("section"), "buckling_ok": r["box"].get("buckling_ok"),

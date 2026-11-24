@@ -241,3 +241,72 @@ def test_twin_boom_pipeline_booms_from_assembly():
     assert len(bm["elements"]) == len(bm["nodes"]) - 1 and not bm["missing"]     # árvore ligada
     assert any(e["component"].startswith("ligacao:") for e in bm["elements"])
     assert r["budget"]["by_component_kg"]["boom"] > 0
+    ids = {m["id"] for m in r["members"] if m["kind"] == "ferragem"}
+    assert {"ferragem.boom.1", "ferragem.boom~m.1"} <= ids          # ferragens das duas ligações dos booms
+    assert not any(i.startswith("ferragem.estabilizador") for i in ids)   # a cauda está nos booms
+
+
+# ------------------------------------------------------------------ incremento B: ferragens
+PSI, INCH, LBF = 6894.757, 0.0254, 4.44822
+
+
+def test_lug_reproduces_affdl_example():
+    """AFFDL-TR-69-42 §9.6: olhal macho 7075-T651, garfo 2024-T351, cavilha 4130 (sem casquilhos aqui)."""
+    from acdt.core.structures import fittings as ft
+    assert ft.k_bearing(1.24) == pytest.approx(1.46, abs=0.02)          # K = 1,46 a e/D = 1,24 (exemplo)
+    assert ft.k_bearing(1.50) == pytest.approx(1.33, abs=0.01)          # K = 1,33 a e/D = 1,5 (exemplo)
+    kn, _ = ft.k_net(0.40, 0.625, 0.051)
+    assert kn is not None and 0.70 <= kn <= 0.74                      # exemplo 0,74 (lemos a curva 0,1)
+    male = {"Ftu": 77000 * PSI, "Fty": 66000 * PSI, "E": 10.3e6 * PSI}
+    fem = {"Ftu": 64000 * PSI, "Fty": 40000 * PSI, "E": 10.5e6 * PSI}
+    pin = {"Ftu": 125000 * PSI, "Fsu": 82000 * PSI}
+    r = ft.lug_joint(1.0, 1.0 * INCH, 0.75 * INCH, 3.0 * INCH, 1.5 * INCH, male, pin, t_clevis=0.5 * INCH,
+                     g=0.1 * INCH, eps_u=0.12, clevis=fem, w_clevis=2.5 * INCH, e_clevis=1.25 * INCH,
+                     eps_u_clevis=0.12, D_pin=0.75 * INCH)
+    assert r.P_bru_N / LBF == pytest.approx(77000, rel=0.01)
+    assert r.P_pin_shear_N / LBF == pytest.approx(72400, rel=0.005)
+    assert r.P_pin_bending_N / LBF == pytest.approx(30100, rel=0.01)
+    assert r.mode == "flexão da cavilha" and r.verdict == "passa"
+
+
+def test_k_net_unknown_ductility_is_conservative_and_thin_lug_unknown():
+    from acdt.core.structures import fittings as ft
+    assert ft.k_net(0.4, 0.62, None)[0] < ft.k_net(0.4, 0.62, 0.05)[0]
+    assert ft.k_net(0.4, 0.5, 0.05)[0] is None
+    al = sl.material_dict("al7075_t6")
+    st = sl.material_dict("steel_4130")
+    r = ft.lug_joint(1000.0, 0.02, 0.003, 0.06, 0.03, al, st)       # D/t = 6,7 > 5
+    assert r.P_bru_N is None and r.verdict == "desconhecido"
+    s = ft.size_lug(30e3, al, st)
+    assert s["mass_kg"] > 0 and s["res"].RF >= 1.0 and s["D_m"] / s["t_m"] <= 5.0 + 1e-9
+
+
+def test_engine_mount_truss_equilibrium():
+    from acdt.core.structures import fittings as ft
+    st = sl.material_dict("steel_4130")
+    W = 1000.0
+    r = ft.engine_mount(np.zeros(3), np.zeros(3), 0.0, 0.2, 0.15, 0.4, st,
+                        cases=[("v", np.array([0.0, 0.0, -W]), np.zeros(3))])
+    assert r["verdict"] == "passa" and r["mass_kg"] > 0
+    fw = np.array(r["nodes_firewall"])
+    en = np.array(r["nodes_engine"])
+    Fz = 0.0
+    for t in r["tubes"]:      # um só caso: N = extremo de tração + extremo de compressão (um deles é 0)
+        i, j = int(t["nodes"][0][-1]) - 1, int(t["nodes"][1][-1]) - 1
+        u = fw[j] - en[i]
+        Fz += (t["N_tension_limit_N"] + t["N_compression_limit_N"]) * u[2] / np.linalg.norm(u)
+    assert Fz == pytest.approx(W, rel=1e-6)                     # tubos sustentam o peso do motor
+
+
+def test_c172_fittings_and_engine_mount(c172):
+    r = c172.structure_layout
+    fit = [m for m in r["members"] if m["component"] == "ligacoes"]
+    kinds = {m["kind"] for m in fit}
+    assert {"ferragem", "berco_motor"} <= kinds
+    ids = {m["id"].rsplit(".", 1)[0] for m in fit if m["kind"] == "ferragem"}
+    assert {"ferragem.asa_fuselagem", "ferragem.trem_principal", "ferragem.estabilizador", "ferragem.deriva"} <= ids
+    assert all(m["verdict"] in ("passa", "desconhecido") for m in fit)
+    em = r["fittings"]["engine_mount"]
+    assert em["verdict"] == "desconhecido"          # n.º de cilindros não declarado no exemplo
+    assert any("23.361" in c for c in em["cases"]) and any("23.363" in c for c in em["cases"])
+    assert r["budget"]["by_component_kg"]["ligacoes"] > 0
