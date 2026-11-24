@@ -5,7 +5,8 @@ applied: false
 cases:
   - id: c172
     example: examples/cessna172_check.yaml
-    structure_layout: {enabled: true}
+    # Lycoming O-320 do C172: 4 cilindros (fator 23.361(c) = 2) — só em memória
+    structure_layout: {enabled: true, fittings: {engine_mount: {n_cylinders: 4}}}
   - id: uav150
     example: examples/uav_150kg_stanag4671.yaml
     structure_layout: {enabled: true}

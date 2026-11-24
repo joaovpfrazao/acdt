@@ -2155,6 +2155,21 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Ficheiros**: `structure_layout.py`, `structures_l1.py`, `tests/test_structure_layout.py`,
   `docs/ESTRUTURA_PARAMETRICA.md` §6, estudo e saídas em `examples/*/estrutura_parametrica/`.
 
+## 54. Estrutura paramétrica B: olhais, cavilhas e berço tubular do motor (24 nov 2026)
+
+* **O que faz**: `acdt/core/structures/fittings.py` — olhal + garfo + cavilha sob carga axial por AFFDL-TR-69-42
+  §9.3–9.4 (Melcon & Hoblit 1953; Bruhn D1): apoio/corte (Fig. 9-2, D/t ≤ 5), secção útil (Fig. 9-4), corte duplo
+  e flexão da cavilha (Eq. 9-12 a 9-15); dimensionamento AN + espessura. Berço de 8 tubos (treliça, Euler–Johnson) com
+  os casos 14 CFR 23.361 (binário × fator por cilindros) e 23.363 (lateral 1,33 g). Em `structure_layout`: ferragens
+  asa–fuselagem, trem, estabilizador, deriva e booms, carga última = 1,5 × 1,15 (23.625) × limite.
+* **Medida**: reproduz o exemplo AFFDL §9.6 (apoio 76 800 vs 77 000 lbf; cavilha 72 460 vs 72 400 e 30 040 vs
+  30 100 lbf). C172: ligações 15,2 kg (asa–fuselagem 13,5 kg em consola, berço 1,39 kg passa); UAV 150 kg 2,18 kg;
+  twin-boom 2,57 kg.
+* **Veredicto**: L1. Tabelas K/K_n lidas à mão das figuras (±0,02/±0,03). Desconhecidos: D/t > 5, F_ty/F_tu < 0,6,
+  berço sem binário (sem rpm/P/W/cilindros). Fora: carga transversal/oblíqua, casquilhos, escora da asa.
+* **Ficheiros**: `src/acdt/core/structures/fittings.py`, `structure_layout.py`, `tests/test_structure_layout.py`,
+  `docs/ESTRUTURA_PARAMETRICA.md` §7.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

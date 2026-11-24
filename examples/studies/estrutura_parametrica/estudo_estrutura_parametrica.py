@@ -67,7 +67,10 @@ def run_case(case: dict, out: Path) -> dict:
             "material": r["material"]["name"], "superficies": r.get("surfaces"),
             "booms": [{k: b.get(k) for k in ("evaluated", "reason", "geometry", "root_moment_limit_Nm", "notes")}
                       for b in r.get("booms", [])],
-            "notas_layout": r.get("notes"), "vigas_em_falta": r["beam_model"].get("missing")}
+            "notas_layout": r.get("notes"),
+            "ferragens": [{k: m.get(k) for k in ("id", "kind", "mass_kg", "RF_min", "verdict", "section", "method",
+                                                  "note")} for m in r["members"] if m["component"] == "ligacoes"],
+            "berco_motor": {k: v for k, v in (r.get("fittings", {}).get("engine_mount") or {}).items()}, "vigas_em_falta": r["beam_model"].get("missing")}
     (out / f"{cid}_resumo.json").write_text(json.dumps(_clean(summ), indent=1, ensure_ascii=False), encoding="utf-8")
     (out / f"{cid}_vigas.json").write_text(json.dumps(_clean(r["beam_model"]), indent=1, ensure_ascii=False),
                                            encoding="utf-8")
@@ -87,7 +90,7 @@ def main(out_dir: str | None = None) -> list[dict]:
               f"{c['fuselage_L1_kg']:.1f} kg vs Raymer {c['fuselage_raymer_kg']:.1f} kg; estabilizador "
               f"{c['htail_layout_kg']:.2f} vs L1 {c['htail_L1_kg']:.2f} kg; deriva {c['vtail_layout_kg']:.2f} vs L1 "
               f"{c['vtail_L1_kg']:.2f} kg; booms {[round(b['root_moment_limit_Nm'] or 0, 1) for b in s['booms']]} N·m; "
-              f"{s['contagem']}")
+              f"ligações {s['orcamento']['by_component_kg'].get('ligacoes', 0):.2f} kg; {s['contagem']}")
     return rows
 
 
