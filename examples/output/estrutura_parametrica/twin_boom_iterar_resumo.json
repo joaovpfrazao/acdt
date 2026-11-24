@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 168.87840020070337,
- "tempo_s": 41.54403805732727,
+ "tempo_s": 42.0063214302063,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 63,
@@ -264,6 +264,11 @@
  "pior_estacao_casca": {
   "x_m": 0.384,
   "R_m": 0.15000000000000002,
+  "perimeter_m": 0.942477796076938,
+  "A_enc_m2": 0.07068583470577036,
+  "n_cut": 0,
+  "sigma_hoop_Pa": null,
+  "pressure_note": null,
   "I_m4": 1.0673145414692446e-05,
   "sigma_stringer_max_Pa": 12329351.85588717,
   "Fcs_Pa": 106053436.05572473,
@@ -1078,5 +1083,15 @@
   ],
   "verdict": "desconhecido"
  },
- "vigas_em_falta": []
+ "vigas_em_falta": [],
+ "piso": null,
+ "aberturas": [],
+ "seccao": {
+  "w_m": null,
+  "h_m": null,
+  "n_exp": 2.0,
+  "noncircular": false
+ },
+ "pressao_Pa": 0.0,
+ "detalhe": []
 }

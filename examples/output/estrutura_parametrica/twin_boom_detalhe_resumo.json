@@ -1,0 +1,1347 @@
+{
+ "caso": "twin_boom_detalhe",
+ "exemplo": "examples/uav_twin_boom_shortcut.yaml",
+ "applied": false,
+ "W0_kg": 167.03090270215554,
+ "tempo_s": 11.775721549987793,
+ "veredicto": "desconhecido",
+ "contagem": {
+  "passa": 73,
+  "desconhecido": 24
+ },
+ "orcamento": {
+  "mass_kg": 28.455187521380388,
+  "cg_m": [
+   1.284892637579918,
+   -1.1704962658822413e-17,
+   0.004352275134957769
+  ],
+  "inertia_kg_m2": {
+   "Ixx": 21.89219262852019,
+   "Iyy": 15.968711532836418,
+   "Izz": 37.43528061467012
+  },
+  "by_component_kg": {
+   "asa": 5.978553199550446,
+   "estabilizador": 0.44844328637577807,
+   "deriva": 0.5135458873537413,
+   "fuselagem": 13.25186379309841,
+   "boom": 2.844421858673641,
+   "boom~m": 2.844421858673641,
+   "ligacoes": 2.573937637654687
+  },
+  "unknown_mass": [],
+  "note": "inércia própria: anéis (m R², m R²/2), linhas ao longo de x (m L²/12), placas (m R²/4, m R²/2); superfícies sustentadoras distribuídas ∝ corda na envergadura — PRESSUPOSTO"
+ },
+ "comparacao": {
+  "fuselage_layout_kg": 13.25186379309841,
+  "fuselage_L1_kg": 5.4935955464479616,
+  "fuselage_raymer_kg": 7.4369731604112115,
+  "wing_box_kg": 5.978553199550446,
+  "htail_layout_kg": 0.44844328637577807,
+  "htail_L1_kg": 0.3058422054791873,
+  "vtail_layout_kg": 0.5135458873537413,
+  "vtail_L1_kg": 0.34690034936248637
+ },
+ "cavernas_pesadas": [
+  {
+   "id": "fuselagem.caverna@0.320",
+   "loads": [
+    "trem_frente"
+   ],
+   "caso": "aterragem",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00241,
+    "A_m2": 6.79138e-05,
+    "I_m4": 1.8896490305466663e-09
+   },
+   "RF": 1.0103658295332771,
+   "veredicto": "passa",
+   "anel": {
+    "aterragem": {
+     "M_max_Nm": 51.40634566514626,
+     "theta_deg": 180.0,
+     "N_max_N": 772.8029138713912
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@0.384",
+   "loads": [
+    "berco_motor",
+    "parede_de_fogo"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00051,
+    "A_m2": 1.63098e-05,
+    "I_m4": 5.975044525800001e-10
+   },
+   "RF": 1.2098537397354976,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 5.364610287425453,
+     "theta_deg": 45.0,
+     "N_max_N": 345.2604336292943
+    },
+    "aterragem": {
+     "M_max_Nm": 4.470508572854498,
+     "theta_deg": 45.0,
+     "N_max_N": 287.71702802441246
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@0.694",
+   "loads": [
+    "asa_longarina_frente"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00051,
+    "A_m2": 1.63098e-05,
+    "I_m4": 5.975044525800001e-10
+   },
+   "RF": 1.0440021408213398,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 6.245199962796891,
+     "theta_deg": 293.0,
+     "N_max_N": 663.1156552905277
+    },
+    "aterragem": {
+     "M_max_Nm": 1.2280696544546768,
+     "theta_deg": 67.0,
+     "N_max_N": 130.39649947276152
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@0.902",
+   "loads": [
+    "asa_longarina_tras"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00041,
+    "A_m2": 1.3193799999999997e-05,
+    "I_m4": 4.899088365466665e-10
+   },
+   "RF": 2.5239025149425776,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 1.8039759598050225,
+     "theta_deg": 293.0,
+     "N_max_N": 179.37892919338844
+    },
+    "aterragem": {
+     "M_max_Nm": 1.3113700218267472,
+     "theta_deg": 67.0,
+     "N_max_N": 130.3964994727615
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@1.120",
+   "loads": [
+    "abertura:alcapao_carga"
+   ],
+   "caso": "abertura",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.0009100000000000002,
+    "A_m2": 2.8373800000000006e-05,
+    "I_m4": 9.839979100466665e-10
+   },
+   "RF": 1.1546906484129114,
+   "veredicto": "passa",
+   "anel": {
+    "abertura": {
+     "M_max_Nm": 17.360253775027395,
+     "theta_deg": 180.0,
+     "N_max_N": 506.41392808714966
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@1.440",
+   "loads": [
+    "trem_tras"
+   ],
+   "caso": "aterragem",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.0018100000000000006,
+    "A_m2": 5.317780000000001e-05,
+    "I_m4": 1.6206685603466666e-09
+   },
+   "RF": 1.0384742061868373,
+   "veredicto": "passa",
+   "anel": {
+    "aterragem": {
+     "M_max_Nm": 37.34041726591505,
+     "theta_deg": 210.00000000000003,
+     "N_max_N": 1177.0244625659625
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@1.760",
+   "loads": [
+    "abertura:alcapao_carga"
+   ],
+   "caso": "abertura",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.0009100000000000002,
+    "A_m2": 2.8373800000000006e-05,
+    "I_m4": 9.839979100466665e-10
+   },
+   "RF": 1.1546906484129114,
+   "veredicto": "passa",
+   "anel": {
+    "abertura": {
+     "M_max_Nm": 17.360253775027395,
+     "theta_deg": 180.0,
+     "N_max_N": 506.41392808714966
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@2.477",
+   "loads": [
+    "cauda"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.0010100000000000003,
+    "A_m2": 3.1289800000000007e-05,
+    "I_m4": 1.0700931227466667e-09
+   },
+   "RF": 1.1046152442058939,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 24.615935853217724,
+     "theta_deg": 0.5,
+     "N_max_N": 181.1002504039566
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "boom.caverna@2.695",
+   "loads": [
+    "cauda"
+   ],
+   "caso": "voo_cauda",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00051,
+    "A_m2": 1.63098e-05,
+    "I_m4": 5.975044525800001e-10
+   },
+   "RF": 1.2936029857408644,
+   "veredicto": "passa",
+   "anel": {
+    "voo_cauda": {
+     "M_max_Nm": 6.522891424745146,
+     "theta_deg": 0.5,
+     "N_max_N": 109.69529098167143
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "boom~m.caverna@2.695",
+   "loads": [
+    "cauda"
+   ],
+   "caso": "voo_cauda",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00051,
+    "A_m2": 1.63098e-05,
+    "I_m4": 5.975044525800001e-10
+   },
+   "RF": 1.2936029857408644,
+   "veredicto": "passa",
+   "anel": {
+    "voo_cauda": {
+     "M_max_Nm": 6.522891424745146,
+     "theta_deg": 0.5,
+     "N_max_N": 109.69529098167143
+    }
+   },
+   "nota": null
+  }
+ ],
+ "pior_estacao_casca": {
+  "x_m": 0.384,
+  "R_m": 0.15000000000000002,
+  "perimeter_m": 0.8880366611441293,
+  "A_enc_m2": 0.059623380961315094,
+  "n_cut": 0,
+  "sigma_hoop_Pa": null,
+  "pressure_note": null,
+  "I_m4": 6.965202330716548e-06,
+  "sigma_stringer_max_Pa": 13813703.046181723,
+  "Fcs_Pa": 106053436.05572473,
+  "sigma_column_Pa": 91353684.88236344,
+  "L_over_rho": 61.11944462005201,
+  "q_skin_N_m": 6391.123819357305,
+  "tau_skin_Pa": 7988904.774196631,
+  "sigma_cr_panel_Pa": 26247876.074379563,
+  "tau_cr_panel_Pa": 35790809.1000851,
+  "b_eff_min_m": 0.08073060555855721,
+  "stringer_area_m2": 1.7703799999999998e-05,
+  "panel_width_m": 0.08073060555855721,
+  "RF_stringer_column": 6.613265434833183,
+  "RF_stringer_tension": 31.418078016376853,
+  "RF_skin_shear": 32.79548416276459,
+  "RF_skin_buckling_limit": 2.4663012595748133,
+  "RF_min": 2.4663012595748133,
+  "verdict": "passa",
+  "t_skin_m": 0.0008,
+  "t_stringer_m": 0.00041
+ },
+ "layout": {
+  "frame_pitch_m": 0.5,
+  "frame_h_m": 0.015,
+  "frame_b_m": 0.009,
+  "n_stringers": 11,
+  "n_longerons": 0
+ },
+ "notas": [
+  "ligação da asa: longarinas a x = 0.694 m e 0.902 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
+  "manobra: as forças concentradas (cauda, motor) são equilibradas pelas duas ligações da asa; a inércia distribuída da casca vai para revestimento/reforçadores, não para as cavernas — PRESSUPOSTO",
+  "aterragem: reações do trem (23.473, viga L1) e metade da sustentação em cada longarina da asa; trem preso à fuselagem — se o trem principal está na asa, declarar gear_theta_deg/loads",
+  "anteparas por omissão: parede de fogo no berço do motor e fecho traseiro a 0,95 L (as duas da viga L1) — PRESSUPOSTO",
+  "piso por omissão: da parede de fogo a 0,5 L, a 0,6 R abaixo do eixo — PRESSUPOSTO, declarar",
+  "secção não circular (superelipse w = 0.400 m, h = 0.300 m, n = 3): booms em perímetro igual, I por booms, Bredt T/(2A); cavernas como anel de raio √(w h)/2 — PRESSUPOSTO",
+  "abertura alcapao_carga: x 1.12–1.76 m, θ 180° ± 30°; reforçadores e painel interrompidos, corte × P/(P − L_aberta), cavernas de bordo com o par de forças tangenciais q L/2 (PRESSUPOSTO)",
+  "piso x 0.38–1.60 m, 5 vigas, área 0.43 m², q_lim 3000 Pa (declarada); cargas de emergência dos assentos (9 g) e ancoragens não modeladas — desconhecido"
+ ],
+ "material": "Al 2024-T3 sheet",
+ "superficies": {
+  "asa": {
+   "mass_kg": 5.978553199550446,
+   "method": "buckling",
+   "section": "multicélula (Fase 5)",
+   "buckling_ok": true,
+   "source": "structures.box (existente)"
+  },
+  "estabilizador": {
+   "mass_kg": 0.44844328637577807,
+   "method": "buckling",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "buckling_ok": true,
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+  },
+  "deriva": {
+   "mass_kg": 0.5135458873537413,
+   "method": "buckling",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "buckling_ok": true,
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+  }
+ },
+ "booms": [
+  {
+   "evaluated": true,
+   "reason": null,
+   "geometry": {
+    "x0_m": 0.27632080108511997,
+    "length_m": 2.7323160094650256,
+    "diameter_m": 0.104666970108,
+    "x_attach_m": 0.7174337130325903,
+    "y_m": 1.0361501406146305,
+    "z_m": 0.0209333940216
+   },
+   "root_moment_limit_Nm": 278.9730765921451,
+   "notes": [
+    "cargas do boom LIMITE (cauda); consolas a partir da ligação x = 0.717 m; casca circular de diâmetro equivalente 0.105 m (PRESSUPOSTO)"
+   ]
+  },
+  {
+   "evaluated": true,
+   "reason": null,
+   "geometry": {
+    "x0_m": 0.27632080108511997,
+    "length_m": 2.7323160094650256,
+    "diameter_m": 0.104666970108,
+    "x_attach_m": 0.7174337130325903,
+    "y_m": -1.0361501406146305,
+    "z_m": 0.0209333940216
+   },
+   "root_moment_limit_Nm": 278.9730765921451,
+   "notes": [
+    "cargas do boom LIMITE (cauda); consolas a partir da ligação x = 0.717 m; casca circular de diâmetro equivalente 0.105 m (PRESSUPOSTO)"
+   ]
+  }
+ ],
+ "notas_layout": [
+  "cauda nos booms: L_estab 214 N e L_deriva 184 N (L1) repartidas por 2 booms — PRESSUPOSTO",
+  "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo"
+ ],
+ "acoplamento": null,
+ "estabilidade_casos": [
+  {
+   "caso": "vazio",
+   "x_cg_m": 0.7659097417992144,
+   "xbar_cg": 0.3783238949144965,
+   "SM": 0.1000000000000002
+  },
+  {
+   "caso": "sem payload",
+   "x_cg_m": 0.7595798153500392,
+   "xbar_cg": 0.3615675549842809,
+   "SM": 0.11675633993021578
+  },
+  {
+   "caso": "MTOW",
+   "x_cg_m": 0.7607166623332926,
+   "xbar_cg": 0.36457697296930613,
+   "SM": 0.11374692194519054
+  },
+  {
+   "caso": "sem combustível (ZFW)",
+   "x_cg_m": 0.7659097417992144,
+   "xbar_cg": 0.3783238949144965,
+   "SM": 0.1000000000000002
+  }
+ ],
+ "ferragens": [
+  {
+   "id": "ferragem.asa_fuselagem.1",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.asa_fuselagem.2",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.asa_fuselagem.3",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.asa_fuselagem.4",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.asa_fuselagem.5",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.asa_fuselagem.6",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.asa_fuselagem.7",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.asa_fuselagem.8",
+   "kind": "ferragem",
+   "mass_kg": 0.2628243591472983,
+   "RF_min": 1.004036977176098,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN9",
+    "D_m": 0.0142875,
+    "t_m": 0.013357500000000008,
+    "t_garfo_m": 0.007178750000000005,
+    "w_m": 0.0428625,
+    "e_m": 0.02143125,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN9 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga banzo da raiz da asa (M_raiz 4194 N·m / h 0.062 m / 2 longarinas); P_u = 1.5 × 1.15 × 33580 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.trem_principal.1",
+   "kind": "ferragem",
+   "mass_kg": 0.003834186495338247,
+   "RF_min": 1.1635997533498594,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.001,
+    "t_garfo_m": 0.001,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga reação do trem principal (aterragem L1) / 2 pernas / 2 olhais; P_u = 1.5 × 1.15 × 723 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.trem_principal.2",
+   "kind": "ferragem",
+   "mass_kg": 0.003834186495338247,
+   "RF_min": 1.1635997533498594,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.001,
+    "t_garfo_m": 0.001,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga reação do trem principal (aterragem L1) / 2 pernas / 2 olhais; P_u = 1.5 × 1.15 × 723 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.trem_principal.3",
+   "kind": "ferragem",
+   "mass_kg": 0.003834186495338247,
+   "RF_min": 1.1635997533498594,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.001,
+    "t_garfo_m": 0.001,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga reação do trem principal (aterragem L1) / 2 pernas / 2 olhais; P_u = 1.5 × 1.15 × 723 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.trem_principal.4",
+   "kind": "ferragem",
+   "mass_kg": 0.003834186495338247,
+   "RF_min": 1.1635997533498594,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.001,
+    "t_garfo_m": 0.001,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga reação do trem principal (aterragem L1) / 2 pernas / 2 olhais; P_u = 1.5 × 1.15 × 723 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.trem_frente.1",
+   "kind": "ferragem",
+   "mass_kg": 0.004779959783391,
+   "RF_min": 1.4212032481114927,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.0015,
+    "t_garfo_m": 0.00125,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga reação do trem da frente / 2 olhais; P_u = 1.5 × 1.15 × 888 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.trem_frente.2",
+   "kind": "ferragem",
+   "mass_kg": 0.004779959783391,
+   "RF_min": 1.4212032481114927,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.0015,
+    "t_garfo_m": 0.00125,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga reação do trem da frente / 2 olhais; P_u = 1.5 × 1.15 × 888 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.boom.1",
+   "kind": "ferragem",
+   "mass_kg": 0.008563052935602012,
+   "RF_min": 1.1048479847263586,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.0035,
+    "t_garfo_m": 0.0022500000000000003,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2665 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.boom.2",
+   "kind": "ferragem",
+   "mass_kg": 0.008563052935602012,
+   "RF_min": 1.1048479847263586,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.0035,
+    "t_garfo_m": 0.0022500000000000003,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2665 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.boom~m.1",
+   "kind": "ferragem",
+   "mass_kg": 0.008563052935602012,
+   "RF_min": 1.1048479847263586,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.0035,
+    "t_garfo_m": 0.0022500000000000003,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2665 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "ferragem.boom~m.2",
+   "kind": "ferragem",
+   "mass_kg": 0.008563052935602012,
+   "RF_min": 1.1048479847263586,
+   "verdict": "passa",
+   "section": {
+    "cavilha": "AN3",
+    "D_m": 0.004762499999999999,
+    "t_m": 0.0035,
+    "t_garfo_m": 0.0022500000000000003,
+    "w_m": 0.014287499999999998,
+    "e_m": 0.007143749999999999,
+    "material_olhal": "Al 7075-T6 sheet",
+    "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2665 N",
+   "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
+  },
+  {
+   "id": "berco_motor",
+   "kind": "berco_motor",
+   "mass_kg": 0.412193887185757,
+   "RF_min": 6.6421646020669725,
+   "verdict": "desconhecido",
+   "section": {
+    "tubos": [
+     {
+      "bar": 1,
+      "nodes": [
+       "apoio1",
+       "parede1"
+      ],
+      "L_m": 0.15099668870541497,
+      "N_tension_limit_N": 0.0,
+      "N_compression_limit_N": -806.8782472806399,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.0390578337741356,
+      "RF": 12.906350512468935
+     },
+     {
+      "bar": 2,
+      "nodes": [
+       "apoio1",
+       "parede2"
+      ],
+      "L_m": 0.24738633753705963,
+      "N_tension_limit_N": 399.5905964924446,
+      "N_compression_limit_N": 0.0,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.06399063802230366,
+      "RF": 36.084926757234776
+     },
+     {
+      "bar": 3,
+      "nodes": [
+       "apoio2",
+       "parede2"
+      ],
+      "L_m": 0.15099668870541497,
+      "N_tension_limit_N": 4.1131696629036136e-13,
+      "N_compression_limit_N": -243.89728838255618,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.0390578337741356,
+      "RF": 42.69770094350641
+     },
+     {
+      "bar": 4,
+      "nodes": [
+       "apoio2",
+       "parede3"
+      ],
+      "L_m": 0.24738633753705963,
+      "N_tension_limit_N": 0.0,
+      "N_compression_limit_N": -1321.9538530577122,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.06399063802230366,
+      "RF": 6.6421646020669725
+     },
+     {
+      "bar": 5,
+      "nodes": [
+       "apoio3",
+       "parede3"
+      ],
+      "L_m": 0.15099668870541497,
+      "N_tension_limit_N": 806.8782472806392,
+      "N_compression_limit_N": 0.0,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.0390578337741356,
+      "RF": 17.87035089358965
+     },
+     {
+      "bar": 6,
+      "nodes": [
+       "apoio3",
+       "parede4"
+      ],
+      "L_m": 0.24738633753705963,
+      "N_tension_limit_N": 2.578269474550554e-13,
+      "N_compression_limit_N": -399.59059649244426,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.06399063802230366,
+      "RF": 21.974078382777986
+     },
+     {
+      "bar": 7,
+      "nodes": [
+       "apoio4",
+       "parede4"
+      ],
+      "L_m": 0.15099668870541497,
+      "N_tension_limit_N": 243.89728838255633,
+      "N_compression_limit_N": -4.697560260521629e-13,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.0390578337741356,
+      "RF": 59.11995784345461
+     },
+     {
+      "bar": 8,
+      "nodes": [
+       "apoio4",
+       "parede1"
+      ],
+      "L_m": 0.24738633753705963,
+      "N_tension_limit_N": 1321.9538530577117,
+      "N_compression_limit_N": 0.0,
+      "D_m": 0.0127,
+      "t_m": 0.00089,
+      "mass_kg": 0.06399063802230366,
+      "RF": 10.907489224345966
+     }
+    ],
+    "material": "AISI 4130 normalized sheet (≤ 0.188 in)"
+   },
+   "method": "treliça espacial articulada, mínimos quadrados (rigidez igual — PRESSUPOSTO); tubos: tração F_tu e Euler–Johnson (Bruhn C2), K = 1; FS 1,5; casos 23.337 n_lim vertical, 23.363 lateral 1,33 g + 1 g",
+   "note": "motor 39.6 kg (F_engine_limit / n_lim); berço de 8 tubos, comprimento 0.140 m, quadrados 0.240 / 0.160 m (PRESSUPOSTO, fração do diâmetro da fuselagem); CG do motor no plano dos apoios (PRESSUPOSTO); binário do motor (23.361) não avaliado: falta P/W, rpm ou motor alternativo — desconhecido; tração do hélice não incluída (declarar engine_mount.thrust_N)"
+  }
+ ],
+ "berco_motor": {
+  "geometry": {
+   "x_firewall_m": 0.524,
+   "x_engine_m": 0.384,
+   "tractor": true,
+   "nodes_firewall": [
+    [
+     0.524,
+     0.12,
+     0.12
+    ],
+    [
+     0.524,
+     -0.12,
+     0.12
+    ],
+    [
+     0.524,
+     -0.12,
+     -0.12
+    ],
+    [
+     0.524,
+     0.12,
+     -0.12
+    ]
+   ],
+   "nodes_engine": [
+    [
+     0.384,
+     0.08000000000000002,
+     0.08000000000000002
+    ],
+    [
+     0.384,
+     -0.08000000000000002,
+     0.08000000000000002
+    ],
+    [
+     0.384,
+     -0.08000000000000002,
+     -0.08000000000000002
+    ],
+    [
+     0.384,
+     0.08000000000000002,
+     -0.08000000000000002
+    ]
+   ],
+   "bars": [
+    [
+     "apoio1",
+     "parede1"
+    ],
+    [
+     "apoio1",
+     "parede2"
+    ],
+    [
+     "apoio2",
+     "parede2"
+    ],
+    [
+     "apoio2",
+     "parede3"
+    ],
+    [
+     "apoio3",
+     "parede3"
+    ],
+    [
+     "apoio3",
+     "parede4"
+    ],
+    [
+     "apoio4",
+     "parede4"
+    ],
+    [
+     "apoio4",
+     "parede1"
+    ]
+   ]
+  },
+  "tubes": [
+   {
+    "bar": 1,
+    "nodes": [
+     "apoio1",
+     "parede1"
+    ],
+    "L_m": 0.15099668870541497,
+    "N_tension_limit_N": 0.0,
+    "N_compression_limit_N": -806.8782472806399,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.0390578337741356,
+    "RF": 12.906350512468935
+   },
+   {
+    "bar": 2,
+    "nodes": [
+     "apoio1",
+     "parede2"
+    ],
+    "L_m": 0.24738633753705963,
+    "N_tension_limit_N": 399.5905964924446,
+    "N_compression_limit_N": 0.0,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.06399063802230366,
+    "RF": 36.084926757234776
+   },
+   {
+    "bar": 3,
+    "nodes": [
+     "apoio2",
+     "parede2"
+    ],
+    "L_m": 0.15099668870541497,
+    "N_tension_limit_N": 4.1131696629036136e-13,
+    "N_compression_limit_N": -243.89728838255618,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.0390578337741356,
+    "RF": 42.69770094350641
+   },
+   {
+    "bar": 4,
+    "nodes": [
+     "apoio2",
+     "parede3"
+    ],
+    "L_m": 0.24738633753705963,
+    "N_tension_limit_N": 0.0,
+    "N_compression_limit_N": -1321.9538530577122,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.06399063802230366,
+    "RF": 6.6421646020669725
+   },
+   {
+    "bar": 5,
+    "nodes": [
+     "apoio3",
+     "parede3"
+    ],
+    "L_m": 0.15099668870541497,
+    "N_tension_limit_N": 806.8782472806392,
+    "N_compression_limit_N": 0.0,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.0390578337741356,
+    "RF": 17.87035089358965
+   },
+   {
+    "bar": 6,
+    "nodes": [
+     "apoio3",
+     "parede4"
+    ],
+    "L_m": 0.24738633753705963,
+    "N_tension_limit_N": 2.578269474550554e-13,
+    "N_compression_limit_N": -399.59059649244426,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.06399063802230366,
+    "RF": 21.974078382777986
+   },
+   {
+    "bar": 7,
+    "nodes": [
+     "apoio4",
+     "parede4"
+    ],
+    "L_m": 0.15099668870541497,
+    "N_tension_limit_N": 243.89728838255633,
+    "N_compression_limit_N": -4.697560260521629e-13,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.0390578337741356,
+    "RF": 59.11995784345461
+   },
+   {
+    "bar": 8,
+    "nodes": [
+     "apoio4",
+     "parede1"
+    ],
+    "L_m": 0.24738633753705963,
+    "N_tension_limit_N": 1321.9538530577117,
+    "N_compression_limit_N": 0.0,
+    "D_m": 0.0127,
+    "t_m": 0.00089,
+    "mass_kg": 0.06399063802230366,
+    "RF": 10.907489224345966
+   }
+  ],
+  "cases": [
+   "23.337 n_lim vertical",
+   "23.363 lateral 1,33 g + 1 g"
+  ],
+  "notes": [
+   "motor 39.6 kg (F_engine_limit / n_lim); berço de 8 tubos, comprimento 0.140 m, quadrados 0.240 / 0.160 m (PRESSUPOSTO, fração do diâmetro da fuselagem); CG do motor no plano dos apoios (PRESSUPOSTO)",
+   "binário do motor (23.361) não avaliado: falta P/W, rpm ou motor alternativo — desconhecido",
+   "tração do hélice não incluída (declarar engine_mount.thrust_N)"
+  ],
+  "verdict": "desconhecido"
+ },
+ "vigas_em_falta": [],
+ "piso": {
+  "evaluated": true,
+  "x0_m": 0.384,
+  "x1_m": 1.6,
+  "area_m2": 0.429321103812581,
+  "q_lim_Pa": 3000.0,
+  "q_source": "declarada",
+  "z_m": -0.08435661057692308,
+  "beams": [
+   {
+    "x_m": 0.384,
+    "span_m": 0.2766261775235069,
+    "z_m": -0.0675,
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.00051,
+    "A_m2": 2.7019800000000002e-05,
+    "RF": 1.2474793342948152,
+    "M_u_Nm": 21.52182433816877,
+    "V_u_N": 311.2044497139452,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 0.6943,
+    "span_m": 0.3454059073997442,
+    "z_m": -0.08428305288461538,
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.0006100000000000001,
+    "A_m2": 3.21958e-05,
+    "RF": 1.0895700888223339,
+    "M_u_Nm": 33.55459899374269,
+    "V_u_N": 388.5816458247122,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 0.9025,
+    "span_m": 0.36883490336467584,
+    "z_m": -0.09,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.00051,
+    "A_m2": 3.61998e-05,
+    "RF": 1.0112280514780916,
+    "M_u_Nm": 38.26102104563337,
+    "V_u_N": 414.9392662852603,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 1.12,
+    "span_m": 0.36883490336467584,
+    "z_m": -0.09,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.00051,
+    "A_m2": 3.61998e-05,
+    "RF": 1.0112280514780916,
+    "M_u_Nm": 38.26102104563337,
+    "V_u_N": 414.9392662852603,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 1.44,
+    "span_m": 0.36883490336467584,
+    "z_m": -0.09,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.00051,
+    "A_m2": 3.61998e-05,
+    "RF": 1.0112280514780916,
+    "M_u_Nm": 38.26102104563337,
+    "V_u_N": 414.9392662852603,
+    "verdict": "passa"
+   }
+  ],
+  "panel": {
+   "t_m": 0.001,
+   "beta": 0.46786550034301017,
+   "sigma_Pa": 251623260.00496608,
+   "RF": 1.0690585599864295,
+   "verdict": "passa"
+  },
+  "mass_kg": 1.3565603711310297
+ },
+ "aberturas": [
+  {
+   "id": "alcapao_carga",
+   "x0_m": 1.1199999999999999,
+   "x1_m": 1.7600000000000002,
+   "theta_deg": 180.0,
+   "width_deg": 60.0
+  }
+ ],
+ "seccao": {
+  "w_m": 0.4,
+  "h_m": 0.3,
+  "n_exp": 3.0,
+  "noncircular": true
+ },
+ "pressao_Pa": 0.0,
+ "detalhe": [
+  {
+   "id": "fuselagem.abertura.alcapao_carga.soleira_a",
+   "kind": "soleira",
+   "mass_kg": 0.08071516496000002,
+   "RF_min": 2.3518371356768477,
+   "verdict": "passa",
+   "section": {
+    "kind": "z",
+    "h_m": 0.02,
+    "t_m": 0.00041,
+    "A_m2": 1.7703799999999998e-05,
+    "P_u_N": 617.0364434031151,
+    "L_m": 0.6400000000000003,
+    "theta_deg": 150.0
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.abertura.alcapao_carga.soleira_b",
+   "kind": "soleira",
+   "mass_kg": 0.08071516496000002,
+   "RF_min": 2.3518371356768477,
+   "verdict": "passa",
+   "section": {
+    "kind": "z",
+    "h_m": 0.02,
+    "t_m": 0.00041,
+    "A_m2": 1.7703799999999998e-05,
+    "P_u_N": 617.0364434031151,
+    "L_m": 0.6400000000000003,
+    "theta_deg": 210.0
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@0.384",
+   "kind": "viga_piso",
+   "mass_kg": 0.020778787496230033,
+   "RF_min": 1.2474793342948152,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.00051,
+    "A_m2": 2.7019800000000002e-05
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@0.694",
+   "kind": "viga_piso",
+   "mass_kg": 0.0309153222474207,
+   "RF_min": 1.0895700888223339,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.0006100000000000001,
+    "A_m2": 3.21958e-05
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@0.902",
+   "kind": "viga_piso",
+   "mass_kg": 0.037117864262801246,
+   "RF_min": 1.0112280514780916,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.00051,
+    "A_m2": 3.61998e-05
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@1.120",
+   "kind": "viga_piso",
+   "mass_kg": 0.037117864262801246,
+   "RF_min": 1.0112280514780916,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.00051,
+    "A_m2": 3.61998e-05
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@1.440",
+   "kind": "viga_piso",
+   "mass_kg": 0.037117864262801246,
+   "RF_min": 1.0112280514780916,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.00051,
+    "A_m2": 3.61998e-05
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.painel",
+   "kind": "piso",
+   "mass_kg": 1.1935126685989752,
+   "RF_min": 1.0690585599864295,
+   "verdict": "passa",
+   "section": {
+    "t_m": 0.001,
+    "beta": 0.46786550034301017
+   },
+   "note": null
+  }
+ ]
+}

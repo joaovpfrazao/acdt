@@ -365,3 +365,82 @@ def test_c172_iterar_converges_and_sets_balance_stations():
     # nada aplicado ao exemplo: o yaml em disco não tem o bloco
     assert "structure_layout" not in (yaml.safe_load((EX / "cessna172_check.yaml").read_text(encoding="utf-8"))
                                       .get("assumptions") or {})
+
+
+# ------------------------------------------------------------------ incremento D: detalhe da fuselagem
+def test_superellipse_section_limits():
+    c = fr.section_points(0.5, 8)
+    assert c["P"] == pytest.approx(math.pi) and c["circular"]
+    e = fr.section_points(0.5, 64, 1.0, 1.0, 2.0)
+    assert e["P"] == pytest.approx(math.pi, rel=1e-3) and e["A"] == pytest.approx(math.pi / 4, rel=1e-3)
+    sq = fr.section_points(0.5, 64, 1.0, 0.6, 40.0)
+    el = fr.section_points(0.5, 64, 1.0, 0.6, 2.0)
+    assert el["A"] == pytest.approx(math.pi * 0.5 * 0.3, rel=1e-3)
+    assert el["P"] < sq["P"] < 3.2 and el["A"] < sq["A"] < 0.6        # entre a elipse e o retângulo
+    assert not sq["circular"]
+
+
+def test_roark_plate_beta_and_floor_beam():
+    assert fr.plate_ss_uniform_beta(1.0, 1.0) == pytest.approx(0.2874)
+    assert fr.plate_ss_uniform_beta(0.5, 1.0) == pytest.approx(0.6102)
+    mat = sl.material_dict("al2024_t3")
+    p = fr.size_floor_panel(0.5, 1.0, 10e3, mat, 0.5e-3)
+    assert p["sigma_Pa"] == pytest.approx(0.6102 * 10e3 * 0.25 / p["t_m"] ** 2) and p["RF"] >= 1.0
+    b = fr.size_floor_beam(1.0, 5e3, mat, 0.5e-3)
+    assert b["M_u_Nm"] == pytest.approx(5e3 / 8) and b["RF"] >= 1.0
+
+
+def test_pressure_hoop_and_cutout_in_shell():
+    mat = sl.material_dict("al2024_t3")
+    lay = fr.ShellLayout(n_stringers=24, stringer_kind="z", stringer_h=0.02, stringer_b=0.012, stringer_t=1e-3,
+                         skin_t=1e-3, frame_pitch=0.5)
+    st0 = fr.ShellStation(0.0, 1.0, 2e4, 5e3, 1e3)
+    r0 = fr.shell_station_check(st0, lay, mat)
+    stp = fr.ShellStation(0.0, 1.0, 2e4, 5e3, 1e3, p_lim=40e3)
+    rp = fr.shell_station_check(stp, lay, mat)
+    assert rp["sigma_hoop_Pa"] == pytest.approx(40e3 * 1.0 / 1e-3)
+    assert rp["RF_skin_hoop_pressure"] == pytest.approx(mat["Ftu"] / (1.5 * 1.33 * 40e6))
+    stc = fr.ShellStation(0.0, 1.0, 2e4, 5e3, 1e3, cutouts=[(60.0, 120.0)])
+    rc = fr.shell_station_check(stc, lay, mat)
+    assert rc["n_cut"] > 0 and rc["q_skin_N_m"] > r0["q_skin_N_m"] and rc["I_m4"] < r0["I_m4"]
+    nc = fr.shell_station_check(fr.ShellStation(0.0, 1.0, 2e4, 5e3, 1e3, w=2.0, h=1.4, n_exp=3.0, p_lim=40e3),
+                                lay, mat)
+    assert nc["verdict"] != "passa" and nc["pressure_note"]
+
+
+def _c172_d(extra):
+    from acdt.core.pipeline import run_pipeline
+    from acdt.domains.aircraft.mission import MissionSpec
+    d = yaml.safe_load((EX / "cessna172_check.yaml").read_text(encoding="utf-8"))
+    d.setdefault("assumptions", {})["structure_layout"] = {"enabled": True, "fuselage": extra}
+    return run_pipeline("aircraft", MissionSpec.from_dict(d, EX / "cessna172_check.yaml"))["result"].structure_layout
+
+
+def test_c172_floor_door_pressure():
+    r = _c172_d({"cutouts": [{"id": "porta_esq", "x0_m": 1.6, "x1_m": 2.5, "theta_deg": -90.0, "width_deg": 50.0}],
+                 "pressure_Pa": 25e3})
+    f = r["fuselage"]
+    assert f["floor"]["evaluated"] and f["floor"]["q_lim_Pa"] > 0
+    kinds = {m["kind"] for m in r["members"]}
+    assert {"viga_piso", "piso", "soleira"} <= kinds
+    edge = [m for m in r["members"] if m["kind"] == "caverna_pesada" and "abertura:porta_esq" in m["loads"]]
+    assert len(edge) == 2
+    assert any("pressurizacao" in (m.get("ring") or {}) for m in r["members"] if m["kind"].startswith("caverna"))
+    assert all(m["verdict"] in ("passa", "falha", "desconhecido") for m in r["members"])
+
+
+def test_twin_boom_pod_noncircular_floor_declared():
+    from acdt.core.pipeline import run_pipeline
+    from acdt.domains.aircraft.mission import MissionSpec
+    p = EX / "uav_twin_boom_shortcut.yaml"
+    d = yaml.safe_load(p.read_text(encoding="utf-8"))
+    d.setdefault("assumptions", {})["structure_layout"] = {
+        "enabled": True, "fuselage": {"section": {"w_m": 0.40, "h_m": 0.30, "n_exp": 3.0},
+                                      "floor": {"enabled": True, "x0_frac": None, "q_Pa": 3000.0},
+                                      "cutouts": [{"id": "alcapao", "x0_frac": 0.35, "x1_frac": 0.55,
+                                                   "theta_deg": 180.0, "width_deg": 60.0}]}}
+    r = run_pipeline("aircraft", MissionSpec.from_dict(d, p))["result"].structure_layout
+    f = r["fuselage"]
+    assert f["section"]["noncircular"] and f["floor"]["evaluated"]
+    assert any(m["kind"] == "soleira" for m in r["members"])
+    assert f["shell_table"][0]["perimeter_m"] < 2 * math.pi * f["shell_table"][0]["R_m"] * 1.5

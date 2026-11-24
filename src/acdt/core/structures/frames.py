@@ -238,6 +238,11 @@ class ShellStation:
     M_lim: float        # momento fletor LIMITE [N m]
     V_lim: float        # esforço transverso LIMITE [N]
     T_lim: float = 0.0  # torção LIMITE [N m]
+    w: float | None = None      # secção não circular: largura total [m] (superelipse; None → círculo de raio R)
+    h: float | None = None      # altura total [m]
+    n_exp: float = 2.0          # expoente da superelipse
+    p_lim: float = 0.0          # pressão diferencial LIMITE [Pa] (cabine pressurizada)
+    cutouts: list[tuple[float, float]] = field(default_factory=list)   # arcos sem painel [(θ0, θ1) graus]
 
 
 @dataclass
@@ -275,23 +280,28 @@ def shell_station_check(st: ShellStation, lay: ShellLayout, mat: dict[str, Any],
     # raio de giração para flexão para fora do plano do revestimento (eixo paralelo à pele): o revestimento
     # estabiliza o modo lateral/torsional — PRESSUPOSTO (Bruhn C2/C7: coluna reforçador + pele)
     rho_s = math.sqrt(pr["Iyy"] / A_s)
-    th = 2 * math.pi * np.arange(n) / n
-    z = st.R * np.cos(th)
+    sp = section_points(st.R, n, st.w, st.h, st.n_exp)
+    th = sp["theta"]
+    z = sp["z"]
     A_b = np.full(n, A_s)
     for tl in lay.longeron_theta_deg:
         A_b[int(np.argmin(np.abs(((th - math.radians(tl)) + math.pi) % (2 * math.pi) - math.pi)))] += lay.longeron_area
-    b = 2 * math.pi * st.R / n
+    P = float(sp["P"])
+    b = P / n
+    cut = in_arcs(th, st.cutouts) if st.cutouts else np.zeros(n, bool)
+    A_b[cut] = 0.0                    # abertura: reforçadores e painel interrompidos (cargas vão para as soleiras)
     t = lay.skin_t
     Mu, Vu, Tu = fs * abs(st.M_lim), fs * abs(st.V_lim), fs * abs(st.T_lim)
     # largura efetiva: começa com o painel inteiro e itera com a tensão nos reforçadores comprimidos (von Kármán)
-    be = np.full(n, b)
+    be = np.where(cut, 0.0, b)
     sig = np.zeros(n)
     for _ in range(8):
         B = A_b + be * t
         I = float(np.sum(B * z**2))
         sig = Mu * z / I if I > 0 else np.full(n, math.inf)
         comp = np.maximum(sig, 0.0)    # z > 0 comprimido para momento que flete a cauda para cima (convenção)
-        be_new = np.where(comp > 0, np.minimum(b, 1.9 * t * np.sqrt(E / np.maximum(comp, 1.0))), b)
+        be_new = np.where(cut, 0.0,
+                          np.where(comp > 0, np.minimum(b, 1.9 * t * np.sqrt(E / np.maximum(comp, 1.0))), b))
         if np.allclose(be_new, be, rtol=1e-4):
             break
         be = be_new
@@ -300,7 +310,11 @@ def shell_station_check(st: ShellStation, lay: ShellLayout, mat: dict[str, Any],
     s_col = euler_johnson(E, Fcs, lay.frame_pitch / rho_s)
     rf_col = s_col / s_c if s_c > 0 else math.inf
     rf_ten = mat["Ftu"] / s_c if s_c > 0 else math.inf
-    q = Vu / (math.pi * st.R) + Tu / (2 * math.pi * st.R**2)
+    # corte: S/(π R_eq) com R_eq = P/(2π) (exato no círculo; PRESSUPOSTO fora dele) + Bredt T/(2A) (Megson);
+    # com abertura, o fluxo redistribui-se pelos painéis restantes: × P/(P − L_aberta) (PRESSUPOSTO)
+    R_eq = P / (2 * math.pi)
+    L_cut = b * int(np.sum(cut))
+    q = (Vu / (math.pi * R_eq) + Tu / (2 * float(sp["A"]))) * (P / max(P - L_cut, 1e-9))
     tau = q / t
     rf_sh = mat["Fsu"] / tau if tau > 0 else math.inf
     # encurvadura do painel à carga limite (sem encurvadura até à limite — PRESSUPOSTO)
@@ -319,11 +333,30 @@ def shell_station_check(st: ShellStation, lay: ShellLayout, mat: dict[str, Any],
         rf_pb = 1.0 / Rc if Rc > 0 else math.inf
     rfs = {"RF_stringer_column": rf_col, "RF_stringer_tension": rf_ten, "RF_skin_shear": rf_sh,
            "RF_skin_buckling_limit": rf_pb}
+    # pressurização (cabine): pressão sozinha, 14 CFR 25.365(d) 1,33 × p, última × 1,5: aro σ = p R/t na pele
+    # (membrana, só em secção circular); longitudinal p A/(Σ B) somada à tração dos reforçadores (combinada com o
+    # voo a 1,0 p, 25.365(a))
+    sig_h = None
+    rf_hoop: float | None = None
+    pnote = None
+    if st.p_lim > 0:
+        sig_px = st.p_lim * float(sp["A"]) / max(float(np.sum(A_b + be * t)), 1e-12)
+        rfs["RF_stringer_tension"] = mat["Ftu"] / (s_c + fs * sig_px) if (s_c + sig_px) > 0 else math.inf
+        if sp["circular"]:
+            sig_h = st.p_lim * st.R / t
+            rf_hoop = mat["Ftu"] / (fs * 1.33 * sig_h)
+            rfs["RF_skin_hoop_pressure"] = rf_hoop
+        else:
+            pnote = "pressurização em secção não circular: flexão do anel/painel não modelada — desconhecido"
     rmin = min(rfs.values())
-    return {"x_m": st.x, "R_m": st.R, "I_m4": I, "sigma_stringer_max_Pa": s_c, "Fcs_Pa": Fcs,
+    ver = verdict(rmin)
+    if pnote and ver == "passa":
+        ver = "desconhecido"
+    return {"x_m": st.x, "R_m": st.R, "perimeter_m": P, "A_enc_m2": float(sp["A"]), "n_cut": int(np.sum(cut)),
+            "sigma_hoop_Pa": sig_h, "pressure_note": pnote, "I_m4": I, "sigma_stringer_max_Pa": s_c, "Fcs_Pa": Fcs,
             "sigma_column_Pa": s_col, "L_over_rho": lay.frame_pitch / rho_s, "q_skin_N_m": q, "tau_skin_Pa": tau,
             "sigma_cr_panel_Pa": sc_cr, "tau_cr_panel_Pa": ts_cr, "b_eff_min_m": float(be.min()),
-            "stringer_area_m2": A_s, "panel_width_m": b, **rfs, "RF_min": rmin, "verdict": verdict(rmin)}
+            "stringer_area_m2": A_s, "panel_width_m": b, **rfs, "RF_min": rmin, "verdict": ver}
 
 
 def size_shell(stations: list[ShellStation], lay: ShellLayout, mat: dict[str, Any], t_skin_min: float,
@@ -340,7 +373,8 @@ def size_shell(stations: list[ShellStation], lay: ShellLayout, mat: dict[str, An
             if chk["RF_min"] >= 1.0:
                 break
             grew = False
-            if min(chk["RF_skin_shear"], chk["RF_skin_buckling_limit"]) < 1.0 and ts < t_skin_max:
+            if min(chk["RF_skin_shear"], chk["RF_skin_buckling_limit"],
+                   chk.get("RF_skin_hoop_pressure", math.inf)) < 1.0 and ts < t_skin_max:
                 ts += dt
                 grew = True
             if min(chk["RF_stringer_column"], chk["RF_stringer_tension"]) < 1.0 and tstr < t_str_max:
@@ -352,3 +386,92 @@ def size_shell(stations: list[ShellStation], lay: ShellLayout, mat: dict[str, An
         chk["t_skin_m"], chk["t_stringer_m"] = ts, tstr
         out.append(chk)
     return out
+
+
+# ------------------------------------------------------------------------------------------------ incremento D
+def section_points(R: float, k: int, w: float | None = None, h: float | None = None, n_exp: float = 2.0,
+                   dense: int = 720) -> dict[str, Any]:
+    """Pontos de ``k`` booms igualmente espaçados em perímetro numa secção circular (raio R) ou superelíptica
+    |y/a|^n + |z/b|^n = 1 (a = w/2, b = h/2; n = 2 elipse, n → ∞ retângulo). θ a partir do topo, positivo para +y.
+    Devolve y, z, θ dos booms, perímetro P e área encerrada A."""
+    if w is None or h is None:
+        th = 2 * math.pi * np.arange(k) / k
+        return {"y": R * np.sin(th), "z": R * np.cos(th), "theta": th, "P": 2 * math.pi * R,
+                "A": math.pi * R**2, "circular": True}
+    a, b = 0.5 * w, 0.5 * h
+    t = np.linspace(0.0, 2 * math.pi, dense + 1)
+    c, s = np.cos(t), np.sin(t)
+    e = 2.0 / n_exp
+    yy = a * np.sign(s) * np.abs(s) ** e
+    zz = b * np.sign(c) * np.abs(c) ** e
+    seg = np.hypot(np.diff(yy), np.diff(zz))
+    cum = np.concatenate([[0.0], np.cumsum(seg)])
+    P = float(cum[-1])
+    sk = P * np.arange(k) / k
+    yk, zk = np.interp(sk, cum, yy), np.interp(sk, cum, zz)
+    A = float(0.5 * abs(np.sum(yy[:-1] * zz[1:] - yy[1:] * zz[:-1])))
+    circ = abs(w - h) <= 0.02 * max(w, h) and abs(n_exp - 2.0) <= 0.05
+    return {"y": yk, "z": zk, "theta": np.arctan2(yk, zk) % (2 * math.pi), "P": P, "A": A, "circular": circ}
+
+
+def in_arcs(theta: Any, arcs: list[tuple[float, float]]) -> Any:
+    """Máscara dos ângulos (rad, a partir do topo) dentro de algum arco [θ0, θ1] em graus."""
+    th = np.degrees(np.asarray(theta, float)) % 360.0
+    m = np.zeros(th.shape, bool)
+    for t0, t1 in arcs:
+        a0, a1 = t0 % 360.0, t1 % 360.0
+        m |= ((th >= a0) & (th <= a1)) if a0 <= a1 else ((th >= a0) | (th <= a1))
+    return m
+
+
+# Roark & Young, *Formulas for Stress and Strain* (7.ª ed.), Tabela 11.4 caso 1a: placa retangular simplesmente
+# apoiada, carga uniforme q, σ_max = β q b²/t² (b = lado curto), β em função de a/b.
+_ROARK_AB = (1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 3.0, 4.0, 5.0, 1e9)
+_ROARK_BETA = (0.2874, 0.3762, 0.4530, 0.5172, 0.5688, 0.6102, 0.7134, 0.7410, 0.7476, 0.7500)
+
+
+def plate_ss_uniform_beta(a: float, b: float) -> float:
+    lo, hi = min(a, b), max(a, b)
+    return float(np.interp(hi / lo, _ROARK_AB, _ROARK_BETA))
+
+
+def size_floor_panel(a: float, b: float, q_u: float, mat: dict[str, Any], t_min: float) -> dict[str, Any]:
+    """Painel de piso como placa retangular simplesmente apoiada (Roark Tab. 11.4 caso 1a), carga ÚLTIMA q_u."""
+    beta = plate_ss_uniform_beta(a, b)
+    bs = min(a, b)
+    t = max(t_min, math.sqrt(beta * q_u * bs**2 / mat["Fty"])) if q_u > 0 else t_min
+    t = math.ceil(t / 1e-4 - 1e-9) * 1e-4       # espessura comercial em passos de 0,1 mm
+    s = beta * q_u * bs**2 / t**2
+    rf = mat["Fty"] / s if s > 0 else math.inf
+    return {"t_m": t, "beta": beta, "sigma_Pa": s, "RF": rf, "verdict": verdict(rf)}
+
+
+def size_floor_beam(span: float, w_u: float, mat: dict[str, Any], t_min: float,
+                    h_steps: tuple[float, ...] = (0.03, 0.04, 0.05, 0.06, 0.08, 0.10, 0.12, 0.15)) -> dict[str, Any]:
+    """Viga de piso simplesmente apoiada nas cavernas, carga ÚLTIMA distribuída w_u [N/m]: M = w L²/8, V = w L/2.
+    Perfil em C (largura 0,4 h); σ = M c/I ≤ min(F_cy, F_cs Gerard) (banzo comprimido, PRESSUPOSTO travado pelo
+    painel), τ = V/(h t) ≤ F_su. Escolhe a secção de menor área."""
+    M = w_u * span**2 / 8
+    V = w_u * span / 2
+    best: dict[str, Any] | None = None
+    for hh in h_steps:
+        t = t_min
+        while t <= 4e-3 + 1e-12:
+            prof = sections.channel(hh, 0.4 * hh, t, t)
+            pr = prof.properties()
+            zs = prof.pts[:, 1] - pr["zc"]
+            c = float(max(abs(zs.max()), abs(zs.min())))
+            sig = M * c / pr["Iyy"]
+            Fcs = prof.crippling(mat["E"], mat["Fcy"], mat.get("nu", 0.33))["Fcs"]
+            tau = V / (hh * t)
+            rf = min(min(mat["Fcy"], Fcs) / sig if sig > 0 else math.inf, mat["Fsu"] / tau if tau > 0 else math.inf)
+            if rf >= 1.0:
+                if best is None or pr["A"] < best["A_m2"]:
+                    best = {"h_m": hh, "b_m": 0.4 * hh, "t_m": t, "A_m2": pr["A"], "RF": rf, "M_u_Nm": M, "V_u_N": V}
+                break
+            t += 0.1e-3
+    if best is None:
+        return {"RF": None, "verdict": "falha", "M_u_Nm": M, "V_u_N": V, "A_m2": None,
+                "note": "nenhum C até 150 mm × 4 mm passa"}
+    best["verdict"] = verdict(best["RF"])
+    return best

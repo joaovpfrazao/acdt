@@ -3,17 +3,17 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 167.03090270215554,
- "tempo_s": 12.671059370040894,
+ "tempo_s": 13.063024044036865,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 63,
   "desconhecido": 24
  },
  "orcamento": {
-  "mass_kg": 27.408566215888595,
+  "mass_kg": 27.408566215888598,
   "cg_m": [
    1.3057779764274633,
-   -2.4303854843342363e-17,
+   -1.215192742167118e-17,
    0.009723823894745545
   ],
   "inertia_kg_m2": {
@@ -26,8 +26,8 @@
    "estabilizador": 0.44844328637577807,
    "deriva": 0.5135458873537413,
    "fuselagem": 12.205242487606611,
-   "boom": 2.8444218586736407,
-   "boom~m": 2.8444218586736407,
+   "boom": 2.844421858673641,
+   "boom~m": 2.844421858673641,
    "ligacoes": 2.573937637654687
   },
   "unknown_mass": [],
@@ -264,6 +264,11 @@
  "pior_estacao_casca": {
   "x_m": 0.384,
   "R_m": 0.15000000000000002,
+  "perimeter_m": 0.942477796076938,
+  "A_enc_m2": 0.07068583470577036,
+  "n_cut": 0,
+  "sigma_hoop_Pa": null,
+  "pressure_note": null,
   "I_m4": 1.0673145414692446e-05,
   "sigma_stringer_max_Pa": 12019604.082928006,
   "Fcs_Pa": 106053436.05572473,
@@ -1066,5 +1071,15 @@
   ],
   "verdict": "desconhecido"
  },
- "vigas_em_falta": []
+ "vigas_em_falta": [],
+ "piso": null,
+ "aberturas": [],
+ "seccao": {
+  "w_m": null,
+  "h_m": null,
+  "n_exp": 2.0,
+  "noncircular": false
+ },
+ "pressao_Pa": 0.0,
+ "detalhe": []
 }

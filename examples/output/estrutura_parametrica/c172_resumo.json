@@ -3,36 +3,36 @@
  "exemplo": "examples/cessna172_check.yaml",
  "applied": false,
  "W0_kg": 1137.8001977766298,
- "tempo_s": 22.081437349319458,
+ "tempo_s": 22.615009546279907,
  "veredicto": "desconhecido",
  "contagem": {
-  "passa": 59,
+  "passa": 68,
   "desconhecido": 13
  },
  "orcamento": {
-  "mass_kg": 233.54885162553975,
+  "mass_kg": 253.15288151466112,
   "cg_m": [
-   3.1102979835636995,
+   3.0645448541252627,
    0.0,
-   0.01053610922805889
+   -0.010664940506926155
   ],
   "inertia_kg_m2": {
-   "Ixx": 777.0962573952796,
-   "Iyy": 849.3731112152097,
-   "Izz": 1602.6324185068559
+   "Ixx": 778.9367979171761,
+   "Iyy": 854.3255058641677,
+   "Izz": 1606.0323191589591
   },
   "by_component_kg": {
    "asa": 96.94938904178068,
    "estabilizador": 11.15946771766674,
    "deriva": 4.309464985403533,
-   "fuselagem": 105.9635077045319,
+   "fuselagem": 125.56753759365324,
    "ligacoes": 15.16702217615694
   },
   "unknown_mass": [],
   "note": "inércia própria: anéis (m R², m R²/2), linhas ao longo de x (m L²/12), placas (m R²/4, m R²/2); superfícies sustentadoras distribuídas ∝ corda na envergadura — PRESSUPOSTO"
  },
  "comparacao": {
-  "fuselage_layout_kg": 105.9635077045319,
+  "fuselage_layout_kg": 125.56753759365324,
   "fuselage_L1_kg": 85.11908175763308,
   "fuselage_raymer_kg": 97.60168778513065,
   "wing_box_kg": 96.94938904178068,
@@ -212,6 +212,11 @@
  "pior_estacao_casca": {
   "x_m": 4.63474991474487,
   "R_m": 0.5757453310242074,
+  "perimeter_m": 3.6175146045685476,
+  "A_enc_m2": 1.0413835717461117,
+  "n_cut": 0,
+  "sigma_hoop_Pa": null,
+  "pressure_note": null,
   "I_m4": 0.0005476483875897593,
   "sigma_stringer_max_Pa": 17310271.38182309,
   "Fcs_Pa": 106053436.05572473,
@@ -244,7 +249,9 @@
   "ligação da asa: longarinas a x = 1.910 m e 2.636 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
   "manobra: as forças concentradas (cauda, motor) são equilibradas pelas duas ligações da asa; a inércia distribuída da casca vai para revestimento/reforçadores, não para as cavernas — PRESSUPOSTO",
   "aterragem: reações do trem (23.473, viga L1) e metade da sustentação em cada longarina da asa; trem preso à fuselagem — se o trem principal está na asa, declarar gear_theta_deg/loads",
-  "anteparas por omissão: parede de fogo no berço do motor e fecho traseiro a 0,95 L (as duas da viga L1) — PRESSUPOSTO"
+  "anteparas por omissão: parede de fogo no berço do motor e fecho traseiro a 0,95 L (as duas da viga L1) — PRESSUPOSTO",
+  "piso por omissão: da parede de fogo a 0,5 L, a 0,6 R abaixo do eixo — PRESSUPOSTO, declarar",
+  "piso x 0.97–4.03 m, 8 vigas, área 2.70 m², q_lim 3765 Pa ((262 kg × g × n 3.96) / 2.70 m²); cargas de emergência dos assentos (9 g) e ancoragens não modeladas — desconhecido"
  ],
  "material": "Al 2024-T3 sheet",
  "superficies": {
@@ -1057,5 +1064,262 @@
   ],
   "verdict": "passa"
  },
- "vigas_em_falta": []
+ "vigas_em_falta": [],
+ "piso": {
+  "evaluated": true,
+  "x0_m": 0.9672521561206684,
+  "x1_m": 4.030217317169452,
+  "area_m2": 2.7009037920214176,
+  "q_lim_Pa": 3764.750571156109,
+  "q_source": "(262 kg × g × n 3.96) / 2.70 m²",
+  "z_m": -0.32826080463354046,
+  "beams": [
+   {
+    "x_m": 0.9673,
+    "span_m": 0.6909049123673635,
+    "z_m": -0.2590893421377613,
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.0015100000000000005,
+    "A_m2": 7.697980000000002e-05,
+    "RF": 1.016590406754514,
+    "M_u_Nm": 168.47832857444382,
+    "V_u_N": 975.4067487935973,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 1.5,
+    "span_m": 0.8079818354442866,
+    "z_m": -0.30299318829160743,
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.0020100000000000005,
+    "A_m2": 0.00010045980000000001,
+    "RF": 1.0285663561491645,
+    "M_u_Nm": 230.4149632438787,
+    "V_u_N": 1140.6937786772396,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 1.9098,
+    "span_m": 0.8980477695102207,
+    "z_m": -0.3367679135663328,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004,
+    "RF": 1.083302395369537,
+    "M_u_Nm": 284.6468363752394,
+    "V_u_N": 1267.8471949459022,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 2.5196,
+    "span_m": 0.921192529638732,
+    "z_m": -0.34544719861452444,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004,
+    "RF": 1.029550765134047,
+    "M_u_Nm": 299.50791172449794,
+    "V_u_N": 1300.5225382883089,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 2.6356,
+    "span_m": 0.921192529638732,
+    "z_m": -0.34544719861452444,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004,
+    "RF": 1.029550765134047,
+    "M_u_Nm": 299.50791172449794,
+    "V_u_N": 1300.5225382883089,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 3.0,
+    "span_m": 0.921192529638732,
+    "z_m": -0.34544719861452444,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004,
+    "RF": 1.029550765134047,
+    "M_u_Nm": 299.50791172449794,
+    "V_u_N": 1300.5225382883089,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 3.5,
+    "span_m": 0.921192529638732,
+    "z_m": -0.34544719861452444,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004,
+    "RF": 1.029550765134047,
+    "M_u_Nm": 299.50791172449794,
+    "V_u_N": 1300.5225382883089,
+    "verdict": "passa"
+   },
+   {
+    "x_m": 4.0,
+    "span_m": 0.921192529638732,
+    "z_m": -0.34544719861452444,
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004,
+    "RF": 1.029550765134047,
+    "M_u_Nm": 299.50791172449794,
+    "V_u_N": 1300.5225382883089,
+    "verdict": "passa"
+   }
+  ],
+  "panel": {
+   "t_m": 0.0018000000000000002,
+   "beta": 0.5560868671757517,
+   "sigma_Pa": 242306522.08475947,
+   "RF": 1.11016409168674,
+   "verdict": "passa"
+  },
+  "mass_kg": 15.683223911297075
+ },
+ "aberturas": [],
+ "seccao": {
+  "w_m": null,
+  "h_m": null,
+  "n_exp": 2.0,
+  "noncircular": false
+ },
+ "pressao_Pa": 0.0,
+ "detalhe": [
+  {
+   "id": "fuselagem.piso.viga@0.967",
+   "kind": "viga_piso",
+   "mass_kg": 0.14785630708509898,
+   "RF_min": 1.016590406754514,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.0015100000000000005,
+    "A_m2": 7.697980000000002e-05
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@1.500",
+   "kind": "viga_piso",
+   "mass_kg": 0.22565174818677733,
+   "RF_min": 1.0285663561491645,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.03,
+    "b_m": 0.012,
+    "t_m": 0.0020100000000000005,
+    "A_m2": 0.00010045980000000001
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@1.910",
+   "kind": "viga_piso",
+   "mass_kg": 0.2927775859977275,
+   "RF_min": 1.083302395369537,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@2.520",
+   "kind": "viga_piso",
+   "mass_kg": 0.3003231389504592,
+   "RF_min": 1.029550765134047,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@2.636",
+   "kind": "viga_piso",
+   "mass_kg": 0.3003231389504592,
+   "RF_min": 1.029550765134047,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@3.000",
+   "kind": "viga_piso",
+   "mass_kg": 0.3003231389504592,
+   "RF_min": 1.029550765134047,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@3.500",
+   "kind": "viga_piso",
+   "mass_kg": 0.3003231389504592,
+   "RF_min": 1.029550765134047,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.viga@4.000",
+   "kind": "viga_piso",
+   "mass_kg": 0.3003231389504592,
+   "RF_min": 1.029550765134047,
+   "verdict": "passa",
+   "section": {
+    "h_m": 0.04,
+    "b_m": 0.016,
+    "t_m": 0.0017100000000000006,
+    "A_m2": 0.00011727180000000004
+   },
+   "note": null
+  },
+  {
+   "id": "fuselagem.piso.painel",
+   "kind": "piso",
+   "mass_kg": 13.515322575275174,
+   "RF_min": 1.11016409168674,
+   "verdict": "passa",
+   "section": {
+    "t_m": 0.0018000000000000002,
+    "beta": 0.5560868671757517
+   },
+   "note": null
+  }
+ ]
 }
