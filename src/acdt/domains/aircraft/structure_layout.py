@@ -34,6 +34,7 @@ from acdt.core.structures import frames as fr
 LEVEL = "L1"
 DEFAULTS: dict[str, Any] = {
     "enabled": False, "coupling": "relatorio", "material": "auto",
+    "tol": 1e-3, "max_iter": 8,       # coupling iterar: |ΔW0|/W0 entre voltas e n.º máximo de voltas
     "fuselage": {
         "enabled": True, "frame_pitch_m": None,
         # secção das cavernas: altura PRESSUPOSTO max(15 mm, 3 % D) (Niu 1988 cap. 11: cavernas leves de pequena altura)
@@ -1094,8 +1095,12 @@ def analyse_layout(res: Any) -> dict[str, Any]:
                                         {"mass_kg": r["box"]["masses"].get("total"), "method": r["box"].get("method"),
                                          "section": r["box"].get("section"), "buckling_ok": r["box"].get("buckling_ok"),
                                          "source": r["source"]} for r in recs}}
+    loop = getattr(res, "structure_coupling", None)
     if o["coupling"] == "iterar":
-        notes.append("acoplamento iterar ainda não implementado: resultado relatado, não aplicado ao dimensionamento")
+        if loop is None:
+            notes.append("coupling: iterar pedido mas o ciclo não correu (só pelo pipeline) — resultado relatado")
+        else:
+            out["coupling"] = loop
     if l1 is not None and fus.get("evaluated"):
         fm = bud["by_component_kg"].get("fuselagem")
         out["comparison"] = {"fuselage_layout_kg": fm, "fuselage_L1_kg": l1.masses.get("fuselage_kg"),
@@ -1108,6 +1113,118 @@ def analyse_layout(res: Any) -> dict[str, Any]:
     if o.get("export", {}).get("beam_model", True):
         out["beam_model"] = beam_model(mat, bodies, recs, members)
     return out
+
+
+# ------------------------------------------------------------------------------------------------ coupling
+_ITEM_OF = {"asa": "wing", "fuselagem": "fuselage", "estabilizador": "htail", "deriva": "vtail"}
+COUPLING_PREFIX = "estrutura_parametrica"
+
+
+def _component_cg(members: list[dict[str, Any]]) -> dict[str, tuple[float, float]]:
+    """{componente: (massa conhecida, x_cg)}."""
+    acc: dict[str, list[float]] = {}
+    for m in members:
+        if m["mass_kg"] is None or not math.isfinite(float(m["mass_kg"])):
+            continue
+        a = acc.setdefault(m["component"], [0.0, 0.0])
+        a[0] += float(m["mass_kg"])
+        a[1] += float(m["mass_kg"]) * float(m["x_m"])
+    return {c: (a[0], a[1] / a[0] if a[0] > 0 else 0.0) for c, a in acc.items()}
+
+
+def coupling_items(res: Any, layout: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any], list[str]]:
+    """Itens de massa e estações para o modo ``iterar``. Para cada componente com item no build-up (asa,
+    fuselagem, empenagens) acrescenta o item de correção ``estrutura_parametrica:<item>`` = massa paramétrica − item
+    atual (pode ser negativo) e põe a estação do item original e da correção no CG paramétrico (``("m", x)``): a soma
+    fica com a massa e o momento da estrutura paramétrica. Booms e ligações (sem item no build-up) entram como itens
+    novos no seu CG. Membros sem massa (desconhecidos) não entram — listados."""
+    notes: list[str] = []
+    wb = getattr(res, "weights", None)
+    cur = {i.key: float(i.mass) for i in wb.items} if wb is not None else {}
+    cg = _component_cg(layout["members"])
+    items: list[dict[str, Any]] = []
+    stations: dict[str, list[Any]] = {}
+    asm_keys = [k for k in cur if k.startswith("asm:")]
+    if asm_keys:
+        # montagem: as partes estruturais já são itens asm:<parte> com nomes do utilizador; correção única
+        m_lay = sum(m for m, _x in cg.values())
+        x_lay = sum(m * x for m, x in cg.values()) / m_lay if m_lay > 0 else 0.0
+        m_asm = sum(cur[k] for k in asm_keys)
+        name = f"{COUPLING_PREFIX}:correcao_montagem"
+        items.append({"name": name, "mass_kg": m_lay - m_asm, "group": "structure",
+                      "source": f"estrutura paramétrica {m_lay:.2f} kg − partes da montagem {m_asm:.2f} kg"})
+        stations[name] = ["m", x_lay]
+        notes.append("montagem: correção única (estrutura paramétrica − Σ asm:*) no CG paramétrico; as estações das "
+                     "partes da montagem não são substituídas (PRESSUPOSTO)")
+        cg = {}
+    for comp, (m, x) in cg.items():
+        key = _ITEM_OF.get(comp)
+        name = f"{COUPLING_PREFIX}:{key or comp}"
+        if key is not None and key in cur:
+            items.append({"name": name, "mass_kg": m - cur[key], "group": "structure",
+                          "source": f"estrutura paramétrica {m:.2f} kg − {key} {cur[key]:.2f} kg (acoplamento iterar)"})
+            stations[key] = ["m", x]
+        elif key is not None:
+            notes.append(f"{comp}: sem item {key!r} no build-up — massa paramétrica acrescentada inteira")
+            items.append({"name": name, "mass_kg": m, "group": "structure", "source": "estrutura paramétrica"})
+        else:
+            items.append({"name": name, "mass_kg": m, "group": "structure", "source": "estrutura paramétrica"})
+        stations[name] = ["m", x]
+    unk = layout["budget"].get("unknown_mass") or []
+    if unk:
+        notes.append(f"{len(unk)} membros sem massa (desconhecidos) fora do acoplamento")
+    return items, stations, notes
+
+
+def size_with_structure(spec: Any, run_fn: Any) -> tuple[Any, Any, dict[str, Any]]:
+    """Modo ``iterar``: ponto fixo dimensionamento ↔ estrutura paramétrica. Em cada volta corre o dimensionamento,
+    a estrutura paramétrica sobre esse resultado e substitui no build-up de massas (``weights.components.items``) e
+    nas estações do balanço (``stability.stations``) a massa e o CG das partes estruturais. Pára quando o W0 muda
+    menos de ``tol`` (relativo). Exige o build-up de massas (``res.weights``)."""
+    o = options(spec)
+    tol = float(o.get("tol", 1e-3))
+    max_iter = int(o.get("max_iter", 8))
+    base_items = list((spec.assumptions["weights"].get("components") or {}).get("items") or [])
+    base_items = [i for i in base_items if not str(i.get("name", "")).startswith(COUPLING_PREFIX + ":")]
+    base_st = dict((spec.assumptions.get("stability") or {}).get("stations") or {})
+    hist: list[dict[str, Any]] = []
+    sp = spec
+    res = sysr = None
+    converged = False
+    reason = ""
+    W_prev = None
+    for it in range(max_iter):
+        res, sysr = run_fn(sp)
+        W0 = float(res.sizing.W0)
+        if not getattr(res.sizing, "converged", True) or not math.isfinite(W0):
+            reason = "dimensionamento não convergiu"
+            hist.append({"iter": it, "W0_kg": None, "status": "nao_avaliado", "reason": reason})
+            break
+        if getattr(res, "weights", None) is None:
+            reason = "acoplamento iterar exige o build-up de massas (res.weights) — não avaliado"
+            hist.append({"iter": it, "W0_kg": W0, "status": "nao_avaliado", "reason": reason})
+            break
+        lay = analyse_layout(res)
+        items, stations, notes = coupling_items(res, lay)
+        hist.append({"iter": it, "W0_kg": W0, "structure_kg": float(lay["budget"]["mass_kg"]),
+                     "delta_items_kg": {i["name"]: float(i["mass_kg"]) for i in items}, "notes": notes})
+        if W_prev is not None and abs(W0 - W_prev) / max(W0, 1e-9) < tol:
+            converged = True
+            break
+        W_prev = W0
+        sp = copy.copy(spec)
+        sp.assumptions = copy.deepcopy(spec.assumptions)
+        comp = sp.assumptions["weights"].setdefault("components", {}) or {}
+        sp.assumptions["weights"]["components"] = comp
+        comp["items"] = base_items + items
+        stab = sp.assumptions.setdefault("stability", {}) or {}
+        sp.assumptions["stability"] = stab
+        stab["stations"] = {**base_st, **stations}
+    out = {"converged": converged, "history": hist, "method": "ponto fixo dimensionamento ↔ estrutura paramétrica",
+           "tol": tol, "reason": reason,
+           "applied_to": "weights.components.items (correções estrutura_parametrica:*) e stability.stations "
+                         "(CG paramétrico de asa, fuselagem, empenagens, booms e ligações) — só em memória"}
+    return res, sysr, out
 
 
 def structure_layout_stage(res: Any) -> None:

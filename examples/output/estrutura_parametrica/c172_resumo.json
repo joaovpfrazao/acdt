@@ -3,7 +3,7 @@
  "exemplo": "examples/cessna172_check.yaml",
  "applied": false,
  "W0_kg": 1137.8001977766298,
- "tempo_s": 20.250065088272095,
+ "tempo_s": 22.081437349319458,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 59,
@@ -273,6 +273,33 @@
  "booms": [],
  "notas_layout": [
   "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo"
+ ],
+ "acoplamento": null,
+ "estabilidade_casos": [
+  {
+   "caso": "vazio + tripulação",
+   "x_cg_m": 2.021351795176883,
+   "xbar_cg": 0.2723250988132695,
+   "SM": 0.22379985172273859
+  },
+  {
+   "caso": "sem payload",
+   "x_cg_m": 2.059877818650034,
+   "xbar_cg": 0.30013677685315904,
+   "SM": 0.19598817368284904
+  },
+  {
+   "caso": "MTOW",
+   "x_cg_m": 2.192845078919132,
+   "xbar_cg": 0.39612495053600816,
+   "SM": 0.09999999999999992
+  },
+  {
+   "caso": "sem combustível (ZFW)",
+   "x_cg_m": 2.184348760527283,
+   "xbar_cg": 0.389991515254187,
+   "SM": 0.10613343528182106
+  }
  ],
  "ferragens": [
   {

@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_150kg_stanag4671.yaml",
  "applied": false,
  "W0_kg": 153.21267779959328,
- "tempo_s": 6.280935049057007,
+ "tempo_s": 6.220733642578125,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 47,
@@ -273,6 +273,33 @@
  "booms": [],
  "notas_layout": [
   "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo"
+ ],
+ "acoplamento": null,
+ "estabilidade_casos": [
+  {
+   "caso": "vazio",
+   "x_cg_m": 0.7107397578347643,
+   "xbar_cg": 0.3533956846371281,
+   "SM": 0.10000000000000003
+  },
+  {
+   "caso": "sem payload",
+   "x_cg_m": 0.7070519782680373,
+   "xbar_cg": 0.3432170465695986,
+   "SM": 0.11017863806752953
+  },
+  {
+   "caso": "MTOW",
+   "x_cg_m": 0.7079666706918673,
+   "xbar_cg": 0.3457416885545151,
+   "SM": 0.10765399608261306
+  },
+  {
+   "caso": "sem combustível (ZFW)",
+   "x_cg_m": 0.7107397578347643,
+   "xbar_cg": 0.3533956846371281,
+   "SM": 0.10000000000000003
+  }
  ],
  "ferragens": [
   {

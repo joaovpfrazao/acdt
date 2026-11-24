@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 167.03090270215554,
- "tempo_s": 11.697759866714478,
+ "tempo_s": 12.671059370040894,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 63,
@@ -359,6 +359,33 @@
  "notas_layout": [
   "cauda nos booms: L_estab 214 N e L_deriva 184 N (L1) repartidas por 2 booms — PRESSUPOSTO",
   "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo"
+ ],
+ "acoplamento": null,
+ "estabilidade_casos": [
+  {
+   "caso": "vazio",
+   "x_cg_m": 0.7659097417992144,
+   "xbar_cg": 0.3783238949144965,
+   "SM": 0.1000000000000002
+  },
+  {
+   "caso": "sem payload",
+   "x_cg_m": 0.7595798153500392,
+   "xbar_cg": 0.3615675549842809,
+   "SM": 0.11675633993021578
+  },
+  {
+   "caso": "MTOW",
+   "x_cg_m": 0.7607166623332926,
+   "xbar_cg": 0.36457697296930613,
+   "SM": 0.11374692194519054
+  },
+  {
+   "caso": "sem combustível (ZFW)",
+   "x_cg_m": 0.7659097417992144,
+   "xbar_cg": 0.3783238949144965,
+   "SM": 0.1000000000000002
+  }
  ],
  "ferragens": [
   {

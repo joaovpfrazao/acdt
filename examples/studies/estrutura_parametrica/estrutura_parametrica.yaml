@@ -13,3 +13,10 @@ cases:
   - id: twin_boom
     example: examples/uav_twin_boom_shortcut.yaml
     structure_layout: {enabled: true}
+  # incremento C: acoplamento iterar (massa e CG da estrutura paramétrica no ciclo do W0) — só em memória
+  - id: c172_iterar
+    example: examples/cessna172_check.yaml
+    structure_layout: {enabled: true, coupling: iterar, fittings: {engine_mount: {n_cylinders: 4}}}
+  - id: twin_boom_iterar
+    example: examples/uav_twin_boom_shortcut.yaml
+    structure_layout: {enabled: true, coupling: iterar}

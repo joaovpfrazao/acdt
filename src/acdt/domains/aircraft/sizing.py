@@ -90,6 +90,7 @@ class DesignResult:
     thermal_coupling: dict | None = None  # thermal.size_with_thermal (acoplamento iterar)
     icing: dict | None = None             # icing.analyse_icing (disciplina gelo, L0/L1)
     icing_coupling: dict | None = None    # icing.size_with_icing (acoplamento iterar)
+    structure_coupling: dict | None = None  # structure_layout.size_with_structure (acoplamento iterar)
     reliability: dict | None = None       # reliability.analyse_reliability (disciplina fiabilidade, L0)
     series_cost: dict | None = None       # series_cost.analyse_series_cost (disciplina custo_serie, L0)
     life_cycle: dict | None = None        # life_cycle.analyse_life_cycle (disciplina ciclo_vida, L0)
