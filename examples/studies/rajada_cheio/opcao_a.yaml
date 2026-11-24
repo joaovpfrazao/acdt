@@ -1,0 +1,17 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Opção (a) escolhida pelo João (24 nov 2026) para a rajada lateral do caso «cheio»: 2× Volz DA 30-HT por folha
+# do split aileron. Estudo de redimensionamento (applied: false): as alterações entram só em memória por `fixed`;
+# examples/heavy/uav150_flying_wing_tailless.yaml e os valores por omissão NÃO mudam.
+applied: false
+example: examples/heavy/uav150_flying_wing_tailless.yaml
+simulation: examples/simulation/uav150_tailless_crosswind.yaml
+fixed:
+  # item de massa do orçamento substituído pelo nome (8 servos = 4 folhas × 2; 1,100 kg do datasheet DA 30-HT Rev H,
+  # já no catálogo do exemplo)
+  replace_items:
+    - match: "atuadores split aileron"
+      item: {name: "atuadores split aileron (8x Volz DA 30-HT, 1100 g cada)", mass_kg: 8.80, group: equipment}
+  # taxa de projeto do split na superfície ≥ 100 °/s (rajada 23.443 no 6-DOF pediu 99,9 °/s no caso «cheio», estudo
+  # rajada_cheio.json); a escolha do servo do catálogo usa max(taxa 3σ da turbulência, esta)
+  set:
+    assumptions.assembly.options.flying_wing.actuators.split_rate_required_deg_s: 100

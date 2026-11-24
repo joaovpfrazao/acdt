@@ -2094,6 +2094,13 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Veredicto**: estudo **validado** como comparação (reprodutível: duas corridas iguais). **Recomendação** (a), marcada como recomendação; a decisão é do João. Nada é aplicado ao exemplo nem aos valores por omissão. W0 não redimensionado; potência elétrica do servo **desconhecida**.
 * **Ficheiros**: `examples/studies/rajada_cheio/{rajada_cheio.yaml,estudo_rajada_cheio.py}`, `examples/output/rajada_cheio/`, `docs/tutorial-asa-voadora-sem-deriva.md` §5, `tests/test_rajada_cheio_estudo.py`.
 
+## 49. Rajada do «cheio», opção (a) escolhida: redimensionamento com 2× Volz DA 30-HT por folha (24 nov 2026)
+
+* **O que faz**: `examples/studies/rajada_cheio/estudo_opcao_a.py` (`applied: false`) corre o exemplo tal como está e com os `fixed` de `opcao_a.yaml` aplicados em memória (massa dos servos do split 8,80 kg; taxa de projeto ≥ 100 °/s pela chave opcional nova `flying_wing.actuators.split_rate_required_deg_s`, em que o servo é escolhido com a maior entre esta taxa e a 3σ da turbulência; sem a chave, nada muda). Volta a fechar o W0 e a correr o equilíbrio, a margem estática, as HQ, a rajada 6-DOF nos 4 casos, o vento cruzado e a missão 6-DOF.
+* **Medida**: W0 149,67 → 157,67 kg (+8,00 kg, +5,3 %), convergido. Taxa do split 107,0 °/s. Rajada estrita: passa nos 4 casos, com margem de taxa mínima 1,071 (cheio). Falhas novas: `hq:phugoid` da célula nua (ζ 0,0419 → 0,0391, Nível 2; com piloto automático fica no Nível 1, ζ 0,965) e a carga lateral no toque da missão 6-DOF (interior 1,20 > 1 nos passos 0,01/0,02/0,025 s; a base já excedia a 0,025 s). Potência mecânica 34,0 W por folha; elétrica desconhecida.
+* **Veredicto**: estudo **validado** como redimensionamento; nada é aplicado ao exemplo nem aos valores por omissão. A falha nova no toque precisa de uma decisão do João.
+* **Ficheiros**: `examples/studies/rajada_cheio/{opcao_a.yaml,estudo_opcao_a.py}`, `examples/output/rajada_cheio/opcao_a.json`, `assembly/tailless_followup.py` (chave opcional), `docs/tutorial-asa-voadora-sem-deriva.md` §5.1, `tests/test_rajada_cheio_estudo.py`.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

@@ -2066,3 +2066,6 @@ O NaN no `brentq` da UQ vinha do dimensionamento sem convergência (espiral de m
 
 `examples/studies/rajada_cheio` (`applied: false`). (a) servo 2× DA 30-HT (111,4 °/s, +3,76 kg), (b) δ0 5,5–6° (ΔC_D0 5,6–6,7 % do C_D0) e (c) k_r × 0,75 (margem de atraso 0,150 s) passam os 4 casos. Recomendação (a), com a decisão para o João. Nada aplicado. Tabela em [tutorial-asa-voadora-sem-deriva.md](tutorial-asa-voadora-sem-deriva.md) §5 e CAPABILITIES §48.
 
+## Rajada do «cheio»: opção (a) redimensionada (24 nov 2026, ramo `rajada-cheio-opcao-a`)
+
+Estudo `examples/studies/rajada_cheio/estudo_opcao_a.py` (`applied: false`). Com 2× DA 30-HT por folha, o W0 vai de 149,67 para 157,67 kg (+5,3 %) e a rajada estrita passa nos 4 casos, com margem de taxa mínima de 7 %. Falhas novas: o fugóide da célula nua no Nível 2 (é informação, porque com piloto automático fica no Nível 1) e a carga lateral no toque da missão 6-DOF (1,20 > 1, consistente nos três passos de integração). Pendente: decisão do João sobre o toque (aproximação, decrab, bitola ou carga do trem) e sobre aplicar ou não a opção (a) ao exemplo. A chave opcional `actuators.split_rate_required_deg_s` existe, mas o exemplo não a usa. Ver [tutorial-asa-voadora-sem-deriva.md](tutorial-asa-voadora-sem-deriva.md) §5.1 e CAPABILITIES §49.
