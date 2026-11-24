@@ -9,6 +9,8 @@ Opt-in through the same ``assumptions.assembly.options.flying_wing`` block (``ya
           - {name: "Volz DA 26-30-5024", torque_Nm: 2.7, speed_deg_s: 200, mass_kg: 0.270, source: "..."}
         factor_of_safety: 1.5          # default as flightsim.controls (servo torque = |H| · FoS)
         max_per_surface: 1             # identical servos ganged per leaf / elevon (PRESSUPOSTO load sharing)
+        split_rate_required_deg_s: null  # opt-in design surface rate of the split leaves [°/s] (e.g. the lateral
+                                         # gust rate); the servo pick uses max(turbulence 3σ rate, this)
         lag_s: null                    # first-order lag of the actuator [s] (unknown → see below)
         delay_s: null                  # pure transport delay of sensor + computer + actuator [s]
 

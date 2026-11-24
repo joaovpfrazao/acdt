@@ -88,6 +88,12 @@ def extend(rep: dict, res, spec: dict, md: dict, asm, ctx: dict) -> None:
             wa = a.get("with_actuator") or {}
             d_op = wa.get("delta_3sigma_deg", a.get("delta_3sigma_deg"))
             rate_req = wa.get("rate_required_deg_s", a.get("rate_required_deg_s"))
+            # opt-in (24 nov 2026): taxa de projeto do split imposta pelo projetista (p.ex. a taxa exigida pela
+            # rajada lateral 23.443 no 6-DOF); a escolha do servo usa a maior das duas. None → sem efeito.
+            rr_design = act_cfg.get("split_rate_required_deg_s")
+            if rr_design is not None:
+                actrep["split_rate_required_design_deg_s"] = float(rr_design)
+                rate_req = float(rr_design) if rate_req is None else max(float(rate_req), float(rr_design))
             H_op = None
             if d_op is not None and ap is not None:
                 ch = TX.split_ch(d_op)

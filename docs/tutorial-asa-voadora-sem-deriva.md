@@ -286,3 +286,58 @@ margem de taxa de dois dígitos (11,5 %) sem mexer no SAS nem no arrasto. Custa 
 que obrigam a redimensionar e a atualizar o orçamento de massa. As opções (b) e (c) passam com margens de ~3 %. A (c)
 depende do atraso real do atuador, que é desconhecido, e de uma janela de ganhos não monótona. A (b) com 6° é a
 alternativa sem massa extra, a ~6,7 % de C_D0 de arrasto.
+
+
+### 5.1 Opção (a) escolhida: redimensionamento com 2× Volz DA 30-HT por folha (24 nov 2026, `applied: false`)
+
+O João escolheu a opção (a). O estudo `examples/studies/rajada_cheio/estudo_opcao_a.py` corre o mesmo código duas
+vezes: com o exemplo tal como está (base) e com os `fixed` de `opcao_a.yaml` aplicados só em memória. Esses `fixed`
+são dois:
+
+* o item de massa dos servos do split passa a 8,80 kg (8× DA 30-HT a 1,100 kg cada, do datasheet que já está no
+  catálogo);
+* a taxa de projeto do split fica ≥ 100 °/s, pela chave opcional nova `actuators.split_rate_required_deg_s`. A escolha
+  do servo usa a maior entre esta taxa e a taxa 3σ da turbulência; sem a chave, nada muda.
+
+O W0 é fechado de novo. Depois volta-se a correr o equilíbrio e a margem estática dos 4 casos, as HQ, a rajada lateral
+no 6-DOF com o critério estrito nos 4 casos, o vento cruzado e a missão 6-DOF, já com a massa e a inércia novas. O
+exemplo e os valores por omissão não mudam. Resultados em `examples/output/rajada_cheio/opcao_a.json`.
+
+| Grandeza | Base (2× DA 30) | Opção (a) (2× DA 30-HT) |
+|---|---|---|
+| W0 (convergido) | 149,67 kg | **157,67 kg (+8,00 kg, +5,3 %)** |
+| Massa vazia | 95,90 kg | 102,94 kg |
+| Servos (split + elevon) | 6,30 kg | 10,06 kg (dentro do orçamento declarado) |
+| I_xx / I_zz | 16,2 / 50,3 kg·m² | 17,5 / 56,2 kg·m² |
+| \|H\| do split (23.455) | 38,3 N·m | 39,9 N·m |
+| Taxa do split na superfície | 83,5 °/s | 107,0 °/s (G 0,93; o \|H\| subiu com o W0, por isso fica abaixo dos 111,4 °/s do estudo de decisão) |
+| Potência mecânica por folha, P = FoS·\|H_op\|·ω | 25,3 W | 34,0 W (a 107 °/s); elétrica **desconhecida** (os datasheets Volz não dão rendimento) |
+| Equilíbrio, 4 casos (cruzeiro e aproximação) | passa | passa (C_L máx. equilibrado 1,116 → 1,145) |
+| Margem estática, vazio / carga / combustível / cheio | 0,051 / 0,065 / 0,051 / 0,063 | 0,050 / 0,062 / 0,050 / 0,060 (banda 0,02–0,08: passa) |
+| Rolamento holandês com SAS (`hq:dutch_roll`) | ζ 0,142 → Nível 1, passa | ζ 0,133 → Nível 1, passa |
+| Margem de atraso para o Nível 1 | 0,234 s | 0,223 s |
+| Espiral (`hq:spiral`) | estável, Nível 1, passa | estável, Nível 1, passa |
+| Fugóide da célula nua (`hq:phugoid`, indicativo em UAV) | ζ 0,0419 → Nível 1, passa | **ζ 0,0391 → Nível 2, falha (nova)** |
+| Fugóide com manutenção de atitude (`hq:phugoid_autopilot`) | ζ 0,960 → Nível 1, passa | ζ 0,965 → Nível 1, passa |
+| Rajada no 6-DOF, critério estrito: vazio / carga / combustível / cheio | passa / passa / passa / **falha** (pede 99,9 °/s) | passa / passa / passa / **passa** |
+| Margem de taxa (disponível / pico): vazio / carga / combustível / cheio | 1,94 / 1,15 / 1,57 / — | 2,62 / 1,41 / 1,77 / **1,071** |
+| Vento cruzado 10,1 kt (`hq:yaw_crosswind`) | passa (máx. 14,7 kt) | passa (máx. 14,2 kt) |
+| Missão 6-DOF, corrida de descolagem com vento cruzado (requisito 300 m) | 325 m (já acima; tabela de opções existente) | 332 m |
+| Missão 6-DOF, carga lateral no toque (14 CFR 23.485), dt 0,02 s | passa (0,60 / 0,62) | **excede: interior 1,20, falha (nova)** |
+| Mesma carga com dt 0,01 / 0,025 s | passa / excede (exterior 1,23) | excede (1,23) / excede (1,19) |
+| Descida e deriva no toque | 1,06 m/s, 0,35 m/s | 1,26 m/s, 0,41 m/s |
+
+Leitura:
+
+* **A rajada do «cheio» fica resolvida**: passa nos 4 casos. Mas a margem de taxa mínima é de **7 %** (pico de
+  99,9 °/s contra 107,0 °/s) e não dos 11,5 % previstos sem redimensionar. O efeito bola de neve (+3,76 kg de servos
+  → +8,0 kg de W0) sobe o \|H\| e a inércia.
+* **Falha nova, `hq:phugoid` da célula nua**: ζ desce de 0,0419 para 0,0391, abaixo do limite do Nível 1 (0,04). O
+  caso de projeto do UAV é com piloto automático (manutenção de atitude), que fica no Nível 1 com ζ 0,965, por isso
+  isto é informação. Mas antes estava no limite e agora está do lado errado.
+* **Falha nova na missão 6-DOF: carga lateral do trem principal no toque.** A razão interior fica em 1,20 > 1 nos três
+  passos de integração (0,01 / 0,02 / 0,025 s). A base passa a 0,02 s, mas já excede a 0,025 s (exterior 1,23). O
+  veredicto do toque é sensível à trajetória, e com a opção (a) excede de forma consistente: descida 1,26 m/s e
+  deriva 0,41 m/s. Precisa de uma decisão própria: aproximação, decrab, bitola ou carga de projeto do trem.
+* O resto mantém-se: equilíbrio, margem estática, rolamento holandês, espiral, vento cruzado e autoridade em
+  turbulência. Nenhuma verificação passou a desconhecida.

@@ -1,0 +1,579 @@
+{
+ "schema": "acdt.estudo_rajada_cheio_opcao_a/1",
+ "applied": false,
+ "example": "examples/heavy/uav150_flying_wing_tailless.yaml",
+ "simulation": "examples/simulation/uav150_tailless_crosswind.yaml",
+ "fixed": {
+  "replace_items": [
+   {
+    "match": "atuadores split aileron",
+    "item": {
+     "name": "atuadores split aileron (8x Volz DA 30-HT, 1100 g cada)",
+     "mass_kg": 8.8,
+     "group": "equipment"
+    }
+   }
+  ],
+  "set": {
+   "assumptions.assembly.options.flying_wing.actuators.split_rate_required_deg_s": 100
+  }
+ },
+ "base": {
+  "label": "base",
+  "W0_kg": 149.66698928125118,
+  "converged": true,
+  "iterations": null,
+  "feasible": true,
+  "We_kg": 95.90281735403153,
+  "inertia": {
+   "Ixx": 16.215405692489686,
+   "Iyy": 37.268407685744556,
+   "Izz": 50.31097384594962,
+   "Ixz": null
+  },
+  "servo_split": {
+   "name": "Volz DA 30",
+   "n_per_surface": 2,
+   "rate_at_surface_deg_s": 83.53566656422923,
+   "gearing": 1.7956401878312351
+  },
+  "split_rate_required_design_deg_s": null,
+  "rate_max_effective_deg_s": 83.53566656422923,
+  "actuator_mass": {
+   "parts": [
+    {
+     "surface": "split_aileron",
+     "n": 8,
+     "servo": "Volz DA 30",
+     "unit_mass_kg": 0.63,
+     "mass_kg": 5.04
+    },
+    {
+     "surface": "elevon",
+     "n": 2,
+     "servo": "Volz DA 30",
+     "unit_mass_kg": 0.63,
+     "mass_kg": 1.26
+    }
+   ],
+   "unknown_surfaces": [],
+   "total_known_kg": 6.3,
+   "budget_items": [
+    "atuadores split aileron (8x Volz DA 30",
+    "atuadores elevon (2x Volz DA 30"
+   ],
+   "budget_declared_kg": 6.3,
+   "within_budget": true,
+   "note": "massas do datasheet do servo (sem hastes/suportes); orçamento = itens de weights.components.items com 'servo'/'atuador' no nome"
+  },
+  "P_mech_per_leaf_W": 25.304230665079707,
+  "P_elec_per_leaf_W": null,
+  "P_elec_note": "desconhecida: datasheets Volz sem rendimento",
+  "trim": {
+   "tailless_trim_converged": true,
+   "CLmax_trimmed": 1.115605139956454,
+   "cases_ok": {
+    "vazio": true,
+    "carga": true,
+    "combustível": true,
+    "cheio": true
+   },
+   "static_margin": {
+    "vazio": 0.05085141007726532,
+    "carga": 0.0649342064394099,
+    "combustível": 0.05085141007726517,
+    "cheio": 0.06275189235992225
+   },
+   "sm_outside_band": {}
+  },
+  "hq": {
+   "hq:dutch_roll": {
+    "ok": true,
+    "message": "montagem com SAS (k_β 0.000/rad, k_r 0.075): rolamento holandês ζ / ζω / ω = 0.142 / 0.341 / 2.40 → Nível 1 (MIL-F-8785C Table VI); com atuador (lag 0.000 s, atraso 0.100 s): Nível 1; autoridade e taxa dentro da capacidade dos split ailerons; célula nua (sem SAS): Nível >3 — informativo"
+   },
+   "hq:spiral": {
+    "ok": true,
+    "message": "montagem com SAS (k_β 0.000/rad, k_r 0.075): espiral T2 [s] (∞ = estável) = inf → Nível 1 (MIL-F-8785C Table VIII); autoridade e taxa dentro da capacidade dos split ailerons; célula nua (sem SAS): Nível 1 — informativo"
+   },
+   "hq:phugoid": {
+    "ok": true,
+    "message": "montagem: fugóide ζ = 0.0419 → Nível 1 (N1: ≥ 0.04; MIL-F-8785C 3.2.1.2, Classe I, Cat. B) — UAV: indicativo"
+   },
+   "hq:phugoid_autopilot": {
+    "ok": true,
+    "message": "fugóide com manutenção de atitude de picada (piloto automático, caso 'cheio'): ζ 0.960, ω 0.293 rad/s → Nível 1 (N1 ζ ≥ 0,04); célula nua ζ 0.0419; k_pθ -1.356, k_dθ -0.639 s (autoridade da elevon 13.6°, e_θ,max 10° PRESSUPOSTO); período curto em malha fechada ζ 0.754 (Beard & McLain 2012 (Small Unmanned Aircraft) Sec. 6.4.1, pitch attitude hold: θ/δe ≈ a_θ3/(s² + a_θ1 s + a_θ2), k_pθ = δe_max/e_θ,max·sign(a_θ3), ω_θ = √(a_θ2 + δe_max/e_θ,max |a_θ3|), k_dθ = (2ζ_θ ω_θ − a_θ1)/a_θ3)"
+   },
+   "hq:lateral_gust": {
+    "ok": true,
+    "message": "rajada lateral 1−cos 17.7 m/s TAS, 18.1 m (14 CFR 23.443(a)/(b) e 23.333(c) (pré-Amdt 23-64): rajada lateral de 50 ft/s EAS em V_C (até 20 000 ft), forma U = (U_de/2)(1 − cos 2πs/25c̄); 23.443 é de cargas em superfícies verticais — aqui PRESSUPOSTO como rajada de dimensionamento da guinada): com SAS β_ar pico 21.0°, ΔC_n pico 0.0012 (comando 0.0012), split 9.9°, taxa 49 °/s, saturação não, limite de taxa não, elevon 14.4°; célula nua β_ar pico 21.0°; pré-deflexão δ0 = 2° como opção de projeto (ΔC_D0 +0.00020 no polar de dimensionamento) — pré-deflexão simétrica δ0 dos dois split ailerons (ΔC_n = 2C₁ sin2δ0 sin2d, linear em ΔC_n = 0: Rajput, Zhang & Qu 2014, Appl. Mech. Mater. 643:54; Wang, Wang & Jia 2011, Acta Aeronaut. Astronaut. Sin. 32(8):1392); arrasto de perfil McCormick 1995 Eq. 3.45 por folha, dois lados"
+   },
+   "hq:yaw_crosswind": {
+    "ok": true,
+    "message": "vento cruzado 10.1 kt a U 28.6 m/s (β 10.3°): ΔC_n -0.01186 → split 40.1° (máx 60°), elevon -17.4°, pranchamento -0.1°; máx. 14.7 kt (14 CFR 23.233(a) (pré-Amdt 23-64): vento cruzado a 90° ≥ 0,2 V_S0; U = 1,1 V_S0 (Sadraey 12.6.2.3))"
+   },
+   "hq:sas_authority": {
+    "ok": true,
+    "message": "SAS: 3σ turbulência (Dryden MIL-F-8785C, aproximação) |ΔC_n| 0.00380 vs capacidade 0.02147 (somado ao vento cruzado 0.01186: cabe); taxa 81 °/s vs 84 °/s; com atuador: 3σ 0.00380, taxa 81 °/s"
+   },
+   "hq:sas_time_delay": {
+    "ok": true,
+    "message": "SAS com atuador (lag 0.000 s, atraso 0.100 s; PRESSUPOSTO: atraso/lag desconhecidos → atraso equivalente puro = limite Nível 1 de MIL-F-8785C 3.5.3 (0,10 s)): cruzeiro ζ 0.149, ω 2.50 rad/s → Nível 1; aproximação ζ 0.109, ω 3.81 rad/s → Nível 1; margem de atraso p/ Nível 1 0.234 s (MIL-F-8785C 3.5.3: atraso equivalente do sistema de comando (inclui SAS) ≤ 0,10/0,20/0,25 s Níveis 1/2/3 (citado em NASA NTRS 19910005040 §2.1.1 e AIAA doi:10.2514/3.20149))"
+   },
+   "hq:actuators": {
+    "ok": true,
+    "message": "split (por folha): |H| 38.3 N·m (23.455), servo 2× Volz DA 30 (G 1.80, 84 °/s); elevon: |H| 6.8 N·m (23.455), servo 1× Volz DA 30 (G 1.28, 117 °/s) — taxa exigida 99 °/s (rajada lateral, bank hold) ≤ 117 °/s na superfície"
+   },
+   "asm:actuator_mass": {
+    "ok": true,
+    "message": "atuadores 6.30 kg conhecidos vs orçamento declarado 6.3 kg (['atuadores split aileron (8x Volz DA 30', 'atuadores elevon (2x Volz DA 30'])"
+   },
+   "hq:pitch_trim_tailless": {
+    "ok": true,
+    "message": "equilíbrio de picada com elevon: ok (C_L máx. equilibrado mín. 1.25); margem estática vazio 0.051, carga 0.065, combustível 0.051, cheio 0.063 (banda 0,02–0,08 de NACA TR-796); δe cruzeiro vazio +11.4°; δe cruzeiro carga +6.8°; δe cruzeiro combustível +9.9°; δe cruzeiro cheio +5.3°; torção desenhada -10.0° vs Panknin -5.0° (C_L 0.50, σ 0.045); C_m dos corpos (Torenbeek) no equilíbrio principal (k = +0.0280 c̄); só asa AVL (sensibilidade): δe cruzeiro vazio +7.4°, carga +1.6°, combustível +4.9°, cheio -0.9°, C_L equilibrado (limite da elevon) mín. 1.14"
+   }
+  },
+  "dutch_roll_zeta_bare_cruise": -0.01542027066528192,
+  "sas": {
+   "k_beta": 0.0,
+   "k_r": 0.075
+  },
+  "delay_margin_level1_s": 0.23446179304664838,
+  "phugoid_zeta_bare": 0.041853283236317464,
+  "crosswind": {
+   "kt": 10.108000093306531,
+   "max_kt": 14.652822850270493
+  },
+  "lateral_gust_linear": {
+   "ok": true,
+   "rate_limited": false
+  },
+  "gust_6dof": {
+   "ok": false,
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "veredicto": "passa",
+     "rate_limited": false,
+     "saturated": false,
+     "peak_rate_deg_s": 43.10152579587879,
+     "rate_required_deg_s": null,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_margin": 1.9381139071465678
+    },
+    "carga": {
+     "ok": true,
+     "veredicto": "passa",
+     "rate_limited": false,
+     "saturated": false,
+     "peak_rate_deg_s": 72.75972654482648,
+     "rate_required_deg_s": null,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_margin": 1.148103085747083
+    },
+    "combustível": {
+     "ok": true,
+     "veredicto": "passa",
+     "rate_limited": false,
+     "saturated": false,
+     "peak_rate_deg_s": 53.05868978640637,
+     "rate_required_deg_s": null,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_margin": 1.5744012319284797
+    },
+    "cheio": {
+     "ok": false,
+     "veredicto": "falha",
+     "rate_limited": true,
+     "saturated": false,
+     "peak_rate_deg_s": 83.53566656422923,
+     "rate_required_deg_s": 99.90946307345588,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_margin": null
+    }
+   },
+   "rate_margin_min": 1.148103085747083
+  },
+  "mission_6dof": {
+   "status": "assessed",
+   "aborted": null,
+   "takeoff_ground_roll_m": 325.1384593403117,
+   "touchdown_side_load_status": "passa",
+   "inboard_ratio": 0.5953700779571515,
+   "outboard_ratio": 0.624761217961247,
+   "residual_crab_deg": -0.27716304991952967,
+   "tip_skid_ok": true,
+   "touchdown_diag": {
+    "phi_td_deg": -1.014061231846161,
+    "drift_m_s": 0.34738386498910845,
+    "main_side_N": {
+     "main_L": {
+      "inboard_N": 57.70897725428951,
+      "outboard_N": 0.0
+     },
+     "main_R": {
+      "inboard_N": 446.9875684654081,
+      "outboard_N": 309.575397383902
+     }
+    },
+    "main_vertical_peak_N": {
+     "main_L": 499.30652734208854,
+     "main_R": 934.7461727108674
+    },
+    "W_N": 1501.5452909528908,
+    "side_load_margin": 0.37523878203875305,
+    "bumper_contacts_N": {
+     "tip_R": 73.77130250552088
+    },
+    "issue": null
+   },
+   "sink_at_touchdown_m_s": 1.057311186164002,
+   "touchdown_dt_sensitivity": {
+    "0.01": {
+     "side_load_status": "passa",
+     "inboard_ratio": 0.6024877507292115,
+     "outboard_ratio": 0.10553088181230774
+    },
+    "0.025": {
+     "side_load_status": "excede",
+     "inboard_ratio": 0.604159477576895,
+     "outboard_ratio": 1.2343025845245374
+    }
+   },
+   "yaw_split_rate_limited_fraction": 0.0017603338114486895,
+   "yaw_split_saturated": false,
+   "aft_clearance_min_m": 0.0627730866742019,
+   "aft_clearance_ok": true
+  },
+  "checks": {
+   "regulatory_category": null,
+   "asm:closes_pessimistic_cd0": true,
+   "static_margin": true,
+   "trim": true,
+   "hq:scissor": true,
+   "wb:envelope": true,
+   "gear:stroke": true,
+   "asm:wing_area": true,
+   "asm:static_margin": true,
+   "asm:gear_tipback": true,
+   "asm:gear_rotation": true,
+   "asm:gear_prop_clearance": true,
+   "asm:gear_belly": true,
+   "asm:gear_position": true,
+   "asm:gear_overturn": true,
+   "asm:gear_nose_vs_prop": true,
+   "asm:gear_tip_skids": true,
+   "asm:gear_side_load_structure": true,
+   "asm:gear_max_track_9532": false,
+   "hq:short_period": true,
+   "hq:CAP": true,
+   "hq:phugoid": true,
+   "hq:dutch_roll": true,
+   "hq:roll": true,
+   "hq:spiral": true,
+   "hq:yaw_crosswind": true,
+   "hq:yaw_coordination": true,
+   "hq:sas_authority": true,
+   "gear:takeoff_rotation": true,
+   "hq:sas_time_delay": true,
+   "hq:lateral_gust": true,
+   "asm:useful_load_packaging": null,
+   "asm:fine_packaging": null,
+   "hq:phugoid_autopilot": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true,
+   "gear:position": true,
+   "gear:tipback": true,
+   "gear:nose_load": true,
+   "gear:overturn": true,
+   "gear:rotation": true
+  },
+  "elapsed_s": 261.8485836982727
+ },
+ "opcao_a": {
+  "label": "opcao_a",
+  "W0_kg": 157.66841923218237,
+  "converged": true,
+  "iterations": null,
+  "feasible": true,
+  "We_kg": 102.94064215114021,
+  "inertia": {
+   "Ixx": 17.50110222579188,
+   "Iyy": 42.19905504908429,
+   "Izz": 56.17904621990235,
+   "Ixz": null
+  },
+  "servo_split": {
+   "name": "Volz DA 30-HT",
+   "n_per_surface": 2,
+   "rate_at_surface_deg_s": 107.04670884762635,
+   "gearing": 0.9341716441029788
+  },
+  "split_rate_required_design_deg_s": 100.0,
+  "rate_max_effective_deg_s": 107.04670884762635,
+  "actuator_mass": {
+   "parts": [
+    {
+     "surface": "split_aileron",
+     "n": 8,
+     "servo": "Volz DA 30-HT",
+     "unit_mass_kg": 1.1,
+     "mass_kg": 8.8
+    },
+    {
+     "surface": "elevon",
+     "n": 2,
+     "servo": "Volz DA 30",
+     "unit_mass_kg": 0.63,
+     "mass_kg": 1.26
+    }
+   ],
+   "unknown_surfaces": [],
+   "total_known_kg": 10.06,
+   "budget_items": [
+    "atuadores split aileron (8x Volz DA 30-HT, 1100 g cada)",
+    "atuadores elevon (2x Volz DA 30"
+   ],
+   "budget_declared_kg": 10.06,
+   "within_budget": true,
+   "note": "massas do datasheet do servo (sem hastes/suportes); orçamento = itens de weights.components.items com 'servo'/'atuador' no nome"
+  },
+  "P_mech_per_leaf_W": 33.99826533054234,
+  "P_elec_per_leaf_W": null,
+  "P_elec_note": "desconhecida: datasheets Volz sem rendimento",
+  "trim": {
+   "tailless_trim_converged": true,
+   "CLmax_trimmed": 1.1445575237206467,
+   "cases_ok": {
+    "vazio": true,
+    "carga": true,
+    "combustível": true,
+    "cheio": true
+   },
+   "static_margin": {
+    "vazio": 0.050014657818839514,
+    "carga": 0.06215922815015005,
+    "combustível": 0.05001465781883965,
+    "cheio": 0.06029808000889917
+   },
+   "sm_outside_band": {}
+  },
+  "hq": {
+   "hq:dutch_roll": {
+    "ok": true,
+    "message": "montagem com SAS (k_β 0.000/rad, k_r 0.075): rolamento holandês ζ / ζω / ω = 0.133 / 0.318 / 2.40 → Nível 1 (MIL-F-8785C Table VI); com atuador (lag 0.000 s, atraso 0.100 s): Nível 1; autoridade e taxa dentro da capacidade dos split ailerons; célula nua (sem SAS): Nível >3 — informativo"
+   },
+   "hq:spiral": {
+    "ok": true,
+    "message": "montagem com SAS (k_β 0.000/rad, k_r 0.075): espiral T2 [s] (∞ = estável) = inf → Nível 1 (MIL-F-8785C Table VIII); autoridade e taxa dentro da capacidade dos split ailerons; célula nua (sem SAS): Nível 1 — informativo"
+   },
+   "hq:phugoid": {
+    "ok": false,
+    "message": "montagem: fugóide ζ = 0.0391 → Nível 2 (N1: ≥ 0.04; MIL-F-8785C 3.2.1.2, Classe I, Cat. B) — UAV: indicativo"
+   },
+   "hq:phugoid_autopilot": {
+    "ok": true,
+    "message": "fugóide com manutenção de atitude de picada (piloto automático, caso 'cheio'): ζ 0.965, ω 0.292 rad/s → Nível 1 (N1 ζ ≥ 0,04); célula nua ζ 0.0391; k_pθ -1.370, k_dθ -0.669 s (autoridade da elevon 13.7°, e_θ,max 10° PRESSUPOSTO); período curto em malha fechada ζ 0.754 (Beard & McLain 2012 (Small Unmanned Aircraft) Sec. 6.4.1, pitch attitude hold: θ/δe ≈ a_θ3/(s² + a_θ1 s + a_θ2), k_pθ = δe_max/e_θ,max·sign(a_θ3), ω_θ = √(a_θ2 + δe_max/e_θ,max |a_θ3|), k_dθ = (2ζ_θ ω_θ − a_θ1)/a_θ3)"
+   },
+   "hq:lateral_gust": {
+    "ok": true,
+    "message": "rajada lateral 1−cos 17.7 m/s TAS, 18.4 m (14 CFR 23.443(a)/(b) e 23.333(c) (pré-Amdt 23-64): rajada lateral de 50 ft/s EAS em V_C (até 20 000 ft), forma U = (U_de/2)(1 − cos 2πs/25c̄); 23.443 é de cargas em superfícies verticais — aqui PRESSUPOSTO como rajada de dimensionamento da guinada): com SAS β_ar pico 21.0°, ΔC_n pico 0.0013 (comando 0.0013), split 10.1°, taxa 49 °/s, saturação não, limite de taxa não, elevon 14.7°; célula nua β_ar pico 21.0°; pré-deflexão δ0 = 2° como opção de projeto (ΔC_D0 +0.00020 no polar de dimensionamento) — pré-deflexão simétrica δ0 dos dois split ailerons (ΔC_n = 2C₁ sin2δ0 sin2d, linear em ΔC_n = 0: Rajput, Zhang & Qu 2014, Appl. Mech. Mater. 643:54; Wang, Wang & Jia 2011, Acta Aeronaut. Astronaut. Sin. 32(8):1392); arrasto de perfil McCormick 1995 Eq. 3.45 por folha, dois lados"
+   },
+   "hq:yaw_crosswind": {
+    "ok": true,
+    "message": "vento cruzado 10.1 kt a U 28.6 m/s (β 10.3°): ΔC_n -0.01255 → split 41.5° (máx 60°), elevon -17.9°, pranchamento -0.1°; máx. 14.2 kt (14 CFR 23.233(a) (pré-Amdt 23-64): vento cruzado a 90° ≥ 0,2 V_S0; U = 1,1 V_S0 (Sadraey 12.6.2.3))"
+   },
+   "hq:sas_authority": {
+    "ok": true,
+    "message": "SAS: 3σ turbulência (Dryden MIL-F-8785C, aproximação) |ΔC_n| 0.00391 vs capacidade 0.02147 (somado ao vento cruzado 0.01255: cabe); taxa 82 °/s vs 107 °/s; com atuador: 3σ 0.00391, taxa 82 °/s"
+   },
+   "hq:sas_time_delay": {
+    "ok": true,
+    "message": "SAS com atuador (lag 0.000 s, atraso 0.100 s; PRESSUPOSTO: atraso/lag desconhecidos → atraso equivalente puro = limite Nível 1 de MIL-F-8785C 3.5.3 (0,10 s)): cruzeiro ζ 0.138, ω 2.50 rad/s → Nível 1; aproximação ζ 0.103, ω 3.78 rad/s → Nível 1; margem de atraso p/ Nível 1 0.223 s (MIL-F-8785C 3.5.3: atraso equivalente do sistema de comando (inclui SAS) ≤ 0,10/0,20/0,25 s Níveis 1/2/3 (citado em NASA NTRS 19910005040 §2.1.1 e AIAA doi:10.2514/3.20149))"
+   },
+   "hq:actuators": {
+    "ok": true,
+    "message": "split (por folha): |H| 39.9 N·m (23.455), servo 2× Volz DA 30-HT (G 0.93, 107 °/s); elevon: |H| 7.1 N·m (23.455), servo 1× Volz DA 30 (G 1.33, 112 °/s) — taxa exigida 100 °/s (rajada lateral, bank hold) ≤ 112 °/s na superfície"
+   },
+   "asm:actuator_mass": {
+    "ok": true,
+    "message": "atuadores 10.06 kg conhecidos vs orçamento declarado 10.06 kg (['atuadores split aileron (8x Volz DA 30-HT, 1100 g cada)', 'atuadores elevon (2x Volz DA 30'])"
+   },
+   "hq:pitch_trim_tailless": {
+    "ok": true,
+    "message": "equilíbrio de picada com elevon: ok (C_L máx. equilibrado mín. 1.25); margem estática vazio 0.050, carga 0.062, combustível 0.050, cheio 0.060 (banda 0,02–0,08 de NACA TR-796); δe cruzeiro vazio +11.3°; δe cruzeiro carga +7.1°; δe cruzeiro combustível +9.8°; δe cruzeiro cheio +5.5°; torção desenhada -10.0° vs Panknin -5.1° (C_L 0.51, σ 0.045); C_m dos corpos (Torenbeek) no equilíbrio principal (k = +0.0273 c̄); só asa AVL (sensibilidade): δe cruzeiro vazio +7.2°, carga +1.8°, combustível +4.7°, cheio -0.7°, C_L equilibrado (limite da elevon) mín. 1.19"
+   }
+  },
+  "dutch_roll_zeta_bare_cruise": -0.015705251951222014,
+  "sas": {
+   "k_beta": 0.0,
+   "k_r": 0.075
+  },
+  "delay_margin_level1_s": 0.2227782544487127,
+  "phugoid_zeta_bare": 0.03905435513779527,
+  "crosswind": {
+   "kt": 10.1080000933027,
+   "max_kt": 14.239606997971528
+  },
+  "lateral_gust_linear": {
+   "ok": true,
+   "rate_limited": false
+  },
+  "gust_6dof": {
+   "ok": true,
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "veredicto": "passa",
+     "rate_limited": false,
+     "saturated": false,
+     "peak_rate_deg_s": 40.825697432827255,
+     "rate_required_deg_s": null,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_margin": 2.6220423796496344
+    },
+    "carga": {
+     "ok": true,
+     "veredicto": "passa",
+     "rate_limited": false,
+     "saturated": false,
+     "peak_rate_deg_s": 76.16892666011984,
+     "rate_required_deg_s": null,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_margin": 1.405385549481208
+    },
+    "combustível": {
+     "ok": true,
+     "veredicto": "passa",
+     "rate_limited": false,
+     "saturated": false,
+     "peak_rate_deg_s": 60.43551877660074,
+     "rate_required_deg_s": null,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_margin": 1.7712549013324994
+    },
+    "cheio": {
+     "ok": true,
+     "veredicto": "passa",
+     "rate_limited": false,
+     "saturated": false,
+     "peak_rate_deg_s": 99.94202565114374,
+     "rate_required_deg_s": null,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_margin": 1.0710880447959112
+    }
+   },
+   "rate_margin_min": 1.0710880447959112
+  },
+  "mission_6dof": {
+   "status": "assessed",
+   "aborted": null,
+   "takeoff_ground_roll_m": 331.8388103867036,
+   "touchdown_side_load_status": "excede",
+   "inboard_ratio": 1.197458766937085,
+   "outboard_ratio": 0.9390784940139136,
+   "residual_crab_deg": -0.17910817941541896,
+   "tip_skid_ok": true,
+   "touchdown_diag": {
+    "phi_td_deg": -0.8810858610696761,
+    "drift_m_s": 0.4136414652280738,
+    "main_side_N": {
+     "main_L": {
+      "inboard_N": 130.91940988397857,
+      "outboard_N": 189.64947310294812
+     },
+     "main_R": {
+      "inboard_N": 945.943608895884,
+      "outboard_N": 489.6102596316503
+     }
+    },
+    "main_vertical_peak_N": {
+     "main_L": 813.1614176420802,
+     "main_R": 1243.8221973141085
+    },
+    "W_N": 1579.9184656945843,
+    "side_load_margin": -0.19745876693708508,
+    "bumper_contacts_N": {
+     "tip_R": 182.52201430193963
+    },
+    "issue": null
+   },
+   "sink_at_touchdown_m_s": 1.2553382213241735,
+   "touchdown_dt_sensitivity": {
+    "0.01": {
+     "side_load_status": "excede",
+     "inboard_ratio": 1.2289619583141072,
+     "outboard_ratio": 0.19061946197889384
+    },
+    "0.025": {
+     "side_load_status": "excede",
+     "inboard_ratio": 1.1917054292506115,
+     "outboard_ratio": 0.379338951535057
+    }
+   },
+   "yaw_split_rate_limited_fraction": 0.0011385816525699415,
+   "yaw_split_saturated": false,
+   "aft_clearance_min_m": 0.05994591253025755,
+   "aft_clearance_ok": true
+  },
+  "checks": {
+   "regulatory_category": null,
+   "asm:closes_pessimistic_cd0": true,
+   "static_margin": true,
+   "trim": true,
+   "hq:scissor": true,
+   "wb:envelope": true,
+   "gear:stroke": true,
+   "asm:wing_area": true,
+   "asm:static_margin": true,
+   "asm:gear_tipback": true,
+   "asm:gear_rotation": true,
+   "asm:gear_prop_clearance": true,
+   "asm:gear_belly": true,
+   "asm:gear_position": true,
+   "asm:gear_overturn": true,
+   "asm:gear_nose_vs_prop": true,
+   "asm:gear_tip_skids": true,
+   "asm:gear_side_load_structure": true,
+   "asm:gear_max_track_9532": false,
+   "hq:short_period": true,
+   "hq:CAP": true,
+   "hq:phugoid": false,
+   "hq:dutch_roll": true,
+   "hq:roll": true,
+   "hq:spiral": true,
+   "hq:yaw_crosswind": true,
+   "hq:yaw_coordination": true,
+   "hq:sas_authority": true,
+   "gear:takeoff_rotation": true,
+   "hq:sas_time_delay": true,
+   "hq:lateral_gust": true,
+   "asm:useful_load_packaging": null,
+   "asm:fine_packaging": null,
+   "hq:phugoid_autopilot": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true,
+   "gear:position": true,
+   "gear:tipback": true,
+   "gear:nose_load": true,
+   "gear:overturn": true,
+   "gear:rotation": true
+  },
+  "elapsed_s": 236.23143815994263
+ },
+ "delta": {
+  "W0_kg": 8.001429950931197,
+  "W0_pct": 5.346155481149606
+ },
+ "checks_changed": {
+  "hq:phugoid": {
+   "base": true,
+   "opcao_a": false
+  }
+ },
+ "new_failures": [
+  "hq:phugoid"
+ ],
+ "new_unknown": []
+}
