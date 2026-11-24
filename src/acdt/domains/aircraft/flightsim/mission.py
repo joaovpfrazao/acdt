@@ -122,7 +122,7 @@ def side_load_band(inboard_ratio: float, outboard_ratio: float, tol: float = SID
 # verdict (example, before: outboard ratio 0,10–0,19 at 5–12,5 ms, 0,56–1,23 at 15–25 ms): (i) the flare law (wing
 # low) stayed on the ground for up to one extra mission step after contact; (ii) the tyre side-friction law
 # F_y = −μ N tanh(v_y/v_ε) (v_ε 0,5 m/s) is a lateral damper c ≈ μN/v_ε ≈ 1,2 kN·s/m per main wheel — through the CG
-# height an estimated |λ| of order 50 s⁻¹ in roll, stiff for explicit RK4 at 15–25 ms. Convergence (mission step
+# height an estimated roll |λ| ≈ 30–50 s⁻¹, stiff for explicit RK4 at 15–25 ms (|λ|·dt ≈ 0,5–1,3). Convergence (mission step
 # 10/20/25 ms, sub-step 5/2,5/1,25 ms) is tested in tests/test_touchdown_convergence.py.
 TOUCHDOWN_SUBSTEP_S = 0.0025
 
