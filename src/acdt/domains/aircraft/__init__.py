@@ -56,6 +56,13 @@ def _stability(st: DesignState):
     stability_stage(st["result"])
 
 
+def _structure_layout(st: DesignState):
+    """Estrutura paramétrica L1 (structure_layout.py; docs/ESTRUTURA_PARAMETRICA.md): tabela única de membros
+    (asa/empenagens embrulhadas, cavernas/anteparas/reforçadores novos), massa/CG/inércia e modelo de vigas."""
+    from .structure_layout import structure_layout_stage
+    structure_layout_stage(st["result"])
+
+
 def _performance(st: DesignState):
     from .phase2 import performance_stage
     performance_stage(st["result"])
@@ -146,6 +153,8 @@ DOMAIN = register_domain(Domain(
                   "derivatives (Raymer Ch. 16, Etkin, Nelson) + AVL"),
             Stage("aeroelasticity", _aeroelastic, description="torsional divergence, aileron reversal, binary "
                   "flutter, AEER-45 (Wright & Cooper, Bisplinghoff) + OpenAeroStruct static coupling"),
+            Stage("structure_layout", _structure_layout, description="estrutura paramétrica L1: cavernas (anel "
+                  "Castigliano, Shanley), anteparas, reforçadores (Euler–Johnson, Gerard), massa/CG/inércia, vigas"),
             Stage("performance", _performance, description="segment mission, payload-range, field lengths, "
                   "ceilings (Raymer Ch. 17, Anderson)"),
             Stage("noise", _noise, description="ruído de hélice L0 (Gutin, Schlegel-King-Mull), ISO 9613-1, "

@@ -94,6 +94,7 @@ class DesignResult:
     series_cost: dict | None = None       # series_cost.analyse_series_cost (disciplina custo_serie, L0)
     life_cycle: dict | None = None        # life_cycle.analyse_life_cycle (disciplina ciclo_vida, L0)
     structures_l1: object | None = None   # structures_l1.StructuresL1 (masses, deflections, elastic correction)
+    structure_layout: dict | None = None  # structure_layout.analyse_layout (estrutura paramétrica, L1)
     launch_recovery: dict | None = None   # opt-in catapult / belly landing (launch_recovery.py)
     gear_drag: dict | None = None         # opt-in gear drag in the polar (aero/gear_drag.py)
     assembly_loop: dict | None = None     # P1b: assembly inside the W0 loop (scale, drag band, parts, history)
