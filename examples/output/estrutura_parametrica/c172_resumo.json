@@ -3,7 +3,7 @@
  "exemplo": "examples/cessna172_check.yaml",
  "applied": false,
  "W0_kg": 1137.8001977766298,
- "tempo_s": 26.1248779296875,
+ "tempo_s": 24.53596305847168,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 68,
@@ -280,7 +280,8 @@
  },
  "booms": [],
  "notas_layout": [
-  "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo"
+  "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo",
+  "flutter (vigas + faixas): V_F = 136.6 m/s EAS, divergência 196.2 m/s, requisito 117.4 m/s — passa"
  ],
  "acoplamento": null,
  "estabilidade_casos": [
@@ -1190,6 +1191,120 @@
   "mass_kg": 15.683223911297075
  },
  "aberturas": [],
+ "flutter": {
+  "method": "vigas 3-D (Przemieniecki, Theory of Matrix Structural Analysis, 1968, cap. 5) + faixas quase-estacionárias (Wright & Cooper, Introduction to Aircraft Aeroelasticity and Loads, 2nd ed., 2015 cap. 11)",
+  "V_F_eas": 136.58529358915695,
+  "f_F_Hz": 22.111821029480886,
+  "V_div_eas": 196.20204876465147,
+  "V_required_eas": 117.37589022753278,
+  "margin": 0.16365714734420167,
+  "verdict": "passa",
+  "modes": [
+   {
+    "f_Hz": 7.998900819626925,
+    "component": "asa",
+    "energy_share": 0.9211187430603253,
+    "rotational_share": 0.0022024076099816394
+   },
+   {
+    "f_Hz": 16.595968661850584,
+    "component": "fuselagem",
+    "energy_share": 0.46694422256942736,
+    "rotational_share": 0.4679095449083401
+   },
+   {
+    "f_Hz": 22.757798130001916,
+    "component": "asa",
+    "energy_share": 0.6443250203115952,
+    "rotational_share": 0.007793412057359272
+   },
+   {
+    "f_Hz": 24.94059651434324,
+    "component": "asa",
+    "energy_share": 0.9429045142799256,
+    "rotational_share": 0.0023985939237493367
+   },
+   {
+    "f_Hz": 29.791651227474226,
+    "component": "asa",
+    "energy_share": 0.9839064101504089,
+    "rotational_share": 0.985323467744579
+   },
+   {
+    "f_Hz": 30.04660632629577,
+    "component": "asa",
+    "energy_share": 0.9898620283543377,
+    "rotational_share": 1.0
+   },
+   {
+    "f_Hz": 33.70741224676902,
+    "component": "estabilizador",
+    "energy_share": 0.8014327012855424,
+    "rotational_share": 0.02957266434948261
+   },
+   {
+    "f_Hz": 35.20657137731444,
+    "component": "asa",
+    "energy_share": 0.6260797794118014,
+    "rotational_share": 0.02699612004624109
+   },
+   {
+    "f_Hz": 36.40262042863345,
+    "component": "estabilizador",
+    "energy_share": 0.590369069822747,
+    "rotational_share": 0.05579653613623678
+   },
+   {
+    "f_Hz": 40.99500474034419,
+    "component": "asa",
+    "energy_share": 0.5664970595856299,
+    "rotational_share": 0.3094138222091617
+   },
+   {
+    "f_Hz": 50.24698555820378,
+    "component": "fuselagem",
+    "energy_share": 0.8402490055937764,
+    "rotational_share": 0.10263341850557868
+   },
+   {
+    "f_Hz": 50.982019866898945,
+    "component": "deriva",
+    "energy_share": 0.45980618776055965,
+    "rotational_share": 0.055012155196556084
+   },
+   {
+    "f_Hz": 55.71795199635126,
+    "component": "deriva",
+    "energy_share": 0.4627435937312838,
+    "rotational_share": 0.03960917380314891
+   },
+   {
+    "f_Hz": 70.29681391616388,
+    "component": "asa",
+    "energy_share": 0.9853263156819244,
+    "rotational_share": 0.9215110322928052
+   },
+   {
+    "f_Hz": 70.30252483202023,
+    "component": "asa",
+    "energy_share": 0.9967618573095431,
+    "rotational_share": 0.9568921130033312
+   },
+   {
+    "f_Hz": 87.6491952979088,
+    "component": "asa",
+    "energy_share": 0.9058564666856265,
+    "rotational_share": 0.24332321824758454
+   }
+  ],
+  "V_F_strip_eas": 155.1919820272617,
+  "V_D_eas": 97.81324185627732,
+  "evaluated": true,
+  "notes": [
+   "massa: superfícies 147.4 kg (build-up) ∝ corda; resto do W0 990.4 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
+   "ESTIMATIVA de baixa fidelidade (quase-estacionária, ρ0 → EAS): flutter de corpo livre, superfícies de comando (massa/folgas/compensação) e efeitos de compressibilidade fora do âmbito — certificação pede :mod:`hifi.flutter` ou ensaio"
+  ]
+ },
  "seccao": {
   "w_m": null,
   "h_m": null,

@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 168.87840020070337,
- "tempo_s": 43.91701030731201,
+ "tempo_s": 39.77479672431946,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 63,
@@ -364,7 +364,8 @@
  ],
  "notas_layout": [
   "cauda nos booms: L_estab 218 N e L_deriva 187 N (L1) repartidas por 2 booms — PRESSUPOSTO",
-  "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo"
+  "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo",
+  "flutter (vigas + faixas): V_F = 57.3 m/s EAS, divergência 63.6 m/s, requisito 58.1 m/s — desconhecido"
  ],
  "acoplamento": {
   "convergiu": true,
@@ -1087,6 +1088,125 @@
  "vigas_em_falta": [],
  "piso": null,
  "aberturas": [],
+ "flutter": {
+  "method": "vigas 3-D (Przemieniecki, Theory of Matrix Structural Analysis, 1968, cap. 5) + faixas quase-estacionárias (Wright & Cooper, Introduction to Aircraft Aeroelasticity and Loads, 2nd ed., 2015 cap. 11)",
+  "V_F_eas": 57.306440160985474,
+  "f_F_Hz": 4.952302784616757,
+  "V_div_eas": 63.5643789163126,
+  "V_required_eas": 58.1496063486542,
+  "margin": -0.014499946613795833,
+  "verdict": "desconhecido",
+  "modes": [
+   {
+    "f_Hz": 4.684424465915921,
+    "component": "boom~m",
+    "energy_share": 0.3358951629765063,
+    "rotational_share": 0.01377939477890473
+   },
+   {
+    "f_Hz": 5.515307828987874,
+    "component": "asa",
+    "energy_share": 0.44531882463414996,
+    "rotational_share": 0.05372961160323918
+   },
+   {
+    "f_Hz": 8.655128928821172,
+    "component": "asa",
+    "energy_share": 0.8733702738141621,
+    "rotational_share": 0.02281364532042699
+   },
+   {
+    "f_Hz": 11.79738946268737,
+    "component": "boom",
+    "energy_share": 0.4739045376511199,
+    "rotational_share": 0.02088052207631473
+   },
+   {
+    "f_Hz": 14.089070701635716,
+    "component": "boom~m",
+    "energy_share": 0.3798414086189224,
+    "rotational_share": 0.025482645138018175
+   },
+   {
+    "f_Hz": 18.792732422210843,
+    "component": "asa",
+    "energy_share": 0.6360190006564505,
+    "rotational_share": 0.24215920921978776
+   },
+   {
+    "f_Hz": 27.720595188457896,
+    "component": "asa",
+    "energy_share": 0.7617634629381647,
+    "rotational_share": 0.0075788595815662356
+   },
+   {
+    "f_Hz": 29.843082773370735,
+    "component": "asa",
+    "energy_share": 0.5625851565306152,
+    "rotational_share": 0.3183296299930801
+   },
+   {
+    "f_Hz": 33.93988139038362,
+    "component": "asa",
+    "energy_share": 0.6314852941744251,
+    "rotational_share": 0.024792982262002144
+   },
+   {
+    "f_Hz": 36.70888042644829,
+    "component": "boom",
+    "energy_share": 0.3749184311193647,
+    "rotational_share": 0.8850041458884803
+   },
+   {
+    "f_Hz": 43.97402335414119,
+    "component": "boom~m",
+    "energy_share": 0.39077347227720055,
+    "rotational_share": 0.6920543727080336
+   },
+   {
+    "f_Hz": 50.91787001602939,
+    "component": "asa",
+    "energy_share": 0.4553244020406344,
+    "rotational_share": 0.5025492998324184
+   },
+   {
+    "f_Hz": 56.66200463516207,
+    "component": "boom",
+    "energy_share": 0.28764120189500836,
+    "rotational_share": 0.03876272773304568
+   },
+   {
+    "f_Hz": 57.778982508106814,
+    "component": "boom~m",
+    "energy_share": 0.3621230307362057,
+    "rotational_share": 0.08490024247943195
+   },
+   {
+    "f_Hz": 58.81476470107439,
+    "component": "boom~m",
+    "energy_share": 0.39024137798128317,
+    "rotational_share": 0.13000642684325037
+   },
+   {
+    "f_Hz": 60.35558756840923,
+    "component": "boom~m",
+    "energy_share": 0.31312167394023876,
+    "rotational_share": 0.023614670417639042
+   }
+  ],
+  "V_F_strip_eas": 113.29087841550577,
+  "V_D_eas": 48.458005290545174,
+  "evaluated": true,
+  "verdict_computed": "falha",
+  "notes": [
+   "asa: sem item no build-up; massa do caixão paramétrico (12.11 kg)",
+   "estabilizador: sem item no build-up; massa do caixão paramétrico (0.91 kg)",
+   "deriva: sem item no build-up; massa do caixão paramétrico (0.52 kg)",
+   "massa: superfícies 13.5 kg (build-up) ∝ corda; resto do W0 155.3 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
+   "ESTIMATIVA de baixa fidelidade (quase-estacionária, ρ0 → EAS): flutter de corpo livre, superfícies de comando (massa/folgas/compensação) e efeitos de compressibilidade fora do âmbito — certificação pede :mod:`hifi.flutter` ou ensaio",
+   "booms boom, boom~m levam a cauda, mas a empenagem do layout está ao centro (presa ao corpo principal): V_F calculado 57.3 m/s fica relatado, veredicto desconhecido"
+  ]
+ },
  "seccao": {
   "w_m": null,
   "h_m": null,

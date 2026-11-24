@@ -2125,3 +2125,9 @@ CAPABILITIES §57): imagens do C172 e do twin-boom em `examples/output/estrutura
 que as superfícies estão todas no plano z0 do registo e que o twin-boom tem uma deriva ao centro — candidatos a
 corrigir no layout.
 
+## Estrutura paramétrica — incremento E (24 nov 2026, ramo `estrutura-param-E`)
+
+Flutter do avião inteiro pelo modelo de vigas ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §11,
+CAPABILITIES §58). C172 V_F 136,6 m/s EAS (passa; −12 % face às faixas encastradas); twin-boom 56,7 m/s abaixo dos
+58,1 exigidos, mas desconhecido porque a empenagem do layout está ao centro e não nos booms — prioridade seguinte.
+

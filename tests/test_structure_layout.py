@@ -446,6 +446,73 @@ def test_twin_boom_pod_noncircular_floor_declared():
     assert f["shell_table"][0]["perimeter_m"] < 2 * math.pi * f["shell_table"][0]["R_m"] * 1.5
 
 
+# ------------------------------------------------------------------ incremento E: flutter do avião inteiro
+def _uniform_cantilever(n=30, s=7.5, c=2.0, EI=2e7, GJ=2e6, E=70e9, G=27e9, axis="y"):
+    ys = np.linspace(0, s, n + 1)
+    nodes = [{"id": i + 1, "xyz": [0.0, float(y), 0.0] if axis == "y" else [0.0, 0.0, float(y)]}
+             for i, y in enumerate(ys)]
+    comp = "asa" if axis == "y" else "deriva"
+    els = [{"id": i + 1, "component": comp, "nodes": [i + 1, i + 2], "A": 1e-4, "I1": EI / E, "I2": 10 * EI / E,
+            "J": GJ / G} for i in range(n)]
+    return {"material": {"E": E, "G": G}, "nodes": nodes, "elements": els}, ys
+
+
+@pytest.mark.parametrize("axis", ["y", "z"])
+def test_frame_element_cantilever_tip_deflection(axis):
+    from acdt.domains.aircraft import structure_flutter as sf
+    model, _ = _uniform_cantilever(n=1, s=2.0, axis=axis)
+    K, M, keep = sf.assemble(model, {}, fixed=[1])
+    P = 1000.0
+    f = np.zeros(K.shape[0])
+    normal = 2 if axis == "y" else 1                  # carga normal à superfície (I1)
+    f[6 + normal] = P
+    u = np.zeros_like(f)
+    u[keep] = np.linalg.solve(K[np.ix_(keep, keep)], f[keep])
+    assert u[6 + normal] == pytest.approx(P * 2.0**3 / (3 * 2e7), rel=1e-9)
+
+
+def test_beam_flutter_matches_closed_forms_and_binary_model():
+    from acdt.domains.aircraft import aeroelasticity as ae
+    from acdt.domains.aircraft import structure_flutter as sf
+    s, c, EI, GJ, mpl, xf, xcg = 7.5, 2.0, 2e7, 2e6, 200.0, 0.48, 0.5
+    model, ys = _uniform_cantilever(s=s, c=c, EI=EI, GJ=GJ)
+    surf = {"asa": {"span": s, "c_root": c, "c_tip": c, "e": xf - 0.25, "x_cg_off": xcg - xf, "a_w": 2 * math.pi,
+                    "m_per_c": mpl / c}}
+    r = sf.flutter_from_beam_model(model, surf, {}, {}, VD_eas=50.0, fixed=[1], n_modes=8)
+    fb = 1.8751**2 / (2 * math.pi) * math.sqrt(EI / (mpl * s**4))             # 1.º modo de flexão encastrado
+    ft = 1 / (4 * s) * math.sqrt(GJ / (mpl * c**2 * (1 / 12 + (xcg - xf) ** 2)))   # 1.º de torção
+    f = [m["f_Hz"] for m in r["modes"]]
+    assert f[0] == pytest.approx(fb, rel=0.02) and f[1] == pytest.approx(ft, rel=0.02)
+    ws = ae.WingStrip(ys, np.full_like(ys, c), np.full_like(ys, EI), np.full_like(ys, GJ), np.full_like(ys, mpl),
+                      xf - 0.25, xf, xcg, 2 * math.pi)
+    VF_wc = ae.flutter_estimate_typical_section(ws, V_max=400)["V_F"]
+    Vdiv = ae.torsional_divergence_speed(ws)["V_div"]          # forma fechada das faixas
+    assert r["V_F_eas"] == pytest.approx(VF_wc, rel=0.10)
+    assert r["V_div_eas"] == pytest.approx(Vdiv, rel=0.03)
+    assert r["verdict"] == "passa"                 # 1,2 × 50 < V_F
+
+
+def test_c172_whole_aircraft_flutter(c172):
+    fl = c172.structure_layout["flutter"]
+    assert fl["evaluated"] and fl["verdict"] in ("passa", "falha")
+    assert fl["n_modes"] >= 8 and all(m["f_Hz"] > 0.5 for m in fl["modes"])
+    assert {"asa", "estabilizador", "deriva"} <= set(fl["surfaces"])
+    assert fl["mass_kg"] == pytest.approx(c172.sizing.W0, rel=0.02)
+    assert fl["V_F_eas"] > fl["V_D_eas"]
+
+
+def test_twin_boom_whole_aircraft_flutter():
+    from acdt.core.pipeline import run_pipeline
+    from acdt.domains.aircraft.mission import MissionSpec
+    p = EX / "uav_twin_boom_shortcut.yaml"
+    d = yaml.safe_load(p.read_text(encoding="utf-8"))
+    d.setdefault("assumptions", {})["structure_layout"] = {"enabled": True}
+    r = run_pipeline("aircraft", MissionSpec.from_dict(d, p))["result"].structure_layout
+    fl = r["flutter"]
+    assert fl["evaluated"] and math.isfinite(fl["V_F_eas"]) or math.isinf(fl["V_F_eas"])
+    assert any(m["component"].startswith("boom") for m in fl["modes"])
+    # empenagem ao centro presa a um só boom: número relatado, veredicto desconhecido
+    assert fl["verdict"] == "desconhecido" and fl["verdict_computed"] in ("passa", "falha")
 # ------------------------------------------------------------------ render 3-D da estrutura
 def test_layout_geometry_and_render(c172, tmp_path):
     from acdt.domains.aircraft.structure_render import render_layout
