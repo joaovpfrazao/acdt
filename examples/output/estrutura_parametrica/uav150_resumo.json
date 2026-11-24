@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_150kg_stanag4671.yaml",
  "applied": false,
  "W0_kg": 153.21267779959328,
- "tempo_s": 6.220733642578125,
+ "tempo_s": 6.4449450969696045,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 47,
@@ -212,6 +212,11 @@
  "pior_estacao_casca": {
   "x_m": 0.384,
   "R_m": 0.15000000000000002,
+  "perimeter_m": 0.942477796076938,
+  "A_enc_m2": 0.07068583470577036,
+  "n_cut": 0,
+  "sigma_hoop_Pa": null,
+  "pressure_note": null,
   "I_m4": 1.0673145414692446e-05,
   "sigma_stringer_max_Pa": 8082583.097096668,
   "Fcs_Pa": 106053436.05572473,
@@ -1056,5 +1061,15 @@
   ],
   "verdict": "desconhecido"
  },
- "vigas_em_falta": []
+ "vigas_em_falta": [],
+ "piso": null,
+ "aberturas": [],
+ "seccao": {
+  "w_m": null,
+  "h_m": null,
+  "n_exp": 2.0,
+  "noncircular": false
+ },
+ "pressao_Pa": 0.0,
+ "detalhe": []
 }

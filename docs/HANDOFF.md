@@ -2109,3 +2109,12 @@ Acoplamento `iterar` da estrutura paramétrica ([ESTRUTURA_PARAMETRICA.md](ESTRU
 CAPABILITIES §55): massa por itens de correção no build-up e CG pelas estações do balanço, ponto fixo no W0. C172
 1137,8 → 1115,9 kg (âmbito incompleto: a asa paramétrica não tem superfícies de comando/escora), twin-boom
 167,0 → 168,9 kg. Pendente: âmbito completo, estações por parte no modo montagem.
+
+## Estrutura paramétrica — incremento D (24 nov 2026, ramo `estrutura-param-D`)
+
+Piso (Roark Tab. 11.4 caso 1a + vigas M = wL²/8), aberturas com soleiras e cavernas de bordo, secção superelíptica
+(booms em perímetro igual, Bredt) e pressurização (aro 25.365(d), quinhão do aro nas cavernas)
+([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §9, CAPABILITIES §56). O piso por omissão do C172 sobe a
+fuselagem paramétrica de 106 para 126 kg e o W0 `iterar` para 1153,9 kg. Pendente: assentos 9 g, cantos de janelas,
+flexão do anel não circular sob pressão, longarinas reais.
+

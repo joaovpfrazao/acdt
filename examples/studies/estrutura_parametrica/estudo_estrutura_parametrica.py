@@ -76,7 +76,11 @@ def run_case(case: dict, out: Path) -> dict:
                 {"caso": c.name, "x_cg_m": c.x_cg, "xbar_cg": c.xbar_cg, "SM": c.SM} for c in res.stability.cases],
             "ferragens": [{k: m.get(k) for k in ("id", "kind", "mass_kg", "RF_min", "verdict", "section", "method",
                                                   "note")} for m in r["members"] if m["component"] == "ligacoes"],
-            "berco_motor": {k: v for k, v in (r.get("fittings", {}).get("engine_mount") or {}).items()}, "vigas_em_falta": r["beam_model"].get("missing")}
+            "berco_motor": {k: v for k, v in (r.get("fittings", {}).get("engine_mount") or {}).items()}, "vigas_em_falta": r["beam_model"].get("missing"),
+            "piso": r["fuselage"].get("floor"), "aberturas": r["fuselage"].get("cutouts"),
+            "seccao": r["fuselage"].get("section"), "pressao_Pa": r["fuselage"].get("pressure_Pa"),
+            "detalhe": [{k: m.get(k) for k in ("id", "kind", "mass_kg", "RF_min", "verdict", "section", "note")}
+                        for m in r["members"] if m["kind"] in ("piso", "viga_piso", "soleira")]}
     (out / f"{cid}_resumo.json").write_text(json.dumps(_clean(summ), indent=1, ensure_ascii=False), encoding="utf-8")
     (out / f"{cid}_vigas.json").write_text(json.dumps(_clean(r["beam_model"]), indent=1, ensure_ascii=False),
                                            encoding="utf-8")

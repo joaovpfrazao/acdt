@@ -29,6 +29,7 @@ import numpy as np
 
 from acdt import G0
 from acdt.core import materials as matlib
+from acdt.core import sections
 from acdt.core.structures import frames as fr
 
 LEVEL = "L1"
@@ -50,6 +51,13 @@ DEFAULTS: dict[str, Any] = {
         "gear_theta_deg": {"fwd": [180.0], "aft": [150.0, -150.0]},
         "tail_theta_deg": [90.0, -90.0],
         "loads": [],                  # [{id, kind, x_m | x_frac, theta_deg, Fz_N, Fy_N, M_Nm, mass_kg, case}]
+        # secção não circular (superelipse |y/a|^n + |z/b|^n = 1) na estação máxima, escalada com R(x) da viga L1
+        "section": {"w_m": None, "h_m": None, "n_exp": 2.0},
+        "pressure_Pa": 0.0,           # pressão diferencial LIMITE da cabine [Pa]; 0 → não pressurizada
+        "pressure_x_m": None,         # [x0, x1] da zona pressurizada; None → corpo inteiro
+        # piso: auto → só com tripulação+carga > 0 e D ≥ 0,9 m (cabine habitável — PRESSUPOSTO)
+        "floor": {"enabled": "auto", "x0_m": None, "x1_m": None, "z_frac": 0.6, "q_Pa": None},
+        "cutouts": [],                # [{id, x0_m, x1_m (ou x0_frac/x1_frac), theta_deg, width_deg}]
     },
     "booms": [],                      # [{id, x0_m, length_m, diameter_m, y_m, z_m, x_attach_m, loads: [{x_m, Fz_N, Fy_N, T_Nm}]}]
     "booms_from_assembly": True,      # corpos com papel «boom» na montagem + cauda/rotores que lá se apoiam
@@ -359,6 +367,131 @@ def _user_loads(o: dict[str, Any], L: float, n_lim: float, n_land: float) -> tup
     return cases, notes
 
 
+def _size_sill(P_u: float, L: float, mat: dict[str, Any], t_min: float) -> dict[str, Any]:
+    """Soleira da abertura: coluna Z entre as cavernas de bordo (Euler–Johnson com crippling de Gerard, raio de
+    giração no eixo paralelo à pele — PRESSUPOSTO estabilizada pelo revestimento). Menor área com P_cr ≥ P_u."""
+    best: dict[str, Any] | None = None
+    for hh in (0.02, 0.025, 0.03, 0.04, 0.05, 0.06, 0.08):
+        t = t_min
+        while t <= 4e-3 + 1e-12:
+            prof = sections.z_section(hh, 0.6 * hh, t, t)
+            pr = prof.properties()
+            Fcs = prof.crippling(mat["E"], mat["Fcy"], mat.get("nu", 0.33))["Fcs"]
+            s_col = fr.euler_johnson(mat["E"], Fcs, L / math.sqrt(pr["Iyy"] / pr["A"]))
+            rf = s_col * pr["A"] / P_u if P_u > 0 else math.inf
+            if rf >= 1.0:
+                if best is None or pr["A"] < best["A_m2"]:
+                    best = {"h_m": hh, "t_m": t, "A_m2": pr["A"], "RF": rf, "sigma_col_Pa": s_col}
+                break
+            t += 0.1e-3
+    if best is None:
+        return {"RF": None, "A_m2": None, "verdict": "falha", "note": "nenhuma Z até 80 mm × 4 mm passa"}
+    best["verdict"] = fr.verdict(best["RF"])
+    return best
+
+
+def _cutout_members(cid: str, cutouts: list[dict[str, Any]], tab: list[dict[str, Any]], lay: Any,
+                    mat: dict[str, Any], pitch: float, x_off: float, y0: float, z0: float,
+                    notes: list[str]) -> list[dict[str, Any]]:
+    """Duas soleiras por abertura: carregam metade da força axial ÚLTIMA dos reforçadores e painel removidos à
+    tensão máxima da estação (PRESSUPOSTO conservador; Niu 1988 cap. 13 / Bruhn C10 — desvio de carga para os
+    membros de bordo); prolongadas um passo de cavernas para cada lado (difusão — PRESSUPOSTO)."""
+    rows: list[dict[str, Any]] = []
+    for c in cutouts:
+        x0, x1 = float(c["x0_m"]), float(c["x1_m"])
+        inside = [r for r in tab if x0 - x_off - 1e-9 <= r["x_m"] <= x1 - x_off + 1e-9 and r["n_cut"] > 0]
+        if not inside:
+            notes.append(f"abertura {c['id']}: sem estações da viga L1 no intervalo — desconhecida")
+            rows.append(member(f"{cid}.abertura.{c['id']}", cid, "soleira", None, 0.5 * (x0 + x1), y0, z0,
+                               verdict="desconhecido", method="sem estações"))
+            continue
+        P_u = max(r["sigma_stringer_max_Pa"] * r["n_cut"] * (r["stringer_area_m2"] + r["panel_width_m"] * r["t_skin_m"])
+                  for r in inside) / 2
+        L = x1 - x0
+        sz = _size_sill(P_u, L, mat, float(mat["t_min"]))
+        m = mat["rho"] * sz["A_m2"] * (L + 2 * pitch) if sz.get("A_m2") else None
+        R_c = float(np.mean([r["R_m"] for r in inside]))
+        for side, th in (("a", float(c["theta_deg"]) - 0.5 * float(c["width_deg"])),
+                         ("b", float(c["theta_deg"]) + 0.5 * float(c["width_deg"]))):
+            rows.append(member(f"{cid}.abertura.{c['id']}.soleira_{side}", cid, "soleira", m, 0.5 * (x0 + x1),
+                               y0 + R_c * math.sin(math.radians(th)), z0 + R_c * math.cos(math.radians(th)),
+                               RF=sz.get("RF"), verdict=sz["verdict"],
+                               method="soleira: metade da força dos reforçadores/painel removidos (PRESSUPOSTO); "
+                                      "Euler–Johnson + Gerard (Bruhn C2/C7)",
+                               section={"kind": "z", "h_m": sz.get("h_m"), "t_m": sz.get("t_m"), "A_m2": sz.get("A_m2"),
+                                        "P_u_N": P_u, "L_m": L, "theta_deg": th}, note=sz.get("note")))
+        notes.append(f"abertura {c['id']}: x {x0:.2f}–{x1:.2f} m, θ {float(c['theta_deg']):g}° ± "
+                     f"{0.5 * float(c['width_deg']):g}°; reforçadores e painel interrompidos, corte × P/(P − L_aberta), "
+                     "cavernas de bordo com o par de forças tangenciais q L/2 (PRESSUPOSTO)")
+    return rows
+
+
+def _floor_members(cid: str, floor: dict[str, Any] | None, frames_out: list[dict[str, Any]], wh: Any, n_exp: float,
+                   mat: dict[str, Any], pitch: float, y0: float, z0: float, rows_ctx: list[dict[str, Any]],
+                   notes: list[str], xb: np.ndarray | None = None, Rb: np.ndarray | None = None
+                   ) -> dict[str, Any] | None:
+    """Piso: vigas transversais em cada caverna (simplesmente apoiadas, M = w L²/8) + painel entre vigas (placa
+    retangular simplesmente apoiada, Roark Tab. 11.4 caso 1a). Carga LIMITE uniforme q = (tripulação + carga) g n /
+    área do piso, salvo q declarado (PRESSUPOSTO: assentos/carga distribuídos; cargas de emergência 9 g dos assentos e
+    ancoragens não modeladas — desconhecido)."""
+    if not floor:
+        return None
+    x0, x1 = float(floor["x0_m"]), float(floor["x1_m"])
+    fr_in = [f for f in frames_out if x0 - 1e-9 <= f["x_m"] <= x1 + 1e-9]
+    if len(fr_in) < 2:
+        notes.append("piso: menos de duas cavernas no intervalo — não avaliado")
+        return {"evaluated": False, "reason": "menos de duas cavernas no intervalo"}
+    def span_z(Rx: float) -> tuple[float, float]:
+        w_, h_ = wh(Rx)
+        if w_ and h_:
+            a, bb = 0.5 * w_, 0.5 * h_
+            z = float(floor["z_frac"]) * bb
+            return 2 * a * max(0.0, 1 - (z / bb) ** n_exp) ** (1 / n_exp), z
+        z = float(floor["z_frac"]) * Rx
+        return 2 * math.sqrt(max(Rx**2 - z**2, 0.0)), z
+
+    spans = []
+    for f in fr_in:
+        sp_, z = span_z(f["R_m"])
+        spans.append(sp_)
+        f["floor_z_m"] = -z
+    xs = np.array([f["x_m"] for f in fr_in])
+    # área no intervalo declarado [x0, x1] (contínua em x0/x1, não só entre cavernas)
+    if xb is not None and Rb is not None:
+        xg = np.linspace(x0, x1, 101)
+        area = float(np.trapezoid([span_z(float(np.interp(v, xb, Rb)))[0] for v in xg], xg))
+    else:
+        area = float(np.trapezoid(spans, xs))
+    if floor.get("q_Pa"):
+        q_lim, qsrc = float(floor["q_Pa"]), "declarada"
+    else:
+        q_lim = float(floor["mass_kg"]) * G0 * float(floor["n_lim"]) / max(area, 1e-9)
+        qsrc = f"({float(floor['mass_kg']):.0f} kg × g × n {float(floor['n_lim']):.2f}) / {area:.2f} m²"
+    q_u = 1.5 * q_lim
+    t_min = float(mat["t_min"])
+    beams, rows = [], []
+    for f, sp in zip(fr_in, spans):
+        bm = fr.size_floor_beam(sp, q_u * pitch, mat, t_min)
+        m = mat["rho"] * bm["A_m2"] * sp if bm.get("A_m2") else None
+        beams.append({"x_m": f["x_m"], "span_m": sp, "z_m": f["floor_z_m"], **bm})
+        rows.append(member(f"{cid}.piso.viga@{f['x_m']:.3f}", cid, "viga_piso", m, f["x_m"], y0, z0 + f["floor_z_m"],
+                           I_own=((m or 0.0) * sp**2 / 12, 0.0, (m or 0.0) * sp**2 / 12), RF=bm.get("RF"),
+                           verdict=bm["verdict"], method="viga simplesmente apoiada M = w L²/8, C com Gerard",
+                           section={k: bm.get(k) for k in ("h_m", "b_m", "t_m", "A_m2")}, note=bm.get("note")))
+    pan = fr.size_floor_panel(pitch, float(np.mean(spans)), q_u, mat, t_min)
+    m_p = mat["rho"] * pan["t_m"] * area
+    z_f = float(np.mean([f["floor_z_m"] for f in fr_in]))
+    rows.append(member(f"{cid}.piso.painel", cid, "piso", m_p, 0.5 * (x0 + x1),
+                       y0, z0 + z_f, RF=pan["RF"], verdict=pan["verdict"],
+                       method="placa retangular simplesmente apoiada σ = β q b²/t² (Roark Tab. 11.4 caso 1a)",
+                       section={"t_m": pan["t_m"], "beta": pan["beta"]}))
+    rows_ctx.extend(rows)
+    notes.append(f"piso x {x0:.2f}–{x1:.2f} m, {len(fr_in)} vigas, área {area:.2f} m², q_lim {q_lim:.0f} Pa ({qsrc}); "
+                 "cargas de emergência dos assentos (9 g) e ancoragens não modeladas — desconhecido")
+    return {"evaluated": True, "x0_m": x0, "x1_m": x1, "area_m2": area, "q_lim_Pa": q_lim, "q_source": qsrc,
+            "z_m": z_f, "beams": beams, "panel": pan, "mass_kg": float(sum(r["mass_kg"] or 0.0 for r in rows))}
+
+
 def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.ndarray, T: np.ndarray,
                  frame_loads: dict[str, list[Any]], bulkheads: list[dict[str, Any]], fo: dict[str, Any], mat: dict[str, Any], nonopt: float,
                  y0: float = 0.0, z0: float = 0.0, x_off: float = 0.0) -> dict[str, Any]:
@@ -371,6 +504,38 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
     b = float(fsec.get("b_m") or 0.6 * h)
     kind = fsec.get("kind", "z")
     t_min = float(mat["t_min"])
+    sec = fo.get("section") or {}
+    w_s: float | None = float(sec["w_m"]) if sec.get("w_m") else None
+    h_s: float | None = float(sec["h_m"]) if sec.get("h_m") else None
+    n_exp = float(sec.get("n_exp") or 2.0)
+    Rmax = float(np.max(R))
+    noncirc = w_s is not None and h_s is not None and not fr.section_points(1.0, 4, w_s, h_s, n_exp)["circular"]
+
+    def wh(Rx: float) -> tuple[float | None, float | None]:
+        if w_s is not None and h_s is not None and Rmax > 0:
+            return w_s * Rx / Rmax, h_s * Rx / Rmax
+        return None, None
+
+    def perim(Rx: float) -> float:
+        w_, h_ = wh(Rx)
+        return float(fr.section_points(Rx, 4, w_, h_, n_exp)["P"])
+
+    def r_ring(Rx: float) -> float:
+        # anel equivalente de uma secção não circular: raio √(w h)/2 — PRESSUPOSTO (Niu 1988 cap. 11 trata a
+        # flexão do anel não circular à parte; aqui só a ordem de grandeza)
+        w_, h_ = wh(Rx)
+        return math.sqrt(w_ * h_) / 2 if (noncirc and w_ and h_) else Rx
+
+    p_cab = float(fo.get("pressure_Pa") or 0.0)
+    pz = fo.get("pressure_x_m") or [float(x[0]) + x_off, float(x[-1]) + x_off]
+    px0, px1 = float(pz[0]) - x_off, float(pz[1]) - x_off
+    t_sk0 = float(fo.get("skin_t_m") or t_min)
+    cutouts = list(fo.get("_cutouts") or [])
+    body_notes: list[str] = []
+    if noncirc and w_s is not None and h_s is not None:
+        body_notes.append(f"secção não circular (superelipse w = {w_s:.3f} m, h = {h_s:.3f} m, "
+                          f"n = {n_exp:g}): booms em perímetro igual, I por booms, Bredt T/(2A); cavernas como anel "
+                          "de raio √(w h)/2 — PRESSUPOSTO")
     # estações das cavernas: passo regular + estações de carga + anteparas (as regulares a < 0,3 passo saem)
     special: dict[float, list[str]] = {}
     for case, items in frame_loads.items():
@@ -387,13 +552,26 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
     frames_out = []
     for xs in st_x:
         Rf = float(np.interp(xs, x, R))
+        Rr = r_ring(Rf)
         Mb = float(np.interp(xs, x, np.abs(M)))
         ids = special.get(round(xs, 4), [])
         cases_here = {}
         for case, items in frame_loads.items():
             lds = [ld for xx, _i, ll in items if abs(float(xx) - xs) < 1e-4 for ld in ll]
             if lds:
-                cases_here[case] = fr.ring_internal_forces(Rf, lds)
+                cases_here[case] = fr.ring_internal_forces(Rr, lds)
+        heavy = bool(cases_here)
+        # pressurização: quinhão do aro na caverna por compatibilidade de extensão com a pele,
+        # N_f = 1,33 p R b A_f/(A_f + b t) (25.365(d); derivado — PRESSUPOSTO); não circular → desconhecido
+        pnote = None
+        if p_cab > 0 and px0 - 1e-9 <= xs <= px1 + 1e-9:
+            if noncirc:
+                pnote = "pressurização em anel não circular: flexão do anel não modelada — desconhecido"
+            else:
+                A0 = fr.frame_profile(kind, h, b, t_min).properties()["A"]
+                Np = 1.33 * p_cab * Rf * pitch * A0 / (A0 + pitch * t_sk0)
+                cases_here["pressurizacao"] = {"M": np.zeros(1), "N": np.array([Np]), "M_max_abs": 0.0,
+                                               "theta_M_max_deg": 0.0, "N_max_abs": Np}
         chk: dict[str, Any] = {}
         worst = None
         loop: dict[str, Any] = dict(cases_here) if cases_here else {"_": None}
@@ -411,10 +589,14 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
             chk = {**min(allc, key=lambda c: c["RF_min"]), "t_m": chk["t_m"], "h_m": chk["h_m"], "b_m": chk["b_m"]}
             if note:
                 chk["note"] = note
+        if pnote:
+            prev_note = chk.get("note")
+            chk["note"] = f"{prev_note}; {pnote}" if prev_note else pnote
+            if chk.get("verdict") == "passa":
+                chk["verdict"] = "desconhecido"
         t_need = chk["t_m"]
         A = chk["A_m2"]
-        m = mat["rho"] * A * 2 * math.pi * Rf
-        heavy = bool(cases_here)
+        m = mat["rho"] * A * perim(Rf)
         fid = f"{cid}.caverna@{xs + x_off:.3f}"
         rows.append(member(fid, cid, "caverna_pesada" if heavy else "caverna", m, xs + x_off, y0, z0,
                            I_own=(m * Rf**2, 0.5 * m * Rf**2, 0.5 * m * Rf**2), RF=chk["RF_min"],
@@ -426,7 +608,9 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
                            ring={k: {"M_max_Nm": v["M_max_abs"], "theta_deg": v["theta_M_max_deg"],
                                      "N_max_N": v["N_max_abs"]} for k, v in cases_here.items()},
                            checks={k: chk.get(k) for k in ("RF_strength", "RF_crippling", "RF_shanley")}))
-        frames_out.append({"x_m": xs + x_off, "R_m": Rf, "t_m": t_need, "heavy": heavy})
+        fw, fh = wh(Rf)
+        frames_out.append({"x_m": xs + x_off, "R_m": Rf, "t_m": t_need, "heavy": heavy, "w_m": fw, "h_m": fh,
+                           "n_exp": n_exp, "ids": ids})
     # anteparas: placa circular (pressão) + anel já contado como caverna na mesma estação
     for bk in bulkheads:
         xs = float(bk["x_m"])
@@ -452,7 +636,12 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
                          frame_pitch=pitch, longeron_area=float(lo.get("area_m2") or 0.0),
                          longeron_theta_deg=list(lo.get("theta_deg") or
                                                  [45.0 + 360.0 * k / n_l for k in range(n_l)] if n_l else []))
-    stations = [fr.ShellStation(float(xi), float(ri), float(mi), float(vi), float(ti))
+    def arcs_at(xi: float) -> list[tuple[float, float]]:
+        return [(float(c["theta_deg"]) - 0.5 * float(c["width_deg"]), float(c["theta_deg"]) + 0.5 * float(c["width_deg"]))
+                for c in cutouts if float(c["x0_m"]) - x_off - 1e-9 <= xi <= float(c["x1_m"]) - x_off + 1e-9]
+
+    stations = [fr.ShellStation(float(xi), float(ri), float(mi), float(vi), float(ti), *wh(float(ri)), n_exp,
+                                p_cab if px0 - 1e-9 <= xi <= px1 + 1e-9 else 0.0, arcs_at(float(xi)))
                 for xi, ri, mi, vi, ti in zip(x, R, M, V, T)]
     tab = fr.size_shell(stations, lay, mat, t_min)
     ts = np.array([r["t_skin_m"] for r in tab])
@@ -460,7 +649,8 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
     A_str = np.array([fr.stringer_profile(lay.stringer_kind, lay.stringer_h, lay.stringer_b, t_).properties()["A"]
                       for t_ in tstr])
     rho = mat["rho"]
-    dm_skin = rho * 2 * math.pi * R * ts
+    P_x = np.array([r["perimeter_m"] * (1.0 - r["n_cut"] / max(lay.n_stringers, 1)) for r in tab])
+    dm_skin = rho * P_x * ts
     dm_str = rho * lay.n_stringers * A_str
     m_skin = float(np.trapezoid(dm_skin, x))
     m_str = float(np.trapezoid(dm_str, x))
@@ -473,7 +663,9 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
     rows.append(member(f"{cid}.revestimento", cid, "revestimento", m_skin, x_skin + x_off, y0, z0,
                        I_own=(m_skin * R2, m_skin * (0.5 * R2 + L**2 / 12), m_skin * (0.5 * R2 + L**2 / 12)),
                        RF=min(min(r["RF_skin_shear"], r["RF_skin_buckling_limit"]) for r in tab),
-                       method="corte V/(πR)+T/(2πR²) (Megson); painel plano k=4/5,35 à carga limite (Bruhn C5)",
+                       verdict="desconhecido" if any(r.get("pressure_note") for r in tab) else None,
+                       method="corte V/(πR)+T/(2πR²) (Megson); painel plano k=4/5,35 à carga limite (Bruhn C5)"
+                              + ("; aro p R/t × 1,33 × 1,5 (14 CFR 25.365(d))" if p_cab > 0 else ""),
                        section={"t_max_m": float(ts.max()), "t_min_m": float(ts.min())}))
     rows.append(member(f"{cid}.reforcadores", cid, "reforcador", m_str, x_str + x_off, y0, z0,
                        I_own=(m_str * R2, m_str * (0.5 * R2 + L**2 / 12), m_str * (0.5 * R2 + L**2 / 12)),
@@ -486,16 +678,21 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
                            I_own=(m_lon * R2, m_lon * L**2 / 12, m_lon * L**2 / 12), RF=rf_shell,
                            method="booms adicionais na idealização da casca",
                            section={"n": n_l, "area_m2": lay.longeron_area, "theta_deg": lay.longeron_theta_deg}))
+    rows += _cutout_members(cid, cutouts, tab, lay, mat, pitch, x_off, y0, z0, body_notes)
+    floor_out = _floor_members(cid, fo.get("_floor"), frames_out, wh, n_exp, mat, pitch, y0, z0, rows, body_notes,
+                               x + x_off, R)
     ideal = sum(r["mass_kg"] for r in rows)
     rows.append(member(f"{cid}.nao_otimo", cid, "nao_otimo", (nonopt - 1.0) * ideal,
                        float(sum(r["mass_kg"] * r["x_m"] for r in rows) / ideal) if ideal else x_off, y0, z0,
                        verdict="desconhecido", method=f"fator não-ótimo {nonopt:g} (Torenbeek 1982 App. C) — PRESSUPOSTO"))
     beam = {"x": (x + x_off).tolist(), "A": [], "I": [], "J": []}
     for r, t_ in zip(tab, ts):
-        beam["A"].append(float(2 * math.pi * r["R_m"] * t_ + lay.n_stringers * r["stringer_area_m2"]))
+        beam["A"].append(float(r["perimeter_m"] * t_ + lay.n_stringers * r["stringer_area_m2"]))
         beam["I"].append(float(r["I_m4"]))
-        beam["J"].append(float(2 * math.pi * r["R_m"] ** 3 * t_))
+        beam["J"].append(float(4 * r["A_enc_m2"] ** 2 * t_ / r["perimeter_m"]))     # Bredt (= 2πR³t no círculo)
     return {"members": rows, "frames": frames_out, "shell_table": tab, "worst_shell_station": tab[i_w],
+            "notes_body": body_notes, "floor": floor_out, "cutouts": cutouts, "pressure_Pa": p_cab,
+            "section": {"w_m": w_s, "h_m": h_s, "n_exp": n_exp, "noncircular": noncirc},
             "beam": beam, "layout": {"frame_pitch_m": pitch, "frame_h_m": h, "frame_b_m": b,
                                      "n_stringers": lay.n_stringers, "n_longerons": n_l}}
 
@@ -539,7 +736,47 @@ def fuselage_layout(res: Any, o: dict[str, Any], mat: dict[str, Any]) -> dict[st
                      "(as duas da viga L1) — PRESSUPOSTO")
     bks = [{**b, "x_m": _xpos(b, L)} for b in bks if _xpos(b, L) is not None]
     nonopt = float(res.spec.assumptions["structures"].get("nonoptimum_factor", 1.25))
+    # aberturas (portas, janelas, alçapões): intervalo + arco; cavernas de bordo carregadas com o par tangencial
+    # F = q L/2 do fluxo de corte que o painel em falta levava (PRESSUPOSTO, moldura de corte — Niu 1988 cap. 13)
+    cuts = []
+    cu: dict[str, Any]
+    for kc, cu in enumerate(fo.get("cutouts") or []):
+        x0c = _xpos({"x_m": cu.get("x0_m"), "x_frac": cu.get("x0_frac")}, L)
+        x1c = _xpos({"x_m": cu.get("x1_m"), "x_frac": cu.get("x1_frac")}, L)
+        cid_ = str(cu.get("id") or f"abertura_{kc}")
+        if x0c is None or x1c is None or x1c <= x0c or cu.get("theta_deg") is None or not cu.get("width_deg"):
+            notes.append(f"abertura {cid_}: geometria incompleta (x0, x1, theta_deg, width_deg) — não entra")
+            continue
+        cuts.append({"id": cid_, "x0_m": x0c, "x1_m": x1c, "theta_deg": float(cu["theta_deg"]),
+                     "width_deg": float(cu["width_deg"])})
+        xm = 0.5 * (x0c + x1c)
+        Rm = float(np.interp(xm, x, R))
+        q = float(np.interp(xm, x, np.abs(V))) / (math.pi * Rm) + float(np.interp(xm, x, np.abs(T))) / (2 * math.pi * Rm**2)
+        F = q * (x1c - x0c) / 2
+        th0 = math.radians(cu["theta_deg"] - 0.5 * cu["width_deg"])
+        th1 = math.radians(cu["theta_deg"] + 0.5 * cu["width_deg"])
+        pair = [fr.RingLoad(math.degrees(th0), Fy=F * math.cos(th0), Fz=-F * math.sin(th0)),
+                fr.RingLoad(math.degrees(th1), Fy=-F * math.cos(th1), Fz=F * math.sin(th1))]
+        for xe in (x0c, x1c):
+            cases.setdefault("abertura", []).append((xe, f"abertura:{cid_}", pair))
+    fo["_cutouts"] = cuts
+    fl = fo.get("floor") or {}
+    reqs = res.spec.requirements
+    m_occ = float(reqs.value("payload_mass", 0.0) or 0.0) + float(reqs.value("crew_mass", 0.0) or 0.0)
+    en = fl.get("enabled", "auto")
+    if en == "auto":
+        en = m_occ > 0 and float(cfg.fuselage.max_diameter) >= 0.9
+    if en:
+        x0f: Any = fl.get("x0_m")
+        if x0f is None:
+            x0f = min((b["x_m"] for b in bks if b["id"] == "parede_de_fogo"), default=0.15 * L)
+        x1f: Any = fl.get("x1_m") if fl.get("x1_m") is not None else 0.5 * L
+        fo["_floor"] = {"x0_m": float(x0f), "x1_m": float(x1f), "z_frac": float(fl.get("z_frac") or 0.6),
+                        "q_Pa": fl.get("q_Pa"), "mass_kg": m_occ, "n_lim": n_lim}
+        if fl.get("x0_m") is None or fl.get("x1_m") is None:
+            notes.append("piso por omissão: da parede de fogo a 0,5 L, a 0,6 R abaixo do eixo — PRESSUPOSTO, declarar")
     out = analyse_body("fuselagem", x, R, M, V, T, cases, bks, fo, mat, nonopt)
+    notes += out.pop("notes_body", [])
     out["notes"] = notes
     out["evaluated"] = True
     out["load_cases"] = {k: [{"x_m": xx, "id": i, "loads": [vars(ld) for ld in ll]} for xx, i, ll in v]

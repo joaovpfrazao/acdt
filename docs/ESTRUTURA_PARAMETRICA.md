@@ -251,10 +251,53 @@ paramétrica ainda não tem piso, portas e janelas (incremento D). O W0 acoplado
 itens, a comparação fica direta. O posicionamento da asa no estágio de estabilidade reajusta-se ao novo CG (a
 margem estática alvo mantém-se no caso crítico).
 
-## 9. Próximos incrementos
+## 9. Detalhe da fuselagem: piso, aberturas, secções não circulares e pressurização (incremento D)
 
-1. Fuselagem: piso e vigas de piso, portas/aberturas (molduras), secções não circulares, longarinas reais
-   (cargas de flexão lateral e torção), alma das anteparas sob cargas concentradas, pressurização no anel.
+Tudo em `structure_layout.fuselage` (só em memória nos estudos) e em `core/structures/frames.py`.
+
+**Secção não circular** — `section: {w_m, h_m, n_exp}` dá a superelipse |y/a|ⁿ + |z/b|ⁿ = 1 na estação máxima,
+escalada com R(x) da viga L1. `section_points` coloca os booms em perímetro igual; I = Σ B z², corte
+S/(π R_eq) com R_eq = P/(2π) (exato no círculo, PRESSUPOSTO fora dele) + Bredt T/(2A) (Megson cap. 18), J = 4A²t/P
+no modelo de vigas e massa do revestimento pelo perímetro real. As cavernas são analisadas como anel de raio
+√(w h)/2 (PRESSUPOSTO; Niu 1988 cap. 11 trata a flexão do anel não circular à parte).
+
+**Aberturas** — `cutouts: [{id, x0_m|x0_frac, x1_m|x1_frac, theta_deg, width_deg}]` (θ a partir do topo, +y).
+Nas estações dentro do intervalo os reforçadores e o painel do arco saem da idealização (I menor) e o fluxo de
+corte sobe P/(P − L_aberta) (redistribuição pelos painéis restantes, PRESSUPOSTO). As duas cavernas de bordo passam
+a fortes com o par de forças tangenciais F = q (x1 − x0)/2 nos bordos do arco (moldura de corte, Niu 1988 cap. 13 —
+PRESSUPOSTO) e há duas soleiras (Z, Euler–Johnson + Gerard, comprimento x1 − x0) que levam metade da força última dos
+reforçadores e painel removidos à tensão máxima da estação, prolongadas um passo de cavernas para cada lado.
+
+**Piso** — `floor: {enabled: auto|true|false, x0_m, x1_m, z_frac, q_Pa}`; auto liga-o com tripulação+carga > 0 e
+D ≥ 0,9 m (cabine habitável — PRESSUPOSTO). Por omissão vai da parede de fogo a 0,5 L, a 0,6 R abaixo do eixo.
+Carga LIMITE uniforme q = (tripulação + carga) g n_lim / área (ou `q_Pa` declarada), última × 1,5. Vigas
+transversais em cada caverna, simplesmente apoiadas (M = w L²/8, V = w L/2, perfil C de largura 0,4 h, banzo
+comprimido com crippling de Gerard, alma τ = V/(h t)); painel entre vigas como placa retangular simplesmente
+apoiada σ = β q b²/t² (Roark & Young 7.ª ed., Tab. 11.4 caso 1a; β de 0,2874 a a/b = 1 até 0,75), espessura em
+passos de 0,1 mm. As cargas de emergência dos assentos (9 g), as ancoragens e as calhas ficam desconhecidas.
+
+**Pressurização** — `pressure_Pa` (diferencial LIMITE) e `pressure_x_m` (zona; omissão: corpo inteiro). Pele:
+aro σ = p R/t com 1,33 p (14 CFR 25.365(d), pressão sozinha) × 1,5; reforçadores: tração p A/ΣB somada à tração de
+flexão. Cavernas: quinhão do aro por compatibilidade de extensão N_f = 1,33 p R b A_f/(A_f + b t) (derivado,
+PRESSUPOSTO), como caso «pressurizacao» do anel. Em secção não circular a flexão do anel/painel sob pressão não é
+modelada → desconhecido.
+
+**Números** (estudo, `applied: false`):
+
+| Caso | Fuselagem paramétrica | Detalhe |
+|---|---|---|
+| C172 (piso por omissão) | 125,6 kg (106,0 sem piso) | piso 2,70 m², q_lim 3,8 kPa, 15,7 kg (painel maciço 1,8 mm — limite superior face a sandwich) |
+| C172 + 2 portas + 25 kPa hipotéticos | 129,6 kg | soleiras 4 × 0,68 kg (RF 1,02); aro RF 12 na pele dimensionada pela encurvadura |
+| Twin-boom, casulo superelíptico 0,40 × 0,30 m (n = 3), piso 3 kPa, alçapão | 13,3 kg (12,2) | piso 1,4 kg; soleiras RF 2,35 |
+
+Com o piso, o C172 `iterar` passa a 1137,8 → 1153,9 kg (a área do piso é integrada no intervalo declarado, contínua
+com o comprimento da fuselagem — com a área entre cavernas o ponto fixo oscilava entre 1150 e 1153 kg).
+
+## 10. Próximos incrementos
+
+1. ~~Fuselagem: piso, aberturas, secções não circulares, pressurização~~ — feito (§9). Falta: longarinas reais
+   (flexão lateral e torção), alma das anteparas sob cargas concentradas, cantos das janelas, assentos 9 g, flexão
+   do anel não circular.
 2. ~~Empenagens pelo caminho `wingbox` e no modelo de vigas; booms ligados à geometria de `assembly`~~ — feito
    (§6). Falta: binário de reação dos rotores, duas derivas separadas no twin-boom.
 3. ~~Apoios e ferragens: berço do motor, olhais e cavilhas das ligações~~ — feito (§7). Falta: olhais sob carga

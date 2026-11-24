@@ -20,3 +20,24 @@ cases:
   - id: twin_boom_iterar
     example: examples/uav_twin_boom_shortcut.yaml
     structure_layout: {enabled: true, coupling: iterar}
+  # incremento D: detalhe da fuselagem — portas (aberturas), piso por omissão e pressurização hipotética (o C172
+  # real não é pressurizado: 25 kPa só para exercitar o caminho) — só em memória
+  - id: c172_detalhe
+    example: examples/cessna172_check.yaml
+    structure_layout:
+      enabled: true
+      fittings: {engine_mount: {n_cylinders: 4}}
+      fuselage:
+        pressure_Pa: 25000.0
+        cutouts:
+          - {id: porta_esq, x0_m: 1.6, x1_m: 2.5, theta_deg: -90.0, width_deg: 50.0}
+          - {id: porta_dir, x0_m: 1.6, x1_m: 2.5, theta_deg: 90.0, width_deg: 50.0}
+  - id: twin_boom_detalhe
+    example: examples/uav_twin_boom_shortcut.yaml
+    structure_layout:
+      enabled: true
+      fuselage:
+        section: {w_m: 0.40, h_m: 0.30, n_exp: 3.0}
+        floor: {enabled: true, q_Pa: 3000.0}
+        cutouts:
+          - {id: alcapao_carga, x0_frac: 0.35, x1_frac: 0.55, theta_deg: 180.0, width_deg: 60.0}

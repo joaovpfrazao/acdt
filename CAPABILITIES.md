@@ -2183,6 +2183,27 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Ficheiros**: `structure_layout.py`, `domains/aircraft/__init__.py`, `sizing.py` (campo `structure_coupling`),
   `tests/test_structure_layout.py`, `docs/ESTRUTURA_PARAMETRICA.md` §8.
 
+## 56. Estrutura paramétrica D: piso, aberturas, secções não circulares e pressurização (24 nov 2026)
+
+* **O que faz**: na fuselagem paramétrica (`structure_layout.fuselage`): piso (`floor`, auto com tripulação+carga
+  e D ≥ 0,9 m) com vigas transversais em cada caverna (M = wL²/8, perfil C com crippling de Gerard) e painel como
+  placa retangular simplesmente apoiada (Roark Tab. 11.4 caso 1a, σ = β q b²/t²); aberturas declaradas
+  (`cutouts`: portas, alçapões) com reforçadores e painel interrompidos, fluxo de corte × P/(P − L_aberta),
+  cavernas de bordo carregadas pelo par tangencial q L/2 e duas soleiras (Euler–Johnson + Gerard) que levam metade
+  da força removida; secção superelíptica (`section: w_m, h_m, n_exp`) com booms em perímetro igual, I por booms,
+  Bredt T/(2A) e J = 4A²t/P; pressurização (`pressure_Pa`) com aro p R/t × 1,33 × 1,5 (14 CFR 25.365(d)), tração
+  longitudinal p A/ΣB nos reforçadores e quinhão do aro nas cavernas N_f = 1,33 p R b A_f/(A_f + b t). Pressão em
+  secção não circular → desconhecido (flexão do anel não modelada).
+* **Medida**: C172 piso 2,70 m², q_lim 3,8 kPa, 15,7 kg (painel maciço 1,8 mm — limite superior face a sandwich);
+  fuselagem paramétrica 106 → 126 kg; duas portas: soleiras 4 × 0,68 kg (RF 1,02), +4 kg; 25 kPa hipotéticos:
+  aro RF 12 na pele dimensionada pela encurvadura. Twin-boom com casulo superelíptico 0,40 × 0,30 m (n = 3), piso
+  declarado 3 kPa (1,4 kg) e alçapão inferior (soleiras RF 2,35). C172 `iterar` com piso: 1137,8 → 1153,9 kg.
+* **Veredicto**: implementado (L1). Cargas de emergência dos assentos (9 g), ancoragens, molduras de janelas com
+  cantos (concentração de tensões) e flexão do anel não circular ficam desconhecidas.
+* **Ficheiros**: `core/structures/frames.py` (`section_points`, `in_arcs`, `plate_ss_uniform_beta`,
+  `size_floor_panel`, `size_floor_beam`, `ShellStation` w/h/n_exp/p_lim/cutouts), `structure_layout.py`,
+  `tests/test_structure_layout.py`, `docs/ESTRUTURA_PARAMETRICA.md` §9.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado
