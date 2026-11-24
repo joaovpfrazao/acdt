@@ -1,0 +1,19 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Estudo consolidado (applied: false, 24 nov 2026): as duas decisões do João para o caso «cheio» da asa voadora sem
+# deriva — (a) servos 2× Volz DA 30-HT por folha do split aileron (rajada lateral) e pernas do trem principal
+# projetadas para 1,3 × as cargas laterais de 14 CFR 23.485 (toque com vento cruzado). Tudo entra em memória por
+# `fixed`; examples/heavy/uav150_flying_wing_tailless.yaml e os valores por omissão NÃO mudam.
+applied: false
+example: examples/heavy/uav150_flying_wing_tailless.yaml
+simulation: examples/simulation/uav150_tailless_crosswind.yaml
+option_a: examples/studies/rajada_cheio/opcao_a.yaml        # fixed da opção (a), reutilizados
+fixed:
+  set:
+    # pernas projetadas para k × 23.485 (chave opcional gear.side_load_factor; o toque 6-DOF compara com o mesmo limite)
+    assumptions.assembly.options.flying_wing.gear.side_load_factor: 1.3
+  # reforço das pernas = massa(k) − massa(1) do modelo existente (gear_devices.size_gear_side_load_structure,
+  # consola Al 2024-T3); valor inicial do estudo toque_cheio, recalculado pelo script no W0 convergido até fechar
+  leg_reinforcement_item:
+    name: reforço das pernas principais (carga lateral 1,3 × 23.485)
+    mass_kg_initial: 0.213
+    group: structure

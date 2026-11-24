@@ -126,8 +126,8 @@ def _assembly(res) -> None:
         spec = lp["spec_scaled"] if lp else load_spec(res.spec, a)
         out, cmp = assembly_stage(res, spec)
         res.assembly = {"result": out, "comparison": cmp}
-        for key, ok, msg in out.checks:
-            res.checks.append(CheckResult(key, bool(ok), msg))
+        for key, ok, msg in out.checks:   # None = unassessed stays None (unassessed ≠ fail; 24 nov 2026)
+            res.checks.append(CheckResult(key, None if ok is None else bool(ok), msg))
     except Exception as ex:
         res.issues.append(Issue("warning", f"Avaliação da montagem genérica falhou: {ex}"))
         return

@@ -99,6 +99,8 @@ def _assembly_gear(asm, out, cs: dict, w) -> dict:
         out_g.update({"ground_attitude_deg": thg, "nose_extension_m": float(g.get("nose_strut_extension_m") or 0.0),
                       "h_cg_static": (z_cg - zg) * math.cos(math.radians(thg))
                       + (xm - x_cg) * math.sin(math.radians(thg))})
+    if g.get("side_load_factor"):   # legs designed to k × 23.485 (gear.side_load_factor, opt-in)
+        out_g["side_load_factor"] = float(g["side_load_factor"])
     # Designed tip skids (Raymer Ch. 11 / Currey energy): contact is a sized event, not a structural strike.
     sk = g.get("tip_skids")
     if sk and sk.get("status") == "assessed":

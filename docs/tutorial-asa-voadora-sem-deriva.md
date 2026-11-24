@@ -420,3 +420,72 @@ e cobre a aproximação nominal medida. Como reforço opcional, a variante de de
 Mas sozinha não se recomenda, porque a janela é estreita (30 m falha, 60 m perde o controlo). Antes de aplicar, falta
 avaliar as ferragens e a ligação à asa, e a dispersão das condições de aproximação (rajadas, erro de rampa).
 
+### 5.4 Estudo consolidado: opção (a) + pernas a 1,3 × 23.485 (24 nov 2026, estudo `applied: false`)
+
+O João escolheu juntar as duas decisões: servos da opção (a) (2× Volz DA 30-HT por folha) e pernas do trem
+projetadas para 1,3 × as cargas laterais de 23.485. O estudo `examples/studies/rajada_cheio/consolidado.yaml`
+(com `estudo_consolidado.py`) corre as duas decisões juntas, em memória. Redimensiona o W0 até convergir e repete
+toda a verificação para o exemplo, a opção (a) e o consolidado, com o mesmo código. **Nada é aplicado**: o yaml do
+exemplo e os valores por omissão não mudam. Resultados em `examples/output/rajada_cheio/consolidado.json`
+(cerca de 8 min).
+
+Chave opcional nova: `assumptions.assembly.options.flying_wing.gear.side_load_factor` (por omissão 1). Multiplica as
+cargas laterais de 23.485 usadas para dimensionar as pernas (`size_gear_side_load_structure`) e o limite de projeto
+contra o qual o 6-DOF compara o toque. O relatório do toque mostra também a razão contra 23.485 simples
+(`inboard_ratio_23_485`). O reforço das pernas entra como item de massa (0,213 kg). O estudo itera até o item igualar
+o acréscimo do modelo de pernas (0,2133 kg, fechado à 1.ª iteração, |Δ| ≤ 1 g).
+
+| Grandeza | Exemplo | Opção (a) | Consolidado |
+|---|---|---|---|
+| W0 convergido (viável) | 149,67 kg | 157,67 kg | **158,09 kg** (+8,42 kg; +0,42 kg face a (a)) |
+| Servo da folha dividida / taxa efetiva | 2× DA 30, 83,5 °/s | 2× DA 30-HT, 107,0 °/s | 2× DA 30-HT, 109,6 °/s |
+| Massa dos atuadores | 6,30 kg | 10,06 kg | 10,06 kg |
+| Pernas (estrutura lateral) | k 1; 0,387 kg; RF flexão 1,087 | k 1; 0,387 kg; RF 1,032 | **k 1,3; 0,601 kg; RF 1,22** (parede 1,25 mm) |
+| Equilíbrio, 4 casos | passa | passa | passa |
+| Margem estática (vazio / carga / combustível / cheio) | 0,051 / 0,065 / 0,051 / 0,063 | 0,050 / 0,062 / 0,050 / 0,060 | 0,050 / 0,062 / 0,050 / 0,060 |
+| Dutch roll com SAS | ζ 0,142, passa | ζ 0,133, passa | ζ 0,128, passa |
+| Espiral, autoridade do SAS, atrasos, atuadores, compensação em picada, guinada com vento cruzado | passa | passa | passa |
+| Fugóide sem aumento (`hq:phugoid`) | ζ 0,0419, passa | ζ 0,0391, Nível 2, **falha** | ζ 0,0391, Nível 2, **falha** |
+| Fugóide com piloto automático | passa | passa | passa |
+| Margem de atraso (Nível 1) | 0,234 s | 0,223 s | 0,210 s |
+| Rajada 6-DOF estrita (vazio / carga / combustível / cheio) | passa / passa / passa / **falha** | passa nos 4 | passa nos 4 |
+| Margem de taxa (vazio / carga / combustível / cheio) | 1,94 / 1,15 / 1,57 / — (satura) | 2,62 / 1,41 / 1,77 / 1,07 | 2,65 / 1,33 / 1,51 / **1,07** (pico 102 °/s) |
+| Vento cruzado 10,1 kt | passa (máx. 14,65 kt) | passa (14,24 kt) | passa (13,95 kt) |
+| Corrida de descolagem, massa pontual (MIS-TO-01) | 227,6 m, passa | passa | 226,1 m, passa |
+| Corrida de descolagem 6-DOF com vento cruzado (≤ 300 m) | 325,1 m, falha | 331,8 m, falha | 332,6 m, **falha** |
+| Toque 23.485, convergido (razão interior) | 0,595, passa | 1,228, excede (falha) | **0,896 do limite 1,3×, passa** (1,165 de 23.485 simples) |
+| Afundamento / deriva no toque | 1,06 / 0,34 m/s | 1,26 / 0,41 m/s | 1,15 / 0,38 m/s |
+| Raspagem da ponta, folga traseira | ok | ok | ok |
+| Bitola máxima Sadraey 9.5.3.2 | desconhecido | desconhecido | desconhecido |
+| Ferragens e ligação do trem à asa | desconhecido | desconhecido | desconhecido |
+| Potência elétrica dos servos | desconhecido | desconhecido | desconhecido |
+| Matriz de requisitos | 11 passa, 3 no limite, 2 desconhecido, 4 não avaliado | igual | igual |
+
+Linhas da matriz que não passam (iguais nas três variantes):
+
+* **No limite**: MIS-STALL-01 (perda ≤ 26 m/s), MIS-CEIL-01 (teto de 5000 m) e MIS-OPS-01 (operar a partir de 300 m
+  com o vento cruzado regulamentar).
+* **Desconhecido**: MIS-CERT-01 (categoria específica da EASA) e DER-PKG-01 (arrumação perto do CG).
+* **Não avaliado**: MIS-CFG-01, DER-TO-XW-01, SORA-01 e PL-FOV-01. A matriz só lê o resultado do pipeline, e por isso
+  a rajada 6-DOF, o toque e a corrida 6-DOF não lhe chegam como evidência. A corrida 6-DOF do estudo (332,6 m > 300 m)
+  diz que DER-TO-XW-01 **falharia** se fosse ligada à matriz.
+
+Correção feita nesta ronda: as verificações da montagem com veredicto `None` (não avaliadas) eram convertidas em
+`False` ao entrar em `res.checks` (`phase2._assembly`, `bool(ok)`). Isso fazia `asm:gear_max_track_9532` aparecer
+como falha, quando o δ admissível de Sadraey não está citado. Agora ficam `None`, ou seja, desconhecido. Não avaliado
+não é falha, nem passa.
+
+O que ainda falha e o que seria preciso:
+
+* **`hq:phugoid` sem aumento** (ζ 0,039 < 0,04, Nível 2; MIL-F-8785C é indicativo para um UAV). Com piloto automático
+  é Nível 1. Resolve-se de duas formas: aceitar formalmente o PRESSUPOSTO de piloto automático sempre ativo (válido
+  num UAV, e a decisão é do João), ou dar mais amortecimento em picada à aeronave, ou mudar o CG.
+* **Corrida de descolagem 6-DOF com vento cruzado** (332,6 m > 300 m; já falhava no exemplo com 325,1 m). Fecham-na
+  as opções que o estudo de descolagem já indica: vento de frente, mais tração, menos carga alar ou menos massa.
+* **Por avaliar**: o δ admissível da bitola (Sadraey 9.5.3.2), as ferragens e a ligação das pernas à asa, a potência
+  elétrica dos servos DA 30-HT e as linhas da matriz não avaliadas. Ficam desconhecidas, não passam.
+
+As margens mais curtas são a de taxa no «cheio» (1,07) e a de atraso (0,21 s, que desce face à opção (a)). O reforço
+das pernas custa 0,42 kg de W0 e não muda nenhum veredicto de qualidades de voo. A única verificação que muda face ao
+exemplo é `hq:phugoid`, que já mudava com a opção (a).
+
