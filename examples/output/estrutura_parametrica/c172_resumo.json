@@ -1,0 +1,245 @@
+{
+ "caso": "c172",
+ "exemplo": "examples/cessna172_check.yaml",
+ "applied": false,
+ "W0_kg": 1137.8001977766298,
+ "tempo_s": 21.221737384796143,
+ "veredicto": "desconhecido",
+ "contagem": {
+  "passa": 28,
+  "desconhecido": 7
+ },
+ "orcamento": {
+  "mass_kg": 217.5606814478336,
+  "cg_m": [
+   3.1593250741158507,
+   0.0,
+   0.0
+  ],
+  "inertia_kg_m2": {
+   "Ixx": 761.3671492280698,
+   "Iyy": 817.2072529967576,
+   "Izz": 1559.1609679962112
+  },
+  "by_component_kg": {
+   "asa": 96.94938904178068,
+   "estabilizador": 10.54010077097789,
+   "deriva": 4.1076839305431445,
+   "fuselagem": 105.9635077045319
+  },
+  "unknown_mass": [],
+  "note": "inércia própria: anéis (m R², m R²/2), linhas ao longo de x (m L²/12), placas (m R²/4, m R²/2); superfícies sustentadoras distribuídas ∝ corda na envergadura — PRESSUPOSTO"
+ },
+ "comparacao": {
+  "fuselage_layout_kg": 105.9635077045319,
+  "fuselage_L1_kg": 85.11908175763308,
+  "fuselage_raymer_kg": 97.60168778513065,
+  "wing_box_kg": 96.94938904178068
+ },
+ "cavernas_pesadas": [
+  {
+   "id": "fuselagem.caverna@0.561",
+   "loads": [
+    "trem_frente"
+   ],
+   "caso": "aterragem",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.034544719861452446,
+    "b_m": 0.020726831916871465,
+    "t_m": 0.00041,
+    "A_m2": 3.08231373150301e-05,
+    "I_m4": 6.260792934342898e-09
+   },
+   "RF": 1.8466709434110857,
+   "veredicto": "passa",
+   "anel": {
+    "aterragem": {
+     "M_max_Nm": 8.969033011348927,
+     "theta_deg": 180.0,
+     "N_max_N": 45.503273768690796
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@0.967",
+   "loads": [
+    "berco_motor",
+    "parede_de_fogo"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.034544719861452446,
+    "b_m": 0.020726831916871465,
+    "t_m": 0.0012100000000000004,
+    "A_m2": 8.902984427118643e-05,
+    "I_m4": 1.726250181713021e-08
+   },
+   "RF": 1.1012296703400095,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 81.93585149458193,
+     "theta_deg": 225.0,
+     "N_max_N": 1586.3762443242813
+    },
+    "aterragem": {
+     "M_max_Nm": 75.91402983806722,
+     "theta_deg": 225.0,
+     "N_max_N": 1469.7865628942404
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@1.910",
+   "loads": [
+    "asa_longarina_frente"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.034544719861452446,
+    "b_m": 0.020726831916871465,
+    "t_m": 0.0012100000000000004,
+    "A_m2": 8.902984427118643e-05,
+    "I_m4": 1.726250181713021e-08
+   },
+   "RF": 1.028741380332902,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 88.94855846471299,
+     "theta_deg": 293.0,
+     "N_max_N": 2729.3596514817114
+    },
+    "aterragem": {
+     "M_max_Nm": 28.94764624016277,
+     "theta_deg": 67.0,
+     "N_max_N": 888.249781862513
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@2.520",
+   "loads": [
+    "trem_tras"
+   ],
+   "caso": "aterragem",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.053976124783519444,
+    "b_m": 0.032385674870111666,
+    "t_m": 0.00471,
+    "A_m2": 0.0005149324050068285,
+    "I_m4": 2.185872656788512e-07
+   },
+   "RF": 1.0145786466768154,
+   "veredicto": "passa",
+   "anel": {
+    "aterragem": {
+     "M_max_Nm": 1360.2116520330082,
+     "theta_deg": 150.0,
+     "N_max_N": 12898.613090460636
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@2.636",
+   "loads": [
+    "asa_longarina_tras"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.034544719861452446,
+    "b_m": 0.020726831916871465,
+    "t_m": 0.0019100000000000007,
+    "A_m2": 0.0001378607128578232,
+    "I_m4": 2.564202937474022e-08
+   },
+   "RF": 1.0030207669215623,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 199.35388195050228,
+     "theta_deg": 67.0,
+     "N_max_N": 5963.42251899757
+    },
+    "aterragem": {
+     "M_max_Nm": 29.693693779347413,
+     "theta_deg": 293.0,
+     "N_max_N": 888.2497818625133
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@6.827",
+   "loads": [
+    "cauda"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.034544719861452446,
+    "b_m": 0.020726831916871465,
+    "t_m": 0.005210000000000001,
+    "A_m2": 0.000341663379051968,
+    "I_m4": 5.158295319713825e-08
+   },
+   "RF": 1.0088691829844687,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 621.0698646023378,
+     "theta_deg": 0.5,
+     "N_max_N": 2415.1999386321822
+    }
+   },
+   "nota": null
+  }
+ ],
+ "pior_estacao_casca": {
+  "x_m": 4.63474991474487,
+  "R_m": 0.5757453310242074,
+  "I_m4": 0.0005476483875897593,
+  "sigma_stringer_max_Pa": 17310271.38182309,
+  "Fcs_Pa": 106053436.05572473,
+  "sigma_column_Pa": 91353684.88236344,
+  "L_over_rho": 61.11944462005201,
+  "q_skin_N_m": 5024.146454066812,
+  "tau_skin_Pa": 6280183.067583514,
+  "sigma_cr_panel_Pa": 12562422.299882809,
+  "tau_cr_panel_Pa": 17486514.676695697,
+  "b_eff_min_m": 0.0983072290494756,
+  "stringer_area_m2": 1.7703799999999998e-05,
+  "panel_width_m": 0.11669401950221121,
+  "RF_stringer_column": 5.277426498251827,
+  "RF_stringer_tension": 25.071819524200425,
+  "RF_skin_shear": 41.71852909071522,
+  "RF_skin_buckling_limit": 1.0232419698012911,
+  "RF_min": 1.0232419698012911,
+  "verdict": "passa",
+  "t_skin_m": 0.0008,
+  "t_stringer_m": 0.00041
+ },
+ "layout": {
+  "frame_pitch_m": 0.5,
+  "frame_h_m": 0.034544719861452446,
+  "frame_b_m": 0.020726831916871465,
+  "n_stringers": 31,
+  "n_longerons": 0
+ },
+ "notas": [
+  "ligação da asa: longarinas a x = 1.910 m e 2.636 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
+  "manobra: as forças concentradas (cauda, motor) são equilibradas pelas duas ligações da asa; a inércia distribuída da casca vai para revestimento/reforçadores, não para as cavernas — PRESSUPOSTO",
+  "aterragem: reações do trem (23.473, viga L1) e metade da sustentação em cada longarina da asa; trem preso à fuselagem — se o trem principal está na asa, declarar gear_theta_deg/loads",
+  "anteparas por omissão: parede de fogo no berço do motor e fecho traseiro a 0,95 L (as duas da viga L1) — PRESSUPOSTO"
+ ],
+ "material": "Al 2024-T3 sheet"
+}

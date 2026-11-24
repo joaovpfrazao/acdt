@@ -1,0 +1,11 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Estudo (applied: false, 24 nov 2026): estrutura paramétrica L1 (docs/ESTRUTURA_PARAMETRICA.md) em exemplos
+# convencionais. O bloco structure_layout é aplicado só em memória; os yaml dos exemplos ficam iguais.
+applied: false
+cases:
+  - id: c172
+    example: examples/cessna172_check.yaml
+    structure_layout: {enabled: true}
+  - id: uav150
+    example: examples/uav_150kg_stanag4671.yaml
+    structure_layout: {enabled: true}

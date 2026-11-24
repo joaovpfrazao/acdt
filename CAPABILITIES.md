@@ -2115,6 +2115,31 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Veredicto**: fica por resolver `hq:phugoid` sem aumento (ζ 0,039, Nível 2; com piloto automático passa), por aceitar como PRESSUPOSTO de piloto automático ou por resolver com amortecimento ou CG. Fica também a corrida 6-DOF com vento cruzado, 332,6 m > 300 m (já falhava no exemplo, e DER-TO-XW-01 não está ligado à matriz). Desconhecidos: ferragens e ligação à asa, potência elétrica dos servos e δ admissível da bitola. Nada é aplicado ao exemplo nem aos valores por omissão.
 * **Ficheiros**: `assembly/sizing.py`, `flightsim/tailless_sim.py`, `flightsim/mission.py`, `phase2.py`, `examples/studies/rajada_cheio/consolidado.yaml`, `examples/studies/rajada_cheio/estudo_consolidado.py`, `examples/output/rajada_cheio/consolidado.json`, `docs/tutorial-asa-voadora-sem-deriva.md` §5.4, `tests/test_touchdown_convergence.py`, `tests/test_rajada_cheio_estudo.py`.
 
+## 52. Estrutura paramétrica L1: cavernas, anteparas, reforçadores, tabela única de membros e modelo de vigas (24 nov 2026)
+
+* **O que faz**: disciplina opt-in `structure_layout` (etapa do pipeline depois da aeroelasticidade;
+  `assumptions.structure_layout.enabled: true`), geral para qualquer configuração. Esquema único por componente:
+  superfícies sustentadoras (asa e empenagens **embrulhadas** de `structures.py`/`wingbox`/`structures_l1`, sem
+  redimensionar), fuselagem e booms (novo: `acdt/core/structures/frames.py`, genérico). Cavernas a passo regular e
+  cavernas pesadas nas estações das cargas concentradas (ligação da asa à frente e atrás, trem, berço do motor, cauda,
+  cargas do utilizador), anteparas, reforçadores/longarinas e revestimento por estação. Verificações citadas: anel por
+  Castigliano com reação da casca (Megson, Timoshenko), crippling de Gerard, instabilidade geral de Shanley (1949),
+  Euler–Johnson dos reforçadores com largura efetiva de von Kármán (Bruhn C2/C7), corte e encurvadura de painéis à
+  carga limite (Bruhn C5), antepara sob pressão (Timoshenko & Woinowsky-Krieger). Dimensionamento por membro, tabela
+  única de membros (RF, passa/falha/desconhecido, método, fonte), massa/CG/inércia estrutural e modelo de vigas neutro
+  `acdt.beam/1` + texto tipo Nastran (`to_nastran`, sem GPL). `fuselage_beam` passa a expor V/T limite e as forças
+  concentradas que já calculava (aditivo).
+* **Medida** (`examples/studies/estrutura_parametrica`, `applied: false`): C172 fuselagem paramétrica **106,0 kg** vs
+  viga L1 85,1 kg vs Raymer 97,6 kg (6 cavernas pesadas passam; trem principal 54 mm × 4,7 mm); UAV 150 kg 12,1 kg vs
+  7,3 kg Raymer (espessuras mínimas dominam — limite superior). 0 falhas, 7 desconhecidos por caso.
+* **Veredicto**: L1, opt-in, `coupling: relatorio` (iterar por implementar). Desconhecidos: anteparas sem pressão,
+  bordos/nervuras/não-ótimo da asa, booms sem cargas. Fora: piso, aberturas, secções não circulares, ferragens,
+  empenagens no modelo de vigas.
+* **Ficheiros**: `src/acdt/core/structures/frames.py`, `src/acdt/domains/aircraft/structure_layout.py`,
+  `domains/aircraft/__init__.py` (etapa), `mission.py` (pressupostos), `sizing.py` (campo), `structures_l1.py`,
+  `docs/ESTRUTURA_PARAMETRICA.md`, `examples/studies/estrutura_parametrica/`, `examples/output/estrutura_parametrica/`,
+  `tests/test_structure_layout.py`.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

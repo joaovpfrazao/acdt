@@ -1,0 +1,245 @@
+{
+ "caso": "uav150",
+ "exemplo": "examples/uav_150kg_stanag4671.yaml",
+ "applied": false,
+ "W0_kg": 153.21267779959328,
+ "tempo_s": 6.138139963150024,
+ "veredicto": "desconhecido",
+ "contagem": {
+  "passa": 17,
+  "desconhecido": 7
+ },
+ "orcamento": {
+  "mass_kg": 17.979716458963463,
+  "cg_m": [
+   1.2748653829178151,
+   0.0,
+   0.0
+  ],
+  "inertia_kg_m2": {
+   "Ixx": 12.96572345110834,
+   "Iyy": 11.628417216689904,
+   "Izz": 24.33271513039286
+  },
+  "by_component_kg": {
+   "asa": 5.402858969227022,
+   "estabilizador": 0.247129133179115,
+   "deriva": 0.2314822763801359,
+   "fuselagem": 12.098246080177189
+  },
+  "unknown_mass": [],
+  "note": "inércia própria: anéis (m R², m R²/2), linhas ao longo de x (m L²/12), placas (m R²/4, m R²/2); superfícies sustentadoras distribuídas ∝ corda na envergadura — PRESSUPOSTO"
+ },
+ "comparacao": {
+  "fuselage_layout_kg": 12.098246080177189,
+  "fuselage_L1_kg": 5.4935955464479616,
+  "fuselage_raymer_kg": 7.324168683248986,
+  "wing_box_kg": 5.402858969227022
+ },
+ "cavernas_pesadas": [
+  {
+   "id": "fuselagem.caverna@0.320",
+   "loads": [
+    "trem_frente"
+   ],
+   "caso": "aterragem",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.0025099999999999996,
+    "A_m2": 7.02298e-05,
+    "I_m4": 1.923866033246666e-09
+   },
+   "RF": 1.0070210310649401,
+   "veredicto": "passa",
+   "anel": {
+    "aterragem": {
+     "M_max_Nm": 53.19441757688756,
+     "theta_deg": 180.0,
+     "N_max_N": 692.54613301719
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@0.384",
+   "loads": [
+    "berco_motor",
+    "parede_de_fogo"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00051,
+    "A_m2": 1.63098e-05,
+    "I_m4": 5.975044525800001e-10
+   },
+   "RF": 1.3977741901360865,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 4.801316223860303,
+     "theta_deg": 315.0,
+     "N_max_N": 267.6082978294932
+    },
+    "aterragem": {
+     "M_max_Nm": 4.001096853216857,
+     "theta_deg": 45.0,
+     "N_max_N": 223.00691485791185
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@0.651",
+   "loads": [
+    "asa_longarina_frente"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00041,
+    "A_m2": 1.3193799999999997e-05,
+    "I_m4": 4.899088365466665e-10
+   },
+   "RF": 1.0318303261535662,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 4.465589935833812,
+     "theta_deg": 247.0,
+     "N_max_N": 422.3399627127272
+    },
+    "aterragem": {
+     "M_max_Nm": 1.2646794765471965,
+     "theta_deg": 67.0,
+     "N_max_N": 119.60898574283542
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@0.851",
+   "loads": [
+    "asa_longarina_tras"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.00041,
+    "A_m2": 1.3193799999999997e-05,
+    "I_m4": 4.899088365466665e-10
+   },
+   "RF": 3.3879492404278384,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 0.5128577564992745,
+     "theta_deg": 293.0,
+     "N_max_N": 44.16398374065826
+    },
+    "aterragem": {
+     "M_max_Nm": 1.3889688132628835,
+     "theta_deg": 67.0,
+     "N_max_N": 119.6089857428355
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@1.440",
+   "loads": [
+    "trem_tras"
+   ],
+   "caso": "aterragem",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.0019100000000000007,
+    "A_m2": 5.5733800000000005e-05,
+    "I_m4": 1.6734655070466667e-09
+   },
+   "RF": 1.0231414692052505,
+   "veredicto": "passa",
+   "anel": {
+    "aterragem": {
+     "M_max_Nm": 40.1092516351454,
+     "theta_deg": 150.0,
+     "N_max_N": 1094.917791986696
+    }
+   },
+   "nota": null
+  },
+  {
+   "id": "fuselagem.caverna@2.433",
+   "loads": [
+    "cauda"
+   ],
+   "caso": "manobra",
+   "seccao": {
+    "kind": "z",
+    "h_m": 0.015,
+    "b_m": 0.009,
+    "t_m": 0.0007100000000000001,
+    "A_m2": 2.2421800000000003e-05,
+    "I_m4": 7.993501426466667e-10
+   },
+   "RF": 1.122112824185321,
+   "veredicto": "passa",
+   "anel": {
+    "manobra": {
+     "M_max_Nm": 13.38480240520012,
+     "theta_deg": 0.5,
+     "N_max_N": 102.17273588347761
+    }
+   },
+   "nota": null
+  }
+ ],
+ "pior_estacao_casca": {
+  "x_m": 0.384,
+  "R_m": 0.15000000000000002,
+  "I_m4": 1.0673145414692446e-05,
+  "sigma_stringer_max_Pa": 8082583.097096668,
+  "Fcs_Pa": 106053436.05572473,
+  "sigma_column_Pa": 91353684.88236344,
+  "L_over_rho": 61.11944462005201,
+  "q_skin_N_m": 4497.767138182885,
+  "tau_skin_Pa": 5622208.922728606,
+  "sigma_cr_panel_Pa": 23303100.20490696,
+  "tau_cr_panel_Pa": 31852171.3746655,
+  "b_eff_min_m": 0.085679799643358,
+  "stringer_area_m2": 1.7703799999999998e-05,
+  "panel_width_m": 0.085679799643358,
+  "RF_stringer_column": 11.302535808778565,
+  "RF_stringer_tension": 53.695705294498794,
+  "RF_skin_shear": 46.60090074931696,
+  "RF_skin_buckling_limit": 3.564028293369127,
+  "RF_min": 3.564028293369127,
+  "verdict": "passa",
+  "t_skin_m": 0.0008,
+  "t_stringer_m": 0.00041
+ },
+ "layout": {
+  "frame_pitch_m": 0.5,
+  "frame_h_m": 0.015,
+  "frame_b_m": 0.009,
+  "n_stringers": 11,
+  "n_longerons": 0
+ },
+ "notas": [
+  "ligação da asa: longarinas a x = 0.651 m e 0.851 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
+  "manobra: as forças concentradas (cauda, motor) são equilibradas pelas duas ligações da asa; a inércia distribuída da casca vai para revestimento/reforçadores, não para as cavernas — PRESSUPOSTO",
+  "aterragem: reações do trem (23.473, viga L1) e metade da sustentação em cada longarina da asa; trem preso à fuselagem — se o trem principal está na asa, declarar gear_theta_deg/loads",
+  "anteparas por omissão: parede de fogo no berço do motor e fecho traseiro a 0,95 L (as duas da viga L1) — PRESSUPOSTO"
+ ],
+ "material": "Al 2024-T3 sheet"
+}

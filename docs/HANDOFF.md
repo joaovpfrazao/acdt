@@ -2077,3 +2077,12 @@ O veredicto do toque deixou de depender do passo: há sub-passos de 2,5 ms na ja
 ## Estudo consolidado: opção (a) + pernas a 1,3 × 23.485 (24 nov 2026, ramo `cheio-consolidado`)
 
 Estudo `applied: false` em `examples/studies/rajada_cheio/consolidado.yaml`: W0 158,09 kg (+0,42 kg face a (a)). Rajada 6-DOF passa nos 4 casos e o toque passa (0,896 do limite 1,3×). Falta resolver `hq:phugoid` sem aumento e a corrida 6-DOF com vento cruzado (332,6 m). Ferragens e ligação à asa ficam desconhecidas. Chave opcional nova `gear.side_load_factor`. As verificações `asm:*` não avaliadas deixam de contar como falha. Tabela em [tutorial-asa-voadora-sem-deriva.md](tutorial-asa-voadora-sem-deriva.md) §5.4; CAPABILITIES §51.
+
+## Estrutura paramétrica L1 — incremento 1 (24 nov 2026, ramo `estrutura-parametrica`)
+
+Disciplina opt-in `structure_layout` ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md), CAPABILITIES §52): esquema
+único independente da configuração, cavernas/anteparas/reforçadores explícitos na fuselagem e nos booms com
+verificações clássicas e dimensionamento por membro, asa e empenagens embrulhadas (não redimensionadas), tabela
+única de membros, massa/CG/inércia e modelo de vigas `acdt.beam/1` + `.bdf`. Estudo `applied: false` no C172
+(fuselagem 106,0 kg vs Raymer 97,6 kg) e no UAV 150 kg. Pendente: acoplamento `iterar`, piso/aberturas, empenagens e
+booms no modelo de vigas, ferragens e berço do motor, flutter com o modelo de vigas, CalculiX via Build.

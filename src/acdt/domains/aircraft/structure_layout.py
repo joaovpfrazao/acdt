@@ -290,7 +290,9 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
     special: dict[float, list[str]] = {}
     for case, items in frame_loads.items():
         for xx, lid, _l in items:
-            special.setdefault(round(float(xx), 4), []).append(lid)
+            ids_ = special.setdefault(round(float(xx), 4), [])
+            if lid not in ids_:
+                ids_.append(lid)
     for bk in bulkheads:
         special.setdefault(round(float(bk["x_m"]), 4), []).append(str(bk["id"]))
     reg = [float(v) for v in np.arange(x[0], x[-1] + 1e-9, pitch)]
