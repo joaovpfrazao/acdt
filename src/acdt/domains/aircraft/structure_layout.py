@@ -55,7 +55,7 @@ DEFAULTS: dict[str, Any] = {
 }
 
 
-def _merge(base: dict, over: dict) -> dict:
+def _merge(base: dict[str, Any], over: dict[str, Any]) -> dict[str, Any]:
     out = copy.deepcopy(base)
     for k, v in (over or {}).items():
         if isinstance(v, dict) and isinstance(out.get(k), dict):
@@ -74,13 +74,13 @@ def _not_evaluated(reason: str) -> dict[str, Any]:
     return {"evaluated": False, "level": LEVEL, "reason": reason, "members": [], "budget": None}
 
 
-def material_dict(key: str) -> dict:
+def material_dict(key: str) -> dict[str, Any]:
     m = matlib.get(key)
     return {"key": m.key, "name": m.name, "E": m.E, "G": m.G, "nu": m.nu, "rho": m.rho, "Ftu": m.Ftu, "Fty": m.Fty,
             "Fcy": m.Fcy, "Fsu": m.Fsu, "t_min": m.t_min, "source": m.source, "kind": m.kind}
 
 
-def _material_key(res: Any, o: dict) -> str:
+def _material_key(res: Any, o: dict[str, Any]) -> str:
     k = o.get("material", "auto")
     if k and k != "auto":
         return str(k)
@@ -97,13 +97,13 @@ def _material_key(res: Any, o: dict) -> str:
 def member(mid: str, component: str, kind: str, mass: float | None, x: float, y: float = 0.0, z: float = 0.0,
            *, I_own: tuple[float, float, float] = (0.0, 0.0, 0.0), RF: float | None = None,
            verdict: str | None = None, method: str = "", source: str = "estrutura_parametrica",
-           section: dict | None = None, **extra: Any) -> dict:
+           section: dict[str, Any] | None = None, **extra: Any) -> dict[str, Any]:
     return {"id": mid, "component": component, "kind": kind, "mass_kg": mass, "x_m": x, "y_m": y, "z_m": z,
             "I_own_kg_m2": list(I_own), "RF_min": RF, "verdict": verdict or fr.verdict(RF), "method": method,
             "source": source, "section": section or {}, **extra}
 
 
-def budget(members: list[dict]) -> dict:
+def budget(members: list[dict[str, Any]]) -> dict[str, Any]:
     """Massa, CG e inércia (em torno do CG estrutural, eixos x para trás, y direita, z para cima) dos membros com
     massa conhecida; os de massa desconhecida ficam listados (desconhecido ≠ zero)."""
     known = [m for m in members if m["mass_kg"] is not None and math.isfinite(m["mass_kg"])]
@@ -129,7 +129,7 @@ def budget(members: list[dict]) -> dict:
 
 
 # ------------------------------------------------------------------------------------------------ wrapped surfaces
-def wing_members(res: Any, x_wing: float) -> tuple[list[dict], dict | None]:
+def wing_members(res: Any, x_wing: float) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
     """Embrulha o caixão já dimensionado (:mod:`.structures`) — sem o redimensionar."""
     st = getattr(res, "structures", None)
     if st is None or getattr(st, "box", None) is None:
@@ -163,7 +163,7 @@ def wing_members(res: Any, x_wing: float) -> tuple[list[dict], dict | None]:
     return rows, beam
 
 
-def tail_members(res: Any, fus: dict) -> list[dict]:
+def tail_members(res: Any, fus: dict[str, Any]) -> list[dict[str, Any]]:
     l1 = getattr(res, "structures_l1", None)
     tails = getattr(l1, "tails", None) or {}
     rows = []
@@ -178,7 +178,7 @@ def tail_members(res: Any, fus: dict) -> list[dict]:
 
 
 # ------------------------------------------------------------------------------------------------ fuselage
-def _xpos(d: dict, L: float) -> float | None:
+def _xpos(d: dict[str, Any], L: float) -> float | None:
     if d.get("x_m") is not None:
         return float(d["x_m"])
     if d.get("x_frac") is not None:
@@ -191,12 +191,12 @@ def _split(F: float, thetas: list[float], comp: str = "Fz") -> list[fr.RingLoad]
     return [fr.RingLoad(float(t), **{comp: F / n}) for t in thetas]
 
 
-def auto_frame_loads(fus: dict, o: dict, wing: Any, n_lim: float = 0.0) -> tuple[dict[str, list[tuple[float, str, list[fr.RingLoad]]]],
+def auto_frame_loads(fus: dict[str, Any], o: dict[str, Any], wing: Any, n_lim: float = 0.0) -> tuple[dict[str, list[tuple[float, str, list[fr.RingLoad]]]],
                                                          list[str]]:
     """Cargas LIMITE concentradas por caso: {caso: [(x, id, [RingLoad])]} a partir da viga-fuselagem L1."""
     f = o["fuselage"]
     notes: list[str] = []
-    cases: dict[str, list] = {"manobra": [], "aterragem": []}
+    cases: dict[str, list[Any]] = {"manobra": [], "aterragem": []}
     x_w = float(fus["x_wing_m"])
     fs, rs = wing.box.front_spar_xc, wing.box.rear_spar_xc
     c_r = wing.c_root
@@ -247,9 +247,9 @@ def auto_frame_loads(fus: dict, o: dict, wing: Any, n_lim: float = 0.0) -> tuple
     return cases, notes
 
 
-def _user_loads(o: dict, L: float, n_lim: float, n_land: float) -> tuple[dict[str, list], list[str]]:
+def _user_loads(o: dict[str, Any], L: float, n_lim: float, n_land: float) -> tuple[dict[str, list[Any]], list[str]]:
     f = o["fuselage"]
-    cases: dict[str, list] = {}
+    cases: dict[str, list[Any]] = {}
     notes: list[str] = []
     for k, ld in enumerate(f.get("loads") or []):
         x = _xpos(ld, L)
@@ -275,8 +275,8 @@ def _user_loads(o: dict, L: float, n_lim: float, n_land: float) -> tuple[dict[st
 
 
 def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.ndarray, T: np.ndarray,
-                 frame_loads: dict[str, list], bulkheads: list[dict], fo: dict, mat: dict, nonopt: float,
-                 y0: float = 0.0, z0: float = 0.0, x_off: float = 0.0) -> dict:
+                 frame_loads: dict[str, list[Any]], bulkheads: list[dict[str, Any]], fo: dict[str, Any], mat: dict[str, Any], nonopt: float,
+                 y0: float = 0.0, z0: float = 0.0, x_off: float = 0.0) -> dict[str, Any]:
     """Cavernas + anteparas + casca reforçada de um corpo tubular. x relativo ao início do corpo (+ x_off global)."""
     L = float(x[-1] - x[0])
     D = 2 * float(np.max(R))
@@ -296,7 +296,7 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
     reg = [float(v) for v in np.arange(x[0], x[-1] + 1e-9, pitch)]
     st_x = sorted(set([v for v in reg if all(abs(v - s) > 0.3 * pitch for s in special)] + list(special)))
     st_x = [v for v in st_x if x[0] - 1e-9 <= v <= x[-1] + 1e-9]
-    rows: list[dict] = []
+    rows: list[dict[str, Any]] = []
     frames_out = []
     for xs in st_x:
         Rf = float(np.interp(xs, x, R))
@@ -307,9 +307,10 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
             lds = [ld for xx, _i, ll in items if abs(float(xx) - xs) < 1e-4 for ld in ll]
             if lds:
                 cases_here[case] = fr.ring_internal_forces(Rf, lds)
-        chk: dict = {}
+        chk: dict[str, Any] = {}
         worst = None
-        for case, ring in (cases_here or {"_": None}).items():
+        loop: dict[str, Any] = dict(cases_here) if cases_here else {"_": None}
+        for case, ring in loop.items():
             Mu = 1.5 * ring["M"] if ring else 0.0
             Nu = 1.5 * ring["N"] if ring else 0.0
             c_ = fr.size_frame(kind, h, b, t_min, mat, Mu, Nu, Mb, D, pitch)
@@ -412,7 +413,7 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
                                      "n_stringers": lay.n_stringers, "n_longerons": n_l}}
 
 
-def fuselage_layout(res: Any, o: dict, mat: dict) -> dict:
+def fuselage_layout(res: Any, o: dict[str, Any], mat: dict[str, Any]) -> dict[str, Any]:
     l1 = getattr(res, "structures_l1", None)
     fus = getattr(l1, "fuselage", None) or {}
     if not fus or "V_limit_N" not in fus:
@@ -433,7 +434,7 @@ def fuselage_layout(res: Any, o: dict, mat: dict) -> dict:
     V = np.asarray(fus["V_limit_N"], float)
     T = np.asarray(fus["T_limit_Nm"], float)
     notes: list[str] = []
-    cases: dict[str, list] = {}
+    cases: dict[str, list[Any]] = {}
     n_lim = float(res.structures.vn.n_limit_pos) if getattr(res, "structures", None) is not None else 0.0
     lr = fus.get("landing_reactions_N") or {}
     if fo.get("auto_loads", True):
@@ -460,7 +461,7 @@ def fuselage_layout(res: Any, o: dict, mat: dict) -> dict:
     return out
 
 
-def boom_layout(bd: dict, o: dict, mat: dict, nonopt: float) -> dict:
+def boom_layout(bd: dict[str, Any], o: dict[str, Any], mat: dict[str, Any], nonopt: float) -> dict[str, Any]:
     """Boom em consola a partir da raiz (x0): cargas pontuais do utilizador → V, M, T por integração da ponta."""
     bid = str(bd.get("id") or "boom")
     try:
@@ -476,7 +477,7 @@ def boom_layout(bd: dict, o: dict, mat: dict, nonopt: float) -> dict:
     V = np.zeros_like(s)
     M = np.zeros_like(s)
     T = np.zeros_like(s)
-    fl: dict[str, list] = {"limite": []}
+    fl: dict[str, list[Any]] = {"limite": []}
     for ld in loads:
         p = float(ld["x_m"]) - x0
         F = math.hypot(float(ld.get("Fz_N") or 0.0), float(ld.get("Fy_N") or 0.0))
@@ -502,10 +503,10 @@ def boom_layout(bd: dict, o: dict, mat: dict, nonopt: float) -> dict:
 
 
 # ------------------------------------------------------------------------------------------------ beam model
-def beam_model(mat: dict, fus: dict | None, wing: dict | None, members: list[dict]) -> dict:
+def beam_model(mat: dict[str, Any], fus: dict[str, Any] | None, wing: dict[str, Any] | None, members: list[dict[str, Any]]) -> dict[str, Any]:
     """Modelo de vigas neutro ``acdt.beam/1``: nós, barras (A, I1, I2, J), material e massas concentradas."""
-    nodes: list[dict] = []
-    elems: list[dict] = []
+    nodes: list[dict[str, Any]] = []
+    elems: list[dict[str, Any]] = []
     E, G = mat["E"], mat["G"]
 
     def node(x: float, y: float, z: float) -> int:
@@ -562,7 +563,7 @@ def _f8(v: float) -> str:
     return s[:8].ljust(8)
 
 
-def to_nastran(model: dict) -> str:
+def to_nastran(model: dict[str, Any]) -> str:
     """Texto em formato de campos curtos tipo Nastran (GRID/MAT1/PBAR/CBAR/CONM2). Gerado aqui, sem código GPL."""
     out = ["$ acdt estrutura paramétrica — modelo de vigas (acdt.beam/1)", "$ unidades SI", "BEGIN BULK"]
     mt = model["material"]
@@ -584,14 +585,14 @@ def to_nastran(model: dict) -> str:
 
 
 # ------------------------------------------------------------------------------------------------ stage
-def analyse_layout(res: Any) -> dict:
+def analyse_layout(res: Any) -> dict[str, Any]:
     o = options(res.spec)
     mkey = _material_key(res, o)
     mat = material_dict(mkey)
     notes: list[str] = []
-    members: list[dict] = []
-    fus = fuselage_layout(res, o, mat) if o["fuselage"].get("enabled", True) else {"evaluated": False,
-                                                                                  "reason": "desligada"}
+    members: list[dict[str, Any]] = []
+    fus: dict[str, Any] = (fuselage_layout(res, o, mat) if o["fuselage"].get("enabled", True)
+                           else {"evaluated": False, "reason": "desligada"})
     x_w = float(((getattr(res.structures_l1, "fuselage", None) or {}).get("x_wing_m"))
                 or 0.35 * res.config.fuselage.length) if getattr(res, "structures_l1", None) else 0.0
     wrows, wbeam = wing_members(res, x_w)

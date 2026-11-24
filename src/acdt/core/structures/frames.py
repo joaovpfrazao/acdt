@@ -58,12 +58,12 @@ class RingLoad:
     M: float = 0.0
 
 
-def _cross(p, F):
+def _cross(p: Any, F: Any) -> Any:
     """Momento 2-D (y, z) de F aplicada em p: p_y F_z − p_z F_y."""
     return p[..., 0] * F[..., 1] - p[..., 1] * F[..., 0]
 
 
-def ring_internal_forces(R: float, loads: list[RingLoad], shell_reaction: bool = True, n: int = N_RING) -> dict:
+def ring_internal_forces(R: float, loads: list[RingLoad], shell_reaction: bool = True, n: int = N_RING) -> dict[str, Any]:
     """Esforços internos M(θ), N(θ), V(θ) num anel circular fino de raio R.
 
     Cargas concentradas ``loads``; com ``shell_reaction`` a resultante (força e binário) é reagida pelo fluxo de corte
@@ -74,9 +74,9 @@ def ring_internal_forces(R: float, loads: list[RingLoad], shell_reaction: bool =
     tan = np.stack([np.cos(th), -np.sin(th)], axis=1)          # d(pos)/dθ / R
     Fy = sum(ld.Fy for ld in loads)
     Fz = sum(ld.Fz for ld in loads)
-    Mtot = sum(ld.M + float(_cross(R * np.array([math.sin(math.radians(ld.theta_deg)),
+    Mtot = float(sum(ld.M + float(_cross(R * np.array([math.sin(math.radians(ld.theta_deg)),
                                                      math.cos(math.radians(ld.theta_deg))]),
-                                        np.array([ld.Fy, ld.Fz]))) for ld in loads)
+                                        np.array([ld.Fy, ld.Fz]))) for ld in loads))
     if shell_reaction:
         a, b = -Fy / (math.pi * R), Fz / (math.pi * R)
         # binário do fluxo tangencial: r × t = −R → M_q = −2 π R² c; equilíbrio M_q = −M_tot
@@ -143,8 +143,8 @@ def frame_profile(kind: str, h: float, b: float, t: float) -> sections.Profile:
     raise ValueError(f"secção de caverna desconhecida: {kind} (use {FRAME_SECTIONS})")
 
 
-def frame_check(prof: sections.Profile, mat: dict, M_u, N_u, M_lim_body: float | None,
-                D: float, pitch: float) -> dict:
+def frame_check(prof: sections.Profile, mat: dict[str, Any], M_u: Any, N_u: Any, M_lim_body: float | None,
+                D: float, pitch: float) -> dict[str, Any]:
     """Verificações de uma caverna. ``M_u``, ``N_u``: esforços ÚLTIMOS no anel (escalares ou distribuições M(θ),
     N(θ) do mesmo comprimento); ``M_lim_body``: momento fletor LIMITE do corpo na estação (Shanley).
 
@@ -175,14 +175,14 @@ def frame_check(prof: sections.Profile, mat: dict, M_u, N_u, M_lim_body: float |
     return out
 
 
-def size_frame(kind: str, h: float, b: float, t_min: float, mat: dict, M_u, N_u,
+def size_frame(kind: str, h: float, b: float, t_min: float, mat: dict[str, Any], M_u: Any, N_u: Any,
                M_lim_body: float | None, D: float, pitch: float, t_max: float = 6e-3, dt: float = 0.1e-3,
-               h_max: float | None = None) -> dict:
+               h_max: float | None = None) -> dict[str, Any]:
     """Secção de caverna mínima que passa todas as verificações conhecidas: espessura em passos de ``dt`` até
     ``t_max``; se não chegar, altura × 1,25 (largura proporcional) até ``h_max`` (omissão 0,12 D — PRESSUPOSTO)."""
     h_max = 0.12 * D if h_max is None else h_max
     bh = b / h
-    chk: dict = {}
+    chk: dict[str, Any] = {}
     while True:
         t = t_min
         while t <= t_max + 1e-12:
@@ -200,7 +200,7 @@ def size_frame(kind: str, h: float, b: float, t_min: float, mat: dict, M_u, N_u,
 
 
 # ------------------------------------------------------------------------------------------------ bulkhead plate
-def pressure_bulkhead(a: float, t: float, p: float, mat: dict, edge: str = "simply_supported") -> dict:
+def pressure_bulkhead(a: float, t: float, p: float, mat: dict[str, Any], edge: str = "simply_supported") -> dict[str, Any]:
     """Placa circular plana de raio a sob pressão p (Timoshenko & Woinowsky-Krieger §15–16), carga ÚLTIMA."""
     nu = mat.get("nu", 0.33)
     if edge == "clamped":
@@ -211,7 +211,7 @@ def pressure_bulkhead(a: float, t: float, p: float, mat: dict, edge: str = "simp
     return {"sigma_Pa": s, "RF": rf, "verdict": verdict(rf), "edge": edge}
 
 
-def size_pressure_bulkhead(a: float, p: float, mat: dict, t_min: float, edge: str = "simply_supported") -> dict:
+def size_pressure_bulkhead(a: float, p: float, mat: dict[str, Any], t_min: float, edge: str = "simply_supported") -> dict[str, Any]:
     nu = mat.get("nu", 0.33)
     k = 3 / 4 if edge == "clamped" else 3 * (3 + nu) / 8
     t = max(t_min, math.sqrt(k * p * a**2 / mat["Fty"])) if p > 0 else t_min
@@ -250,7 +250,7 @@ class ShellLayout:
     skin_t: float = 0.6e-3
     frame_pitch: float = 0.5
     longeron_area: float = 0.0       # área adicional por longarina [m²] (0 → só reforçadores)
-    longeron_theta_deg: list = field(default_factory=list)
+    longeron_theta_deg: list[Any] = field(default_factory=list[Any])
 
 
 def stringer_profile(kind: str, h: float, b: float, t: float) -> sections.Profile:
@@ -265,7 +265,7 @@ def stringer_profile(kind: str, h: float, b: float, t: float) -> sections.Profil
     raise ValueError(f"secção de reforçador desconhecida: {kind}")
 
 
-def shell_station_check(st: ShellStation, lay: ShellLayout, mat: dict, fs: float = 1.5) -> dict:
+def shell_station_check(st: ShellStation, lay: ShellLayout, mat: dict[str, Any], fs: float = 1.5) -> dict[str, Any]:
     """Verificações da casca reforçada numa estação (ver docstring do módulo)."""
     E, nu = mat["E"], mat.get("nu", 0.33)
     n = max(int(lay.n_stringers), 1)
@@ -326,14 +326,14 @@ def shell_station_check(st: ShellStation, lay: ShellLayout, mat: dict, fs: float
             "stringer_area_m2": A_s, "panel_width_m": b, **rfs, "RF_min": rmin, "verdict": verdict(rmin)}
 
 
-def size_shell(stations: list[ShellStation], lay: ShellLayout, mat: dict, t_skin_min: float,
-               t_str_max: float = 4e-3, t_skin_max: float = 4e-3, dt: float = 0.1e-3, fs: float = 1.5) -> list[dict]:
+def size_shell(stations: list[ShellStation], lay: ShellLayout, mat: dict[str, Any], t_skin_min: float,
+               t_str_max: float = 4e-3, t_skin_max: float = 4e-3, dt: float = 0.1e-3, fs: float = 1.5) -> list[dict[str, Any]]:
     """Por estação: aumenta a espessura do revestimento (corte e encurvadura) e a do reforçador (coluna/tração)
     em passos de ``dt`` até todas as verificações passarem. Devolve a tabela por estação (com t_skin, t_stringer)."""
     out = []
     for st in stations:
         ts, tstr = max(t_skin_min, lay.skin_t), lay.stringer_t
-        chk: dict = {}
+        chk: dict[str, Any] = {}
         for _ in range(400):
             L2 = ShellLayout(**{**lay.__dict__, "skin_t": ts, "stringer_t": tstr})
             chk = shell_station_check(st, L2, mat, fs)
