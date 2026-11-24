@@ -73,6 +73,14 @@ DEFAULTS: dict[str, Any] = {
     "export": {"beam_model": True},
     # flutter do avião inteiro pelo modelo de vigas (structure_flutter.py): modos 3-D + faixas quase-estacionárias
     "flutter": {"enabled": True, "n_modes": 16, "margin_factor": 1.2, "x_cg_chord": 0.5, "a_w": None},
+    # colocação das superfícies: {asa|estabilizador|deriva: {z_m, incidence_deg, dihedral_deg}} sobrepõe
+    # geometry.wing_position / wing_z_fraction / wing_incidence_deg e o diedro da configuração
+    "surfaces": {},
+    "surfaces_from_assembly": True,   # superfícies com papel wing/tail na montagem dão a posição real (raiz, ponta)
+    # escora da asa (asa escorada, p. ex. C172): barra bi-articulada, Euler–Johnson (Bruhn C2). Geometria declarada:
+    # y_frac = ligação na asa / semienvergadura; ligação à fuselagem no ângulo fus_theta_deg (0 = topo, 180 = quilha)
+    # da secção à estação da longarina dianteira; tubo redondo de diâmetro D_m (None → o mais leve, D/t ≤ 50 — PRESSUPOSTO)
+    "strut": {"enabled": False, "y_frac": 0.5, "fus_theta_deg": 120.0, "x_c": None, "D_m": None, "material": None},
 }
 
 
@@ -156,10 +164,13 @@ _BOX_KINDS = {"caps": "banzo_longarina", "webs": "alma_longarina", "web_uprights
 
 
 def box_members(comp: str, box: dict[str, Any], x: float, y0: float = 0.0, z0: float = 0.0, axis: str = "y",
-                mirror: bool = True, source: str = "") -> list[dict[str, Any]]:
+                mirror: bool = True, source: str = "", span_vec: Any = None, share: float = 1.0,
+                prefix: str | None = None) -> list[dict[str, Any]]:
     """Linhas da tabela de membros de um caixão já dimensionado (asa ou empenagem; ``box`` no formato de
     :func:`.structures_l1._tail_box_summary`). A massa distribui-se ∝ corda na envergadura (PRESSUPOSTO) para a
-    inércia própria; com ``mirror`` o caixão tem duas metades simétricas (centroide no plano de simetria)."""
+    inércia própria; com ``mirror`` o caixão tem duas metades simétricas (centroide no plano de simetria).
+    ``span_vec``: vetor raiz→ponta (¼ de corda, lado +y) — o centroide segue o diedro/flecha/inclinação reais;
+    ``share``: fração da massa do caixão neste painel (empenagens repartidas por vários painéis)."""
     y = np.asarray(box["y"], float)
     c = box["c_root_m"] + (box["c_tip_m"] - box["c_root_m"]) * y / max(box["semispan_m"], 1e-9)
     w = c / np.trapezoid(c, y)
@@ -170,7 +181,7 @@ def box_members(comp: str, box: dict[str, Any], x: float, y0: float = 0.0, z0: f
     for key, m in box["masses"].items():
         if key in ("ideal", "total"):
             continue
-        m = float(m)
+        m = float(m) * share
         if key in ("caps", "webs", "web_uprights"):
             ver = "passa"           # dimensionados a RF = 1 (A = M_u/(h σ), t = q/τ, Kuhn) ou espessura mínima
         elif key in ("box_skins", "covers_skin_stringers", "core"):
@@ -178,15 +189,22 @@ def box_members(comp: str, box: dict[str, Any], x: float, y0: float = 0.0, z0: f
         else:
             ver = "desconhecido"    # espessura mínima / fator — não verificado
         off = 0.0 if mirror else y1     # metade única (deriva): centroide fora do eixo
-        if axis == "z":
+        if span_vec is not None:
+            v = np.asarray(span_vec, float).copy()
+            if mirror:
+                v[1] = 0.0
+            pos = tuple(float(q) for q in np.array([x, y0, z0]) + (y1 / max(box["semispan_m"], 1e-9)) * v)
+            I_own = ((m * (y2 - off**2), m * (y2 - off**2), 0.0) if axis == "z"
+                     else (m * (y2 - off**2), 0.0, m * (y2 - off**2)))
+        elif axis == "z":
             pos = (x, y0, z0 + off)
             I_own = (m * (y2 - off**2), m * (y2 - off**2), 0.0)
         else:
             pos = (x, y0 + off, z0)
             I_own = (m * (y2 - off**2), 0.0, m * (y2 - off**2))
-        rows.append(member(f"{comp}.{key}", comp, _BOX_KINDS.get(key, key), m, *pos, I_own=I_own, verdict=ver,
-                           method=f"caixão {box.get('method')} (Megson/Bruhn) — {box.get('material')}; secção: "
-                                  f"{box.get('section', '')}", source=source))
+        rows.append(member(f"{prefix or comp}.{key}", comp, _BOX_KINDS.get(key, key), m, *pos, I_own=I_own,
+                           verdict=ver, method=f"caixão {box.get('method')} (Megson/Bruhn) — {box.get('material')}; "
+                                               f"secção: {box.get('section', '')}", source=source))
     return rows
 
 
@@ -245,31 +263,200 @@ def tail_boxes(res: Any, o: dict[str, Any]) -> tuple[dict[str, dict[str, Any] | 
     return out, notes
 
 
-def surface_records(res: Any, o: dict[str, Any], fus: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
-    """Superfícies sustentadoras: asa (caixão existente) e empenagens (caminho da asa). Cada registo leva a
-    posição de encastramento e o eixo da envergadura para a tabela de membros e o modelo de vigas."""
+def _span_vec(semi: float, sweep: float, dihedral: float, vertical: bool = False) -> list[float]:
+    """Vetor raiz→ponta do ¼ de corda (lado +y) de um painel trapezoidal: flecha a ¼ e diedro da configuração."""
+    if vertical:
+        return [semi * math.tan(sweep), 0.0, semi]
+    return [semi * math.tan(sweep), semi, semi * math.tan(dihedral)]
+
+
+def assembly_surfaces(asm_spec: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """Superfícies da montagem em coordenadas do avião: raiz e ponta do ¼ de corda (primeira e última secção,
+    com orientação e espelho do componente), cordas, torção da raiz (incidência) e papel. Um par espelhado com
+    raiz no plano de simetria dá um registo ``mirror``; os restantes (p. ex. caudas em booms) um por imagem."""
+    if not asm_spec:
+        return []
+    from .assembly.assembly import Assembly
+    from .assembly.components import Surface
+    asm = Assembly.from_dict(asm_spec.get("assembly", asm_spec))
+    out: list[dict[str, Any]] = []
+    for c in asm.components:
+        if not isinstance(c, Surface):
+            continue
+        s0, s1 = c.sections[0], c.sections[-1]
+
+        def c4(sec: dict[str, Any], comp: Any = c) -> np.ndarray:
+            le = np.asarray(sec["le"], float)
+            g: np.ndarray = comp.to_global(le + np.array([0.25 * float(sec["chord"]), 0.0, 0.0]))[0]
+            return g
+        r, t = c4(s0), c4(s1)
+        on_plane = abs(r[1]) < 1e-6
+        if c.mirrored_image and on_plane:
+            continue                       # metade espelhada de um par simétrico — já no registo da base
+        out.append({"name": c.name, "role": str(c.role or "").lower(), "root": r.tolist(), "span_vec": (t - r).tolist(),
+                    "c_root_m": float(s0["chord"]), "c_tip_m": float(s1["chord"]),
+                    "incidence_deg": float(s0.get("twist_deg") or 0.0),
+                    "mirror": bool(c.mirror and on_plane)})
+    return out
+
+
+def _wing_z(res: Any) -> tuple[float, str]:
+    """Posição vertical da raiz da asa pela mesma regra de :func:`.hifi.geometry.vsp_spec`: ``geometry.wing_position``
+    high/low → plano da corda no topo/quilha da fuselagem, afundado ¼ da espessura da raiz (PRESSUPOSTO);
+    ``geometry.wing_z_fraction`` (z/D) sobrepõe."""
+    cfg = res.config
+    gs = res.spec.assumptions.get("geometry", {}) or {}
+    D = float(cfg.fuselage.max_diameter)
+    pos = str(gs.get("wing_position", "mid")).lower()
+    t_root = float(cfg.wing.tc_root) * float(cfg.wing.c_root)
+    z = {"high": D / 2 - 0.25 * t_root, "low": -(D / 2 - 0.25 * t_root)}.get(pos, 0.0)
+    why = f"geometry.wing_position = {pos}"
+    if gs.get("wing_z_fraction") is not None:
+        z, why = float(gs["wing_z_fraction"]) * D, "geometry.wing_z_fraction"
+    return z, why
+
+
+def surface_records(res: Any, o: dict[str, Any], fus: dict[str, Any], body: dict[str, Any] | None = None,
+                    asm_spec: dict[str, Any] | None = None) -> tuple[list[dict[str, Any]], list[str]]:
+    """Superfícies sustentadoras: asa (caixão existente) e empenagens (caminho da asa). Cada registo leva a raiz do
+    ¼ de corda (``root``), o vetor raiz→ponta do lado +y (``span_vec``: flecha, diedro, inclinação), a incidência e
+    as cordas, para a tabela de membros, o modelo de vigas, o flutter e o render.
+
+    * Com montagem (``assembly``): as superfícies com papel wing/asa e tail/cauda/empenagem dão a posição real —
+      p. ex. caudas em booms (um registo por painel; painel com inclinação > 45° usa o caixão da deriva, senão o do
+      estabilizador; a massa do caixão reparte-se pelos painéis do mesmo tipo — PRESSUPOSTO). Numa cauda em V (só
+      painéis de um tipo) o caixão equivalente do outro tipo entra só como massa, repartida pelos painéis.
+    * Sem montagem: asa em z de ``geometry.wing_position`` (regra de :mod:`.hifi.geometry`), diedro e flecha da
+      configuração, incidência ``geometry.wing_incidence_deg`` (0 se não declarada — PRESSUPOSTO); estabilizador no
+      eixo da fuselagem e deriva com raiz no topo da fuselagem à sua estação (PRESSUPOSTO); ``surfaces.<comp>``
+      (z_m, incidence_deg, dihedral_deg) sobrepõe."""
     recs: list[dict[str, Any]] = []
-    x_w = float(fus.get("x_wing_m") or 0.35 * res.config.fuselage.length)
+    notes: list[str] = []
+    cfg = res.config
+    ov = o.get("surfaces") or {}
+    gs = res.spec.assumptions.get("geometry", {}) or {}
+    x_w = float(fus.get("x_wing_m") or 0.35 * cfg.fuselage.length)
     wb = wing_box_summary(res)
-    recs.append({"comp": "asa", "box": wb, "x": x_w, "y0": 0.0, "z0": 0.0, "axis": "y", "mirror": True,
-                 "source": "structures.box (existente)"})
-    tb, notes = tail_boxes(res, o)
+    w = cfg.wing
+    zw, why = _wing_z(res)
+    if (ov.get("asa") or {}).get("z_m") is not None:
+        zw, why = float(ov["asa"]["z_m"]), "structure_layout.surfaces.asa.z_m"
+    dih = float(w.dihedral)
+    if (ov.get("asa") or {}).get("dihedral_deg") is not None:
+        dih = math.radians(float(ov["asa"]["dihedral_deg"]))
+    inc = float((ov.get("asa") or {}).get("incidence_deg", gs.get("wing_incidence_deg", 0.0)) or 0.0)
+    recs.append({"comp": "asa", "id": "asa", "box": wb, "root": [x_w, 0.0, zw],
+                 "span_vec": _span_vec(float(w.span) / 2, float(w.sweep_c4), dih), "mirror": True,
+                 "incidence_deg": inc, "c_root_m": float(w.c_root), "c_tip_m": float(w.c_tip),
+                 "source": "structures.box (existente)", "placement": f"z {zw:.3f} m ({why}), diedro "
+                 f"{math.degrees(dih):.1f}°, incidência {inc:.1f}°"})
+    if gs.get("wing_incidence_deg") is None and (ov.get("asa") or {}).get("incidence_deg") is None:
+        notes.append("asa: incidência não declarada (geometry.wing_incidence_deg) — 0° (PRESSUPOSTO, só afeta o render)")
+    tb, n_t = tail_boxes(res, o)
+    notes += n_t
     meth = str((o.get("tails") or {}).get("method", "buckling"))
     src = ("structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5" if meth == "buckling"
            else "structures_l1.tails (existente)")
-    recs.append({"comp": "estabilizador", "box": tb.get("htail"), "x": float(fus.get("x_ht_m") or 0.0), "y0": 0.0,
-                 "z0": 0.0, "axis": "y", "mirror": True, "source": src})
-    recs.append({"comp": "deriva", "box": tb.get("vtail"), "x": float(fus.get("x_vt_m") or 0.0), "y0": 0.0,
-                 "z0": 0.0, "axis": "z", "mirror": False, "source": src})
+    tails_cfg = {"estabilizador": cfg.htail, "deriva": cfg.vtail}
+    boxes = {"estabilizador": tb.get("htail"), "deriva": tb.get("vtail")}
+    asm = []
+    if asm_spec and o.get("surfaces_from_assembly", True):
+        try:
+            asm = assembly_surfaces(asm_spec)
+        except Exception as ex:  # noqa: BLE001 — recua para a colocação pela configuração, com nota
+            notes.append(f"superfícies da montagem não lidas: {type(ex).__name__}: {ex}")
+    a_wing = [a for a in asm if "wing" in a["role"] or a["role"] in ("asa", "main_wing")]
+    if a_wing and not any(t in a_wing[0]["role"] for t in ("tail", "cauda")):
+        aw = a_wing[0]
+        recs[0].update({"root": aw["root"], "span_vec": aw["span_vec"], "mirror": aw["mirror"] or recs[0]["mirror"],
+                        "incidence_deg": aw["incidence_deg"], "c_root_m": aw["c_root_m"], "c_tip_m": aw["c_tip_m"],
+                        "placement": f"montagem «{aw['name']}» (raiz, ponta, torção da raiz)"})
+        dx = float(aw["root"][0]) - x_w
+        if abs(dx) > 0.05:
+            notes.append(f"asa: ¼ de corda da raiz na montagem a x = {aw['root'][0]:.2f} m, a viga-fuselagem L1 liga a asa "
+                         f"a x = {x_w:.2f} m (Δ {dx:+.2f} m): cavernas fortes e cargas da fuselagem seguem a L1 — "
+                         "diferença relatada, não corrigida")
+    a_tail = [a for a in asm if any(t in a["role"] for t in ("tail", "cauda", "empenagem"))]
+    if a_tail:
+        for a in a_tail:
+            v = a["span_vec"]
+            a["comp"] = "deriva" if abs(v[2]) > math.hypot(v[1], 0.0) else "estabilizador"
+        kinds = {a["comp"] for a in a_tail}
+        for comp in ("estabilizador", "deriva"):
+            panels = [a for a in a_tail if a["comp"] == comp]
+            n = sum(2 if a["mirror"] else 1 for a in panels)
+            for a in panels:
+                sides = 2 if a["mirror"] else 1
+                # caixão do estabilizador = duas metades; da deriva = uma: fração por painel
+                share = (sides / n) if comp == "deriva" else (sides / max(n, 1))
+                recs.append({"comp": comp, "id": f"{comp}:{a['name']}", "box": boxes[comp], "root": a["root"],
+                             "span_vec": a["span_vec"], "mirror": a["mirror"], "incidence_deg": a["incidence_deg"],
+                             "c_root_m": a["c_root_m"], "c_tip_m": a["c_tip_m"], "share": share, "source": src,
+                             "placement": f"montagem «{a['name']}»"})
+        other = {"estabilizador", "deriva"} - kinds
+        for comp in other:
+            if boxes[comp] is None:
+                continue
+            n = len(a_tail)
+            for a in a_tail:
+                recs.append({"comp": comp, "id": f"{comp}:{a['name']}", "box": boxes[comp], "root": a["root"],
+                             "span_vec": a["span_vec"], "mirror": a["mirror"], "incidence_deg": 0.0,
+                             "c_root_m": a["c_root_m"], "c_tip_m": a["c_tip_m"], "share": 1.0 / n, "beam": False,
+                             "source": src, "placement": f"montagem «{a['name']}» (só massa)"})
+            notes.append(f"cauda da montagem só com painéis de {'/'.join(sorted(kinds))}: caixão equivalente de {comp} "
+                         "(L1) entra só como massa repartida pelos painéis; rigidez dos painéis = caixão de "
+                         f"{'/'.join(sorted(kinds))} (PRESSUPOSTO — cauda em V/V invertido)")
+        n_pan = sum(2 if a["mirror"] else 1 for a in a_tail)
+        notes.append(f"empenagem da montagem: {n_pan} painel(éis) ({', '.join(a['name'] for a in a_tail)}) — "
+                     "posição real; caixão L1 repartido pelos painéis (PRESSUPOSTO)")
+        return recs, notes
+    if asm:
+        notes.append("montagem sem superfícies de cauda (sem empenagem — p. ex. asa voadora): estabilizador/deriva do "
+                     "modelo de tipo fixo não colocados na tabela de membros nem no modelo de vigas")
+        return recs, notes
+    tab = (body or {}).get("shell_table") or []
+    xs_b, Rs_b = [float(r["x_m"]) for r in tab], [float(r["R_m"]) for r in tab]
+    for comp, key in (("estabilizador", "htail"), ("deriva", "vtail")):
+        surf = tails_cfg[comp]
+        bx = boxes[comp]
+        x_t = float(fus.get(f"x_{'ht' if key == 'htail' else 'vt'}_m") or 0.0)
+        oc = ov.get(comp) or {}
+        if comp == "deriva":
+            z_t = float(np.interp(x_t, xs_b, Rs_b)) if xs_b else 0.0
+            zwhy = "topo da fuselagem R(x) (PRESSUPOSTO)"
+        else:
+            z_t, zwhy = 0.0, "eixo da fuselagem (PRESSUPOSTO)"
+        if oc.get("z_m") is not None:
+            z_t, zwhy = float(oc["z_m"]), f"structure_layout.surfaces.{comp}.z_m"
+        semi = float(bx["semispan_m"]) if bx else (0.0 if surf is None else float(surf.as_wing().span) / 2)
+        sw = float(getattr(surf, "sweep_c4", 0.0) or 0.0) if surf is not None else 0.0
+        dh = math.radians(float(oc.get("dihedral_deg", 0.0) or 0.0))
+        recs.append({"comp": comp, "id": comp, "box": bx, "root": [x_t, 0.0, z_t],
+                     "span_vec": _span_vec(semi, sw, dh, vertical=comp == "deriva"), "mirror": comp != "deriva",
+                     "incidence_deg": float(oc.get("incidence_deg", 0.0) or 0.0),
+                     "c_root_m": float(bx["c_root_m"]) if bx else 0.0, "c_tip_m": float(bx["c_tip_m"]) if bx else 0.0,
+                     "source": src, "placement": f"z {z_t:.3f} m ({zwhy})"})
     return recs, notes
 
 
+def _legacy(rec: dict[str, Any]) -> dict[str, Any]:
+    """Campos antigos (x, y0, z0, axis) a partir de root/span_vec."""
+    v = rec["span_vec"]
+    rec.setdefault("x", float(rec["root"][0]))
+    rec.setdefault("y0", float(rec["root"][1]))
+    rec.setdefault("z0", float(rec["root"][2]))
+    rec.setdefault("axis", "z" if abs(v[2]) > abs(v[1]) else "y")
+    return rec
+
+
 def surface_members(rec: dict[str, Any]) -> list[dict[str, Any]]:
+    _legacy(rec)
     if rec["box"] is None:
-        return [member(f"{rec['comp']}.caixao", rec["comp"], "caixao", None, rec["x"], verdict="desconhecido",
-                       method="caixão em falta", source=rec["source"])]
+        return [member(f"{rec.get('id', rec['comp'])}.caixao", rec["comp"], "caixao", None, rec["x"],
+                       verdict="desconhecido", method="caixão em falta", source=rec["source"])]
     return box_members(rec["comp"], rec["box"], rec["x"], rec["y0"], rec["z0"], rec["axis"], rec["mirror"],
-                       rec["source"])
+                       rec["source"], span_vec=rec["span_vec"], share=float(rec.get("share", 1.0)),
+                       prefix=rec.get("id"))
 
 
 # ------------------------------------------------------------------------------------------------ fuselage
@@ -995,8 +1182,118 @@ def _lug_member(mid: str, comp: str, P_lim: float, n: int, pos: list[tuple[float
 _FS_LAYOUT = 1.5
 
 
+def strut_layout(res: Any, o: dict[str, Any], recs: list[dict[str, Any]], body: dict[str, Any] | None,
+                 mat: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any] | None, list[str]]:
+    """Escora da asa (``strut.enabled``): barra bi-articulada entre a asa (``y_frac`` da semienvergadura, longarina
+    dianteira) e a fuselagem (ângulo ``fus_theta_deg`` da secção à mesma estação).
+
+    Cargas (estática): asa articulada na raiz (ferragens à face da fuselagem, y_h = R) e apoiada na escora; o
+    momento da carga da asa em torno da articulação é o momento fletor da viga em consola nesse ponto,
+    M(y_h) (:mod:`.structures`, LIMITE a n_lim+, com alívio de inércia), logo a reação vertical na escora é
+    F_v = M(y_h)/(y_s − y_h) e o esforço axial T = F_v L/Δz (tração a n+); a n− (n_lim−/n_lim+, linear) a escora
+    fica à compressão C = T |n−|/n+. Tubo redondo de diâmetro ``D_m`` (PRESSUPOSTO): espessura mínima (passos de
+    0,1 mm) com A Ftu ≥ T_u e A σ_cr ≥ C_u, σ_cr de Euler–Johnson com L'/ρ = L/ρ (bi-articulada, c = 1 — Bruhn C2);
+    F_cc = F_cy (encurvadura local do tubo não verificada — PRESSUPOSTO). Cargas últimas = 1,5 × limite."""
+    so = o.get("strut") or {}
+    if not so.get("enabled"):
+        return [], None, []
+    notes: list[str] = []
+    st = getattr(res, "structures", None)
+    wrec = next((r for r in recs if r["comp"] == "asa"), None)
+    if st is None or wrec is None or getattr(st, "vn", None) is None:
+        return [member("escora", "escora", "escora", None, 0.0, verdict="desconhecido",
+                       method="escora sem cargas da asa (structures/V-n em falta)")], None, notes
+    w = res.config.wing
+    r0, sv = np.asarray(wrec["root"], float), np.asarray(wrec["span_vec"], float)
+    semi = float(np.hypot(sv[1], sv[2]))
+    eta = float(so.get("y_frac") or 0.5)
+    xc_o = so.get("x_c")
+    xc = float(xc_o) if xc_o is not None else float(w.box.front_spar_xc)
+    c_s = float(wrec["c_root_m"]) + (float(wrec["c_tip_m"]) - float(wrec["c_root_m"])) * eta
+    P1 = r0 + eta * sv + np.array([(xc - 0.25) * c_s, 0.0, 0.0])
+    tab = (body or {}).get("shell_table") or []
+    R_f = (float(np.interp(P1[0], [float(r["x_m"]) for r in tab], [float(r["R_m"]) for r in tab])) if tab
+           else 0.5 * float(res.config.fuselage.max_diameter))
+    th = math.radians(float(so.get("fus_theta_deg", 120.0)))
+    P0 = np.array([P1[0], R_f * math.sin(th), R_f * math.cos(th)])
+    d = P1 - P0
+    L = float(np.linalg.norm(d))
+    dz = float(d[2])
+    if dz <= 1e-3 or L <= 0:
+        return [member("escora", "escora", "escora", None, float(P1[0]), verdict="desconhecido",
+                       method=f"geometria da escora inválida (Δz = {dz:.3f} m: a asa tem de ficar acima da ligação)")], \
+            None, notes
+    y_b = np.asarray(st.beam.y, float)
+    y_h = R_f
+    y_s = float(P1[1])
+    M_h = abs(float(np.interp(y_h, y_b, np.asarray(st.beam.moment, float))))
+    V_h = abs(float(np.interp(y_h, y_b, np.asarray(st.beam.shear, float))))
+    F_v = M_h / max(y_s - y_h, 1e-6)
+    T_lim = F_v * L / dz
+    F_h = F_v * float(d[1]) / dz
+    n_pos, n_neg = float(st.vn.n_limit_pos), float(st.vn.n_limit_neg)
+    C_lim = T_lim * abs(n_neg) / max(n_pos, 1e-9)
+    smat = material_dict(str(so.get("material") or mat["key"]))
+    T_u, C_u = _FS_LAYOUT * T_lim, _FS_LAYOUT * C_lim
+
+    def size(D: float, t_floor: float) -> dict[str, Any]:
+        t = max(float(smat.get("t_min") or 0.5e-3), 0.5e-3, t_floor)
+        out: dict[str, Any] = {}
+        while t < 0.5 * D:
+            A = math.pi / 4 * (D**2 - (D - 2 * t) ** 2)
+            Iy = math.pi / 64 * (D**4 - (D - 2 * t) ** 4)
+            rho = math.sqrt(Iy / A)
+            scr = fr.euler_johnson(float(smat["E"]), float(smat["Fcy"]), L / rho)
+            RF_t = A * float(smat["Ftu"]) / T_u if T_u > 0 else math.inf
+            RF_c = A * scr / C_u if C_u > 0 else math.inf
+            out = {"D_m": D, "t_m": t, "A_m2": A, "I_m4": Iy, "rho_m": rho, "L_rho": L / rho, "sigma_cr_Pa": scr,
+                   "RF_tension": RF_t, "RF_compression": RF_c}
+            if min(RF_t, RF_c) >= 1.0:
+                break
+            t = round(t + 1e-4, 7)
+        return out
+    if so.get("D_m"):
+        best = size(float(so["D_m"]), 0.0)
+    else:   # D livre: tubo mais leve em 20–120 mm com D/t ≤ 50 (encurvadura local não crítica — PRESSUPOSTO)
+        cands = [size(float(D), float(D) / 50) for D in np.arange(0.020, 0.1201, 0.005)]
+        ok = [c for c in cands if c and min(c["RF_tension"], c["RF_compression"]) >= 1.0]
+        best = min(ok or cands, key=lambda c: c.get("A_m2", math.inf))
+        notes.append(f"escora: diâmetro escolhido pela menor massa em 20–120 mm com D/t ≤ 50 (PRESSUPOSTO): "
+                     f"Ø{best['D_m'] * 1e3:.0f} mm")
+    D = float(best["D_m"])
+    assert best is not None
+    RF = min(best["RF_tension"], best["RF_compression"])
+    m1 = float(smat["rho"]) * best["A_m2"] * L
+    rows = []
+    for side, nm in ((1.0, "dir"), (-1.0, "esq")):
+        p0, p1 = P0 * [1, side, 1], P1 * [1, side, 1]
+        mid = 0.5 * (p0 + p1)
+        rows.append(member(f"escora.{nm}", "escora", "escora", m1, *[float(q) for q in mid],
+                           I_own=(m1 * L**2 / 12, m1 * L**2 / 12, m1 * L**2 / 12), RF=RF,
+                           method=f"barra bi-articulada, tubo Ø{D * 1e3:.0f} × {best['t_m'] * 1e3:.1f} mm "
+                                  f"({smat['name']}); tração A Ftu, compressão Euler–Johnson L/ρ = {best['L_rho']:.0f} "
+                                  f"(Bruhn C2); T_lim {T_lim:.0f} N (n {n_pos:.2f}), C_lim {C_lim:.0f} N (n {n_neg:.2f})",
+                           section={"D_m": D, "t_m": best["t_m"], "L_m": L, "material": smat["name"]},
+                           geometry={"p0_m": [float(q) for q in p0], "p1_m": [float(q) for q in p1]}))
+    P_fit = max(T_lim, C_lim)
+    rows += _lug_member("ferragem.escora", "ligacoes", P_fit, 4,
+                        [(float(P[0]), float(P[1] * sd), float(P[2])) for P in (P0, P1) for sd in (1, -1)], o,
+                        "esforço axial da escora (máx. tração/compressão LIMITE, 1 olhal por extremo)")
+    info = {"y_s_m": y_s, "y_hinge_m": y_h, "L_m": L, "angle_deg": math.degrees(math.asin(dz / L)),
+            "M_hinge_lim_Nm": M_h, "V_hinge_lim_N": V_h, "F_v_lim_N": F_v, "F_h_lim_N": F_h,
+            "T_lim_N": T_lim, "C_lim_N": C_lim, "n_pos": n_pos, "n_neg": n_neg, "D_m": D, **best,
+            "RF": RF, "mass_each_kg": m1, "p0_m": P0.tolist(), "p1_m": P1.tolist(), "material": smat["name"]}
+    notes.append(f"escora: y_s {y_s:.2f} m ({eta:.2f} b/2), L {L:.2f} m, {info['angle_deg']:.1f}°; F_v {F_v:.0f} N, "
+                 f"T_lim {T_lim:.0f} N, C_lim {C_lim:.0f} N; tubo Ø{D * 1e3:.0f} × {best['t_m'] * 1e3:.1f} mm, "
+                 f"{m1:.2f} kg cada, RF {RF:.2f} — geometria PRESSUPOSTO (declarar a do projeto); caixão da asa "
+                 "mantém-se dimensionado em consola (conservativo); flexão-compressão da asa entre a raiz e a escora "
+                 "(F_h) não verificada")
+    return rows, info, notes
+
+
 def fittings_layout(res: Any, o: dict[str, Any], fus: dict[str, Any], booms: list[dict[str, Any]],
-                    boom_defs: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any], list[str]]:
+                    boom_defs: list[dict[str, Any]], strut: dict[str, Any] | None = None, z_wing: float = 0.0,
+                    tails_present: bool = True) -> tuple[list[dict[str, Any]], dict[str, Any], list[str]]:
     """Ferragens das ligações principais (cargas LIMITE das fontes já existentes, cada uma com a sua origem):
 
     * asa–fuselagem: binário de raiz da asa (``structures.beam``, asa em consola — PRESSUPOSTO) por banzo,
@@ -1016,7 +1313,19 @@ def fittings_layout(res: Any, o: dict[str, Any], fus: dict[str, Any], booms: lis
     R_f = 0.5 * float(cfg.fuselage.max_diameter)
     st = getattr(res, "structures", None)
     x_w = float(fus.get("x_wing_m") or 0.35 * cfg.fuselage.length)
-    if st is not None and fo.get("wing_root", True):
+    if st is not None and fo.get("wing_root", True) and strut:
+        w = cfg.wing
+        x_f = x_w + (w.box.front_spar_xc - 0.25) * w.c_root
+        x_r = x_w + (w.box.rear_spar_xc - 0.25) * w.c_root
+        R_v = float(strut["V_hinge_lim_N"]) - float(strut["F_v_lim_N"])
+        P = math.hypot(R_v, float(strut["F_h_lim_N"])) / 2
+        pos = [(x, s * R_f, z_wing) for x in (x_f, x_r) for s in (1, -1)]
+        rows += _lug_member("ferragem.asa_fuselagem", "ligacoes", P, 4, pos, o,
+                            f"asa escorada articulada na raiz: |(V(y_h) − F_v, F_h)| = |({R_v:.0f}, "
+                            f"{float(strut['F_h_lim_N']):.0f})| N / 2 longarinas")
+        notes.append("asa–fuselagem: asa escorada — ferragens da raiz só com a reação da articulação (o binário vai "
+                     "para a escora)")
+    elif st is not None and fo.get("wing_root", True):
         w = cfg.wing
         M = abs(float(st.beam.moment[0]))
         h = 0.9 * float(w.tc_root) * float(w.c_root)
@@ -1041,7 +1350,7 @@ def fittings_layout(res: Any, o: dict[str, Any], fus: dict[str, Any], booms: lis
                                 [(xf, 0.0, z_g), (xf, 0.0, z_g)], o, "reação do trem da frente / 2 olhais")
     tails = (getattr(res.structures_l1, "tails", None) or {}) if getattr(res, "structures_l1", None) else {}
     has_boom_tail = any(ld.get("kind") == "tail" for b in boom_defs for ld in (b.get("loads") or []))
-    if fo.get("tails", True) and not has_boom_tail:
+    if fo.get("tails", True) and not has_boom_tail and tails_present:
         Lt = float(fus.get("L_tail_design_N") or 0.0)
         x_ht = float(fus.get("x_ht_m") or 0.0)
         if Lt:
@@ -1140,7 +1449,7 @@ def engine_mount_layout(res: Any, o: dict[str, Any], fus: dict[str, Any], R_f: f
 
 # ------------------------------------------------------------------------------------------------ beam model
 def beam_model(mat: dict[str, Any], bodies: list[dict[str, Any]], surfaces: list[dict[str, Any]],
-               members: list[dict[str, Any]]) -> dict[str, Any]:
+               members: list[dict[str, Any]], strut: dict[str, Any] | None = None) -> dict[str, Any]:
     """Modelo de vigas neutro ``acdt.beam/1`` do avião inteiro: corpos (fuselagem, booms: eixo x a (y0, z0)) e
     superfícies (asa/estabilizador em ±y, deriva em +z) com EI/GJ por estação; cada superfície liga ao nó de corpo
     mais próximo da sua raiz (ou cria um). Massas concentradas no nó mais próximo; barras sem massa."""
@@ -1173,30 +1482,61 @@ def beam_model(mat: dict[str, Any], bodies: list[dict[str, Any]], surfaces: list
                           "A": 0.5 * (bm["A"][k] + bm["A"][k + 1]), "I1": Iav, "I2": Iav,
                           "J": 0.5 * (bm["J"][k] + bm["J"][k + 1])})
     for sf in surfaces:
+        if sf.get("beam", True) is False:
+            continue                   # só massa (p. ex. caixão equivalente de uma cauda em V)
         bx = sf.get("box")
         if not bx or not bx.get("EI") or not bx.get("GJ"):
             missing.append(f"{sf['comp']} (EI/GJ do caixão)")
             continue
-        xr, yr, zr = float(sf["x"]), float(sf.get("y0", 0.0)), float(sf.get("z0", 0.0))
+        if "root" in sf:
+            r0 = np.asarray(sf["root"], float)
+            sv = np.asarray(sf["span_vec"], float)
+        else:   # registo antigo: eixo y ou z a partir de (x, y0, z0)
+            r0 = np.array([float(sf["x"]), float(sf.get("y0", 0.0)), float(sf.get("z0", 0.0))])
+            sp = float(bx["semispan_m"])
+            sv = np.array([0.0, sp, 0.0]) if sf.get("axis", "y") == "y" else np.array([0.0, 0.0, sp])
+        semi = max(float(bx["semispan_m"]), 1e-9)
         cand = body_nodes + [i for _c, ids_b, _x, _b in attach for i in ids_b]
+        EImax, GJmax = max(bx["EI"]), max(bx["GJ"])
         if cand:
-            d = [math.dist(nodes[i - 1]["xyz"], [xr, yr, zr]) for i in cand]
-            root = cand[int(np.argmin(d))]
+            d = [math.dist(nodes[i - 1]["xyz"], r0.tolist()) for i in cand]
+            jb = cand[int(np.argmin(d))]
+            if min(d) > 1e-6:          # raiz fora do eixo do corpo: nó próprio + ligação rígida ao nó do corpo
+                root = node(*[float(q) for q in r0])
+                elems.append({"id": len(elems) + 1, "component": f"ligacao:{sf.get('id', sf['comp'])}",
+                              "nodes": [jb, root], "A": 1e-2, "I1": 10 * EImax / E, "I2": 10 * EImax / E,
+                              "J": 10 * GJmax / G})
+                owner[root] = str(sf["comp"])
+            else:
+                root = jb
         else:
-            root = node(xr, yr, zr)
+            root = node(*[float(q) for q in r0])
+        tips = []
         for side in ((1.0, -1.0) if sf.get("mirror", True) else (1.0,)):
+            v = sv * np.array([1.0, side, 1.0])
             prev = root
             for k, s_ in enumerate(bx["y"]):
                 if s_ <= 1e-9:
                     continue
-                pos = [xr, yr + side * float(s_), zr] if sf.get("axis", "y") == "y" else [xr, yr, zr + float(s_)]
-                nid = node(*pos)
+                nid = node(*[float(q) for q in r0 + (float(s_) / semi) * v])
                 EI = 0.5 * (bx["EI"][k - 1] + bx["EI"][k])
                 GJ = 0.5 * (bx["GJ"][k - 1] + bx["GJ"][k])
                 elems.append({"id": len(elems) + 1, "component": sf["comp"], "nodes": [prev, nid], "A": 1e-4,
                               "I1": EI / E, "I2": 10 * EI / E, "J": GJ / G})
                 owner[nid] = str(sf["comp"])
                 prev = nid
+            tips.append(prev)
+        # ponta junto de outro corpo (p. ex. estabilizador entre os booms): ligação rígida (PRESSUPOSTO)
+        L_p = float(np.linalg.norm(sv))
+        for tnode in tips:
+            others = [i for i in cand if i != root]
+            if not others:
+                continue
+            d = [math.dist(nodes[i - 1]["xyz"], nodes[tnode - 1]["xyz"]) for i in others]
+            if min(d) < max(0.1, 0.1 * L_p):
+                elems.append({"id": len(elems) + 1, "component": f"ligacao:{sf.get('id', sf['comp'])}:ponta",
+                              "nodes": [others[int(np.argmin(d))], tnode], "A": 1e-2, "I1": 10 * EImax / E,
+                              "I2": 10 * EImax / E, "J": 10 * GJmax / G})
     for comp, ids, xa, bm in attach:   # ligação rígida do boom ao nó mais próximo de outro componente
         k = int(np.argmin([abs(nodes[i - 1]["xyz"][0] - xa) for i in ids]))
         others = [i for i in owner if owner[i] != comp and i not in ids]
@@ -1207,6 +1547,24 @@ def beam_model(mat: dict[str, Any], bodies: list[dict[str, Any]], surfaces: list
         elems.append({"id": len(elems) + 1, "component": f"ligacao:{comp}", "nodes": [j, ids[k]],
                       "A": 10 * max(bm["A"]), "I1": 10 * max(bm["I"]), "I2": 10 * max(bm["I"]),
                       "J": 10 * max(bm["J"])})
+    if strut and body_nodes:      # escora bi-articulada: barra só axial (I, J ≈ 0) fuselagem → nó da asa mais próximo
+        wing_nodes = [i for i, c in owner.items() if c == "asa"]
+        for sd in (1.0, -1.0):
+            p0 = [float(q) for q in np.asarray(strut["p0_m"], float) * [1, sd, 1]]
+            p1 = [float(q) for q in np.asarray(strut["p1_m"], float) * [1, sd, 1]]
+            if not wing_nodes:
+                missing.append("escora: sem nós da asa")
+                break
+            jb = body_nodes[int(np.argmin([math.dist(nodes[i - 1]["xyz"], p0) for i in body_nodes]))]
+            n0 = node(*p0)
+            owner[n0] = "escora"
+            Ib = max(e["I1"] for e in elems if e["component"] == "fuselagem") if any(
+                e["component"] == "fuselagem" for e in elems) else 1e-6
+            elems.append({"id": len(elems) + 1, "component": "ligacao:escora", "nodes": [jb, n0], "A": 1e-2,
+                          "I1": 10 * Ib, "I2": 10 * Ib, "J": 10 * Ib})
+            jw = wing_nodes[int(np.argmin([math.dist(nodes[i - 1]["xyz"], p1) for i in wing_nodes]))]
+            elems.append({"id": len(elems) + 1, "component": "escora", "nodes": [n0, jw], "A": float(strut["A_m2"]),
+                          "I1": 1e-12, "I2": 1e-12, "J": 1e-12})
     masses = []
     for m in members:
         if not nodes or m["mass_kg"] is None or m["mass_kg"] <= 0:
@@ -1219,8 +1577,9 @@ def beam_model(mat: dict[str, Any], bodies: list[dict[str, Any]], surfaces: list
             "nodes": nodes, "elements": elems, "point_masses": masses, "missing": missing,
             "note": "barras sem massa (ρ = 0): a massa estrutural entra só como massas concentradas no nó mais próximo; "
                     "nas superfícies A simbólica (1e-4 m²), I1 = EI/E (flexão para fora do plano), I2 = 10 I1 "
-                    "(rigidez no plano — PRESSUPOSTO), J = GJ/G; a raiz de cada superfície partilha o nó de corpo mais "
-                    "próximo (ligação rígida — PRESSUPOSTO); cada boom liga ao nó mais próximo de outro componente na estação "
+                    "(rigidez no plano — PRESSUPOSTO), J = GJ/G; superfícies na posição real (raiz, diedro, flecha, "
+                    "inclinação); a raiz liga ao nó de corpo mais próximo por um elemento rígido (PRESSUPOSTO) e uma "
+                    "ponta junto de outro corpo também; cada boom liga ao nó mais próximo de outro componente na estação "
                     "de ligação por um elemento 10× mais rígido que o boom (PRESSUPOSTO). Para análise externa (p. ex. CalculiX via Build)."}
 
 
@@ -1311,19 +1670,27 @@ def layout_geometry(res: Any, fus: dict[str, Any], booms: list[dict[str, Any]], 
     for r in recs:
         bx = r.get("box")
         src = {"asa": cfg.wing, "estabilizador": cfg.htail, "deriva": cfg.vtail}.get(r["comp"])
-        if bx is None or src is None:
+        if bx is None or src is None or r.get("beam", True) is False:
             continue
+        _legacy(r)
         wing = src if r["comp"] == "asa" else src.as_wing()
         rp = getattr(wing.box, "rib_pitch", None) or 0.6 * float(wing.mac)
-        surfs.append({"comp": r["comp"], "x_c4_root_m": float(r["x"]), "y0_m": float(r["y0"]), "z0_m": float(r["z0"]),
-                      "axis": r["axis"], "mirror": bool(r["mirror"]), "semispan_m": float(bx["semispan_m"]),
-                      "c_root_m": float(bx["c_root_m"]), "c_tip_m": float(bx["c_tip_m"]),
+        sv = [float(q) for q in r["span_vec"]]
+        surfs.append({"comp": r["comp"], "id": r.get("id", r["comp"]), "root_c4_m": [float(q) for q in r["root"]],
+                      "span_vec_m": sv, "incidence_deg": float(r.get("incidence_deg") or 0.0),
+                      "x_c4_root_m": float(r["x"]), "y0_m": float(r["y0"]), "z0_m": float(r["z0"]),
+                      "axis": r["axis"], "mirror": bool(r["mirror"]), "semispan_m": float(np.hypot(sv[1], sv[2])),
+                      "c_root_m": float(r.get("c_root_m") or bx["c_root_m"]),
+                      "c_tip_m": float(r.get("c_tip_m") or bx["c_tip_m"]),
                       "sweep_c4_rad": float(getattr(src, "sweep_c4", 0.0)),
                       "front_spar_xc": float(wing.box.front_spar_xc), "rear_spar_xc": float(wing.box.rear_spar_xc),
-                      "rib_pitch_m": float(rp)})
+                      "rib_pitch_m": float(rp), "placement": r.get("placement")})
+    struts = [m for m in members if m["kind"] == "escora" and m.get("geometry")]
     return {"bodies": bodies, "surfaces": surfs,
-            "note": "superfícies no plano z0 dos registos (diedro e posição vertical da asa não modelados no layout); "
-                    "raiz da corda a 1/4 em x_c4_root"}
+            "struts": [{"id": m["id"], "p0_m": m["geometry"]["p0_m"], "p1_m": m["geometry"]["p1_m"]} for m in struts],
+            "note": "superfícies na posição real: raiz do ¼ de corda (root_c4_m), vetor raiz→ponta do lado +y "
+                    "(span_vec_m: flecha, diedro, inclinação) e incidência; com montagem, a posição das superfícies "
+                    "vem da montagem"}
 
 
 def analyse_layout(res: Any) -> dict[str, Any]:
@@ -1336,7 +1703,12 @@ def analyse_layout(res: Any) -> dict[str, Any]:
                            else {"evaluated": False, "reason": "desligada"})
     l1 = getattr(res, "structures_l1", None)
     fus_l1 = (getattr(l1, "fuselage", None) or {}) if l1 is not None else {}
-    recs, n_s = surface_records(res, o, fus_l1)
+    try:
+        asm_spec = _assembly_spec(res)
+    except Exception as ex:  # noqa: BLE001 — sem montagem: colocação pela configuração, com nota
+        asm_spec = None
+        notes.append(f"montagem não lida: {type(ex).__name__}: {ex}")
+    recs, n_s = surface_records(res, o, fus_l1, fus if fus.get("evaluated") else None, asm_spec)
     notes += n_s
     for rec in recs:
         members += surface_members(rec)
@@ -1349,7 +1721,7 @@ def analyse_layout(res: Any) -> dict[str, Any]:
     boom_defs = list(o.get("booms") or [])
     if o.get("booms_from_assembly", True):
         try:
-            ab, n_b = booms_from_assembly(_assembly_spec(res), float(res.sizing.W0),
+            ab, n_b = booms_from_assembly(asm_spec, float(res.sizing.W0),
                                           (getattr(l1, "tails", None) or {}) if l1 is not None else {}, o,
                                           fus_l1.get("x_wing_m"))
         except Exception as ex:  # noqa: BLE001 — booms da montagem ficam desconhecidos, com a razão
@@ -1371,10 +1743,20 @@ def analyse_layout(res: Any) -> dict[str, Any]:
             members.append(member(str(bd.get("id") or "boom"), str(bd.get("id") or "boom"), "boom", None,
                                   float(bd.get("x0_m") or 0.0), float(bd.get("y_m") or 0.0),
                                   float(bd.get("z_m") or 0.0), verdict="desconhecido", method=str(b.get("reason"))))
+    strut_info = None
+    try:
+        s_rows, strut_info, s_notes = strut_layout(res, o, recs, fus if fus.get("evaluated") else None, mat)
+        members += s_rows
+        notes += s_notes
+    except Exception as ex:  # noqa: BLE001 — escora fica desconhecida, com a razão
+        members.append(member("escora", "escora", "escora", None, 0.0, verdict="desconhecido",
+                              method=f"escora não avaliada: {type(ex).__name__}: {ex}"))
     fit_out: dict[str, Any] = {}
     if o["fittings"].get("enabled", True):
         try:
-            f_rows, fit_out, f_notes = fittings_layout(res, o, fus_l1, booms, boom_defs)
+            f_rows, fit_out, f_notes = fittings_layout(
+                res, o, fus_l1, booms, boom_defs, strut_info, float(recs[0]["root"][2]),
+                tails_present=any(r["comp"] in ("estabilizador", "deriva") for r in recs))
             members += f_rows
             notes += f_notes
         except Exception as ex:  # noqa: BLE001 — ferragens ficam desconhecidas, com a razão
@@ -1393,11 +1775,12 @@ def analyse_layout(res: Any) -> dict[str, Any]:
     out: dict[str, Any] = {"evaluated": True, "level": LEVEL, "material": mat, "coupling_mode": o["coupling"],
                            "members": members, "budget": bud, "verdict_counts": counts, "verdict": overall,
                            "fuselage": {k: v for k, v in fus.items() if k not in ("members",)},
-                           "booms": booms, "notes": notes, "fittings": fit_out,
+                           "booms": booms, "notes": notes, "fittings": fit_out, "strut": strut_info,
                            "surfaces": {r["comp"]: None if r["box"] is None else
                                         {"mass_kg": r["box"]["masses"].get("total"), "method": r["box"].get("method"),
                                          "section": r["box"].get("section"), "buckling_ok": r["box"].get("buckling_ok"),
-                                         "source": r["source"]} for r in recs}}
+                                         "source": r["source"], "placement": r.get("placement")}
+                                        for r in recs[::-1]}}
     try:
         out["geometry"] = layout_geometry(res, fus, booms, recs, members)
     except Exception as ex:  # noqa: BLE001 — só afeta o render
@@ -1418,7 +1801,7 @@ def analyse_layout(res: Any) -> dict[str, Any]:
                              "vtail_layout_kg": bud["by_component_kg"].get("deriva"),
                              "vtail_L1_kg": l1.masses.get("vtail_kg")}
     if o.get("export", {}).get("beam_model", True):
-        out["beam_model"] = beam_model(mat, bodies, recs, members)
+        out["beam_model"] = beam_model(mat, bodies, recs, members, strut_info)
         if (o.get("flutter") or {}).get("enabled", True):
             from .structure_flutter import layout_flutter
             try:

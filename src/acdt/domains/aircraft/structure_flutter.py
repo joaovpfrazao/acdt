@@ -110,7 +110,7 @@ def assemble(model: dict[str, Any], node_mass: dict[int, np.ndarray], fixed: lis
         p1, p2 = pos[a], pos[b]
         if np.linalg.norm(p2 - p1) < 1e-9:
             continue
-        A_e = 1.0 if e["component"] in SURFACE_AXIS else e["A"]
+        A_e = 1.0 if e["component"] in SURFACE_AXIS else e["A"]   # superfícies: axialmente rígidas
         ke = frame_element_k(p1, p2, E, G, A_e, e["I1"], e["I2"], e["J"], _v_ref((p2 - p1) / np.linalg.norm(p2 - p1)))
         dofs = [6 * ix[a] + i for i in range(6)] + [6 * ix[b] + i for i in range(6)]
         K[np.ix_(dofs, dofs)] += ke
@@ -137,13 +137,26 @@ def modes(K: np.ndarray, M: np.ndarray, keep: list[int], n: int, rigid: int) -> 
     return np.sqrt(np.maximum(w2[rigid:], 0.0)), full[:, rigid:]
 
 
+def _normal(span: np.ndarray) -> np.ndarray:
+    """Normal da superfície: x × ŝ (ŝ sem a componente em x), orientada para +z (ou +y numa deriva vertical)."""
+    sp = np.array([0.0, span[1], span[2]])
+    n = np.cross(np.array([1.0, 0.0, 0.0]), sp)
+    nn = float(np.linalg.norm(n))
+    if nn < 1e-12:
+        return np.array([0.0, 0.0, 1.0])
+    n = n / nn
+    if n[2] < -1e-9 or (abs(n[2]) <= 1e-9 and n[1] < 0):
+        n = -n
+    return n
+
+
 def strips(model: dict[str, Any], surf: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
-    """Faixas aerodinâmicas: uma por nó de superfície (exceto a raiz partilhada), largura tributária, corda c(s)
-    linear raiz→ponta, componente, eixo normal e eixo de torção."""
+    """Faixas aerodinâmicas: uma por nó de superfície (exceto a raiz), largura tributária medida na envergadura
+    (distância entre nós sem a componente em x), corda c(η) linear raiz→ponta de cada ramo, componente, vetor da
+    envergadura ``s_vec`` e normal ``n_vec`` (diedro, cauda em V e derivas em qualquer posição)."""
     pos = {n["id"]: np.asarray(n["xyz"], float) for n in model["nodes"]}
     out: list[dict[str, Any]] = []
     for comp, sd in surf.items():
-        span_ax, norm_ax = SURFACE_AXIS[comp]
         els = [e for e in model["elements"] if e["component"] == comp]
         # nós de cada ramo pela ordem dos elementos (raiz → ponta)
         chains: list[list[int]] = []
@@ -156,14 +169,20 @@ def strips(model: dict[str, Any], surf: dict[str, dict[str, Any]]) -> list[dict[
             else:
                 chains.append([a, b])
         for ch in chains:
-            root = pos[ch[0]]
-            s = np.array([abs(pos[i][_IDX[span_ax]] - root[_IDX[span_ax]]) for i in ch])
+            P = np.array([pos[i] for i in ch])
+            dP = np.diff(P, axis=0)
+            seg = np.hypot(dP[:, 1], dP[:, 2])
+            s = np.concatenate([[0.0], np.cumsum(seg)])
+            L = float(s[-1]) or 1.0
+            sv = P[-1] - P[0]
+            sv = sv / (float(np.linalg.norm(sv)) or 1.0)
+            n = _normal(sv)
             for k in range(1, len(ch)):
                 lo = 0.5 * (s[k] - s[k - 1])
                 hi = 0.5 * (s[k + 1] - s[k]) if k + 1 < len(ch) else 0.0
-                c = float(sd["c_root"] + (sd["c_tip"] - sd["c_root"]) * min(s[k] / sd["span"], 1.0))
-                out.append({"node": ch[k], "comp": comp, "ds": lo + hi, "c": c, "span_axis": span_ax,
-                            "normal": norm_ax, "e": float(sd["e"]), "x_cg_off": float(sd["x_cg_off"]),
+                c = float(sd["c_root"] + (sd["c_tip"] - sd["c_root"]) * min(s[k] / L, 1.0))
+                out.append({"node": ch[k], "comp": comp, "ds": lo + hi, "c": c, "s_vec": sv, "n_vec": n,
+                            "e": float(sd["e"]), "x_cg_off": float(sd["x_cg_off"]),
                             "a_w": float(sd["a_w"]), "m_per_c": float(sd["m_per_c"])})
     return out
 
@@ -175,8 +194,8 @@ def strip_masses(strip_list: list[dict[str, Any]]) -> dict[int, np.ndarray]:
     for st in strip_list:
         m = st["m_per_c"] * st["c"] * st["ds"]
         r = np.array([st["x_cg_off"] * st["c"], 0.0, 0.0])
-        J = np.zeros((3, 3))
-        J[_IDX[st["span_axis"]], _IDX[st["span_axis"]]] = m * st["c"] ** 2 / 12
+        sv = np.asarray(st["s_vec"], float)
+        J = m * st["c"] ** 2 / 12 * np.outer(sv, sv)
         out[st["node"]] = out.get(st["node"], np.zeros((6, 6))) + point_mass_matrix(m, r, J)
     return out
 
@@ -184,16 +203,17 @@ def strip_masses(strip_list: list[dict[str, Any]]) -> dict[int, np.ndarray]:
 def aero_matrices(strip_list: list[dict[str, Any]], phi: np.ndarray, node_ix: dict[int, int],
                   M_thetadot: float = M_THETADOT) -> tuple[np.ndarray, np.ndarray]:
     """Matrizes aerodinâmicas generalizadas por unidade de q (A_K) e de q/V (A_D): Q = q A_K η + (q/V) A_D η̇.
-    Arfagem positiva = bordo de ataque para o lado da normal (asa: rotação +y; deriva: −rotação z)."""
+    h = deslocamento segundo a normal n; arfagem positiva = bordo de ataque para o lado da normal, rotação em
+    torno de n × x (asa: +y; deriva com normal +y: −z)."""
     n = phi.shape[1]
     AK, AD = np.zeros((n, n)), np.zeros((n, n))
+    ex = np.array([1.0, 0.0, 0.0])
     for st in strip_list:
         k0 = 6 * node_ix[st["node"]]
-        h = phi[k0 + _IDX[st["normal"]], :]
-        if st["comp"] == "deriva":
-            th = -phi[k0 + 3 + 2, :]
-        else:
-            th = phi[k0 + 3 + 1, :]
+        nv = np.asarray(st["n_vec"], float)
+        pv = np.cross(nv, ex)
+        h = nv @ phi[k0:k0 + 3, :]
+        th = pv @ phi[k0 + 3:k0 + 6, :]
         c, ds, a, e = st["c"], st["ds"], st["a_w"], st["e"]
         # L' = q c a (θ − ḣ/V) ; M' = e c L' + q c² M_θ̇ c θ̇ /(4V)
         AK += ds * (np.outer(h, c * a * th) + np.outer(th, e * c**2 * a * th))
@@ -322,24 +342,39 @@ def layout_flutter(res: Any, layout: dict[str, Any], recs: list[dict[str, Any]],
     notes: list[str] = []
     m_surf = 0.0
     key_of = {"asa": "wing", "estabilizador": "htail", "deriva": "vtail"}
+    by_comp: dict[str, list[dict[str, Any]]] = {}
     for r in recs:
-        comp, bx = r["comp"], r.get("box")
+        if r.get("beam", True) is not False:
+            by_comp.setdefault(r["comp"], []).append(r)
+    mass_only = {r["comp"] for r in recs if r.get("beam", True) is False}
+    for comp, rs in by_comp.items():
+        bx = rs[0].get("box")
         if bx is None or not any(e["component"] == comp for e in model["elements"]):
             notes.append(f"{comp}: sem caixão no modelo de vigas — fora do modelo aeroelástico")
             continue
-        sp, cr, ct = float(bx.get("semispan_m") or 0.0), float(bx.get("c_root_m") or 0.0), float(bx.get("c_tip_m") or 0.0)
-        if sp <= 0 or cr <= 0:
+        cr = float(rs[0].get("c_root_m") or bx.get("c_root_m") or 0.0)
+        ct = float(rs[0].get("c_tip_m") or bx.get("c_tip_m") or 0.0)
+        area = 0.0
+        for r in rs:
+            L_p = float(np.hypot(r["span_vec"][1], r["span_vec"][2])) if "span_vec" in r else float(bx.get("semispan_m") or 0.0)
+            area += (2 if r.get("mirror", True) else 1) * 0.5 * (float(r.get("c_root_m") or cr)
+                                                                 + float(r.get("c_tip_m") or ct)) * L_p
+        if area <= 0 or cr <= 0:
             notes.append(f"{comp}: geometria do caixão incompleta — fora do modelo aeroelástico")
             continue
-        sides = 2 if r.get("mirror", True) else 1
-        area_side = 0.5 * (cr + ct) * sp
         m_tot = items.get(key_of[comp])
         if m_tot is None:
-            m_tot = float((bx.get("masses") or {}).get("total") or 0.0) * sides
+            m_tot = sum(float((bx.get("masses") or {}).get("total") or 0.0) * float(r.get("share", 1.0))
+                        * (2 if r.get("mirror", True) else 1) for r in rs)
             notes.append(f"{comp}: sem item no build-up; massa do caixão paramétrico ({m_tot:.2f} kg)")
+        for other in mass_only:        # cauda em V: os painéis levam também a massa da superfície equivalente
+            mo = items.get(key_of[other])
+            if mo is not None and comp in ("estabilizador", "deriva"):
+                m_tot += mo
+                notes.append(f"{comp}: painéis da cauda em V levam também a massa de {other} ({mo:.2f} kg, build-up)")
         m_surf += m_tot
-        surf[comp] = {"span": sp, "c_root": cr, "c_tip": ct, "e": xf - 0.25, "x_cg_off": xcg - xf,
-                      "a_w": float(o.get("a_w") or 2 * math.pi), "m_per_c": m_tot / sides / area_side}
+        surf[comp] = {"span": float(bx.get("semispan_m") or 0.0), "c_root": cr, "c_tip": ct, "e": xf - 0.25,
+                      "x_cg_off": xcg - xf, "a_w": float(o.get("a_w") or 2 * math.pi), "m_per_c": m_tot / area}
     if "asa" not in surf:
         return {"evaluated": False, "verdict": "desconhecido", "reason": "asa fora do modelo de vigas", "notes": notes}
     W0 = float(res.sizing.W0)
@@ -370,16 +405,17 @@ def layout_flutter(res: Any, layout: dict[str, Any], recs: list[dict[str, Any]],
               "ESTIMATIVA de baixa fidelidade (quase-estacionária, ρ0 → EAS): flutter de corpo livre, superfícies de "
               "comando (massa/folgas/compensação) e efeitos de compressibilidade fora do âmbito — certificação pede "
               ":mod:`hifi.flutter` ou ensaio"]
-    # empenagem lida ao centro mas presa a um boom (twin-boom): o modelo liga a raiz a um só nó de um dos booms
-    # (assimétrico) — o número fica relatado, o veredicto passa a desconhecido
-    # twin-boom: os booms levam a cauda (cargas «voo_cauda»), mas o layout regista a empenagem ao centro, presa ao
-    # casulo — no modelo de vigas os booms ficam consolas sem a massa da cauda. Número relatado, veredicto
-    # desconhecido até a empenagem ligar aos booms
+    # twin-boom: os booms levam a cauda; se a empenagem do modelo não ficou presa a esses booms (sem montagem), o
+    # número fica relatado e o veredicto passa a desconhecido
     tb = [str(b.get("id")) for b in layout.get("booms", []) if b.get("evaluated") and b.get("carries_tail")]
-    if tb:
+    tail_on_booms = any(r.get("placement", "").startswith("montagem") and r["comp"] in ("estabilizador", "deriva")
+                        for r in recs)
+    if tb and not tail_on_booms:
         r["verdict_computed"] = r["verdict"]
         r["verdict"] = "desconhecido"
         notes.append(f"booms {', '.join(tb)} levam a cauda, mas a empenagem do layout está ao centro (presa ao corpo "
                      f"principal): V_F calculado {r['V_F_eas']:.1f} m/s fica relatado, veredicto desconhecido")
+    elif tb:
+        notes.append(f"empenagem na posição da montagem, presa aos booms {', '.join(tb)} pela raiz de cada painel")
     r["notes"] = notes
     return r

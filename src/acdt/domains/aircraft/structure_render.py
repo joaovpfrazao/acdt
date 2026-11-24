@@ -24,13 +24,14 @@ KIND_COLORS: dict[str, str] = {
     "revestimento": "#9aa5b1", "caverna": "#4e79a7", "caverna_pesada": "#d62728", "antepara": "#f28e2b",
     "reforcador": "#59a14f", "longarina": "#1b5e20", "alma_longarina": "#1f3a93", "nervura": "#17becf",
     "piso": "#8c564b", "viga_piso": "#5d3a1a", "soleira": "#e377c2", "ferragem": "#111111",
-    "berco_motor": "#7f7f7f", "boom": "#9467bd",
+    "berco_motor": "#7f7f7f", "boom": "#9467bd", "escora": "#bcbd22",
 }
 LABELS: dict[str, str] = {
     "caverna": "cavernas", "caverna_pesada": "cavernas fortes", "antepara": "anteparas", "reforcador": "reforçadores",
     "longarina": "longarinas (fuselagem)", "alma_longarina": "longarinas (caixões)", "nervura": "nervuras",
     "piso": "piso", "viga_piso": "vigas de piso", "soleira": "soleiras de aberturas", "ferragem": "ferragens",
     "berco_motor": "berço do motor", "boom": "cavernas dos booms", "revestimento": "revestimento",
+    "escora": "escoras da asa",
 }
 
 
@@ -47,24 +48,41 @@ def _section_xyz(R: float, w: float | None, h: float | None, n_exp: float, k: in
 
 
 def _surface_lines(sf: dict[str, Any]) -> dict[str, Any]:
-    """Planta da superfície: bordos, longarinas e nervuras em coordenadas globais (um lado ou os dois)."""
-    s, cr, ct, sw = sf["semispan_m"], sf["c_root_m"], sf["c_tip_m"], sf.get("sweep_c4_rad", 0.0)
+    """Planta da superfície: bordos, longarinas e nervuras em coordenadas globais (um lado ou os dois). Com
+    ``root_c4_m``/``span_vec_m`` (layout com colocação real) segue diedro, flecha, inclinação e incidência; sem
+    eles, o plano z0 antigo."""
+    cr, ct = sf["c_root_m"], sf["c_tip_m"]
     fs, rs = sf["front_spar_xc"], sf["rear_spar_xc"]
     pitch = max(float(sf.get("rib_pitch_m") or 0.6 * (cr + ct) / 2), 1e-3)
     sides = (1.0, -1.0) if sf.get("mirror", True) else (1.0,)
     out: dict[str, list[Any]] = {"outline": [], "spars": [], "ribs": []}
-    eta_ribs = np.unique(np.append(np.arange(0.0, s, pitch), s))
+    if sf.get("span_vec_m") is not None:
+        r0 = np.asarray(sf["root_c4_m"], float)
+        sv = np.asarray(sf["span_vec_m"], float)
+        s = float(np.hypot(sv[1], sv[2])) or 1e-9
+        inc = math.radians(float(sf.get("incidence_deg") or 0.0))
+    else:
+        s, sw = sf["semispan_m"], sf.get("sweep_c4_rad", 0.0)
+        r0 = np.array([sf["x_c4_root_m"], sf["y0_m"], sf["z0_m"]], float)
+        sv = (np.array([s * math.tan(sw), 0.0, s]) if sf.get("axis", "y") == "z"
+              else np.array([s * math.tan(sw), s, 0.0]))
+        inc = 0.0
+    eta_ribs = np.unique(np.append(np.arange(0.0, s, pitch), s)) / s
 
     def P(eta: float, xc: float, side: float) -> tuple[float, float, float]:
-        c = cr + (ct - cr) * eta / s
-        x = sf["x_c4_root_m"] + eta * math.tan(sw) + (xc - 0.25) * c
-        if sf.get("axis", "y") == "z":
-            return x, sf["y0_m"], sf["z0_m"] + eta
-        return x, sf["y0_m"] + side * eta, sf["z0_m"]
+        v = sv * np.array([1.0, side, 1.0])
+        n = np.cross([1.0, 0.0, 0.0], [0.0, v[1], v[2]])
+        n = n / (np.linalg.norm(n) or 1.0)
+        if n[2] < 0 or (abs(n[2]) < 1e-9 and n[1] < 0):
+            n = -n
+        cdir = math.cos(inc) * np.array([1.0, 0.0, 0.0]) - math.sin(inc) * n   # incidência: bordo de fuga desce
+        c = cr + (ct - cr) * eta
+        p = r0 + eta * v + (xc - 0.25) * c * cdir
+        return float(p[0]), float(p[1]), float(p[2])
 
     for sd in sides:
-        out["outline"].append([P(0, 0, sd), P(s, 0, sd), P(s, 1, sd), P(0, 1, sd)])
-        out["spars"] += [[P(0, fs, sd), P(s, fs, sd)], [P(0, rs, sd), P(s, rs, sd)]]
+        out["outline"].append([P(0, 0, sd), P(1, 0, sd), P(1, 1, sd), P(0, 1, sd)])
+        out["spars"] += [[P(0, fs, sd), P(1, fs, sd)], [P(0, rs, sd), P(1, rs, sd)]]
         out["ribs"] += [[P(e, fs, sd), P(e, rs, sd)] for e in eta_ribs]
     return out
 
@@ -172,9 +190,11 @@ def render_layout(layout: dict[str, Any], path: str | Path, color_by: str = "kin
             ax.add_collection3d(Poly3DCollection([q], alpha=0.08, facecolor="#9aa5b1", edgecolor="#6b7680", lw=0.4))
             pts.append(np.asarray(q))
         for sp in L["spars"]:
-            line(sp, "alma_longarina", f"{sf['comp']}.caps", lw=2.2)
+            line(sp, "alma_longarina", f"{sf.get('id', sf['comp'])}.caps", lw=2.2)
         for rb in L["ribs"]:
-            line(rb, "nervura", f"{sf['comp']}.ribs", lw=0.9)
+            line(rb, "nervura", f"{sf.get('id', sf['comp'])}.ribs", lw=0.9)
+    for es in geo.get("struts", []):
+        line([es["p0_m"], es["p1_m"]], "escora", es["id"], lw=3.0)
     # ---- ferragens e berço
     for m in layout["members"]:
         if m["kind"] == "ferragem" and m.get("mass_kg") is not None:
