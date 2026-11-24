@@ -85,6 +85,11 @@ def run_case(case: dict, out: Path) -> dict:
     (out / f"{cid}_vigas.json").write_text(json.dumps(_clean(r["beam_model"]), indent=1, ensure_ascii=False),
                                            encoding="utf-8")
     (out / f"{cid}_vigas.bdf").write_text(to_nastran(r["beam_model"]), encoding="utf-8")
+    if case.get("render"):
+        from acdt.domains.aircraft.structure_render import render_layout
+        name = cid.removesuffix("_detalhe")
+        summ["render_png"] = [str(render_layout(r, out / f"{name}_estrutura_3d.png")),
+                              str(render_layout(r, out / f"{name}_estrutura_3d_rf.png", color_by="RF"))]
     return summ
 
 

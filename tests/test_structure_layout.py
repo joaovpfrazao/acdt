@@ -444,3 +444,18 @@ def test_twin_boom_pod_noncircular_floor_declared():
     assert f["section"]["noncircular"] and f["floor"]["evaluated"]
     assert any(m["kind"] == "soleira" for m in r["members"])
     assert f["shell_table"][0]["perimeter_m"] < 2 * math.pi * f["shell_table"][0]["R_m"] * 1.5
+
+
+# ------------------------------------------------------------------ render 3-D da estrutura
+def test_layout_geometry_and_render(c172, tmp_path):
+    from acdt.domains.aircraft.structure_render import render_layout
+    r = c172.structure_layout
+    g = r["geometry"]
+    assert [b["comp"] for b in g["bodies"]] == ["fuselagem"]
+    assert {s["comp"] for s in g["surfaces"]} == {"asa", "estabilizador", "deriva"}
+    fus = g["bodies"][0]
+    assert len(fus["frames"]) == sum(1 for m in r["members"] if m["kind"].startswith("caverna"))
+    assert fus["bulkheads"] and fus["floor"] and fus["n_stringers"] > 0
+    for mode in ("kind", "RF"):
+        p = render_layout(r, tmp_path / f"c172_{mode}.png", color_by=mode, dpi=60)
+        assert p.exists() and p.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n" and p.stat().st_size > 10_000

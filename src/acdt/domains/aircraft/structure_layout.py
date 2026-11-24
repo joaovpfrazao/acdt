@@ -694,7 +694,8 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
             "notes_body": body_notes, "floor": floor_out, "cutouts": cutouts, "pressure_Pa": p_cab,
             "section": {"w_m": w_s, "h_m": h_s, "n_exp": n_exp, "noncircular": noncirc},
             "beam": beam, "layout": {"frame_pitch_m": pitch, "frame_h_m": h, "frame_b_m": b,
-                                     "n_stringers": lay.n_stringers, "n_longerons": n_l}}
+                                     "n_stringers": lay.n_stringers, "n_longerons": n_l,
+                                     "longeron_theta_deg": list(lay.longeron_theta_deg) if n_l else []}}
 
 
 def fuselage_layout(res: Any, o: dict[str, Any], mat: dict[str, Any]) -> dict[str, Any]:
@@ -1260,6 +1261,68 @@ def _assembly_spec(res: Any) -> dict[str, Any] | None:
     return dict(load_spec(res.spec, a))
 
 
+def _body_geometry(comp: str, xs: list[float], Rs: list[float], frames: list[dict[str, Any]],
+                   members: list[dict[str, Any]], y0: float = 0.0, z0: float = 0.0, extra: dict[str, Any] | None = None
+                   ) -> dict[str, Any]:
+    bks = []
+    for m in members:
+        if m["component"] == comp and m["kind"] == "antepara":
+            R = float(np.interp(m["x_m"], xs, Rs)) if xs else 0.0
+            w_, h_ = (extra or {}).get("w_m"), (extra or {}).get("h_m")
+            Rmax = max(Rs) if Rs else 1.0
+            bks.append({"x_m": m["x_m"], "R_m": R, "member": m["id"],
+                        "w_m": w_ * R / Rmax if w_ else None, "h_m": h_ * R / Rmax if h_ else None})
+    return {"comp": comp, "x_m": xs, "R_m": Rs, "y0_m": y0, "z0_m": z0, "frames": frames, "bulkheads": bks,
+            **(extra or {})}
+
+
+def layout_geometry(res: Any, fus: dict[str, Any], booms: list[dict[str, Any]], recs: list[dict[str, Any]],
+                    members: list[dict[str, Any]]) -> dict[str, Any]:
+    """Geometria que a tabela de membros descreve, para o render 3-D (:mod:`.structure_render`) e exportação:
+    corpos (estações x, R, cavernas, anteparas, piso, aberturas, reforçadores/longarinas) e superfícies (planta,
+    longarinas a x/c do caixão, passo de nervuras do dimensionamento: ``box.rib_pitch`` ou 0,6 CMA — o mesmo
+    PRESSUPOSTO da Fase 2)."""
+    bodies = []
+    if fus.get("evaluated"):
+        tab = fus.get("shell_table") or []
+        sec = fus.get("section") or {}
+        lay = fus.get("layout") or {}
+        fl = fus.get("floor")
+        bodies.append(_body_geometry(
+            "fuselagem", [float(r["x_m"]) for r in tab], [float(r["R_m"]) for r in tab], fus.get("frames") or [],
+            members, extra={"w_m": sec.get("w_m"), "h_m": sec.get("h_m"), "n_exp": sec.get("n_exp", 2.0),
+                            "n_stringers": lay.get("n_stringers"), "longeron_theta_deg": lay.get("longeron_theta_deg"),
+                            "floor": fl if (fl and fl.get("evaluated")) else None, "cutouts": fus.get("cutouts") or []}))
+    for b in booms:
+        if not b.get("evaluated"):
+            continue
+        g = b["geometry"]
+        frs = b.get("frames") or []
+        comp = str(b.get("id") or "boom")
+        xs = [float(f["x_m"]) for f in frs] or [g["x0_m"], g["x0_m"] + g["length_m"]]
+        Rs = [float(f["R_m"]) for f in frs] or [0.5 * g["diameter_m"]] * 2
+        bodies.append(_body_geometry(comp, xs, Rs, frs, members, g["y_m"], g["z_m"],
+                                     {"n_stringers": (b.get("layout") or {}).get("n_stringers")}))
+    cfg = res.config
+    surfs = []
+    for r in recs:
+        bx = r.get("box")
+        src = {"asa": cfg.wing, "estabilizador": cfg.htail, "deriva": cfg.vtail}.get(r["comp"])
+        if bx is None or src is None:
+            continue
+        wing = src if r["comp"] == "asa" else src.as_wing()
+        rp = getattr(wing.box, "rib_pitch", None) or 0.6 * float(wing.mac)
+        surfs.append({"comp": r["comp"], "x_c4_root_m": float(r["x"]), "y0_m": float(r["y0"]), "z0_m": float(r["z0"]),
+                      "axis": r["axis"], "mirror": bool(r["mirror"]), "semispan_m": float(bx["semispan_m"]),
+                      "c_root_m": float(bx["c_root_m"]), "c_tip_m": float(bx["c_tip_m"]),
+                      "sweep_c4_rad": float(getattr(src, "sweep_c4", 0.0)),
+                      "front_spar_xc": float(wing.box.front_spar_xc), "rear_spar_xc": float(wing.box.rear_spar_xc),
+                      "rib_pitch_m": float(rp)})
+    return {"bodies": bodies, "surfaces": surfs,
+            "note": "superfícies no plano z0 dos registos (diedro e posição vertical da asa não modelados no layout); "
+                    "raiz da corda a 1/4 em x_c4_root"}
+
+
 def analyse_layout(res: Any) -> dict[str, Any]:
     o = options(res.spec)
     mkey = _material_key(res, o)
@@ -1332,6 +1395,10 @@ def analyse_layout(res: Any) -> dict[str, Any]:
                                         {"mass_kg": r["box"]["masses"].get("total"), "method": r["box"].get("method"),
                                          "section": r["box"].get("section"), "buckling_ok": r["box"].get("buckling_ok"),
                                          "source": r["source"]} for r in recs}}
+    try:
+        out["geometry"] = layout_geometry(res, fus, booms, recs, members)
+    except Exception as ex:  # noqa: BLE001 — só afeta o render
+        notes.append(f"geometria do layout não construída: {type(ex).__name__}: {ex}")
     loop = getattr(res, "structure_coupling", None)
     if o["coupling"] == "iterar":
         if loop is None:
