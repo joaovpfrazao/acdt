@@ -341,21 +341,104 @@ O avião inteiro baixa o V_F do C172 em 12 % face às faixas encastradas (raiz f
 fuselagem). No twin-boom os booms levam a cauda (cargas «voo_cauda»), mas o layout regista a empenagem ao centro,
 presa ao casulo: no modelo de vigas os booms ficam consolas sem a massa da cauda, e o flutter a 4,8 Hz envolve o
 modo dos booms. O número fica relatado e o veredicto fica desconhecido até a empenagem ligar aos booms. Como o valor
-calculado está abaixo do requisito, merece prioridade.
+calculado está abaixo do requisito, merece prioridade. **Atualização (§12):** com a cauda da montagem nos booms,
+o V_F passa a 94,5 m/s e o veredicto a passa; a tabela acima fica como registo do incremento E.
 
-## 12. Próximos incrementos
+## 12. Superfícies na posição real e escora da asa (ronda 3)
+
+**Colocação** (`surface_records`): cada superfície leva a raiz do ¼ de corda (`root`), o vetor raiz→ponta do lado +y
+(`span_vec`: flecha, diedro, inclinação) e a incidência. Isto vale para a tabela de membros (CG), o modelo de vigas,
+o flutter e o render.
+
+* **Sem montagem** (C172, UAV 150 kg):
+  * Asa em z pela mesma regra de `hifi/geometry.py`: `geometry.wing_position` high/low põe o plano da corda no
+    topo ou na quilha, afundado ¼ da espessura da raiz (PRESSUPOSTO). `geometry.wing_z_fraction` sobrepõe.
+  * Diedro: `wing.dihedral` da configuração. O C172 não o declara, por isso fica o valor por omissão de 3°.
+  * Incidência: `geometry.wing_incidence_deg`. Se não for declarada fica 0°, com nota; só afeta o render.
+  * Estabilizador no eixo da fuselagem e deriva com raiz no topo da fuselagem, R(x_vt) (PRESSUPOSTO).
+  * `structure_layout.surfaces.<comp>` (`z_m`, `incidence_deg`, `dihedral_deg`) sobrepõe tudo isto.
+* **Com montagem** (twin-boom, V invertido, asa voadora): as superfícies com papel wing/tail dão a posição real
+  (primeira e última secção, com orientação e espelho do componente; torção da raiz = incidência).
+  * Um par espelhado com raiz no plano de simetria dá um registo; as caudas em booms dão um registo por painel.
+  * Um painel com inclinação > 45° usa o caixão da deriva; os outros usam o do estabilizador. A massa do caixão
+    reparte-se pelos painéis (PRESSUPOSTO).
+  * Numa cauda em V só com painéis de um tipo, o caixão equivalente do outro entra só como massa.
+  * Uma montagem sem superfícies de cauda (asa voadora) não coloca o estabilizador e a deriva do modelo de tipo fixo,
+    nem as respetivas ferragens.
+  * Se a raiz da asa na montagem não coincidir com a ligação da viga-fuselagem L1, a diferença fica relatada:
+    as cavernas fortes seguem a L1.
+
+**Modelo de vigas**:
+
+* A raiz de cada superfície fica no ponto real. Se esse ponto não estiver no eixo do corpo, liga ao nó de corpo
+  mais próximo por um elemento rígido `ligacao:<superfície>` (PRESSUPOSTO). Uma ponta junto de outro corpo
+  (estabilizador entre booms) também liga.
+* Os nós da envergadura seguem `span_vec` à fração s/semienvergadura do caixão.
+* O flutter usa, por faixa, a normal n = x × ŝ e a arfagem em torno de n × x, o que serve para diedro, painéis em V
+  e derivas em qualquer posição.
+* No twin-boom a cauda em V invertido fica presa aos booms, por isso a substituição do veredicto por desconhecido
+  sai.
+
+**Escora da asa** (`structure_layout.strut`, `strut_layout`), para uma asa escorada como a do C172:
+
+* **Geometria** (declarada, PRESSUPOSTO):
+  * na asa, `y_frac` = 0,5 da semienvergadura, na longarina dianteira;
+  * na fuselagem, a `fus_theta_deg` = 120° do topo, à mesma estação;
+  * tubo redondo: `D_m`, ou o mais leve entre 20 e 120 mm com D/t ≤ 50 (encurvadura local não verificada).
+* **Cargas** (estática): a asa fica articulada na raiz, à face da fuselagem (y_h = R), e apoiada na escora.
+  * F_v = M(y_h)/(y_s − y_h), com M a flexão LIMITE da viga em consola de `structures` a n+.
+  * Tração T = F_v L/Δz; compressão a n−, C = T |n−|/n+.
+  * Tração verificada com A Ftu; compressão com Euler–Johnson, L'/ρ = L/ρ (bi-articulada — Bruhn C2).
+  * Cargas últimas = 1,5 × limite.
+* **Ferragens**: as da raiz passam a 4 olhais com |(V(y_h) − F_v, F_h)|/2, sem binário. Juntam-se 4 olhais nos
+  extremos da escora.
+* **Modelo de vigas**: barra só axial (I, J ≈ 0) do corpo ao nó da asa mais próximo. Render a cor própria.
+* **Fora do âmbito**: o caixão da asa continua dimensionado em consola (conservativo), e a flexão-compressão da asa
+  entre a raiz e a escora (F_h) não é verificada.
+
+| Caso | Massa estrutural | Escora | Ligações | V_F (EAS) | Divergência | 1,2 V_D | Veredicto |
+|---|---|---|---|---|---|---|---|
+| C172 (escora) | 245,8 kg | 2 × 2,15 kg, Ø75 × 1,5 mm, RF 1,11 | 3,55 kg (antes 15,17) | 133,6 m/s (22,4 Hz) | 197,1 m/s | 117,4 m/s | passa (+14 %) |
+| C172 `iterar` (escora) | W0 1139,6 kg (antes 1153,9) | 2 × 2,14 kg | 3,51 kg | 133,5 m/s | — | 117,4 m/s | passa |
+| Twin-boom (cauda nos booms) | 27,4 kg | — | 2,57 kg | 94,5 m/s (6,9 Hz) | 92,7 m/s | 58,1 m/s | passa (+59 %) |
+| Twin-boom `iterar` | W0 168,9 kg | — | 2,64 kg | 94,0 m/s | 90,9 m/s | 58,1 m/s | passa |
+| UAV 150 kg | 20,4 kg | — | 2,18 kg | 99,8 m/s | 150,7 m/s | 58,1 m/s | passa |
+| V invertido (UAV) | 20,4 kg | — | 2,18 kg | 99,4 m/s | 152,0 m/s | 58,1 m/s | passa |
+| Asa voadora (UAV 150 kg) | 18,1 kg | — | 0,73 kg | sem cruzamento até 4 V_D | — | 58,1 m/s | passa |
+
+Escora do C172:
+
+* geometria: y_s = 2,51 m, L = 2,23 m a 24,9°;
+* cargas LIMITE: F_v = 17 156 N, T = 40 675 N, C = 20 119 N;
+* a compressão governa (L/ρ ≈ 85).
+
+O twin-boom deixa de ter o modo de 4,8 Hz dos booms em consola sem cauda que dava 56,7 m/s. Com a massa e a rigidez
+dos painéis nas pontas dos booms, o primeiro modo da asa fica a 6,1 Hz, os dos booms a 11,5 Hz, e o V_F sobe para
+94,5 m/s.
+
+Diferenças relatadas entre a raiz da asa na montagem e a ligação da viga L1: twin-boom +0,14 m, V invertido
++0,51 m, asa voadora −0,90 m. As cavernas fortes destes casos seguem a L1; alinhar a viga-fuselagem L1 com a
+montagem fica como incremento seguinte.
+
+Imagens (estudo, `render: true`) em `examples/output/estrutura_parametrica/`: `c172_estrutura_3d*.png` (asa alta,
+escoras, deriva no topo), `twin_boom_estrutura_3d*.png` (cauda em V invertido nos booms),
+`tailless_estrutura_3d*.png` e `inverted_v_estrutura_3d*.png`.
+
+## 13. Próximos incrementos
 
 1. ~~Fuselagem: piso, aberturas, secções não circulares, pressurização~~ — feito (§9). Falta: longarinas reais
    (flexão lateral e torção), alma das anteparas sob cargas concentradas, cantos das janelas, assentos 9 g, flexão
    do anel não circular.
 2. ~~Empenagens pelo caminho `wingbox` e no modelo de vigas; booms ligados à geometria de `assembly`~~ — feito
-   (§6). Falta: binário de reação dos rotores, duas derivas separadas no twin-boom.
+   (§6). ~~Superfícies na posição real; cauda da montagem nos booms~~ — feito (§12). Falta: binário de reação dos
+   rotores; alinhar a ligação da asa da viga-fuselagem L1 com a montagem (Δx relatado em §12).
 3. ~~Apoios e ferragens: berço do motor, olhais e cavilhas das ligações~~ — feito (§7). Falta: olhais sob carga
    transversal/oblíqua (AFFDL-TR-69-42 Fig. 9-8, interação 1,6), casquilhos, juntas aparafusadas em tração
-   (parafusos em tração e corte combinados), escora da asa, apoios elásticos do motor.
+   (parafusos em tração e corte combinados), apoios elásticos do motor. ~~Escora da asa~~ — feita (§12). Falta:
+   caixão da asa redimensionado com a escora (viga-coluna entre a raiz e a escora) e secção carenada da escora.
 4. ~~Acoplamento `iterar`~~ — feito (§8). Falta: âmbito completo (superfícies de comando, piso, portas) antes de
    ler o W0 acoplado como estimativa; estações por parte no modo montagem.
-5. ~~Estimativa de flutter com o modelo de vigas~~ — feito (§11). Falta: empenagem do twin-boom ligada aos booms
-   (o V_F calculado fica abaixo do requisito), superfícies de comando (massa e compensação), caso de tanques cheios,
+5. ~~Estimativa de flutter com o modelo de vigas~~ — feito (§11). ~~Empenagem do twin-boom ligada aos booms~~ —
+   feito (§12, V_F 94,5 m/s). Falta: superfícies de comando (massa e compensação), caso de tanques cheios,
    flutter de corpo livre, aerodinâmica não estacionária (Theodorsen / p-k).
 6. Exportação para CalculiX por subprocesso (via Build, no PC do João) e comparação viga vs casca.
