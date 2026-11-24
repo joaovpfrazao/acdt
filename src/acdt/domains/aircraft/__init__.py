@@ -38,13 +38,24 @@ def _size(st: DesignState):
             return r, s
         return run_fn(sp)
 
-    if ic.get("coupling") == "iterar" and ic.get("enabled", True):
-        # acoplamento do gelo (icing.py; docs/GELO.md): ponto fixo dimensionamento ↔ proteção contra o gelo
-        from .icing import size_with_icing
-        res, sysr, loop = size_with_icing(spec, run_th)
-        res.icing_coupling = loop
+    def run_ic(sp):  # noqa: ANN001, ANN202
+        if ic.get("coupling") == "iterar" and ic.get("enabled", True):
+            # acoplamento do gelo (icing.py; docs/GELO.md): ponto fixo dimensionamento ↔ proteção contra o gelo
+            from .icing import size_with_icing
+            r, s, loop = size_with_icing(sp, run_th)
+            r.icing_coupling = loop
+            return r, s
+        return run_th(sp)
+
+    sl = (spec.assumptions.get("structure_layout") or {}) if isinstance(spec.assumptions, dict) else {}
+    if sl.get("enabled") and sl.get("coupling") == "iterar":
+        # estrutura paramétrica (structure_layout.py; docs/ESTRUTURA_PARAMETRICA.md): ponto fixo
+        # dimensionamento ↔ massa/CG da estrutura paramétrica
+        from .structure_layout import size_with_structure
+        res, sysr, loop_sl = size_with_structure(spec, run_ic)
+        res.structure_coupling = loop_sl
     else:
-        res, sysr = run_th(spec)
+        res, sysr = run_ic(spec)
     st["result"] = res
     if use_sys:
         st["systems"] = sysr

@@ -310,3 +310,58 @@ def test_c172_fittings_and_engine_mount(c172):
     assert em["verdict"] == "desconhecido"          # n.º de cilindros não declarado no exemplo
     assert any("23.361" in c for c in em["cases"]) and any("23.363" in c for c in em["cases"])
     assert r["budget"]["by_component_kg"]["ligacoes"] > 0
+
+
+# ------------------------------------------------------------------ incremento C: acoplamento iterar
+def _fake(items):
+    from types import SimpleNamespace as NS
+    return NS(weights=NS(items=[NS(key=k, mass=m) for k, m in items]))
+
+
+def _lay(rows):
+    return {"members": [sl.member(f"m{i}", c, "x", m, x) for i, (c, m, x) in enumerate(rows)],
+            "budget": {"unknown_mass": []}}
+
+
+def test_coupling_items_preserve_mass_and_moment():
+    res = _fake([("wing", 120.0), ("fuselage", 90.0), ("main_gear", 70.0)])
+    lay = _lay([("asa", 60.0, 2.0), ("asa", 40.0, 2.5), ("fuselagem", 100.0, 3.0), ("ligacoes", 5.0, 1.0),
+                ("boom", 3.0, 4.0)])
+    items, st, notes = sl.coupling_items(res, lay)
+    d = {i["name"]: i["mass_kg"] for i in items}
+    assert d["estrutura_parametrica:wing"] == pytest.approx(100.0 - 120.0)
+    assert d["estrutura_parametrica:fuselage"] == pytest.approx(10.0)
+    assert d["estrutura_parametrica:ligacoes"] == pytest.approx(5.0) and d["estrutura_parametrica:boom"] == 3.0
+    x_w = (60 * 2.0 + 40 * 2.5) / 100
+    assert st["wing"] == ["m", pytest.approx(x_w)] and st["estrutura_parametrica:wing"] == ["m", pytest.approx(x_w)]
+    # item original + correção = massa paramétrica, no CG paramétrico → momento igual ao da estrutura paramétrica
+    assert (120.0 + d["estrutura_parametrica:wing"]) * st["wing"][1] == pytest.approx(60 * 2.0 + 40 * 2.5)
+    assert "main_gear" not in st
+
+
+def test_coupling_items_assembly_single_correction():
+    res = _fake([("asm:wing", 17.0), ("asm:pod", 4.0), ("main_gear", 10.0)])
+    items, st, notes = sl.coupling_items(res, _lay([("asa", 6.0, 1.0), ("fuselagem", 12.0, 0.8), ("boom", 3.0, 2.0)]))
+    assert len(items) == 1 and items[0]["mass_kg"] == pytest.approx(21.0 - 21.0)
+    assert any("montagem" in n for n in notes)
+
+
+def test_c172_iterar_converges_and_sets_balance_stations():
+    from acdt.core.pipeline import run_pipeline
+    from acdt.domains.aircraft.mission import MissionSpec
+    d = yaml.safe_load((EX / "cessna172_check.yaml").read_text(encoding="utf-8"))
+    d.setdefault("assumptions", {})["structure_layout"] = {"enabled": True, "coupling": "iterar",
+                                                          "fittings": {"engine_mount": {"n_cylinders": 4}}}
+    res = run_pipeline("aircraft", MissionSpec.from_dict(d, EX / "cessna172_check.yaml"))["result"]
+    loop = res.structure_coupling
+    assert loop["converged"] and 2 <= len(loop["history"]) <= 8
+    W = [h["W0_kg"] for h in loop["history"]]
+    assert abs(W[-1] - W[-2]) / W[-1] < 1e-3 and abs(W[-1] - W[0]) > 1.0       # o acoplamento mexe no W0
+    st = res.spec.assumptions["stability"]["stations"]
+    assert st["wing"][0] == "m" and st["fuselage"][0] == "m"
+    keys = [i.key for i in res.weights.items]
+    assert "item:estrutura_parametrica:wing" in keys and "item:estrutura_parametrica:ligacoes" in keys
+    assert res.structure_layout["coupling"]["converged"]
+    # nada aplicado ao exemplo: o yaml em disco não tem o bloco
+    assert "structure_layout" not in (yaml.safe_load((EX / "cessna172_check.yaml").read_text(encoding="utf-8"))
+                                      .get("assumptions") or {})

@@ -68,6 +68,12 @@ def run_case(case: dict, out: Path) -> dict:
             "booms": [{k: b.get(k) for k in ("evaluated", "reason", "geometry", "root_moment_limit_Nm", "notes")}
                       for b in r.get("booms", [])],
             "notas_layout": r.get("notes"),
+            "acoplamento": None if not r.get("coupling") else {
+                "convergiu": r["coupling"]["converged"], "motivo": r["coupling"]["reason"],
+                "W0_por_volta_kg": [h.get("W0_kg") for h in r["coupling"]["history"]],
+                "itens_ultima_volta_kg": r["coupling"]["history"][-1].get("delta_items_kg")},
+            "estabilidade_casos": None if getattr(res, "stability", None) is None else [
+                {"caso": c.name, "x_cg_m": c.x_cg, "xbar_cg": c.xbar_cg, "SM": c.SM} for c in res.stability.cases],
             "ferragens": [{k: m.get(k) for k in ("id", "kind", "mass_kg", "RF_min", "verdict", "section", "method",
                                                   "note")} for m in r["members"] if m["component"] == "ligacoes"],
             "berco_motor": {k: v for k, v in (r.get("fittings", {}).get("engine_mount") or {}).items()}, "vigas_em_falta": r["beam_model"].get("missing")}
