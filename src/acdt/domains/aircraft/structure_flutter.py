@@ -95,7 +95,7 @@ def _v_ref(ex: np.ndarray) -> np.ndarray:
 def assemble(model: dict[str, Any], node_mass: dict[int, np.ndarray], fixed: list[int] | None = None
              ) -> tuple[np.ndarray, np.ndarray, list[int]]:
     """K e M globais (6 GL por nó, ordem dos ids dos nós). ``node_mass``: {id do nó: matriz 6×6}. Nós sem massa
-    recebem 1e-6 kg e 1e-8 kg m² (só para M definida positiva). ``fixed``: nós encastrados (testes). Nas superfícies
+    levam um piso de 1e-3 kg e 1e-5 kg m² (M definida positiva e bem condicionada). ``fixed``: nós encastrados (testes). Nas superfícies
     a área simbólica do modelo neutro (1e-4 m²) dá modos axiais espúrios: aqui A = 1 m² (axialmente rígidas)."""
     E, G = model["material"]["E"], model["material"]["G"]
     ids = [n["id"] for n in model["nodes"]]
@@ -115,8 +115,10 @@ def assemble(model: dict[str, Any], node_mass: dict[int, np.ndarray], fixed: lis
         K[np.ix_(dofs, dofs)] += ke
     for i in ids:
         d = slice(6 * ix[i], 6 * ix[i] + 6)
-        M[d, d] += node_mass.get(i, np.diag([1e-6] * 3 + [1e-8] * 3))
-        M[d, d] += np.diag([1e-6] * 3 + [1e-8] * 3)
+        M[d, d] += node_mass.get(i, np.zeros((6, 6)))
+        # piso de massa 1 g / 1e-5 kg m² por nó: com 1e-6 kg o problema generalizado ficava mal condicionado
+        # (elementos curtos, K até 1e15) e o eigh devolvia modos repetidos espúrios
+        M[d, d] += np.diag([1e-3] * 3 + [1e-5] * 3)
     keep = list(range(N))
     if fixed:
         drop = {6 * ix[i] + j for i in fixed for j in range(6)}
