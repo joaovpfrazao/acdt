@@ -309,7 +309,41 @@ O desenho mostra as simplificações do layout tal como estão: superfícies no 
 aparece no eixo; diedro não modelado), empenagem do twin-boom ao centro (uma só deriva — ver pendentes da §6) e
 longarinas e nervuras sem a geometria das mesas.
 
-## 11. Próximos incrementos
+## 11. Flutter do avião inteiro pelo modelo de vigas (incremento E)
+
+`structure_flutter.py` liga o modelo de vigas `acdt.beam/1` (§6) ao modelo aeroelástico de
+`aeroelasticity.py` (Wright & Cooper 2015, cap. 11):
+
+1. **Modos**: elementos de pórtico 3-D de Euler–Bernoulli (12 GL; Przemieniecki 1968, cap. 5), I1 = flexão para fora
+   do plano das superfícies, I2 = 10 I1 no plano, J = GJ/G; nas superfícies A = 1 m² (a área simbólica do modelo
+   neutro dava modos axiais espúrios). Massas por faixa (massa do build-up ∝ corda, como em `aeroelasticity.py`) no
+   CG da secção (0,5 c — PRESSUPOSTO) excêntrico do eixo elástico (meio do caixão), inércia própria m c²/12; o resto
+   do W0 nos nós dos corpos ∝ massa estrutural local, rolamento m R²/2 (PRESSUPOSTO). Problema livre-livre; os 6
+   modos de corpo rígido saem (flutter de corpo livre fora do âmbito). Piso de massa nodal 1 g / 1e-5 kg m² para o
+   condicionamento (com 1e-6 kg o eigh dava modos repetidos espúrios no twin-boom).
+2. **Aerodinâmica**: por faixa, L' = q c a_w (θ − ḣ/V), M' = e c L' + q c² M_θ̇ θ̇ c/(4V) (M_θ̇ = −1,2, a mesma de
+   `flutter_matrices`), projetada nos 16 primeiros modos elásticos.
+3. **Varrimento** em V (ρ0 → EAS) com bisseção do cruzamento; modos sem acoplamento aerodinâmico têm ζ = 0 exato →
+   limiar ζ < −1e-6. Requisito 1,2 V_D (14 CFR 23.629 legado). ESTIMATIVA: certificação pede `hifi.flutter` ou ensaio.
+
+**Verificação** (teste): asa uniforme encastrada s = 7,5 m, c = 2 m, EI = 2e7, GJ = 2e6 N m², 200 kg/m —
+1.º modo de flexão 3,141 Hz (fechada 3,146), torção 5,777 Hz (5,76), V_F 81,4 m/s contra 82,9 do modelo binário de
+modos assumidos, divergência 157,39 contra 157,43 m/s (forma fechada das faixas); deformação de consola P L³/(3EI)
+exata nos dois eixos.
+
+| Caso | V_F (EAS) | f_F | Divergência | 1,2 V_D | Faixas encastradas (`aeroelasticity`) | Veredicto |
+|---|---|---|---|---|---|---|
+| C172 | 136,6 m/s | 22,1 Hz | 196,2 m/s | 117,4 m/s | 155,2 m/s | passa (+16 %) |
+| UAV 150 kg | 99,9 m/s | 37,8 Hz | 150,9 m/s | 58,1 m/s | 116,0 m/s | passa |
+| Twin-boom | 56,7 m/s | 4,8 Hz | 63,5 m/s | 58,1 m/s | 113,6 m/s | desconhecido (calculado: falha) |
+
+O avião inteiro baixa o V_F do C172 em 12 % face às faixas encastradas (raiz flexível, acoplamento com a
+fuselagem). No twin-boom os booms levam a cauda (cargas «voo_cauda»), mas o layout regista a empenagem ao centro,
+presa ao casulo: no modelo de vigas os booms ficam consolas sem a massa da cauda, e o flutter a 4,8 Hz envolve o
+modo dos booms. O número fica relatado e o veredicto fica desconhecido até a empenagem ligar aos booms. Como o valor
+calculado está abaixo do requisito, merece prioridade.
+
+## 12. Próximos incrementos
 
 1. ~~Fuselagem: piso, aberturas, secções não circulares, pressurização~~ — feito (§9). Falta: longarinas reais
    (flexão lateral e torção), alma das anteparas sob cargas concentradas, cantos das janelas, assentos 9 g, flexão
@@ -321,5 +355,7 @@ longarinas e nervuras sem a geometria das mesas.
    (parafusos em tração e corte combinados), escora da asa, apoios elásticos do motor.
 4. ~~Acoplamento `iterar`~~ — feito (§8). Falta: âmbito completo (superfícies de comando, piso, portas) antes de
    ler o W0 acoplado como estimativa; estações por parte no modo montagem.
-5. Estimativa de flutter com o modelo de vigas (modos da asa + massas concentradas) ligada a `aeroelasticity.py`.
+5. ~~Estimativa de flutter com o modelo de vigas~~ — feito (§11). Falta: empenagem do twin-boom ligada aos booms
+   (o V_F calculado fica abaixo do requisito), superfícies de comando (massa e compensação), caso de tanques cheios,
+   flutter de corpo livre, aerodinâmica não estacionária (Theodorsen / p-k).
 6. Exportação para CalculiX por subprocesso (via Build, no PC do João) e comparação viga vs casca.

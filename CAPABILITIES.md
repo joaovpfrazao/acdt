@@ -2217,6 +2217,19 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Ficheiros**: `structure_render.py`, `structure_layout.py` (`layout_geometry`), estudo, `tests/test_structure_layout.py`,
   `docs/ESTRUTURA_PARAMETRICA.md` §10.
 
+## 58. Estrutura paramétrica E: flutter do avião inteiro pelo modelo de vigas (24 nov 2026)
+
+* **O que faz**: `structure_flutter.py` — modos livre-livre do modelo de vigas do avião (pórtico 3-D, Przemieniecki
+  cap. 5, massas de faixa excêntricas) + aerodinâmica quase-estacionária de faixas de `aeroelasticity.py` (Wright &
+  Cooper cap. 11) projetada nos modos; varrimento em EAS com bisseção; requisito 1,2 V_D. Ligado a
+  `structure_layout["flutter"]` (opção `structure_layout.flutter`).
+* **Medida**: verificação contra formas fechadas (flexão/torção < 1 %, divergência 0,03 %) e contra o modelo binário
+  (V_F −1,7 %). C172 V_F 136,6 m/s EAS contra 117,4 exigidos (faixas encastradas 155,2); UAV 150 kg 99,9 contra
+  58,1; twin-boom 56,7 contra 58,1 → desconhecido (empenagem do layout ao centro).
+* **Veredicto**: implementado como ESTIMATIVA de baixa fidelidade; certificação pela Fase 4 (`hifi.flutter`).
+* **Ficheiros**: `structure_flutter.py`, `structure_layout.py`, `tests/test_structure_layout.py`,
+  `docs/ESTRUTURA_PARAMETRICA.md` §11.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

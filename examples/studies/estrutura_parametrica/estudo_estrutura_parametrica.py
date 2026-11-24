@@ -78,6 +78,10 @@ def run_case(case: dict, out: Path) -> dict:
                                                   "note")} for m in r["members"] if m["component"] == "ligacoes"],
             "berco_motor": {k: v for k, v in (r.get("fittings", {}).get("engine_mount") or {}).items()}, "vigas_em_falta": r["beam_model"].get("missing"),
             "piso": r["fuselage"].get("floor"), "aberturas": r["fuselage"].get("cutouts"),
+            "flutter": None if not r.get("flutter") else {
+                k: v for k, v in r["flutter"].items() if k in (
+                    "evaluated", "reason", "V_F_eas", "f_F_Hz", "V_div_eas", "V_required_eas", "V_D_eas", "margin",
+                    "verdict", "verdict_computed", "V_F_strip_eas", "modes", "notes", "method")},
             "seccao": r["fuselage"].get("section"), "pressao_Pa": r["fuselage"].get("pressure_Pa"),
             "detalhe": [{k: m.get(k) for k in ("id", "kind", "mass_kg", "RF_min", "verdict", "section", "note")}
                         for m in r["members"] if m["kind"] in ("piso", "viga_piso", "soleira")]}
