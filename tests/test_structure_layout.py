@@ -149,7 +149,8 @@ def test_c172_layout_end_to_end(c172):
     r = c172.structure_layout
     assert r["evaluated"] and r["level"] == "L1"
     kinds = {m["kind"] for m in r["members"]}
-    assert {"caverna", "caverna_pesada", "antepara", "revestimento", "reforcador", "caixao"} <= kinds
+    assert {"caverna", "caverna_pesada", "antepara", "revestimento", "reforcador", "painel_reforcado",
+            "alma_longarina", "nervura"} <= kinds
     heavy = {i for m in r["members"] if m["kind"] == "caverna_pesada" for i in m["loads"]}
     assert {"asa_longarina_frente", "asa_longarina_tras", "trem_tras", "cauda", "berco_motor"} <= heavy
     assert all(m["verdict"] in ("passa", "falha", "desconhecido") for m in r["members"])
@@ -158,6 +159,85 @@ def test_c172_layout_end_to_end(c172):
     b = r["budget"]
     assert b["mass_kg"] > 0 and b["inertia_kg_m2"]["Iyy"] > 0
     bm = r["beam_model"]
-    assert bm["format"] == "acdt.beam/1" and len(bm["elements"]) == len(bm["nodes"]) - 1
+    assert bm["format"] == "acdt.beam/1" and len(bm["elements"]) == len(bm["nodes"]) - 1 and not bm["missing"]
     assert sum(pm["mass_kg"] for pm in bm["point_masses"]) == pytest.approx(b["mass_kg"], rel=1e-9)
     assert sl.to_nastran(bm).count("CONM2") == len(bm["point_masses"])
+
+
+def test_c172_tails_through_wingbox(c172):
+    r = c172.structure_layout
+    comps = {m["component"] for m in r["members"]}
+    assert {"asa", "estabilizador", "deriva"} <= comps
+    for c in ("estabilizador", "deriva"):
+        sf = r["surfaces"][c]
+        assert sf["method"] == "buckling" and sf["mass_kg"] > 0
+        assert 0.5 < r["comparison"][f"{'htail' if c[0] == 'e' else 'vtail'}_layout_kg"] / \
+            r["comparison"][f"{'htail' if c[0] == 'e' else 'vtail'}_L1_kg"] < 2.0
+    bm = r["beam_model"]
+    comp_el = {e["component"] for e in bm["elements"]}
+    assert {"fuselagem", "asa", "estabilizador", "deriva"} <= comp_el
+    vt_nodes = {n for e in bm["elements"] if e["component"] == "deriva" for n in e["nodes"]}
+    z = [bm["nodes"][n - 1]["xyz"][2] for n in vt_nodes]
+    assert max(z) - min(z) > 1.0          # deriva ao longo de +z
+    l1 = c172.structures_l1.tails
+    assert l1["htail_box"]["EI"][0] > 0 and l1["vtail_box"]["GJ"][0] > 0
+
+
+def _quadplane() -> dict:
+    return {"components": [
+        {"type": "body", "name": "fus", "role": "fuselage",
+         "stations": [{"x": 0, "w": 0.2, "h": 0.2}, {"x": 1.2, "w": 0.2, "h": 0.2}]},
+        {"type": "body", "name": "boom", "role": "boom", "origin": [0.0, 0.8, 0.0], "mirror": True,
+         "stations": [{"x": 0, "w": 0.05, "h": 0.05}, {"x": 2.0, "w": 0.05, "h": 0.05}]},
+        {"type": "disc", "name": "rf", "role": "lift_rotor", "origin": [0.05, 0.8, 0.05], "mirror": True,
+         "diameter": 0.6},
+        {"type": "disc", "name": "ra", "role": "lift_rotor", "origin": [1.95, 0.8, 0.05], "mirror": True,
+         "diameter": 0.6},
+        {"type": "disc", "name": "prop", "role": "propeller", "origin": [1.25, 0, 0], "diameter": 0.4},
+        {"type": "surface", "name": "ht", "role": "htail", "origin": [1.8, 0.8, 0.0], "mirror": True,
+         "sections": [{"le": [0, 0, 0], "chord": 0.25}, {"le": [0, 0.3, 0], "chord": 0.2}]}]}
+
+
+def test_vtol_quadplane_booms_rotor_and_tail_loads():
+    o = sl.options(type("S", (), {"assumptions": {}})())
+    tails = {"htail_limit_lift_N": 200.0, "vtail_limit_lift_N": 100.0, "vtail_box": {"semispan_m": 0.3}}
+    booms, notes = sl.booms_from_assembly({"assembly": _quadplane()}, 25.0, tails, o, 0.6)
+    assert [b["id"] for b in booms] == ["boom", "boom~m"] and booms[1]["y_m"] == -0.8
+    T = 1.5 * 25.0 * 9.80665 / 4
+    rot = [ld for ld in booms[0]["loads"] if ld["kind"] == "rotor"]
+    assert len(rot) == 2 and rot[0]["Fz_N"] == pytest.approx(T)      # a hélice de propulsão não conta
+    tail = [ld for ld in booms[0]["loads"] if ld["kind"] == "tail"][0]
+    assert tail["Fz_N"] == pytest.approx(-100.0) and tail["T_Nm"] == pytest.approx(50.0 * 0.12)
+    assert any("binário de reação" in n for n in notes)
+    out = sl.boom_layout(booms[0], o, AL, 1.25)
+    assert out["evaluated"]
+    # pairar: rotor de trás a 1,95 m, ligação a 0,6 m -> M = T (1,95 - 0,6); cauda (voo) dá 100 x 1,2 (+y)
+    M_hover = T * (1.95 - 0.6)
+    M_tail = math.hypot(100.0, 50.0) * (1.8 - 0.6)
+    assert out["root_moment_limit_Nm"] == pytest.approx(max(M_hover, M_tail), rel=1e-6)
+    heavy = {i for m in out["members"] if m["kind"] == "caverna_pesada" for i in m["loads"]}
+    assert {"rotor:rf", "rotor:ra", "cauda"} <= heavy
+
+
+def test_boom_two_sided_cantilever():
+    s = np.linspace(0.0, 2.0, 21)
+    V, M, T = sl._boom_loads_integrate(s, 1.0, [(0.0, 10.0, 0.0, 0.0), (2.0, 10.0, 0.0, 3.0)])
+    assert M[10] == pytest.approx(10.0) and M[0] == pytest.approx(0.0) and M[-1] == pytest.approx(0.0)
+    assert T[15] == pytest.approx(3.0) and T[5] == pytest.approx(0.0)
+
+
+def test_twin_boom_pipeline_booms_from_assembly():
+    from acdt.core.pipeline import run_pipeline
+    from acdt.domains.aircraft.mission import MissionSpec
+    p = EX / "uav_twin_boom_shortcut.yaml"
+    d = yaml.safe_load(p.read_text(encoding="utf-8"))
+    d.setdefault("assumptions", {})["structure_layout"] = {"enabled": True}
+    r = run_pipeline("aircraft", MissionSpec.from_dict(d, p))["result"].structure_layout
+    assert r["evaluated"]
+    ev = [b for b in r["booms"] if b.get("evaluated")]
+    assert len(ev) == 2 and ev[0]["geometry"]["y_m"] == pytest.approx(-ev[1]["geometry"]["y_m"])
+    assert all(b["root_moment_limit_Nm"] > 0 for b in ev)
+    bm = r["beam_model"]
+    assert len(bm["elements"]) == len(bm["nodes"]) - 1 and not bm["missing"]     # árvore ligada
+    assert any(e["component"].startswith("ligacao:") for e in bm["elements"])
+    assert r["budget"]["by_component_kg"]["boom"] > 0

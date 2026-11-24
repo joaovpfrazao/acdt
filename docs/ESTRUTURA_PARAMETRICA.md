@@ -98,8 +98,8 @@ cargas ficam «desconhecido».
 
 ## 5. Estudo de exemplo (`applied: false`)
 
-`python examples/studies/estrutura_parametrica/estudo_estrutura_parametrica.py` (cerca de 75 s). Liga
-`structure_layout` em memória em `examples/cessna172_check.yaml` e `examples/uav_150kg_stanag4671.yaml`; escreve
+`python examples/studies/estrutura_parametrica/estudo_estrutura_parametrica.py` (cerca de 2 min). Liga
+`structure_layout` em memória em `examples/cessna172_check.yaml` e `examples/uav_150kg_stanag4671.yaml` (e, desde o incremento A, no twin-boom `examples/uav_twin_boom_shortcut.yaml`, §6); escreve
 em `examples/output/estrutura_parametrica/` a tabela de membros (CSV), o resumo (JSON), o modelo de vigas (JSON) e o
 `.bdf`. Material Al 2024-T3 (MIL-HDBK-5J), cavernas Z, reforçadores Z 20 × 12 mm a passo de 0,12 m (PRESSUPOSTO).
 
@@ -116,12 +116,60 @@ espessura (aterragem) e a da cauda para 5,2 mm. No UAV de 150 kg a massa é domi
 ser lido como limite superior até haver um material/processo de UAV (compósito, `material: cfrp_qi`). Nenhum
 membro falha; os desconhecidos (7 em cada caso) são os listados acima.
 
-## 6. Próximos incrementos
+## 6. Empenagens, booms e modelo de vigas do avião inteiro (incremento A)
+
+**Empenagens pelo caminho do caixão da asa.** `assumptions.structure_layout.tails.method` = `buckling` (omissão)
+redimensiona o caixão de cada empenagem com o dimensionador por estabilidade da asa
+(`structures.box_beam_sizing_buckling`: painéis reforçados, almas de Kuhn — Bruhn C5/C11, Megson) sob a sustentação
+de projeto da L1 (carga uniforme, cima e baixo com n_neg = 1 — PRESSUPOSTO); depois a secção multicélula da Fase 5
+(`box_section_properties`, Megson) dá EI, GJ e o centro de corte por estação. `strength` usa o caixão L1 tal como
+está. `structures_l1` passa a expor `tails.htail_box`/`vtail_box` (estações, massas por grupo, EI/GJ, secção) — aditivo.
+
+A deriva é **encastrada só na raiz**: é tratada como metade de uma asa espelhada de altura b e área 2S (mesmas
+cordas), com M_raiz = L b/2. O caixão L1 existente (`_uniform_tail` sem `single_sided`) trata a deriva como duas
+metades de altura b/2, o que dá um momento na raiz 4× menor; esse caminho L1 **não foi alterado** (as massas L1 e o
+W0 dos exemplos ficam iguais) e fica como achado para decisão.
+
+**Booms ligados à geometria de montagem.** Com `booms_from_assembly: true` (omissão), cada corpo da montagem
+(`assumptions.assembly`) com papel «boom» passa a ser um boom (as imagens espelhadas contam à parte): x0/comprimento
+das estações, diâmetro equivalente √(w·h) máximo, eixo paralelo a x (PRESSUPOSTO), ligação à asa no centro
+aerodinâmico da asa (`x_wing_m`, PRESSUPOSTO). Cargas LIMITE que lá se apoiam, por caso:
+
+* `voo_cauda`: superfícies com papel «tail/cauda/empenagem» na extensão do boom mais próximo recebem a sustentação de
+  projeto do estabilizador (−z) e da deriva (+y) da L1 repartidas pelos booms com cauda, e a torção
+  L_deriva × 0,4 × semienvergadura (o braço da L1) — PRESSUPOSTO;
+* `pairar_rotores`: discos com papel rotor/lift/elevação (hélices de propulsão excluídas) recebem
+  T_lim = `rotor_thrust_factor` × W0 g / n_rotores (1,5 por omissão, PRESSUPOSTO — declarar o do projeto). O binário
+  de reação dos rotores não está modelado (desconhecido, listado nas notas).
+
+O boom é verificado como **duas consolas a partir da ligação** (cargas atrás fletem a parte de trás, à frente a da
+frente; somadas com sinal por plano e combinadas vetorialmente; na ligação fica o maior dos dois lados) e envolvente
+dos casos; depois as mesmas cavernas, anteparas, reforçadores e casca da fuselagem (§2–4). Booms declarados em
+`booms:` substituem os da montagem com o mesmo `id`.
+
+**Modelo de vigas do avião inteiro.** `acdt.beam/1` passa a ter corpos (fuselagem, booms em (y0, z0)) e superfícies
+(asa e estabilizador em ±y, deriva em +z) com EI/GJ por estação; a raiz de cada superfície partilha o nó de corpo mais
+próximo e cada boom liga ao nó mais próximo de outro componente na estação de ligação por um elemento 10× mais
+rígido (PRESSUPOSTO). O modelo é uma árvore ligada (elementos = nós − 1).
+
+| Caso | Estabilizador: layout / L1 | Deriva: layout / L1 | Booms | Vigas (nós / elementos) |
+|---|---|---|---|---|
+| C172 | 11,16 / 10,54 kg | 4,31 / 4,11 kg | — | árvore ligada, sem componentes em falta |
+| UAV 150 kg | 0,36 / 0,25 kg | 0,34 / 0,23 kg | — | idem |
+| Twin-boom (`uav_twin_boom_shortcut`, W0 167,0 kg) | 0,45 / 0,31 kg | 0,51 / 0,35 kg | 2 × 2,84 kg; M_lig 279 N·m (cauda) | idem, com 2 ligações rígidas |
+
+Os caixões das empenagens pelo caminho da asa passam a encurvadura (`buckling_ok`); no C172 o caixão L1 só de
+resistência não passa (`buckling_ok` falso). Nos UAV pequenos mandam as espessuras mínimas (layout acima da L1). No twin-boom, as cavernas à
+frente da ligação ficam «desconhecido» (sem carga nesse troço) e a cauda é uma superfície equivalente única da L1
+(duas derivas reais não separadas — PRESSUPOSTO). O caso VTOL (quadplane com 4 rotores de elevação em 2 booms) está
+coberto por um teste com uma montagem em linha, porque os exemplos `examples/vtol/` não têm geometria de montagem.
+
+## 7. Próximos incrementos
 
 1. Fuselagem: piso e vigas de piso, portas/aberturas (molduras), secções não circulares, longarinas reais
    (cargas de flexão lateral e torção), alma das anteparas sob cargas concentradas, pressurização no anel.
-2. Empenagens pelo caminho `wingbox` (secção, EI/GJ por estação) e entrada no modelo de vigas; booms ligados à
-   geometria de `assembly` (twin-boom, VTOL).
+2. ~~Empenagens pelo caminho `wingbox` e no modelo de vigas; booms ligados à geometria de `assembly`~~ — feito
+   (§6). Falta: binário de reação dos rotores, duas derivas separadas no twin-boom.
 3. Apoios e ferragens: berço do motor (treliça tubular, Euler–Johnson), ligações asa–fuselagem e trem (parafusos e
    olhais com métodos citados), cargas dos rotores de VTOL nos booms.
 4. Acoplamento `iterar`: massa estrutural paramétrica no fecho do W0, CG/inércia no balanço.

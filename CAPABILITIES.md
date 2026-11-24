@@ -2140,6 +2140,21 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
   `docs/ESTRUTURA_PARAMETRICA.md`, `examples/studies/estrutura_parametrica/`, `examples/output/estrutura_parametrica/`,
   `tests/test_structure_layout.py`.
 
+## 53. Estrutura paramétrica A: empenagens pelo caminho do caixão, booms da montagem, vigas do avião inteiro (24 nov 2026)
+
+* **O que faz**: em `structure_layout`, as empenagens são redimensionadas pelo dimensionador por estabilidade da asa
+  (`tails.method: buckling`, omissão) com EI/GJ da secção multicélula (Fase 5); a deriva é encastrada só na raiz
+  (`single_sided`, M_raiz = L b/2). `structures_l1.tails` expõe `htail_box`/`vtail_box` (aditivo). Os booms são lidos
+  da montagem (corpos com papel «boom») com as cargas da cauda (`voo_cauda`) e dos rotores de elevação
+  (`pairar_rotores`, `rotor_thrust_factor` 1,5 PRESSUPOSTO), verificados como duas consolas a partir da ligação à
+  asa. O modelo `acdt.beam/1` inclui fuselagem, booms, asa, estabilizador e deriva (em +z), ligado em árvore.
+* **Medida** (`applied: false`): C172 estabilizador 11,16 kg (L1 10,54), deriva 4,31 kg (L1 4,11); twin-boom
+  2 booms × 2,84 kg, M na ligação 279 N·m; quadplane em linha (teste) com 4 rotores e cauda nos booms.
+* **Veredicto**: L1, opt-in. Achado: o caixão L1 da deriva trata-a como duas metades de altura b/2 (momento na raiz
+  4× menor); não alterado, para decisão. Desconhecidos: binário dos rotores, cavernas dos booms sem carga.
+* **Ficheiros**: `structure_layout.py`, `structures_l1.py`, `tests/test_structure_layout.py`,
+  `docs/ESTRUTURA_PARAMETRICA.md` §6, estudo e saídas em `examples/*/estrutura_parametrica/`.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

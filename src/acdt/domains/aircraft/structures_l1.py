@@ -156,10 +156,28 @@ def raymer_fuselage_kg(config, W0_kg: float, Nz: float, q_cruise_Pa: float) -> f
     return float(lb * LB)
 
 
-def _uniform_tail(surface, lift_limit: float, material, nonopt: float):
-    """One tail as a two-spar box. ``lift_limit`` is the limit load [N], whole surface.
-    Uniform semispan load: M_root = L b / 8 (heavier than elliptic). Ultimate ×1.5 is inside the box sizer."""
+def _tail_wing(surface, single_sided: bool = False):
+    """Asa equivalente de uma empenagem. ``single_sided`` (deriva única, encastrada só na raiz): a deriva de altura
+    b e área S é metade de uma asa espelhada de envergadura 2b e área 2S (mesmas cordas), carregada com L de cada
+    lado — assim a semienvergadura é a altura toda e M_raiz = L b/2 (carga uniforme). ``as_wing`` sozinho trata a
+    deriva como duas metades de altura b/2 (M_raiz 4× menor)."""
+    import dataclasses
     wing = surface.as_wing()
+    if single_sided:
+        wing = dataclasses.replace(wing, S=2.0 * wing.S, AR=2.0 * wing.AR)
+    return wing
+
+
+def _uniform_tail(surface, lift_limit: float, material, nonopt: float, method: str = "strength",
+                  single_sided: bool = False):
+    """One tail as a two-spar box. ``lift_limit`` is the limit load [N], whole surface.
+    Uniform semispan load: M_root = L b / 8 (heavier than elliptic). Ultimate ×1.5 is inside the box sizer.
+    ``method``: ``strength`` (L1, omissão) or ``buckling`` — the wing's Phase 3 sizer
+    (:func:`structures.box_beam_sizing_buckling`) with symmetric up/down tail loads (n_neg_ratio = 1, PRESSUPOSTO).
+    ``single_sided``: fin root-clamped (see :func:`_tail_wing`); the returned masses cover the mirrored pair."""
+    wing = _tail_wing(surface, single_sided)
+    if single_sided:
+        lift_limit = 2.0 * lift_limit
     b2 = wing.span / 2.0
     y = np.linspace(0.0, b2, 21)
     c = chord_at(wing, y)
@@ -168,6 +186,9 @@ def _uniform_tail(surface, lift_limit: float, material, nonopt: float):
     M = _cum_from_tip(y, V)
     xea = 0.5 * (wing.box.front_spar_xc + wing.box.rear_spar_xc)
     T = _cum_from_tip(y, lift * (xea - 0.25) * c)
+    if method == "buckling":
+        from .structures import box_beam_sizing_buckling
+        return box_beam_sizing_buckling(wing, BeamLoads(y, V, M, T), material, _FS, nonopt, n_neg_ratio=1.0)
     box = box_beam_sizing(wing, BeamLoads(y, V, M, T), material, _FS, nonopt)
     return box
 
@@ -565,8 +586,34 @@ def analyse(config, W0_kg: float, *, structures=None, q_cruise: float | None = N
                                                            _CLMAX_HT)),
              "vtail_limit_lift_N": float(surface_limit_lift(q_VC, config.vtail.S, config.vtail.as_wing().sweep_c4,
                                                            _CLMAX_VT))}
+    tails["htail_box"] = _tail_box_summary(config.htail, ht, material)
+    tails["vtail_box"] = _tail_box_summary(config.vtail, vt, material)
     fus_out = {k: (v.tolist() if isinstance(v, np.ndarray) else v) for k, v in fus.items() if k != "notes"}
     return StructuresL1(masses, deflections, corr, notes, fus_out, tails)
+
+
+def _tail_box_summary(surface, box, material, single_sided: bool = False) -> dict:
+    """Caixão de uma empenagem pelo mesmo caminho da asa (Fase 5): secção idealizada multicélula no contorno do
+    perfil (:func:`structures.box_section_properties`, Megson) → EI, GJ e centro de corte por estação, mais a massa
+    por grupo. Serializável (listas). Se a secção falhar, EI/GJ ficam os de duas mesas/Bredt do dimensionamento."""
+    from .structures import box_section_properties
+    wing = _tail_wing(surface, single_sided)
+    f = 0.5 if single_sided else 1.0
+    out = {"y": np.asarray(box.y, float).tolist(), "masses": {k: f * float(v) for k, v in box.masses.items()},
+           "single_sided": bool(single_sided),
+           "method": box.method, "material": box.material,
+           "buckling_ok": None if box.buckling is None else bool(box.buckling.ok),
+           "EI": None if box.EI is None else np.asarray(box.EI, float).tolist(),
+           "GJ": None if box.GJ is None else np.asarray(box.GJ, float).tolist(), "section": "duas mesas / Bredt",
+           "semispan_m": float(wing.span / 2), "c_root_m": float(wing.c_root), "c_tip_m": float(wing.c_tip)}
+    try:
+        sp = box_section_properties(wing, box, material, True)
+        out.update({"EI": np.asarray(sp["EI"], float).tolist(), "GJ": np.asarray(sp["GJ"], float).tolist(),
+                    "x_sc_c": np.asarray(sp["x_sc_c"], float).tolist(),
+                    "section": "multicélula no contorno do perfil (Megson; Fase 5)"})
+    except Exception as ex:  # noqa: BLE001 — fica a rigidez do dimensionamento, com a razão
+        out["section_note"] = f"secção Fase 5 não calculada: {type(ex).__name__}: {ex}"
+    return out
 
 
 def apply_beam_masses(breakdown, masses: dict) -> None:

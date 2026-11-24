@@ -3,28 +3,28 @@
  "exemplo": "examples/uav_150kg_stanag4671.yaml",
  "applied": false,
  "W0_kg": 153.21267779959328,
- "tempo_s": 6.138139963150024,
+ "tempo_s": 6.9298930168151855,
  "veredicto": "desconhecido",
  "contagem": {
-  "passa": 17,
-  "desconhecido": 7
+  "passa": 25,
+  "desconhecido": 13
  },
  "orcamento": {
-  "mass_kg": 17.979716458963463,
+  "mass_kg": 18.197605842663567,
   "cg_m": [
-   1.2748653829178151,
+   1.2887356694779366,
    0.0,
-   0.0
+   0.004445130103412924
   ],
   "inertia_kg_m2": {
-   "Ixx": 12.96572345110834,
-   "Iyy": 11.628417216689904,
-   "Izz": 24.33271513039286
+   "Ixx": 13.014529568908438,
+   "Iyy": 11.944326256494627,
+   "Izz": 24.643391384422568
   },
   "by_component_kg": {
    "asa": 5.402858969227022,
-   "estabilizador": 0.247129133179115,
-   "deriva": 0.2314822763801359,
+   "estabilizador": 0.3598325106064096,
+   "deriva": 0.336668282652946,
    "fuselagem": 12.098246080177189
   },
   "unknown_mass": [],
@@ -34,7 +34,11 @@
   "fuselage_layout_kg": 12.098246080177189,
   "fuselage_L1_kg": 5.4935955464479616,
   "fuselage_raymer_kg": 7.324168683248986,
-  "wing_box_kg": 5.402858969227022
+  "wing_box_kg": 5.402858969227022,
+  "htail_layout_kg": 0.3598325106064096,
+  "htail_L1_kg": 0.247129133179115,
+  "vtail_layout_kg": 0.336668282652946,
+  "vtail_L1_kg": 0.2314822763801359
  },
  "cavernas_pesadas": [
   {
@@ -241,5 +245,31 @@
   "aterragem: reações do trem (23.473, viga L1) e metade da sustentação em cada longarina da asa; trem preso à fuselagem — se o trem principal está na asa, declarar gear_theta_deg/loads",
   "anteparas por omissão: parede de fogo no berço do motor e fecho traseiro a 0,95 L (as duas da viga L1) — PRESSUPOSTO"
  ],
- "material": "Al 2024-T3 sheet"
+ "material": "Al 2024-T3 sheet",
+ "superficies": {
+  "asa": {
+   "mass_kg": 5.402858969227022,
+   "method": "buckling",
+   "section": "multicélula (Fase 5)",
+   "buckling_ok": true,
+   "source": "structures.box (existente)"
+  },
+  "estabilizador": {
+   "mass_kg": 0.3598325106064096,
+   "method": "buckling",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "buckling_ok": true,
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+  },
+  "deriva": {
+   "mass_kg": 0.336668282652946,
+   "method": "buckling",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "buckling_ok": true,
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+  }
+ },
+ "booms": [],
+ "notas_layout": [],
+ "vigas_em_falta": []
 }
