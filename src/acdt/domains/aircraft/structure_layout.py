@@ -71,6 +71,8 @@ DEFAULTS: dict[str, Any] = {
                  "engine_mount": {"enabled": True, "material": "steel_4130", "n_cylinders": None, "rpm": None,
                                   "thrust_N": None, "length_m": None, "firewall_half_m": None, "ring_half_m": None}},
     "export": {"beam_model": True},
+    # flutter do avião inteiro pelo modelo de vigas (structure_flutter.py): modos 3-D + faixas quase-estacionárias
+    "flutter": {"enabled": True, "n_modes": 16, "margin_factor": 1.2, "x_cg_chord": 0.5, "a_w": None},
 }
 
 
@@ -1349,6 +1351,17 @@ def analyse_layout(res: Any) -> dict[str, Any]:
                              "vtail_L1_kg": l1.masses.get("vtail_kg")}
     if o.get("export", {}).get("beam_model", True):
         out["beam_model"] = beam_model(mat, bodies, recs, members)
+        if (o.get("flutter") or {}).get("enabled", True):
+            from .structure_flutter import layout_flutter
+            try:
+                out["flutter"] = layout_flutter(res, out, recs, o["flutter"])
+            except Exception as ex:  # noqa: BLE001 — flutter fica desconhecido, com a razão
+                out["flutter"] = {"evaluated": False, "verdict": "desconhecido",
+                                  "reason": f"{type(ex).__name__}: {ex}"}
+            fv = out["flutter"]
+            if fv.get("evaluated"):
+                notes.append(f"flutter (vigas + faixas): V_F = {fv['V_F_eas']:.1f} m/s EAS, divergência "
+                             f"{fv['V_div_eas']:.1f} m/s, requisito {fv['V_required_eas']:.1f} m/s — {fv['verdict']}")
     return out
 
 

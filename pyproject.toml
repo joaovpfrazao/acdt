@@ -79,6 +79,7 @@ files = [
   "src/acdt/core/structures/frames.py",
   "src/acdt/core/structures/fittings.py",
   "src/acdt/domains/aircraft/structure_layout.py",
+  "src/acdt/domains/aircraft/structure_flutter.py",
   "src/acdt/core/units.py",
   "src/acdt/core/requirements.py",
   "src/acdt/domains/aircraft/aero/gear_drag.py",
