@@ -89,3 +89,24 @@ def test_toque_cheio_study_not_applied_and_consistent():
     assert d["converged"] and d["mission"]["ok"] is True and d["dW0_kg"] > 0
     sp = out["smallest_passing"]
     assert sp["b_decrab"]["ok"] is True
+
+
+def test_consolidado_not_applied_and_consistent():
+    st = yaml.safe_load((ROOT / "examples/studies/rajada_cheio/consolidado.yaml").read_text(encoding="utf-8"))
+    assert st["applied"] is False
+    assert st["fixed"]["set"]["assumptions.assembly.options.flying_wing.gear.side_load_factor"] == 1.3
+    out = json.loads((ROOT / "examples/output/rajada_cheio/consolidado.json").read_text(encoding="utf-8"))
+    assert out["applied"] is False and out["leg_reinforcement_closed"] is True
+    E, A, C = out["exemplo"], out["opcao_a"], out["consolidado"]
+    assert E["converged"] and A["converged"] and C["converged"]
+    assert E["W0_kg"] < A["W0_kg"] < C["W0_kg"]
+    assert C["gear_side_load_factor"] == 1.3 and C["gear_side_structure"]["side_factor"] == 1.3
+    assert C["touchdown"]["design_side_load_factor"] == 1.3
+    assert C["touchdown"]["inboard_ratio"] < C["touchdown"]["inboard_ratio_23_485"]
+    assert C["P_elec_per_leaf_W"] is None                     # desconhecida ≠ 0
+    assert C["checks"]["asm:gear_max_track_9532"] is None      # não avaliado ≠ falha (phase2._assembly)
+    for r in (E, A, C):
+        assert set(r["verification"]["counts"]) <= {"passa", "falha", "no_limite", "nao_avaliado", "desconhecido"}
+    # o exemplo e os valores por omissão não mudam
+    ex = yaml.safe_load((ROOT / st["example"]).read_text(encoding="utf-8"))
+    assert "side_load_factor" not in ex["assumptions"]["assembly"]["options"]["flying_wing"]["gear"]

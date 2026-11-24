@@ -887,13 +887,19 @@ def _assess_gear_followup(asm, gear: dict, W_N: float, spec: dict, groups: dict 
         else:
             gear.setdefault("checks", []).append(
                 ("asm:gear_drag_area", None, f"área do trem unassessed: {sc.get('issue')}"))
+    # opt-in (24 nov 2026): legs designed above the 23.485 minimum (factor on both side loads); the 6-DOF touchdown
+    # check then compares with the same design limit (gear['side_load_factor'] → flightsim). Absent → 1 (23.485).
+    k_side = float(gopts.get("side_load_factor") or 1.0)
     side = size_gear_side_load_structure(
-        gear, W_N, diameter_m=gopts.get("leg_diameter_m"), length_opts=length_opts or None)
+        gear, W_N, diameter_m=gopts.get("leg_diameter_m"), length_opts=length_opts or None, side_factor=k_side)
     gear["side_load_structure"] = side
+    if k_side != 1.0:
+        gear["side_load_factor"] = k_side
     if side.get("status") == "assessed":
         gear.setdefault("checks", []).append(
             ("asm:gear_side_load_structure", bool(side.get("ok")),
-             f"pernas às cargas 23.485: RF flexão {side['RF_bending']:.2f}, corte {side['RF_shear']:.2f}, "
+             f"pernas às cargas 23.485{f' × {k_side:g}' if k_side != 1.0 else ''}: RF flexão {side['RF_bending']:.2f}, "
+             f"corte {side['RF_shear']:.2f}, "
              f"encurvadura {side['RF_buckling']:.1f}, σ {side['sigma_MPa']:.0f} MPa, "
              f"massa 2× principais {side['mass_two_mains_kg']:.2f} kg ({side['source']})"))
     else:

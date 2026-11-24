@@ -869,6 +869,8 @@ class MissionRunner:
         1.33 W vertical) — the loads the gear is designed for (PRESSUPOSTO: gear designed to 23.485; the gear
         structure is not sized for side load in landing_gear)."""
         W = self.W()
+        # gear designed above 23.485 (assembly gear.side_load_factor k, opt-in): design limit = k × 23.485
+        k_d = float((self.fm.mass.gear or {}).get("side_load_factor") or 1.0)
         ib = max((v["inboard_N"] for v in td["side"].values()), default=None)
         ob = max((v["outboard_N"] for v in td["side"].values()), default=None)
         out = {**{k: v for k, v in td.items() if k not in ("side", "N", "bumpers")}, "decrab": decrab,
@@ -877,9 +879,16 @@ class MissionRunner:
                                 "source": "14 CFR 23.485(c) (pré-Amdt 23-64; Amdt 23-45): 0,5 W para dentro num lado, "
                                           "0,33 W para fora no outro, vertical 1,33"},
                "bumper_contacts_N": td["bumpers"] or None}
+        if k_d != 1.0:
+            out["design_side_load_factor"] = k_d
+            out["limit_design_N"] = {"inboard_N": 0.5 * W * k_d, "outboard_N": 0.33 * W * k_d,
+                                     "source": f"trem projetado para {k_d:g} × 23.485 (gear.side_load_factor)"}
         if ib is not None:
-            out["inboard_ratio"] = ib / (0.5 * W)
-            out["outboard_ratio"] = ob / (0.33 * W)
+            out["inboard_ratio"] = ib / (0.5 * W * k_d)
+            out["outboard_ratio"] = ob / (0.33 * W * k_d)
+            if k_d != 1.0:
+                out["inboard_ratio_23_485"] = ib / (0.5 * W)
+                out["outboard_ratio_23_485"] = ob / (0.33 * W)
             out.update(side_load_band(out["inboard_ratio"], out["outboard_ratio"]))
         else:
             out["side_load_ok"] = None

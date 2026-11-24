@@ -49,3 +49,28 @@ def test_side_load_converged_in_substep():
 def test_default_substep_declared():
     from acdt.domains.aircraft.flightsim import mission as M
     assert M.TOUCHDOWN_SUBSTEP_S == 0.0025
+
+
+def test_design_side_load_factor_scales_the_limit():
+    """gear.side_load_factor k (opt-in): o toque compara com k × 23.485; a razão a 23.485 continua reportada."""
+    from acdt.domains.aircraft.flightsim.aeromodel import FlightModel
+    from acdt.domains.aircraft.flightsim.mission import MissionRunner
+    fm = FlightModel.load(DATA / "toque_tailless_opcao_a_flight_model.json")
+    fm.mass.gear["side_load_factor"] = 1.3
+    ms = copy.deepcopy(MISSION)
+    ms["dt"] = 0.02
+    td = MissionRunner(fm, ms, None).run()["segments"][-1]["touchdown"]
+    assert td["design_side_load_factor"] == 1.3
+    assert td["inboard_ratio"] == pytest.approx(td["inboard_ratio_23_485"] / 1.3)
+    assert td["limit_design_N"]["inboard_N"] == pytest.approx(1.3 * td["limit_23_485"]["inboard_N"])
+
+
+def test_leg_structure_side_factor_monotone():
+    from acdt.domains.aircraft.assembly.gear_devices import size_gear_side_load_structure
+    lay = {"nose_fraction": [0.08, 0.15]}
+    lo = {"main_gear_length_m": 0.47, "nose_gear_length_m": 0.78}
+    m = [size_gear_side_load_structure(lay, 1550.0, length_opts=lo, side_factor=k) for k in (1.0, 1.3, 2.0)]
+    assert all(x["status"] == "assessed" for x in m)
+    assert m[0]["side_factor"] == 1.0 and m[0]["F_side_N"] == pytest.approx(0.5 * 1550.0)
+    assert m[1]["F_side_N"] == pytest.approx(1.3 * 0.5 * 1550.0)
+    assert m[0]["mass_two_mains_kg"] <= m[1]["mass_two_mains_kg"] <= m[2]["mass_two_mains_kg"]

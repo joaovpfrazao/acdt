@@ -1,0 +1,1041 @@
+{
+ "schema": "acdt.estudo_cheio_consolidado/1",
+ "applied": false,
+ "example": "examples/heavy/uav150_flying_wing_tailless.yaml",
+ "simulation": "examples/simulation/uav150_tailless_crosswind.yaml",
+ "fixed_option_a": {
+  "replace_items": [
+   {
+    "match": "atuadores split aileron",
+    "item": {
+     "name": "atuadores split aileron (8x Volz DA 30-HT, 1100 g cada)",
+     "mass_kg": 8.8,
+     "group": "equipment"
+    }
+   }
+  ],
+  "set": {
+   "assumptions.assembly.options.flying_wing.actuators.split_rate_required_deg_s": 100
+  }
+ },
+ "fixed": {
+  "set": {
+   "assumptions.assembly.options.flying_wing.gear.side_load_factor": 1.3
+  },
+  "leg_reinforcement_item": {
+   "name": "reforço das pernas principais (carga lateral 1,3 × 23.485)",
+   "mass_kg_initial": 0.213,
+   "group": "structure"
+  }
+ },
+ "exemplo": {
+  "label": "exemplo",
+  "W0_kg": 149.66698928125118,
+  "converged": true,
+  "feasible": true,
+  "We_kg": 95.90281735403153,
+  "inertia": {
+   "Ixx": 16.215405692489686,
+   "Iyy": 37.268407685744556,
+   "Izz": 50.31097384594962
+  },
+  "servo_split": {
+   "name": "Volz DA 30",
+   "n_per_surface": 2
+  },
+  "rate_max_effective_deg_s": 83.53566656422923,
+  "P_mech_per_leaf_W": 25.304230665079707,
+  "P_elec_per_leaf_W": null,
+  "actuator_mass_kg": 6.3,
+  "gear_side_load_factor": 1.0,
+  "gear_side_structure": {
+   "mass_two_mains_kg": 0.38730879194020634,
+   "RF_bending": 1.087200283231554,
+   "RF_shear": 35.27589457622585,
+   "RF_buckling": 62.95905482748409,
+   "ok": true,
+   "side_factor": 1.0,
+   "wall_m": 0.0007968750000000001
+  },
+  "trim_cases_ok": {
+   "vazio": true,
+   "carga": true,
+   "combustível": true,
+   "cheio": true
+  },
+  "static_margin": {
+   "vazio": 0.05085141007726532,
+   "carga": 0.0649342064394099,
+   "combustível": 0.05085141007726517,
+   "cheio": 0.06275189235992225
+  },
+  "hq": {
+   "hq:dutch_roll": true,
+   "hq:spiral": true,
+   "hq:phugoid": true,
+   "hq:phugoid_autopilot": true,
+   "hq:lateral_gust": true,
+   "hq:yaw_crosswind": true,
+   "hq:sas_authority": true,
+   "hq:sas_time_delay": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true
+  },
+  "dutch_roll_msg": "montagem com SAS (k_β 0.000/rad, k_r 0.075): rolamento holandês ζ / ζω / ω = 0.142 / 0.341 / 2.40 → Nível 1 (MIL-F-8785C Table VI); com atuador (lag 0.000 s, at",
+  "phugoid_bare_zeta": 0.041853283236317464,
+  "delay_margin_level1_s": 0.23446179304664838,
+  "crosswind": {
+   "kt": 10.108000093306531,
+   "max_kt": 14.652822850270493
+  },
+  "perf_checks": {
+   "perf:endurance": true,
+   "perf:service_ceiling": true,
+   "perf:climb_rate": true,
+   "perf:takeoff_ground_roll": 1.0
+  },
+  "gust_6dof": {
+   "ok": false,
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "peak_rate_deg_s": 43.10152579587879,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.9381139071465678
+    },
+    "carga": {
+     "ok": true,
+     "peak_rate_deg_s": 72.75972654482648,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.148103085747083
+    },
+    "combustível": {
+     "ok": true,
+     "peak_rate_deg_s": 53.05868978640637,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.5744012319284797
+    },
+    "cheio": {
+     "ok": false,
+     "peak_rate_deg_s": 83.53566656422923,
+     "rate_available_deg_s": 83.53566656422923,
+     "rate_required_deg_s": 99.90946307345588,
+     "rate_margin": null
+    }
+   },
+   "rate_margin_min": 1.148103085747083
+  },
+  "takeoff_6dof": {
+   "ground_roll_m": 325.1384593403117,
+   "mode": "fly_off",
+   "options_closing": [
+    "a_vento_de_frente",
+    "b_tracao",
+    "c_carga_alar",
+    "d_massa"
+   ]
+  },
+  "touchdown": {
+   "side_load_status": "passa",
+   "side_load_ok": true,
+   "inboard_ratio": 0.5948328327373055,
+   "outboard_ratio": 0.2201919505172078,
+   "inboard_ratio_23_485": null,
+   "outboard_ratio_23_485": null,
+   "design_side_load_factor": null,
+   "drift_m_s": 0.340183946570066,
+   "residual_crab_deg": -0.2756837581640725,
+   "tip_skid_ok": true
+  },
+  "sink_at_touchdown_m_s": 1.0619797240415834,
+  "aft_clearance_ok": true,
+  "verification": {
+   "counts": {
+    "nao_avaliado": 4,
+    "desconhecido": 2,
+    "passa": 11,
+    "no_limite": 3
+   },
+   "rows": [
+    {
+     "id": "MIS-CFG-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "piston_prop",
+     "text": "Motor a gasolina com hélice propulsora"
+    },
+    {
+     "id": "MIS-CERT-01",
+     "status": "desconhecido",
+     "value": "",
+     "goal": "easa_specific",
+     "text": "Categoria específica (UAS)"
+    },
+    {
+     "id": "MIS-PL-01",
+     "status": "passa",
+     "value": "",
+     "goal": "= 30 kg",
+     "text": "Carga útil EO/IR + SAR ligeiro de 30 kg"
+    },
+    {
+     "id": "MIS-END-01",
+     "status": "passa",
+     "value": "10.47 h",
+     "goal": "≥ 10 h",
+     "text": "Autonomia em espera ≥ 10 h"
+    },
+    {
+     "id": "MIS-CRZ-01",
+     "status": "passa",
+     "value": "",
+     "goal": "= 45 m/s",
+     "text": "Velocidade de cruzeiro 45 m/s"
+    },
+    {
+     "id": "MIS-CRZ-02",
+     "status": "passa",
+     "value": "",
+     "goal": "= 3000 m",
+     "text": "Altitude de cruzeiro 3000 m"
+    },
+    {
+     "id": "MIS-STALL-01",
+     "status": "no_limite",
+     "value": "",
+     "goal": "≤ 26 m/s",
+     "text": "Velocidade de perda ≤ 26 m/s"
+    },
+    {
+     "id": "MIS-CLB-01",
+     "status": "passa",
+     "value": "4.168 m/s",
+     "goal": "≥ 3.0 m/s",
+     "text": "Razão de subida ao nível do mar ≥ 3 m/s"
+    },
+    {
+     "id": "MIS-CEIL-01",
+     "status": "no_limite",
+     "value": "5000 m",
+     "goal": "≥ 5000 m",
+     "text": "Teto de serviço ≥ 5000 m"
+    },
+    {
+     "id": "MIS-TO-01",
+     "status": "passa",
+     "value": "227.6 m",
+     "goal": "≤ 300 m",
+     "text": "Corrida de descolagem ≤ 300 m"
+    },
+    {
+     "id": "MIS-OPS-01",
+     "status": "no_limite",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Operar de pista de 300 m com o vento cruzado regulamentar"
+    },
+    {
+     "id": "REG-23233-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Controlo direcional com vento cruzado a 90° ≥ 0,2 V_S0"
+    },
+    {
+     "id": "DER-TO-XW-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "≤ 300 m",
+     "text": "Corrida de descolagem no 6-DOF com o vento cruzado de REG-23233-01 ≤ 300 m"
+    },
+    {
+     "id": "REG-23485-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Pernas do trem principal às cargas laterais de 23.485"
+    },
+    {
+     "id": "NRM-HQ-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Rolamento holandês Nível 1 (com SAS)"
+    },
+    {
+     "id": "DER-HQ-02",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Autoridade e taxa dos split ailerons para o SAS em turbulência + vento cruzado"
+    },
+    {
+     "id": "DER-SM-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Margem estática mínima de 2 % (asa voadora)"
+    },
+    {
+     "id": "DER-PKG-01",
+     "status": "desconhecido",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Carga útil e combustível arrumados junto ao CG"
+    },
+    {
+     "id": "SORA-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Requisitos de contenção SORA 2.5 Step #8"
+    },
+    {
+     "id": "PL-FOV-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Campo de visão do payload EO/IR desobstruído"
+    }
+   ]
+  },
+  "checks": {
+   "regulatory_category": null,
+   "asm:closes_pessimistic_cd0": true,
+   "static_margin": true,
+   "trim": true,
+   "hq:scissor": true,
+   "wb:envelope": true,
+   "gear:stroke": true,
+   "asm:wing_area": true,
+   "asm:static_margin": true,
+   "asm:gear_tipback": true,
+   "asm:gear_rotation": true,
+   "asm:gear_prop_clearance": true,
+   "asm:gear_belly": true,
+   "asm:gear_position": true,
+   "asm:gear_overturn": true,
+   "asm:gear_nose_vs_prop": true,
+   "asm:gear_tip_skids": true,
+   "asm:gear_side_load_structure": true,
+   "asm:gear_max_track_9532": null,
+   "hq:short_period": true,
+   "hq:CAP": true,
+   "hq:phugoid": true,
+   "hq:dutch_roll": true,
+   "hq:roll": true,
+   "hq:spiral": true,
+   "hq:yaw_crosswind": true,
+   "hq:yaw_coordination": true,
+   "hq:sas_authority": true,
+   "gear:takeoff_rotation": true,
+   "hq:sas_time_delay": true,
+   "hq:lateral_gust": true,
+   "asm:useful_load_packaging": null,
+   "asm:fine_packaging": null,
+   "hq:phugoid_autopilot": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true,
+   "gear:position": true,
+   "gear:tipback": true,
+   "gear:nose_load": true,
+   "gear:overturn": true,
+   "gear:rotation": true,
+   "aeroel:divergence": true,
+   "aeroel:reversal": true,
+   "aeroel:flutter": true,
+   "aeroel:aeer45": true,
+   "perf:endurance": true,
+   "perf:service_ceiling": true,
+   "perf:climb_rate": true,
+   "perf:takeoff_ground_roll": 1.0
+  },
+  "failing_checks": {},
+  "elapsed_s": 186.31701707839966
+ },
+ "opcao_a": {
+  "label": "opcao_a",
+  "W0_kg": 157.66841923218237,
+  "converged": true,
+  "feasible": true,
+  "We_kg": 102.94064215114021,
+  "inertia": {
+   "Ixx": 17.50110222579188,
+   "Iyy": 42.19905504908429,
+   "Izz": 56.17904621990235
+  },
+  "servo_split": {
+   "name": "Volz DA 30-HT",
+   "n_per_surface": 2
+  },
+  "rate_max_effective_deg_s": 107.04670884762635,
+  "P_mech_per_leaf_W": 33.99826533054234,
+  "P_elec_per_leaf_W": null,
+  "actuator_mass_kg": 10.06,
+  "gear_side_load_factor": 1.0,
+  "gear_side_structure": {
+   "mass_two_mains_kg": 0.38730879194020634,
+   "RF_bending": 1.0320551427183315,
+   "RF_shear": 33.48569714301349,
+   "RF_buckling": 59.81255858763623,
+   "ok": true,
+   "side_factor": 1.0,
+   "wall_m": 0.0007968750000000001
+  },
+  "trim_cases_ok": {
+   "vazio": true,
+   "carga": true,
+   "combustível": true,
+   "cheio": true
+  },
+  "static_margin": {
+   "vazio": 0.050014657818839514,
+   "carga": 0.06215922815015005,
+   "combustível": 0.05001465781883965,
+   "cheio": 0.06029808000889917
+  },
+  "hq": {
+   "hq:dutch_roll": true,
+   "hq:spiral": true,
+   "hq:phugoid": false,
+   "hq:phugoid_autopilot": true,
+   "hq:lateral_gust": true,
+   "hq:yaw_crosswind": true,
+   "hq:sas_authority": true,
+   "hq:sas_time_delay": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true
+  },
+  "dutch_roll_msg": "montagem com SAS (k_β 0.000/rad, k_r 0.075): rolamento holandês ζ / ζω / ω = 0.133 / 0.318 / 2.40 → Nível 1 (MIL-F-8785C Table VI); com atuador (lag 0.000 s, at",
+  "phugoid_bare_zeta": 0.03905435513779527,
+  "delay_margin_level1_s": 0.2227782544487127,
+  "crosswind": {
+   "kt": 10.1080000933027,
+   "max_kt": 14.239606997971528
+  },
+  "perf_checks": {
+   "perf:endurance": true,
+   "perf:service_ceiling": true,
+   "perf:climb_rate": true,
+   "perf:takeoff_ground_roll": 1.0
+  },
+  "gust_6dof": {
+   "ok": true,
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "peak_rate_deg_s": 40.825697432827255,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_required_deg_s": null,
+     "rate_margin": 2.6220423796496344
+    },
+    "carga": {
+     "ok": true,
+     "peak_rate_deg_s": 76.16892666011984,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.405385549481208
+    },
+    "combustível": {
+     "ok": true,
+     "peak_rate_deg_s": 60.43551877660074,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.7712549013324994
+    },
+    "cheio": {
+     "ok": true,
+     "peak_rate_deg_s": 99.94202565114374,
+     "rate_available_deg_s": 107.04670884762635,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.0710880447959112
+    }
+   },
+   "rate_margin_min": 1.0710880447959112
+  },
+  "takeoff_6dof": {
+   "ground_roll_m": 331.8388103867036,
+   "mode": "fly_off",
+   "options_closing": [
+    "a_vento_de_frente",
+    "b_tracao",
+    "c_carga_alar",
+    "d_massa"
+   ]
+  },
+  "touchdown": {
+   "side_load_status": "excede",
+   "side_load_ok": false,
+   "inboard_ratio": 1.2280788567177892,
+   "outboard_ratio": 0.3277595256442913,
+   "inboard_ratio_23_485": null,
+   "outboard_ratio_23_485": null,
+   "design_side_load_factor": null,
+   "drift_m_s": 0.40589257931236006,
+   "residual_crab_deg": -0.17797801633337842,
+   "tip_skid_ok": true
+  },
+  "sink_at_touchdown_m_s": 1.26481839830865,
+  "aft_clearance_ok": true,
+  "verification": {
+   "counts": {
+    "nao_avaliado": 4,
+    "desconhecido": 2,
+    "passa": 11,
+    "no_limite": 3
+   },
+   "rows": [
+    {
+     "id": "MIS-CFG-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "piston_prop",
+     "text": "Motor a gasolina com hélice propulsora"
+    },
+    {
+     "id": "MIS-CERT-01",
+     "status": "desconhecido",
+     "value": "",
+     "goal": "easa_specific",
+     "text": "Categoria específica (UAS)"
+    },
+    {
+     "id": "MIS-PL-01",
+     "status": "passa",
+     "value": "",
+     "goal": "= 30 kg",
+     "text": "Carga útil EO/IR + SAR ligeiro de 30 kg"
+    },
+    {
+     "id": "MIS-END-01",
+     "status": "passa",
+     "value": "10.52 h",
+     "goal": "≥ 10 h",
+     "text": "Autonomia em espera ≥ 10 h"
+    },
+    {
+     "id": "MIS-CRZ-01",
+     "status": "passa",
+     "value": "",
+     "goal": "= 45 m/s",
+     "text": "Velocidade de cruzeiro 45 m/s"
+    },
+    {
+     "id": "MIS-CRZ-02",
+     "status": "passa",
+     "value": "",
+     "goal": "= 3000 m",
+     "text": "Altitude de cruzeiro 3000 m"
+    },
+    {
+     "id": "MIS-STALL-01",
+     "status": "no_limite",
+     "value": "",
+     "goal": "≤ 26 m/s",
+     "text": "Velocidade de perda ≤ 26 m/s"
+    },
+    {
+     "id": "MIS-CLB-01",
+     "status": "passa",
+     "value": "4.149 m/s",
+     "goal": "≥ 3.0 m/s",
+     "text": "Razão de subida ao nível do mar ≥ 3 m/s"
+    },
+    {
+     "id": "MIS-CEIL-01",
+     "status": "no_limite",
+     "value": "5000 m",
+     "goal": "≥ 5000 m",
+     "text": "Teto de serviço ≥ 5000 m"
+    },
+    {
+     "id": "MIS-TO-01",
+     "status": "passa",
+     "value": "228.2 m",
+     "goal": "≤ 300 m",
+     "text": "Corrida de descolagem ≤ 300 m"
+    },
+    {
+     "id": "MIS-OPS-01",
+     "status": "no_limite",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Operar de pista de 300 m com o vento cruzado regulamentar"
+    },
+    {
+     "id": "REG-23233-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Controlo direcional com vento cruzado a 90° ≥ 0,2 V_S0"
+    },
+    {
+     "id": "DER-TO-XW-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "≤ 300 m",
+     "text": "Corrida de descolagem no 6-DOF com o vento cruzado de REG-23233-01 ≤ 300 m"
+    },
+    {
+     "id": "REG-23485-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Pernas do trem principal às cargas laterais de 23.485"
+    },
+    {
+     "id": "NRM-HQ-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Rolamento holandês Nível 1 (com SAS)"
+    },
+    {
+     "id": "DER-HQ-02",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Autoridade e taxa dos split ailerons para o SAS em turbulência + vento cruzado"
+    },
+    {
+     "id": "DER-SM-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Margem estática mínima de 2 % (asa voadora)"
+    },
+    {
+     "id": "DER-PKG-01",
+     "status": "desconhecido",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Carga útil e combustível arrumados junto ao CG"
+    },
+    {
+     "id": "SORA-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Requisitos de contenção SORA 2.5 Step #8"
+    },
+    {
+     "id": "PL-FOV-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Campo de visão do payload EO/IR desobstruído"
+    }
+   ]
+  },
+  "checks": {
+   "regulatory_category": null,
+   "asm:closes_pessimistic_cd0": true,
+   "static_margin": true,
+   "trim": true,
+   "hq:scissor": true,
+   "wb:envelope": true,
+   "gear:stroke": true,
+   "asm:wing_area": true,
+   "asm:static_margin": true,
+   "asm:gear_tipback": true,
+   "asm:gear_rotation": true,
+   "asm:gear_prop_clearance": true,
+   "asm:gear_belly": true,
+   "asm:gear_position": true,
+   "asm:gear_overturn": true,
+   "asm:gear_nose_vs_prop": true,
+   "asm:gear_tip_skids": true,
+   "asm:gear_side_load_structure": true,
+   "asm:gear_max_track_9532": null,
+   "hq:short_period": true,
+   "hq:CAP": true,
+   "hq:phugoid": false,
+   "hq:dutch_roll": true,
+   "hq:roll": true,
+   "hq:spiral": true,
+   "hq:yaw_crosswind": true,
+   "hq:yaw_coordination": true,
+   "hq:sas_authority": true,
+   "gear:takeoff_rotation": true,
+   "hq:sas_time_delay": true,
+   "hq:lateral_gust": true,
+   "asm:useful_load_packaging": null,
+   "asm:fine_packaging": null,
+   "hq:phugoid_autopilot": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true,
+   "gear:position": true,
+   "gear:tipback": true,
+   "gear:nose_load": true,
+   "gear:overturn": true,
+   "gear:rotation": true,
+   "aeroel:divergence": true,
+   "aeroel:reversal": true,
+   "aeroel:flutter": true,
+   "aeroel:aeer45": true,
+   "perf:endurance": true,
+   "perf:service_ceiling": true,
+   "perf:climb_rate": true,
+   "perf:takeoff_ground_roll": 1.0
+  },
+  "failing_checks": {
+   "hq:phugoid": "montagem: fugóide ζ = 0.0391 → Nível 2 (N1: ≥ 0.04; MIL-F-8785C 3.2.1.2, Classe I, Cat. B) — UAV: indicativo"
+  },
+  "elapsed_s": 159.36420893669128
+ },
+ "consolidado": {
+  "label": "consolidado",
+  "W0_kg": 158.0917947945274,
+  "converged": true,
+  "feasible": true,
+  "We_kg": 103.27632741665764,
+  "inertia": {
+   "Ixx": 17.101498515714784,
+   "Iyy": 41.676330247124746,
+   "Izz": 55.29583962990781
+  },
+  "servo_split": {
+   "name": "Volz DA 30-HT",
+   "n_per_surface": 2
+  },
+  "rate_max_effective_deg_s": 109.55024391858979,
+  "P_mech_per_leaf_W": 34.12883703714571,
+  "P_elec_per_leaf_W": null,
+  "actuator_mass_kg": 10.06,
+  "gear_side_load_factor": 1.3,
+  "gear_side_structure": {
+   "mass_two_mains_kg": 0.6005880887489523,
+   "RF_bending": 1.2196353199580559,
+   "RF_shear": 39.83554243740383,
+   "RF_buckling": 91.12844572975038,
+   "ok": true,
+   "side_factor": 1.3,
+   "wall_m": 0.0012451171875
+  },
+  "trim_cases_ok": {
+   "vazio": true,
+   "carga": true,
+   "combustível": true,
+   "cheio": true
+  },
+  "static_margin": {
+   "vazio": 0.050016634633946115,
+   "carga": 0.062222598353424044,
+   "combustível": 0.050016634633946115,
+   "cheio": 0.06034789197327353
+  },
+  "hq": {
+   "hq:dutch_roll": true,
+   "hq:spiral": true,
+   "hq:phugoid": false,
+   "hq:phugoid_autopilot": true,
+   "hq:lateral_gust": true,
+   "hq:yaw_crosswind": true,
+   "hq:sas_authority": true,
+   "hq:sas_time_delay": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true
+  },
+  "dutch_roll_msg": "montagem com SAS (k_β 0.000/rad, k_r 0.075): rolamento holandês ζ / ζω / ω = 0.128 / 0.312 / 2.44 → Nível 1 (MIL-F-8785C Table VI); com atuador (lag 0.000 s, at",
+  "phugoid_bare_zeta": 0.039128755470187834,
+  "delay_margin_level1_s": 0.21043512135202036,
+  "crosswind": {
+   "kt": 10.10800009330052,
+   "max_kt": 13.953882523423687
+  },
+  "perf_checks": {
+   "perf:endurance": true,
+   "perf:service_ceiling": true,
+   "perf:climb_rate": true,
+   "perf:takeoff_ground_roll": 1.0
+  },
+  "gust_6dof": {
+   "ok": true,
+   "cases": {
+    "vazio": {
+     "ok": true,
+     "peak_rate_deg_s": 41.3658088225268,
+     "rate_available_deg_s": 109.55024391858979,
+     "rate_required_deg_s": null,
+     "rate_margin": 2.648328342583535
+    },
+    "carga": {
+     "ok": true,
+     "peak_rate_deg_s": 82.62722933800735,
+     "rate_available_deg_s": 109.55024391858979,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.325837073278194
+    },
+    "combustível": {
+     "ok": true,
+     "peak_rate_deg_s": 72.7671746197476,
+     "rate_available_deg_s": 109.55024391858979,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.5054898653280948
+    },
+    "cheio": {
+     "ok": true,
+     "peak_rate_deg_s": 101.98055709532728,
+     "rate_available_deg_s": 109.55024391858979,
+     "rate_required_deg_s": null,
+     "rate_margin": 1.0742267647762178
+    }
+   },
+   "rate_margin_min": 1.0742267647762178
+  },
+  "takeoff_6dof": {
+   "ground_roll_m": 332.55466702702597,
+   "mode": "fly_off",
+   "options_closing": [
+    "a_vento_de_frente",
+    "b_tracao",
+    "c_carga_alar",
+    "d_massa"
+   ]
+  },
+  "touchdown": {
+   "side_load_status": "passa",
+   "side_load_ok": true,
+   "inboard_ratio": 0.8964379448360802,
+   "outboard_ratio": 0.19028056620405384,
+   "inboard_ratio_23_485": 1.1653693282869042,
+   "outboard_ratio_23_485": 0.24736473606526999,
+   "design_side_load_factor": 1.3,
+   "drift_m_s": 0.3800822645050767,
+   "residual_crab_deg": -0.14791187866917105,
+   "tip_skid_ok": true
+  },
+  "sink_at_touchdown_m_s": 1.1547103379287023,
+  "aft_clearance_ok": true,
+  "verification": {
+   "counts": {
+    "nao_avaliado": 4,
+    "desconhecido": 2,
+    "passa": 11,
+    "no_limite": 3
+   },
+   "rows": [
+    {
+     "id": "MIS-CFG-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "piston_prop",
+     "text": "Motor a gasolina com hélice propulsora"
+    },
+    {
+     "id": "MIS-CERT-01",
+     "status": "desconhecido",
+     "value": "",
+     "goal": "easa_specific",
+     "text": "Categoria específica (UAS)"
+    },
+    {
+     "id": "MIS-PL-01",
+     "status": "passa",
+     "value": "",
+     "goal": "= 30 kg",
+     "text": "Carga útil EO/IR + SAR ligeiro de 30 kg"
+    },
+    {
+     "id": "MIS-END-01",
+     "status": "passa",
+     "value": "10.53 h",
+     "goal": "≥ 10 h",
+     "text": "Autonomia em espera ≥ 10 h"
+    },
+    {
+     "id": "MIS-CRZ-01",
+     "status": "passa",
+     "value": "",
+     "goal": "= 45 m/s",
+     "text": "Velocidade de cruzeiro 45 m/s"
+    },
+    {
+     "id": "MIS-CRZ-02",
+     "status": "passa",
+     "value": "",
+     "goal": "= 3000 m",
+     "text": "Altitude de cruzeiro 3000 m"
+    },
+    {
+     "id": "MIS-STALL-01",
+     "status": "no_limite",
+     "value": "",
+     "goal": "≤ 26 m/s",
+     "text": "Velocidade de perda ≤ 26 m/s"
+    },
+    {
+     "id": "MIS-CLB-01",
+     "status": "passa",
+     "value": "4.173 m/s",
+     "goal": "≥ 3.0 m/s",
+     "text": "Razão de subida ao nível do mar ≥ 3 m/s"
+    },
+    {
+     "id": "MIS-CEIL-01",
+     "status": "no_limite",
+     "value": "5000 m",
+     "goal": "≥ 5000 m",
+     "text": "Teto de serviço ≥ 5000 m"
+    },
+    {
+     "id": "MIS-TO-01",
+     "status": "passa",
+     "value": "226.1 m",
+     "goal": "≤ 300 m",
+     "text": "Corrida de descolagem ≤ 300 m"
+    },
+    {
+     "id": "MIS-OPS-01",
+     "status": "no_limite",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Operar de pista de 300 m com o vento cruzado regulamentar"
+    },
+    {
+     "id": "REG-23233-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Controlo direcional com vento cruzado a 90° ≥ 0,2 V_S0"
+    },
+    {
+     "id": "DER-TO-XW-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "≤ 300 m",
+     "text": "Corrida de descolagem no 6-DOF com o vento cruzado de REG-23233-01 ≤ 300 m"
+    },
+    {
+     "id": "REG-23485-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Pernas do trem principal às cargas laterais de 23.485"
+    },
+    {
+     "id": "NRM-HQ-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Rolamento holandês Nível 1 (com SAS)"
+    },
+    {
+     "id": "DER-HQ-02",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Autoridade e taxa dos split ailerons para o SAS em turbulência + vento cruzado"
+    },
+    {
+     "id": "DER-SM-01",
+     "status": "passa",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Margem estática mínima de 2 % (asa voadora)"
+    },
+    {
+     "id": "DER-PKG-01",
+     "status": "desconhecido",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Carga útil e combustível arrumados junto ao CG"
+    },
+    {
+     "id": "SORA-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Requisitos de contenção SORA 2.5 Step #8"
+    },
+    {
+     "id": "PL-FOV-01",
+     "status": "nao_avaliado",
+     "value": "",
+     "goal": "verdadeiro",
+     "text": "Campo de visão do payload EO/IR desobstruído"
+    }
+   ]
+  },
+  "checks": {
+   "regulatory_category": null,
+   "asm:closes_pessimistic_cd0": true,
+   "static_margin": true,
+   "trim": true,
+   "hq:scissor": true,
+   "wb:envelope": true,
+   "gear:stroke": true,
+   "asm:wing_area": true,
+   "asm:static_margin": true,
+   "asm:gear_tipback": true,
+   "asm:gear_rotation": true,
+   "asm:gear_prop_clearance": true,
+   "asm:gear_belly": true,
+   "asm:gear_position": true,
+   "asm:gear_overturn": true,
+   "asm:gear_nose_vs_prop": true,
+   "asm:gear_tip_skids": true,
+   "asm:gear_side_load_structure": true,
+   "asm:gear_max_track_9532": null,
+   "hq:short_period": true,
+   "hq:CAP": true,
+   "hq:phugoid": false,
+   "hq:dutch_roll": true,
+   "hq:roll": true,
+   "hq:spiral": true,
+   "hq:yaw_crosswind": true,
+   "hq:yaw_coordination": true,
+   "hq:sas_authority": true,
+   "gear:takeoff_rotation": true,
+   "hq:sas_time_delay": true,
+   "hq:lateral_gust": true,
+   "asm:useful_load_packaging": null,
+   "asm:fine_packaging": null,
+   "hq:phugoid_autopilot": true,
+   "hq:actuators": true,
+   "asm:actuator_mass": true,
+   "hq:pitch_trim_tailless": true,
+   "gear:position": true,
+   "gear:tipback": true,
+   "gear:nose_load": true,
+   "gear:overturn": true,
+   "gear:rotation": true,
+   "aeroel:divergence": true,
+   "aeroel:reversal": true,
+   "aeroel:flutter": true,
+   "aeroel:aeer45": true,
+   "perf:endurance": true,
+   "perf:service_ceiling": true,
+   "perf:climb_rate": true,
+   "perf:takeoff_ground_roll": 1.0
+  },
+  "failing_checks": {
+   "hq:phugoid": "montagem: fugóide ζ = 0.0391 → Nível 2 (N1: ≥ 0.04; MIL-F-8785C 3.2.1.2, Classe I, Cat. B) — UAV: indicativo"
+  },
+  "elapsed_s": 127.58345293998718
+ },
+ "leg_reinforcement_iterations": [
+  {
+   "leg_item_kg": 0.213,
+   "W0_kg": 158.0917947945274,
+   "leg_delta_model_kg": 0.21327929680874597
+  }
+ ],
+ "leg_reinforcement_closed": true,
+ "delta_W0_vs_exemplo_kg": 8.424805513276226,
+ "delta_W0_vs_opcao_a_kg": 0.42337556234502927,
+ "checks_changed_vs_exemplo": {
+  "hq:phugoid": {
+   "exemplo": true,
+   "consolidado": false
+  }
+ }
+}

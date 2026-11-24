@@ -11,3 +11,8 @@ docs/tutorial-asa-voadora-sem-deriva.md §5, e a decisão é do João.
 Resumo e tabela em docs/tutorial-asa-voadora-sem-deriva.md §5.1.
 
 `opcao_a.json` foi regenerado a 24 nov 2026 com o toque convergido no passo (docs/tutorial-asa-voadora-sem-deriva.md §5.2). Só os números do toque na missão 6-DOF mudaram.
+
+`consolidado.json` (24 nov 2026): opção (a) com as pernas a 1,3 × 23.485, gerado por
+`python examples/studies/rajada_cheio/estudo_consolidado.py` (cerca de 8 min; exemplo, opção (a) e consolidado correm
+com o mesmo código). É `applied: false` e usa os `fixed` de `consolidado.yaml` e `opcao_a.yaml`, aplicados em
+memória. Tabela em docs/tutorial-asa-voadora-sem-deriva.md §5.4.

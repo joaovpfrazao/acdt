@@ -2073,3 +2073,7 @@ Estudo `examples/studies/rajada_cheio/estudo_opcao_a.py` (`applied: false`). Com
 ## Toque 23.485 convergido + decisão da carga lateral com a opção (a) (24 nov 2026, ramo `toque-convergido`)
 
 O veredicto do toque deixou de depender do passo: há sub-passos de 2,5 ms na janela do contacto e a lei muda no instante do toque. A base passa (0,60) e a opção (a) excede (1,23), em todos os passos de 5 a 25 ms. O estudo `examples/studies/toque_cheio` (`applied: false`) dá duas variantes que passam: decrab a 45 m (0,85, janela estreita) e pernas a 1,3 × 23.485 (0,91, W0 +0,42 kg). A recomendação é a segunda, mas a decisão é do João. Pendente: decisão do João; ferragens e ligação do trem à asa (desconhecidas); dispersão da aproximação. Ver [tutorial-asa-voadora-sem-deriva.md](tutorial-asa-voadora-sem-deriva.md) §5.2–5.3 e CAPABILITIES §50.
+
+## Estudo consolidado: opção (a) + pernas a 1,3 × 23.485 (24 nov 2026, ramo `cheio-consolidado`)
+
+Estudo `applied: false` em `examples/studies/rajada_cheio/consolidado.yaml`: W0 158,09 kg (+0,42 kg face a (a)). Rajada 6-DOF passa nos 4 casos e o toque passa (0,896 do limite 1,3×). Falta resolver `hq:phugoid` sem aumento e a corrida 6-DOF com vento cruzado (332,6 m). Ferragens e ligação à asa ficam desconhecidas. Chave opcional nova `gear.side_load_factor`. As verificações `asm:*` não avaliadas deixam de contar como falha. Tabela em [tutorial-asa-voadora-sem-deriva.md](tutorial-asa-voadora-sem-deriva.md) §5.4; CAPABILITIES §51.
