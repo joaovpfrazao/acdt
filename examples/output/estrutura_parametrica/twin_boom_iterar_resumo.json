@@ -3,42 +3,42 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 168.87840020070337,
- "tempo_s": 39.77479672431946,
+ "tempo_s": 47.6363251209259,
  "veredicto": "desconhecido",
  "contagem": {
-  "passa": 63,
-  "desconhecido": 24
+  "passa": 73,
+  "desconhecido": 30
  },
  "orcamento": {
-  "mass_kg": 27.626533049728387,
+  "mass_kg": 27.62685479077798,
   "cg_m": [
-   1.3076694038769083,
-   0.0,
-   0.009845686417307199
+   1.352467583948261,
+   2.0093185290780117e-17,
+   0.012642311865427996
   ],
   "inertia_kg_m2": {
-   "Ixx": 22.379617096159997,
-   "Iyy": 16.681669555255155,
-   "Izz": 38.64795061054091
+   "Ixx": 24.122786824636346,
+   "Iyy": 16.992472188185467,
+   "Izz": 40.71019491077317
   },
   "by_component_kg": {
    "asa": 6.056331000227875,
-   "estabilizador": 0.45550120116461446,
+   "estabilizador": 0.4555012011646144,
    "deriva": 0.5221894703263172,
-   "fuselagem": 12.211387565459102,
-   "boom": 2.869545249078007,
-   "boom~m": 2.869545249078007,
+   "fuselagem": 12.211407779926146,
+   "boom": 2.8696960123692774,
+   "boom~m": 2.8696960123692774,
    "ligacoes": 2.6420333143944856
   },
   "unknown_mass": [],
   "note": "inércia própria: anéis (m R², m R²/2), linhas ao longo de x (m L²/12), placas (m R²/4, m R²/2); superfícies sustentadoras distribuídas ∝ corda na envergadura — PRESSUPOSTO"
  },
  "comparacao": {
-  "fuselage_layout_kg": 12.211387565459102,
+  "fuselage_layout_kg": 12.211407779926146,
   "fuselage_L1_kg": 5.4935955464479616,
   "fuselage_raymer_kg": 7.451467169871182,
   "wing_box_kg": 6.056331000227875,
-  "htail_layout_kg": 0.45550120116461446,
+  "htail_layout_kg": 0.4555012011646144,
   "htail_L1_kg": 0.31060513501539044,
   "vtail_layout_kg": 0.5221894703263172,
   "vtail_L1_kg": 0.3523791784471783
@@ -58,13 +58,13 @@
     "A_m2": 8.328579999999997e-05,
     "I_m4": 2.0722982154466663e-09
    },
-   "RF": 1.008065112366637,
+   "RF": 1.0083147999017181,
    "veredicto": "passa",
    "anel": {
     "aterragem": {
-     "M_max_Nm": 60.21152656235759,
+     "M_max_Nm": 60.196616469148324,
      "theta_deg": 180.0,
-     "N_max_N": 783.9029316102631
+     "N_max_N": 783.7088148614521
     }
    },
    "nota": null
@@ -114,16 +114,16 @@
     "A_m2": 1.93858e-05,
     "I_m4": 7.006215479466666e-10
    },
-   "RF": 1.2445647678061411,
+   "RF": 1.2466291202770876,
    "veredicto": "passa",
    "anel": {
     "manobra": {
-     "M_max_Nm": 7.376179235236982,
-     "theta_deg": 293.0,
-     "N_max_N": 675.6290100565301
+     "M_max_Nm": 7.3635395789708475,
+     "theta_deg": 67.0,
+     "N_max_N": 674.6437662951736
     },
     "aterragem": {
-     "M_max_Nm": 1.4393499034636092,
+     "M_max_Nm": 1.4389818774080023,
      "theta_deg": 293.0,
      "N_max_N": 131.83879070568955
     }
@@ -131,7 +131,7 @@
    "nota": null
   },
   {
-   "id": "fuselagem.caverna@0.910",
+   "id": "fuselagem.caverna@0.909",
    "loads": [
     "asa_longarina_tras"
    ],
@@ -144,13 +144,13 @@
     "A_m2": 1.3193799999999997e-05,
     "I_m4": 4.899088365466665e-10
    },
-   "RF": 2.1545875040714226,
+   "RF": 2.165933752723045,
    "veredicto": "passa",
    "anel": {
     "manobra": {
-     "M_max_Nm": 2.1840634585412415,
-     "theta_deg": 293.0,
-     "N_max_N": 188.0773798372303
+     "M_max_Nm": 2.1726222373864346,
+     "theta_deg": 67.0,
+     "N_max_N": 187.09213607587557
     },
     "aterragem": {
      "M_max_Nm": 1.5309883913087892,
@@ -174,19 +174,19 @@
     "A_m2": 6.07258e-05,
     "I_m4": 1.7692650984466662e-09
    },
-   "RF": 1.0142759702829245,
+   "RF": 1.0141209504067126,
    "veredicto": "passa",
    "anel": {
     "aterragem": {
-     "M_max_Nm": 43.506470731695686,
-     "theta_deg": 210.00000000000003,
-     "N_max_N": 1187.6563867110933
+     "M_max_Nm": 43.51312118863035,
+     "theta_deg": 150.0,
+     "N_max_N": 1187.8379334447138
     }
    },
    "nota": null
   },
   {
-   "id": "fuselagem.caverna@2.484",
+   "id": "fuselagem.caverna@2.483",
    "loads": [
     "cauda"
    ],
@@ -199,13 +199,13 @@
     "A_m2": 3.1289800000000007e-05,
     "I_m4": 1.0700931227466667e-09
    },
-   "RF": 1.0766998206329448,
+   "RF": 1.076693611053487,
    "veredicto": "passa",
    "anel": {
     "manobra": {
-     "M_max_Nm": 25.25478701730864,
+     "M_max_Nm": 25.254932640290715,
      "theta_deg": 0.5,
-     "N_max_N": 168.19208897798265
+     "N_max_N": 168.14421685215888
     }
    },
    "nota": null
@@ -270,7 +270,7 @@
   "sigma_hoop_Pa": null,
   "pressure_note": null,
   "I_m4": 1.0673145414692446e-05,
-  "sigma_stringer_max_Pa": 12329351.85588717,
+  "sigma_stringer_max_Pa": 12312062.20788519,
   "Fcs_Pa": 106053436.05572473,
   "sigma_column_Pa": 91353684.88236344,
   "L_over_rho": 61.11944462005201,
@@ -281,11 +281,11 @@
   "b_eff_min_m": 0.085679799643358,
   "stringer_area_m2": 1.7703799999999998e-05,
   "panel_width_m": 0.085679799643358,
-  "RF_stringer_column": 7.409447467325117,
-  "RF_stringer_tension": 35.20055271946581,
+  "RF_stringer_column": 7.419852445503117,
+  "RF_stringer_tension": 35.24998433828958,
   "RF_skin_shear": 34.868413333635694,
-  "RF_skin_buckling_limit": 2.4233031209242197,
-  "RF_min": 2.4233031209242197,
+  "RF_skin_buckling_limit": 2.4258417328886805,
+  "RF_min": 2.4258417328886805,
   "verdict": "passa",
   "t_skin_m": 0.0008,
   "t_stringer_m": 0.00041
@@ -299,33 +299,36 @@
   "longeron_theta_deg": []
  },
  "notas": [
-  "ligação da asa: longarinas a x = 0.700 m e 0.910 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
+  "ligação da asa: longarinas a x = 0.700 m e 0.909 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
   "manobra: as forças concentradas (cauda, motor) são equilibradas pelas duas ligações da asa; a inércia distribuída da casca vai para revestimento/reforçadores, não para as cavernas — PRESSUPOSTO",
   "aterragem: reações do trem (23.473, viga L1) e metade da sustentação em cada longarina da asa; trem preso à fuselagem — se o trem principal está na asa, declarar gear_theta_deg/loads",
   "anteparas por omissão: parede de fogo no berço do motor e fecho traseiro a 0,95 L (as duas da viga L1) — PRESSUPOSTO"
  ],
  "material": "Al 2024-T3 sheet",
  "superficies": {
-  "asa": {
-   "mass_kg": 6.056331000227875,
+  "deriva": {
+   "mass_kg": 0.5221894703263172,
    "method": "buckling",
-   "section": "multicélula (Fase 5)",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures.box (existente)"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "montagem «tail» (só massa)"
   },
   "estabilizador": {
    "mass_kg": 0.45550120116461446,
    "method": "buckling",
    "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "montagem «tail»"
   },
-  "deriva": {
-   "mass_kg": 0.5221894703263172,
+  "asa": {
+   "mass_kg": 6.056331000227875,
    "method": "buckling",
-   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "section": "multicélula (Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures.box (existente)",
+   "placement": "montagem «wing» (raiz, ponta, torção da raiz)"
   }
  },
  "booms": [
@@ -336,13 +339,13 @@
     "x0_m": 0.27779526465636,
     "length_m": 2.7468958036942372,
     "diameter_m": 0.1052254790365,
-    "x_attach_m": 0.7236967830179143,
+    "x_attach_m": 0.7232204207667242,
     "y_m": 1.0416790969243686,
     "z_m": 0.0210450958073
    },
-   "root_moment_limit_Nm": 284.6263044910919,
+   "root_moment_limit_Nm": 284.69459845584754,
    "notes": [
-    "cargas do boom LIMITE (cauda); consolas a partir da ligação x = 0.724 m; casca circular de diâmetro equivalente 0.105 m (PRESSUPOSTO)"
+    "cargas do boom LIMITE (cauda); consolas a partir da ligação x = 0.723 m; casca circular de diâmetro equivalente 0.105 m (PRESSUPOSTO)"
    ]
   },
   {
@@ -352,20 +355,24 @@
     "x0_m": 0.27779526465636,
     "length_m": 2.7468958036942372,
     "diameter_m": 0.1052254790365,
-    "x_attach_m": 0.7236967830179143,
+    "x_attach_m": 0.7232204207667242,
     "y_m": -1.0416790969243686,
     "z_m": 0.0210450958073
    },
-   "root_moment_limit_Nm": 284.6263044910919,
+   "root_moment_limit_Nm": 284.69459845584754,
    "notes": [
-    "cargas do boom LIMITE (cauda); consolas a partir da ligação x = 0.724 m; casca circular de diâmetro equivalente 0.105 m (PRESSUPOSTO)"
+    "cargas do boom LIMITE (cauda); consolas a partir da ligação x = 0.723 m; casca circular de diâmetro equivalente 0.105 m (PRESSUPOSTO)"
    ]
   }
  ],
  "notas_layout": [
+  "asa: incidência não declarada (geometry.wing_incidence_deg) — 0° (PRESSUPOSTO, só afeta o render)",
+  "asa: ¼ de corda da raiz na montagem a x = 0.86 m, a viga-fuselagem L1 liga a asa a x = 0.72 m (Δ +0.13 m): cavernas fortes e cargas da fuselagem seguem a L1 — diferença relatada, não corrigida",
+  "cauda da montagem só com painéis de estabilizador: caixão equivalente de deriva (L1) entra só como massa repartida pelos painéis; rigidez dos painéis = caixão de estabilizador (PRESSUPOSTO — cauda em V/V invertido)",
+  "empenagem da montagem: 2 painel(éis) (tail, tail~m) — posição real; caixão L1 repartido pelos painéis (PRESSUPOSTO)",
   "cauda nos booms: L_estab 218 N e L_deriva 187 N (L1) repartidas por 2 booms — PRESSUPOSTO",
   "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo",
-  "flutter (vigas + faixas): V_F = 57.3 m/s EAS, divergência 63.6 m/s, requisito 58.1 m/s — desconhecido"
+  "flutter (vigas + faixas): V_F = 94.0 m/s EAS, divergência 90.9 m/s, requisito 58.1 m/s — passa"
  ],
  "acoplamento": {
   "convergiu": true,
@@ -383,27 +390,27 @@
  "estabilidade_casos": [
   {
    "caso": "vazio",
-   "x_cg_m": 0.7724995742516053,
-   "xbar_cg": 0.37850318771103053,
-   "SM": 0.09999999999999998
+   "x_cg_m": 0.772034357346011,
+   "xbar_cg": 0.37853253464797804,
+   "SM": 0.1000000000000002
   },
   {
    "caso": "sem payload",
-   "x_cg_m": 0.7661543004544928,
-   "xbar_cg": 0.3617953747106683,
-   "SM": 0.1167078130003622
+   "x_cg_m": 0.7656867114878974,
+   "xbar_cg": 0.3618184757466665,
+   "SM": 0.11671405890131176
   },
   {
    "caso": "MTOW",
-   "x_cg_m": 0.7672814455925814,
-   "xbar_cg": 0.3647632734639137,
-   "SM": 0.11373991424711682
+   "x_cg_m": 0.766814277987949,
+   "xbar_cg": 0.36478748399291566,
+   "SM": 0.11374505065506257
   },
   {
    "caso": "sem combustível (ZFW)",
-   "x_cg_m": 0.7724995742516053,
-   "xbar_cg": 0.37850318771103053,
-   "SM": 0.09999999999999998
+   "x_cg_m": 0.772034357346011,
+   "xbar_cg": 0.37853253464797804,
+   "SM": 0.1000000000000002
   }
  ],
  "ferragens": [
@@ -563,7 +570,7 @@
    "id": "ferragem.trem_principal.1",
    "kind": "ferragem",
    "mass_kg": 0.003834186495338247,
-   "RF_min": 1.1531831846761798,
+   "RF_min": 1.1530069345038716,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -582,7 +589,7 @@
    "id": "ferragem.trem_principal.2",
    "kind": "ferragem",
    "mass_kg": 0.003834186495338247,
-   "RF_min": 1.1531831846761798,
+   "RF_min": 1.1530069345038716,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -601,7 +608,7 @@
    "id": "ferragem.trem_principal.3",
    "kind": "ferragem",
    "mass_kg": 0.003834186495338247,
-   "RF_min": 1.1531831846761798,
+   "RF_min": 1.1530069345038716,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -620,7 +627,7 @@
    "id": "ferragem.trem_principal.4",
    "kind": "ferragem",
    "mass_kg": 0.003834186495338247,
-   "RF_min": 1.1531831846761798,
+   "RF_min": 1.1530069345038716,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -639,7 +646,7 @@
    "id": "ferragem.trem_frente.1",
    "kind": "ferragem",
    "mass_kg": 0.004779959783391,
-   "RF_min": 1.4010790967294133,
+   "RF_min": 1.4014261298543775,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -658,7 +665,7 @@
    "id": "ferragem.trem_frente.2",
    "kind": "ferragem",
    "mass_kg": 0.004779959783391,
-   "RF_min": 1.4010790967294133,
+   "RF_min": 1.4014261298543775,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -677,7 +684,7 @@
    "id": "ferragem.boom.1",
    "kind": "ferragem",
    "mass_kg": 0.008563052935602012,
-   "RF_min": 1.088682006042814,
+   "RF_min": 1.0884208475559511,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -689,14 +696,14 @@
     "material_olhal": "Al 7075-T6 sheet",
     "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
    },
-   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2705 N",
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2706 N",
    "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
   },
   {
    "id": "ferragem.boom.2",
    "kind": "ferragem",
    "mass_kg": 0.008563052935602012,
-   "RF_min": 1.088682006042814,
+   "RF_min": 1.0884208475559511,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -708,14 +715,14 @@
     "material_olhal": "Al 7075-T6 sheet",
     "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
    },
-   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2705 N",
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2706 N",
    "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
   },
   {
    "id": "ferragem.boom~m.1",
    "kind": "ferragem",
    "mass_kg": 0.008563052935602012,
-   "RF_min": 1.088682006042814,
+   "RF_min": 1.0884208475559511,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -727,14 +734,14 @@
     "material_olhal": "Al 7075-T6 sheet",
     "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
    },
-   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2705 N",
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2706 N",
    "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
   },
   {
    "id": "ferragem.boom~m.2",
    "kind": "ferragem",
    "mass_kg": 0.008563052935602012,
-   "RF_min": 1.088682006042814,
+   "RF_min": 1.0884208475559511,
    "verdict": "passa",
    "section": {
     "cavilha": "AN3",
@@ -746,7 +753,7 @@
     "material_olhal": "Al 7075-T6 sheet",
     "material_cavilha": "AISI 4130 normalized sheet (≤ 0.188 in)"
    },
-   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2705 N",
+   "method": "olhal + garfo + cavilha AN3 (AFFDL-TR-69-42 §9.3–9.4; Melcon & Hoblit; Bruhn D1), modo secção útil olhal; carga binário do boom na ligação / diâmetro; P_u = 1.5 × 1.15 × 2706 N",
    "note": "Fig. 9-4 painel F_ty/F_tu = 0.8, curva F_tu/(E ε_u) = 1.0 (alongamento não declarado → curva mais baixa, conservativa)"
   },
   {
@@ -1090,121 +1097,119 @@
  "aberturas": [],
  "flutter": {
   "method": "vigas 3-D (Przemieniecki, Theory of Matrix Structural Analysis, 1968, cap. 5) + faixas quase-estacionárias (Wright & Cooper, Introduction to Aircraft Aeroelasticity and Loads, 2nd ed., 2015 cap. 11)",
-  "V_F_eas": 57.306440160985474,
-  "f_F_Hz": 4.952302784616757,
-  "V_div_eas": 63.5643789163126,
+  "V_F_eas": 93.95830005761266,
+  "f_F_Hz": 6.847040580588366,
+  "V_div_eas": 90.8729513352373,
   "V_required_eas": 58.1496063486542,
-  "margin": -0.014499946613795833,
-  "verdict": "desconhecido",
+  "margin": 0.5627440500694023,
+  "verdict": "passa",
   "modes": [
    {
-    "f_Hz": 4.684424465915921,
+    "f_Hz": 5.343628163873649,
+    "component": "fuselagem",
+    "energy_share": 0.35065183110946657,
+    "rotational_share": 0.019388089859808225
+   },
+   {
+    "f_Hz": 5.9725984077528596,
+    "component": "asa",
+    "energy_share": 0.41381216898190576,
+    "rotational_share": 0.05525714185761014
+   },
+   {
+    "f_Hz": 8.853098353660258,
+    "component": "asa",
+    "energy_share": 0.8296365763506434,
+    "rotational_share": 0.026100568573815357
+   },
+   {
+    "f_Hz": 11.322558852371678,
     "component": "boom~m",
-    "energy_share": 0.3358951629765063,
-    "rotational_share": 0.01377939477890473
+    "energy_share": 0.411274825426742,
+    "rotational_share": 0.02126599109498775
    },
    {
-    "f_Hz": 5.515307828987874,
-    "component": "asa",
-    "energy_share": 0.44531882463414996,
-    "rotational_share": 0.05372961160323918
-   },
-   {
-    "f_Hz": 8.655128928821172,
-    "component": "asa",
-    "energy_share": 0.8733702738141621,
-    "rotational_share": 0.02281364532042699
-   },
-   {
-    "f_Hz": 11.79738946268737,
+    "f_Hz": 13.34253826943204,
     "component": "boom",
-    "energy_share": 0.4739045376511199,
-    "rotational_share": 0.02088052207631473
+    "energy_share": 0.32515298684270055,
+    "rotational_share": 0.025902415452684773
    },
    {
-    "f_Hz": 14.089070701635716,
-    "component": "boom~m",
-    "energy_share": 0.3798414086189224,
-    "rotational_share": 0.025482645138018175
-   },
-   {
-    "f_Hz": 18.792732422210843,
+    "f_Hz": 17.69907210606468,
     "component": "asa",
-    "energy_share": 0.6360190006564505,
-    "rotational_share": 0.24215920921978776
+    "energy_share": 0.5770586503073984,
+    "rotational_share": 0.19962839203234636
    },
    {
-    "f_Hz": 27.720595188457896,
+    "f_Hz": 26.68034972526378,
     "component": "asa",
-    "energy_share": 0.7617634629381647,
-    "rotational_share": 0.0075788595815662356
+    "energy_share": 0.747098702600645,
+    "rotational_share": 0.006223403452629918
    },
    {
-    "f_Hz": 29.843082773370735,
+    "f_Hz": 28.48661156533117,
     "component": "asa",
-    "energy_share": 0.5625851565306152,
-    "rotational_share": 0.3183296299930801
+    "energy_share": 0.4829384060400396,
+    "rotational_share": 0.2168802153854424
    },
    {
-    "f_Hz": 33.93988139038362,
+    "f_Hz": 31.904491255683126,
+    "component": "estabilizador",
+    "energy_share": 0.3585405770054022,
+    "rotational_share": 0.443825502687916
+   },
+   {
+    "f_Hz": 32.78470863949149,
+    "component": "estabilizador",
+    "energy_share": 0.5087204847216502,
+    "rotational_share": 0.3073952841795582
+   },
+   {
+    "f_Hz": 35.19291442417009,
     "component": "asa",
-    "energy_share": 0.6314852941744251,
-    "rotational_share": 0.024792982262002144
+    "energy_share": 0.5182448011506507,
+    "rotational_share": 0.10241881522335518
    },
    {
-    "f_Hz": 36.70888042644829,
-    "component": "boom",
-    "energy_share": 0.3749184311193647,
-    "rotational_share": 0.8850041458884803
+    "f_Hz": 41.58910363230727,
+    "component": "estabilizador",
+    "energy_share": 0.46875792674947314,
+    "rotational_share": 0.038627892403289815
    },
    {
-    "f_Hz": 43.97402335414119,
-    "component": "boom~m",
-    "energy_share": 0.39077347227720055,
-    "rotational_share": 0.6920543727080336
+    "f_Hz": 42.26812154841022,
+    "component": "estabilizador",
+    "energy_share": 0.25228727344717683,
+    "rotational_share": 0.5001273642723951
    },
    {
-    "f_Hz": 50.91787001602939,
+    "f_Hz": 43.019207655535865,
+    "component": "estabilizador",
+    "energy_share": 0.37602561076248797,
+    "rotational_share": 0.018380239840480036
+   },
+   {
+    "f_Hz": 48.97657706367745,
     "component": "asa",
-    "energy_share": 0.4553244020406344,
-    "rotational_share": 0.5025492998324184
+    "energy_share": 0.3818106517302539,
+    "rotational_share": 0.4017018729860168
    },
    {
-    "f_Hz": 56.66200463516207,
-    "component": "boom",
-    "energy_share": 0.28764120189500836,
-    "rotational_share": 0.03876272773304568
-   },
-   {
-    "f_Hz": 57.778982508106814,
-    "component": "boom~m",
-    "energy_share": 0.3621230307362057,
-    "rotational_share": 0.08490024247943195
-   },
-   {
-    "f_Hz": 58.81476470107439,
-    "component": "boom~m",
-    "energy_share": 0.39024137798128317,
-    "rotational_share": 0.13000642684325037
-   },
-   {
-    "f_Hz": 60.35558756840923,
-    "component": "boom~m",
-    "energy_share": 0.31312167394023876,
-    "rotational_share": 0.023614670417639042
+    "f_Hz": 51.80162055704695,
+    "component": "asa",
+    "energy_share": 0.5526131003030216,
+    "rotational_share": 0.3882421876879873
    }
   ],
   "V_F_strip_eas": 113.29087841550577,
   "V_D_eas": 48.458005290545174,
   "evaluated": true,
-  "verdict_computed": "falha",
   "notes": [
    "asa: sem item no build-up; massa do caixão paramétrico (12.11 kg)",
-   "estabilizador: sem item no build-up; massa do caixão paramétrico (0.91 kg)",
-   "deriva: sem item no build-up; massa do caixão paramétrico (0.52 kg)",
-   "massa: superfícies 13.5 kg (build-up) ∝ corda; resto do W0 155.3 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
+   "estabilizador: sem item no build-up; massa do caixão paramétrico (0.46 kg)",
+   "massa: superfícies 12.6 kg (build-up) ∝ corda; resto do W0 156.3 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
    "ESTIMATIVA de baixa fidelidade (quase-estacionária, ρ0 → EAS): flutter de corpo livre, superfícies de comando (massa/folgas/compensação) e efeitos de compressibilidade fora do âmbito — certificação pede :mod:`hifi.flutter` ou ensaio",
-   "booms boom, boom~m levam a cauda, mas a empenagem do layout está ao centro (presa ao corpo principal): V_F calculado 57.3 m/s fica relatado, veredicto desconhecido"
+   "empenagem na posição da montagem, presa aos booms boom, boom~m pela raiz de cada painel"
   ]
  },
  "seccao": {
@@ -1214,5 +1219,7 @@
   "noncircular": false
  },
  "pressao_Pa": 0.0,
- "detalhe": []
+ "detalhe": [],
+ "escora": null,
+ "escora_membros": []
 }

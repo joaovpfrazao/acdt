@@ -1,12 +1,15 @@
 # Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
 # Estudo (applied: false, 24 nov 2026): estrutura paramétrica L1 (docs/ESTRUTURA_PARAMETRICA.md) em exemplos
 # convencionais. O bloco structure_layout é aplicado só em memória; os yaml dos exemplos ficam iguais.
+# Ronda 3 (24 nov 2026): superfícies na posição real (asa alta do C172 por geometry.wing_position, diedro, deriva
+# no topo da fuselagem; caudas da montagem nos booms) e escora da asa do C172 (asa escorada): strut.enabled só em
+# memória, geometria da escora PRESSUPOSTO (y_frac 0,5, ligação à fuselagem a 120° do topo, tubo redondo).
 applied: false
 cases:
   - id: c172
     example: examples/cessna172_check.yaml
     # Lycoming O-320 do C172: 4 cilindros (fator 23.361(c) = 2) — só em memória
-    structure_layout: {enabled: true, fittings: {engine_mount: {n_cylinders: 4}}}
+    structure_layout: {enabled: true, fittings: {engine_mount: {n_cylinders: 4}}, strut: {enabled: true}}
   - id: uav150
     example: examples/uav_150kg_stanag4671.yaml
     structure_layout: {enabled: true}
@@ -16,7 +19,7 @@ cases:
   # incremento C: acoplamento iterar (massa e CG da estrutura paramétrica no ciclo do W0) — só em memória
   - id: c172_iterar
     example: examples/cessna172_check.yaml
-    structure_layout: {enabled: true, coupling: iterar, fittings: {engine_mount: {n_cylinders: 4}}}
+    structure_layout: {enabled: true, coupling: iterar, fittings: {engine_mount: {n_cylinders: 4}}, strut: {enabled: true}}
   - id: twin_boom_iterar
     example: examples/uav_twin_boom_shortcut.yaml
     structure_layout: {enabled: true, coupling: iterar}
@@ -28,6 +31,7 @@ cases:
     structure_layout:
       enabled: true
       fittings: {engine_mount: {n_cylinders: 4}}
+      strut: {enabled: true}
       fuselage:
         pressure_Pa: 25000.0
         cutouts:
@@ -43,3 +47,12 @@ cases:
         floor: {enabled: true, q_Pa: 3000.0}
         cutouts:
           - {id: alcapao_carga, x0_frac: 0.35, x1_frac: 0.55, theta_deg: 180.0, width_deg: 60.0}
+  # ronda 3: outras configurações só para o render (posição real das superfícies da montagem)
+  - id: tailless
+    example: examples/heavy/uav150_flying_wing_tailless.yaml
+    render: true
+    structure_layout: {enabled: true}
+  - id: inverted_v
+    example: examples/uav_inverted_v_shortcut.yaml
+    render: true
+    structure_layout: {enabled: true}

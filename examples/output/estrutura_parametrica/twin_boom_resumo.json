@@ -3,23 +3,23 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 167.03090270215554,
- "tempo_s": 11.436066389083862,
+ "tempo_s": 14.071808576583862,
  "veredicto": "desconhecido",
  "contagem": {
-  "passa": 63,
-  "desconhecido": 24
+  "passa": 73,
+  "desconhecido": 30
  },
  "orcamento": {
   "mass_kg": 27.408566215888598,
   "cg_m": [
-   1.3057779764274633,
+   1.3503985145462787,
    -1.215192742167118e-17,
-   0.009723823894745545
+   0.01254862962070746
   ],
   "inertia_kg_m2": {
-   "Ixx": 21.888536452308564,
-   "Iyy": 16.568868090372796,
-   "Izz": 38.04872541995974
+   "Ixx": 23.585676220654733,
+   "Iyy": 16.822712431706705,
+   "Izz": 40.00690806557758
   },
   "by_component_kg": {
    "asa": 5.978553199550446,
@@ -306,26 +306,29 @@
  ],
  "material": "Al 2024-T3 sheet",
  "superficies": {
-  "asa": {
-   "mass_kg": 5.978553199550446,
+  "deriva": {
+   "mass_kg": 0.5135458873537413,
    "method": "buckling",
-   "section": "multicélula (Fase 5)",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures.box (existente)"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "montagem «tail» (só massa)"
   },
   "estabilizador": {
    "mass_kg": 0.44844328637577807,
    "method": "buckling",
    "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "montagem «tail»"
   },
-  "deriva": {
-   "mass_kg": 0.5135458873537413,
+  "asa": {
+   "mass_kg": 5.978553199550446,
    "method": "buckling",
-   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "section": "multicélula (Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures.box (existente)",
+   "placement": "montagem «wing» (raiz, ponta, torção da raiz)"
   }
  },
  "booms": [
@@ -363,9 +366,13 @@
   }
  ],
  "notas_layout": [
+  "asa: incidência não declarada (geometry.wing_incidence_deg) — 0° (PRESSUPOSTO, só afeta o render)",
+  "asa: ¼ de corda da raiz na montagem a x = 0.85 m, a viga-fuselagem L1 liga a asa a x = 0.72 m (Δ +0.14 m): cavernas fortes e cargas da fuselagem seguem a L1 — diferença relatada, não corrigida",
+  "cauda da montagem só com painéis de estabilizador: caixão equivalente de deriva (L1) entra só como massa repartida pelos painéis; rigidez dos painéis = caixão de estabilizador (PRESSUPOSTO — cauda em V/V invertido)",
+  "empenagem da montagem: 2 painel(éis) (tail, tail~m) — posição real; caixão L1 repartido pelos painéis (PRESSUPOSTO)",
   "cauda nos booms: L_estab 214 N e L_deriva 184 N (L1) repartidas por 2 booms — PRESSUPOSTO",
   "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo",
-  "flutter (vigas + faixas): V_F = 56.7 m/s EAS, divergência 63.5 m/s, requisito 58.1 m/s — desconhecido"
+  "flutter (vigas + faixas): V_F = 94.5 m/s EAS, divergência 92.7 m/s, requisito 58.1 m/s — passa"
  ],
  "acoplamento": null,
  "estabilidade_casos": [
@@ -1078,121 +1085,119 @@
  "aberturas": [],
  "flutter": {
   "method": "vigas 3-D (Przemieniecki, Theory of Matrix Structural Analysis, 1968, cap. 5) + faixas quase-estacionárias (Wright & Cooper, Introduction to Aircraft Aeroelasticity and Loads, 2nd ed., 2015 cap. 11)",
-  "V_F_eas": 56.66281253449926,
-  "f_F_Hz": 4.8096563571668405,
-  "V_div_eas": 63.47948410079859,
+  "V_F_eas": 94.53110676228164,
+  "f_F_Hz": 6.911114954999546,
+  "V_div_eas": 92.67094023113006,
   "V_required_eas": 58.1496063486542,
-  "margin": -0.025568424405840395,
-  "verdict": "desconhecido",
+  "margin": 0.5936641028228526,
+  "verdict": "passa",
   "modes": [
    {
-    "f_Hz": 4.543183587651419,
-    "component": "boom~m",
-    "energy_share": 0.33873353035646314,
-    "rotational_share": 0.013769052694855212
+    "f_Hz": 5.381599459311976,
+    "component": "fuselagem",
+    "energy_share": 0.34892267568651325,
+    "rotational_share": 0.01863621032262996
    },
    {
-    "f_Hz": 5.513031531021441,
+    "f_Hz": 6.122852945926001,
     "component": "asa",
-    "energy_share": 0.44379054484574354,
-    "rotational_share": 0.05405796003058518
+    "energy_share": 0.41716337293250183,
+    "rotational_share": 0.05615739851895953
    },
    {
-    "f_Hz": 8.61870144750518,
+    "f_Hz": 8.951419188166394,
     "component": "asa",
-    "energy_share": 0.8732690780834006,
-    "rotational_share": 0.023032465680607846
+    "energy_share": 0.8306708189460347,
+    "rotational_share": 0.02626476398251098
    },
    {
-    "f_Hz": 11.939556587149609,
+    "f_Hz": 11.458368043664862,
     "component": "boom",
-    "energy_share": 0.4740106524632518,
-    "rotational_share": 0.020920509031610208
+    "energy_share": 0.41161781946406084,
+    "rotational_share": 0.021339808698882204
    },
    {
-    "f_Hz": 14.179950945025725,
+    "f_Hz": 13.507793711997778,
     "component": "boom~m",
-    "energy_share": 0.3802851905038289,
-    "rotational_share": 0.025434637438236114
+    "energy_share": 0.3261753852966021,
+    "rotational_share": 0.02591317409206001
    },
    {
-    "f_Hz": 18.89759248206602,
+    "f_Hz": 17.857881685053545,
     "component": "asa",
-    "energy_share": 0.6336619222215464,
-    "rotational_share": 0.24321606731753329
+    "energy_share": 0.5751694860172111,
+    "rotational_share": 0.20072096077732557
    },
    {
-    "f_Hz": 27.86571338236809,
+    "f_Hz": 26.827347329821034,
     "component": "asa",
-    "energy_share": 0.7612020279164634,
-    "rotational_share": 0.007639312372058533
+    "energy_share": 0.7464727653464872,
+    "rotational_share": 0.006284136604758475
    },
    {
-    "f_Hz": 29.89203868790927,
+    "f_Hz": 28.522121849215587,
     "component": "asa",
-    "energy_share": 0.5566372383331113,
-    "rotational_share": 0.32150409141834885
+    "energy_share": 0.47718675189844545,
+    "rotational_share": 0.21786594557009503
    },
    {
-    "f_Hz": 34.01271769198416,
+    "f_Hz": 32.04222715738866,
+    "component": "estabilizador",
+    "energy_share": 0.3520192579167161,
+    "rotational_share": 0.448313197389341
+   },
+   {
+    "f_Hz": 32.83093988827463,
+    "component": "estabilizador",
+    "energy_share": 0.5004870251949135,
+    "rotational_share": 0.3114022680152947
+   },
+   {
+    "f_Hz": 35.212174139491715,
     "component": "asa",
-    "energy_share": 0.6295261640938677,
-    "rotational_share": 0.024991289934392466
+    "energy_share": 0.5113636193157984,
+    "rotational_share": 0.1048307212957161
    },
    {
-    "f_Hz": 36.70215873811477,
-    "component": "boom",
-    "energy_share": 0.3762265007312919,
-    "rotational_share": 0.8866546005933658
+    "f_Hz": 41.54487921124638,
+    "component": "estabilizador",
+    "energy_share": 0.45456254340242086,
+    "rotational_share": 0.03825028739575482
    },
    {
-    "f_Hz": 43.957120345783096,
-    "component": "boom~m",
-    "energy_share": 0.39302981221708344,
-    "rotational_share": 0.6866263545098852
+    "f_Hz": 42.25720053287754,
+    "component": "estabilizador",
+    "energy_share": 0.2508024825575938,
+    "rotational_share": 0.5002943911239424
    },
    {
-    "f_Hz": 50.99322404332224,
+    "f_Hz": 43.0568545127436,
+    "component": "estabilizador",
+    "energy_share": 0.35873521587401297,
+    "rotational_share": 0.014339564658242446
+   },
+   {
+    "f_Hz": 49.0733555530338,
     "component": "asa",
-    "energy_share": 0.445612223006234,
-    "rotational_share": 0.5073627942209865
+    "energy_share": 0.3878342495637626,
+    "rotational_share": 0.3938110641369946
    },
    {
-    "f_Hz": 56.56958874443705,
-    "component": "boom~m",
-    "energy_share": 0.31065791433464196,
-    "rotational_share": 0.0482779170418199
-   },
-   {
-    "f_Hz": 57.127164009740525,
-    "component": "boom",
-    "energy_share": 0.3627928282496589,
-    "rotational_share": 0.08154864415398899
-   },
-   {
-    "f_Hz": 58.058555466494674,
-    "component": "boom",
-    "energy_share": 0.38029424857759164,
-    "rotational_share": 0.1064253199997802
-   },
-   {
-    "f_Hz": 60.16225852978584,
-    "component": "boom~m",
-    "energy_share": 0.3403895719773841,
-    "rotational_share": 0.027390404689292366
+    "f_Hz": 51.86143880875663,
+    "component": "asa",
+    "energy_share": 0.5538409214194051,
+    "rotational_share": 0.3860114913193037
    }
   ],
   "V_F_strip_eas": 113.58846605691262,
   "V_D_eas": 48.458005290545174,
   "evaluated": true,
-  "verdict_computed": "falha",
   "notes": [
    "asa: sem item no build-up; massa do caixão paramétrico (11.96 kg)",
-   "estabilizador: sem item no build-up; massa do caixão paramétrico (0.90 kg)",
-   "deriva: sem item no build-up; massa do caixão paramétrico (0.51 kg)",
-   "massa: superfícies 13.4 kg (build-up) ∝ corda; resto do W0 153.7 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
+   "estabilizador: sem item no build-up; massa do caixão paramétrico (0.45 kg)",
+   "massa: superfícies 12.4 kg (build-up) ∝ corda; resto do W0 154.6 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
    "ESTIMATIVA de baixa fidelidade (quase-estacionária, ρ0 → EAS): flutter de corpo livre, superfícies de comando (massa/folgas/compensação) e efeitos de compressibilidade fora do âmbito — certificação pede :mod:`hifi.flutter` ou ensaio",
-   "booms boom, boom~m levam a cauda, mas a empenagem do layout está ao centro (presa ao corpo principal): V_F calculado 56.7 m/s fica relatado, veredicto desconhecido"
+   "empenagem na posição da montagem, presa aos booms boom, boom~m pela raiz de cada painel"
   ]
  },
  "seccao": {
@@ -1202,5 +1207,7 @@
   "noncircular": false
  },
  "pressao_Pa": 0.0,
- "detalhe": []
+ "detalhe": [],
+ "escora": null,
+ "escora_membros": []
 }

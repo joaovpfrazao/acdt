@@ -511,8 +511,86 @@ def test_twin_boom_whole_aircraft_flutter():
     fl = r["flutter"]
     assert fl["evaluated"] and math.isfinite(fl["V_F_eas"]) or math.isinf(fl["V_F_eas"])
     assert any(m["component"].startswith("boom") for m in fl["modes"])
-    # empenagem ao centro presa a um só boom: número relatado, veredicto desconhecido
-    assert fl["verdict"] == "desconhecido" and fl["verdict_computed"] in ("passa", "falha")
+    # cauda da montagem (V invertido, um painel por boom) presa aos booms: veredicto calculado, sem substituição
+    assert fl["verdict"] in ("passa", "falha") and "verdict_computed" not in fl
+    bm = r["beam_model"]
+    pos = {n["id"]: n["xyz"] for n in bm["nodes"]}
+    boom_nodes = {i for e in bm["elements"] if e["component"] in ("boom", "boom~m") for i in e["nodes"]}
+    tails = [s_ for s_ in r["geometry"]["surfaces"] if s_["comp"] == "estabilizador"]
+    ys = sorted(t["root_c4_m"][1] for t in tails)
+    assert len(tails) == 2 and ys[0] < -0.5 and ys[1] > 0.5                 # um painel em cada boom
+    for t in tails:
+        linked = any(e["component"] == f"ligacao:{t['id']}" and e["nodes"][0] in boom_nodes for e in bm["elements"])
+        shared = any(e["component"] == "estabilizador" and e["nodes"][0] in boom_nodes
+                     and abs(pos[e["nodes"][0]][1] - t["root_c4_m"][1]) < 0.05 for e in bm["elements"])
+        assert linked or shared
+    # deriva equivalente da L1 entra só como massa repartida pelos painéis da cauda em V
+    assert sum(m["mass_kg"] for m in r["members"] if m["component"] == "deriva") == pytest.approx(
+        r["surfaces"]["deriva"]["mass_kg"], rel=1e-6)
+
+
+def test_assembly_surfaces_mirror_and_normal():
+    from acdt.domains.aircraft.structure_flutter import _normal
+    a = sl.assembly_surfaces({"assembly": _quadplane()})
+    ht = [x for x in a if x["role"] == "htail"]
+    assert len(ht) == 2 and not any(x["mirror"] for x in ht)          # fora do plano de simetria: um por imagem
+    ys = sorted(x["root"][1] for x in ht)
+    assert ys == pytest.approx([-0.8, 0.8]) and ht[0]["span_vec"][1] * ht[1]["span_vec"][1] < 0
+    assert ht[0]["c_root_m"] == pytest.approx(0.25) and ht[0]["root"][0] == pytest.approx(1.8 + 0.0625)
+    n = _normal(np.array([0.0, 0.82, -0.57]))                          # painel de V invertido
+    assert n == pytest.approx(np.array([0.0, 0.57, 0.82]) / np.linalg.norm([0.57, 0.82]), abs=1e-9)
+    assert _normal(np.array([0.0, -1.0, 0.0])) == pytest.approx([0, 0, 1])      # asa esquerda: normal +z
+    assert _normal(np.array([0.0, 0.0, 1.0])) == pytest.approx([0, 1, 0])       # deriva: normal +y
+
+
+def test_c172_surface_placement(c172):
+    r = c172.structure_layout
+    cfg = c172.config
+    g = {s_["comp"]: s_ for s_ in r["geometry"]["surfaces"]}
+    D, w = cfg.fuselage.max_diameter, cfg.wing
+    assert g["asa"]["root_c4_m"][2] == pytest.approx(D / 2 - 0.25 * w.tc_root * w.c_root)   # asa alta
+    sv = g["asa"]["span_vec_m"]
+    assert sv[2] / sv[1] == pytest.approx(math.tan(w.dihedral)) and sv[1] == pytest.approx(w.span / 2)
+    assert g["deriva"]["root_c4_m"][2] > 0.2 and g["deriva"]["span_vec_m"][1] == 0.0          # deriva no topo
+    bm = r["beam_model"]
+    assert any(e["component"] == "ligacao:asa" for e in bm["elements"])
+    wn = {i for e in bm["elements"] if e["component"] == "asa" for i in e["nodes"]}
+    zs = [n["xyz"][2] for n in bm["nodes"] if n["id"] in wn]
+    assert zs and min(zs) > 0.4                                         # nós da asa acima do eixo da fuselagem
+
+
+def test_c172_wing_strut(tmp_path):
+    from acdt.core.pipeline import run_pipeline
+    from acdt.domains.aircraft.mission import MissionSpec
+    from acdt.domains.aircraft.structure_render import render_layout
+    p = EX / "cessna172_check.yaml"
+    d = yaml.safe_load(p.read_text(encoding="utf-8"))
+    d.setdefault("assumptions", {})["structure_layout"] = {"enabled": True, "strut": {"enabled": True}}
+    res = run_pipeline("aircraft", MissionSpec.from_dict(d, p))["result"]
+    r = res.structure_layout
+    s_ = r["strut"]
+    st = res.structures
+    M_h = abs(float(np.interp(s_["y_hinge_m"], st.beam.y, st.beam.moment)))
+    assert s_["F_v_lim_N"] == pytest.approx(M_h / (s_["y_s_m"] - s_["y_hinge_m"]), rel=1e-9)
+    dz = s_["p1_m"][2] - s_["p0_m"][2]
+    assert s_["T_lim_N"] == pytest.approx(s_["F_v_lim_N"] * s_["L_m"] / dz, rel=1e-9)
+    assert s_["C_lim_N"] == pytest.approx(s_["T_lim_N"] * abs(s_["n_neg"]) / s_["n_pos"], rel=1e-9)
+    E, Fcy = r["material"]["E"], r["material"]["Fcy"]
+    assert s_["sigma_cr_Pa"] == pytest.approx(fr.euler_johnson(E, Fcy, s_["L_m"] / s_["rho_m"]))
+    assert s_["A_m2"] * s_["sigma_cr_Pa"] >= 1.5 * s_["C_lim_N"] * (1 - 1e-9)
+    assert s_["A_m2"] * r["material"]["Ftu"] >= 1.5 * s_["T_lim_N"] * (1 - 1e-9)
+    esc = [m for m in r["members"] if m["kind"] == "escora"]
+    assert len(esc) == 2 and all(m["verdict"] == "passa" and m["mass_kg"] > 0 for m in esc)
+    root = [m for m in r["members"] if m["id"].startswith("ferragem.asa_fuselagem")]
+    assert len(root) == 4                                              # articulação: só a reação, sem binário
+    assert len([m for m in r["members"] if m["id"].startswith("ferragem.escora")]) == 4
+    assert sum(1 for e in r["beam_model"]["elements"] if e["component"] == "escora") == 2
+    assert len(r["geometry"]["struts"]) == 2
+    assert r["flutter"]["evaluated"] and r["flutter"]["verdict"] in ("passa", "falha")
+    png = render_layout(r, tmp_path / "c172_escora.png", dpi=50)
+    assert png.exists() and png.stat().st_size > 10_000
+
+
 # ------------------------------------------------------------------ render 3-D da estrutura
 def test_layout_geometry_and_render(c172, tmp_path):
     from acdt.domains.aircraft.structure_render import render_layout

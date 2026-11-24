@@ -2131,3 +2131,17 @@ Flutter do avião inteiro pelo modelo de vigas ([ESTRUTURA_PARAMETRICA.md](ESTRU
 CAPABILITIES §58). C172 V_F 136,6 m/s EAS (passa; −12 % face às faixas encastradas); twin-boom 56,7 m/s abaixo dos
 58,1 exigidos, mas desconhecido porque a empenagem do layout está ao centro e não nos booms — prioridade seguinte.
 
+## Estrutura paramétrica — superfícies na posição real e escora (24 nov 2026, ramo `estrutura-param-geometria`)
+
+Superfícies na posição real (asa alta do C172, diedro, deriva no topo; caudas da montagem nos booms) e escora da asa
+do C172 por Euler–Johnson ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §12, CAPABILITIES §59).
+
+* Twin-boom: o flutter passa de 56,7 m/s (desconhecido) a 94,5 m/s (passa).
+* C172 com escora: ligações 15,2 → 3,6 kg, escora 4,3 kg, W0 `iterar` 1139,6 kg.
+
+Pendente:
+
+* geometria real da escora;
+* caixão da asa redimensionado com a escora;
+* ligação da asa da viga-fuselagem L1 alinhada com a montagem (Δx de −0,90 m na asa voadora).
+

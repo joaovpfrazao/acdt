@@ -84,7 +84,10 @@ def run_case(case: dict, out: Path) -> dict:
                     "verdict", "verdict_computed", "V_F_strip_eas", "modes", "notes", "method")},
             "seccao": r["fuselage"].get("section"), "pressao_Pa": r["fuselage"].get("pressure_Pa"),
             "detalhe": [{k: m.get(k) for k in ("id", "kind", "mass_kg", "RF_min", "verdict", "section", "note")}
-                        for m in r["members"] if m["kind"] in ("piso", "viga_piso", "soleira")]}
+                        for m in r["members"] if m["kind"] in ("piso", "viga_piso", "soleira")],
+            "escora": r.get("strut"),
+            "escora_membros": [{k: m.get(k) for k in ("id", "kind", "mass_kg", "RF_min", "verdict", "section", "method")}
+                               for m in r["members"] if m["component"] == "escora"]}
     (out / f"{cid}_resumo.json").write_text(json.dumps(_clean(summ), indent=1, ensure_ascii=False), encoding="utf-8")
     (out / f"{cid}_vigas.json").write_text(json.dumps(_clean(r["beam_model"]), indent=1, ensure_ascii=False),
                                            encoding="utf-8")
@@ -104,11 +107,12 @@ def main(out_dir: str | None = None) -> list[dict]:
     out.mkdir(parents=True, exist_ok=True)
     rows = [run_case(c, out) for c in st["cases"]]
     for s in rows:
-        c = s["comparacao"]
+        c = {k: (float("nan") if v is None else v) for k, v in s["comparacao"].items()}
         print(f"{s['caso']}: W0 {s['W0_kg']:.1f} kg; fuselagem paramétrica {c['fuselage_layout_kg']:.1f} kg vs L1 "
               f"{c['fuselage_L1_kg']:.1f} kg vs Raymer {c['fuselage_raymer_kg']:.1f} kg; estabilizador "
               f"{c['htail_layout_kg']:.2f} vs L1 {c['htail_L1_kg']:.2f} kg; deriva {c['vtail_layout_kg']:.2f} vs L1 "
-              f"{c['vtail_L1_kg']:.2f} kg; booms {[round(b['root_moment_limit_Nm'] or 0, 1) for b in s['booms']]} N·m; "
+              f"{c['vtail_L1_kg']:.2f} kg; escora {s['orcamento']['by_component_kg'].get('escora', 0):.2f} kg; "
+              f"flutter {(s['flutter'] or {}).get('V_F_eas')} m/s ({(s['flutter'] or {}).get('verdict')}); booms {[round(b['root_moment_limit_Nm'] or 0, 1) for b in s['booms']]} N·m; "
               f"ligações {s['orcamento']['by_component_kg'].get('ligacoes', 0):.2f} kg; {s['contagem']}")
     return rows
 

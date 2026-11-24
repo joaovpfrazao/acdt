@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_150kg_stanag4671.yaml",
  "applied": false,
  "W0_kg": 153.21267779959328,
- "tempo_s": 6.360404014587402,
+ "tempo_s": 7.184778451919556,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 47,
@@ -12,14 +12,14 @@
  "orcamento": {
   "mass_kg": 20.37932677359782,
   "cg_m": [
-   1.2281174682070937,
+   1.2295621585372651,
    0.0,
-   0.003893997668556032
+   0.024397081590069477
   ],
   "inertia_kg_m2": {
-   "Ixx": 13.086962273747277,
-   "Iyy": 12.724572764644583,
-   "Izz": 25.489824787596756
+   "Ixx": 13.131235324144003,
+   "Iyy": 12.842342266028876,
+   "Izz": 25.563321238584315
   },
   "by_component_kg": {
    "asa": 5.402858969227022,
@@ -254,32 +254,36 @@
  ],
  "material": "Al 2024-T3 sheet",
  "superficies": {
-  "asa": {
-   "mass_kg": 5.402858969227022,
+  "deriva": {
+   "mass_kg": 0.336668282652946,
    "method": "buckling",
-   "section": "multicélula (Fase 5)",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures.box (existente)"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "z 0.147 m (topo da fuselagem R(x) (PRESSUPOSTO))"
   },
   "estabilizador": {
    "mass_kg": 0.3598325106064096,
    "method": "buckling",
    "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "z 0.000 m (eixo da fuselagem (PRESSUPOSTO))"
   },
-  "deriva": {
-   "mass_kg": 0.336668282652946,
+  "asa": {
+   "mass_kg": 5.402858969227022,
    "method": "buckling",
-   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "section": "multicélula (Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures.box (existente)",
+   "placement": "z 0.000 m (geometry.wing_position = mid), diedro 3.0°, incidência 0.0°"
   }
  },
  "booms": [],
  "notas_layout": [
+  "asa: incidência não declarada (geometry.wing_incidence_deg) — 0° (PRESSUPOSTO, só afeta o render)",
   "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo",
-  "flutter (vigas + faixas): V_F = 99.9 m/s EAS, divergência 150.9 m/s, requisito 58.1 m/s — passa"
+  "flutter (vigas + faixas): V_F = 99.8 m/s EAS, divergência 150.7 m/s, requisito 58.1 m/s — passa"
  ],
  "acoplamento": null,
  "estabilidade_casos": [
@@ -1068,108 +1072,108 @@
  "aberturas": [],
  "flutter": {
   "method": "vigas 3-D (Przemieniecki, Theory of Matrix Structural Analysis, 1968, cap. 5) + faixas quase-estacionárias (Wright & Cooper, Introduction to Aircraft Aeroelasticity and Loads, 2nd ed., 2015 cap. 11)",
-  "V_F_eas": 99.89219756759321,
-  "f_F_Hz": 37.77369982043707,
-  "V_div_eas": 150.90832186621805,
+  "V_F_eas": 99.76952081121865,
+  "f_F_Hz": 37.74702668243453,
+  "V_div_eas": 150.72111929391554,
   "V_required_eas": 58.1496063486542,
-  "margin": 0.717848216695711,
+  "margin": 0.7157385419433315,
   "verdict": "passa",
   "modes": [
    {
-    "f_Hz": 7.389257169511363,
+    "f_Hz": 7.372080188508186,
     "component": "asa",
-    "energy_share": 0.908158519156525,
-    "rotational_share": 0.0025984748465603014
+    "energy_share": 0.9088255932657943,
+    "rotational_share": 0.0025564781279503574
    },
    {
-    "f_Hz": 16.97919608319862,
+    "f_Hz": 16.908043111232598,
     "component": "asa",
-    "energy_share": 0.7439095461133577,
-    "rotational_share": 0.24907801167308183
+    "energy_share": 0.7402332909766368,
+    "rotational_share": 0.24769437110996795
    },
    {
-    "f_Hz": 22.69599052306989,
+    "f_Hz": 22.67109543594027,
     "component": "asa",
-    "energy_share": 0.95183854602868,
-    "rotational_share": 0.0006313915302815948
+    "energy_share": 0.949942632296797,
+    "rotational_share": 0.0007174539679032772
    },
    {
-    "f_Hz": 28.286960700015896,
+    "f_Hz": 28.204044079681978,
     "component": "asa",
-    "energy_share": 0.6184948199813174,
-    "rotational_share": 0.01555803250784476
+    "energy_share": 0.6188128840959816,
+    "rotational_share": 0.0154587464733236
    },
    {
-    "f_Hz": 29.9776453863032,
+    "f_Hz": 29.91381751890838,
     "component": "asa",
-    "energy_share": 0.9577646046910631,
-    "rotational_share": 0.006095473339993259
+    "energy_share": 0.9578547047150108,
+    "rotational_share": 0.006042702781228399
    },
    {
-    "f_Hz": 40.842015186041834,
+    "f_Hz": 40.591043810214885,
     "component": "asa",
-    "energy_share": 0.5676146910669594,
-    "rotational_share": 0.43130358658606716
+    "energy_share": 0.567055065884612,
+    "rotational_share": 0.42088203298209564
    },
    {
-    "f_Hz": 51.01738471621141,
+    "f_Hz": 50.98064909626422,
     "component": "asa",
-    "energy_share": 0.9967125576130723,
+    "energy_share": 0.9967324271184883,
     "rotational_share": 1.0
    },
    {
-    "f_Hz": 51.033520071865,
+    "f_Hz": 50.996289624167126,
     "component": "asa",
-    "energy_share": 0.9977661866774915,
+    "energy_share": 0.9978726929446047,
     "rotational_share": 1.0
    },
    {
-    "f_Hz": 73.72719676970485,
+    "f_Hz": 73.572517883041,
     "component": "asa",
-    "energy_share": 0.9786078883864489,
-    "rotational_share": 0.015484407708663245
+    "energy_share": 0.978696310537402,
+    "rotational_share": 0.015373040985093301
    },
    {
-    "f_Hz": 77.57280621700602,
+    "f_Hz": 77.15784181919233,
     "component": "asa",
-    "energy_share": 0.8254064073078792,
-    "rotational_share": 0.17735376611934997
+    "energy_share": 0.8259724234636373,
+    "rotational_share": 0.16406811067615934
    },
    {
-    "f_Hz": 87.50087387294688,
+    "f_Hz": 87.17235606532796,
     "component": "asa",
-    "energy_share": 0.9008049712743692,
-    "rotational_share": 0.013029314541662642
+    "energy_share": 0.890945634634254,
+    "rotational_share": 0.01497002370173282
    },
    {
-    "f_Hz": 93.60728206429548,
+    "f_Hz": 93.3922536461319,
     "component": "asa",
-    "energy_share": 0.9782817176561013,
-    "rotational_share": 0.0036200581730963673
+    "energy_share": 0.9776643795210339,
+    "rotational_share": 0.0036685527587336023
    },
    {
-    "f_Hz": 116.27350247610495,
+    "f_Hz": 116.15425338472627,
     "component": "asa",
-    "energy_share": 0.9847504513572538,
+    "energy_share": 0.979851469915223,
     "rotational_share": 1.0
    },
    {
-    "f_Hz": 116.60811125208835,
+    "f_Hz": 116.52175643505403,
     "component": "asa",
-    "energy_share": 0.999946678477108,
+    "energy_share": 0.9998683037131925,
     "rotational_share": 1.0
    },
    {
-    "f_Hz": 129.03547562667478,
+    "f_Hz": 120.13535727351993,
+    "component": "deriva",
+    "energy_share": 0.7335411973144002,
+    "rotational_share": 0.03900555517371148
+   },
+   {
+    "f_Hz": 127.5922908519254,
     "component": "estabilizador",
-    "energy_share": 0.5638401738611318,
-    "rotational_share": 0.04193878744242373
-   },
-   {
-    "f_Hz": 133.6032754552401,
-    "component": "asa",
-    "energy_share": 0.3912005957941432,
-    "rotational_share": 0.04420547601437523
+    "energy_share": 0.4820018482058623,
+    "rotational_share": 0.04632323221736743
    }
   ],
   "V_F_strip_eas": 115.95952506775718,
@@ -1187,5 +1191,7 @@
   "noncircular": false
  },
  "pressao_Pa": 0.0,
- "detalhe": []
+ "detalhe": [],
+ "escora": null,
+ "escora_membros": []
 }

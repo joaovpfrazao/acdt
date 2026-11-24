@@ -2230,6 +2230,29 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Ficheiros**: `structure_flutter.py`, `structure_layout.py`, `tests/test_structure_layout.py`,
   `docs/ESTRUTURA_PARAMETRICA.md` §11.
 
+## 59. Estrutura paramétrica: superfícies na posição real e escora da asa (24 nov 2026)
+
+* **O que faz**:
+  * Superfícies na posição real: raiz do ¼ de corda e vetor raiz→ponta, com asa alta/baixa
+    (`geometry.wing_position`), diedro, incidência e deriva no topo. Com montagem, as superfícies wing/tail vêm
+    da montagem, por isso a cauda do twin-boom fica nos booms.
+  * Isto vale para a tabela de membros, o modelo de vigas (ligações rígidas raiz→corpo), o flutter (normal por
+    faixa) e o render.
+  * Escora da asa (`structure_layout.strut`): barra bi-articulada. F_v = M(y_h)/(y_s − y_h) por estática;
+    tração A Ftu; compressão Euler–Johnson L/ρ (Bruhn C2).
+  * Com escora, as ferragens da raiz ficam só com a reação da articulação.
+* **Medida**:
+  * C172 com escora: escora 2 × 2,15 kg (Ø75 × 1,5 mm, RF 1,11); ligações 15,17 → 3,55 kg; V_F 133,6 m/s EAS
+    (passa); W0 `iterar` 1153,9 → 1139,6 kg.
+  * Twin-boom: V_F 56,7 → 94,5 m/s, divergência 92,7 contra 58,1 exigidos. Passa de desconhecido a passa.
+  * Asa voadora e V invertido desenhados.
+* **Veredicto**: implementado.
+  * A geometria da escora é PRESSUPOSTO declarado.
+  * O caixão da asa não é redimensionado com a escora.
+  * A diferença entre a ligação da asa da viga L1 e a montagem é relatada.
+* **Ficheiros**: `structure_layout.py`, `structure_flutter.py`, `structure_render.py`,
+  `tests/test_structure_layout.py`, estudo `estrutura_parametrica`, `docs/ESTRUTURA_PARAMETRICA.md` §12.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

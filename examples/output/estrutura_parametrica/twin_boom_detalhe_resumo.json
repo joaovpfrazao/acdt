@@ -3,23 +3,23 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 167.03090270215554,
- "tempo_s": 11.781696557998657,
+ "tempo_s": 13.275325775146484,
  "veredicto": "desconhecido",
  "contagem": {
-  "passa": 73,
-  "desconhecido": 24
+  "passa": 83,
+  "desconhecido": 30
  },
  "orcamento": {
   "mass_kg": 28.455187521380388,
   "cg_m": [
-   1.284892637579918,
+   1.3278719703535717,
    -1.1704962658822413e-17,
-   0.004352275134957769
+   0.0070731805842321515
   ],
   "inertia_kg_m2": {
-   "Ixx": 21.89219262852019,
-   "Iyy": 15.968711532836418,
-   "Izz": 37.43528061467012
+   "Ixx": 23.590172213465543,
+   "Iyy": 16.276487771404213,
+   "Izz": 39.44655534092264
   },
   "by_component_kg": {
    "asa": 5.978553199550446,
@@ -360,26 +360,29 @@
  ],
  "material": "Al 2024-T3 sheet",
  "superficies": {
-  "asa": {
-   "mass_kg": 5.978553199550446,
+  "deriva": {
+   "mass_kg": 0.5135458873537413,
    "method": "buckling",
-   "section": "multicélula (Fase 5)",
+   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures.box (existente)"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "montagem «tail» (só massa)"
   },
   "estabilizador": {
    "mass_kg": 0.44844328637577807,
    "method": "buckling",
    "section": "multicélula no contorno do perfil (Megson; Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5",
+   "placement": "montagem «tail»"
   },
-  "deriva": {
-   "mass_kg": 0.5135458873537413,
+  "asa": {
+   "mass_kg": 5.978553199550446,
    "method": "buckling",
-   "section": "multicélula no contorno do perfil (Megson; Fase 5)",
+   "section": "multicélula (Fase 5)",
    "buckling_ok": true,
-   "source": "structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5"
+   "source": "structures.box (existente)",
+   "placement": "montagem «wing» (raiz, ponta, torção da raiz)"
   }
  },
  "booms": [
@@ -417,9 +420,13 @@
   }
  ],
  "notas_layout": [
+  "asa: incidência não declarada (geometry.wing_incidence_deg) — 0° (PRESSUPOSTO, só afeta o render)",
+  "asa: ¼ de corda da raiz na montagem a x = 0.85 m, a viga-fuselagem L1 liga a asa a x = 0.72 m (Δ +0.14 m): cavernas fortes e cargas da fuselagem seguem a L1 — diferença relatada, não corrigida",
+  "cauda da montagem só com painéis de estabilizador: caixão equivalente de deriva (L1) entra só como massa repartida pelos painéis; rigidez dos painéis = caixão de estabilizador (PRESSUPOSTO — cauda em V/V invertido)",
+  "empenagem da montagem: 2 painel(éis) (tail, tail~m) — posição real; caixão L1 repartido pelos painéis (PRESSUPOSTO)",
   "cauda nos booms: L_estab 214 N e L_deriva 184 N (L1) repartidas por 2 booms — PRESSUPOSTO",
   "asa–fuselagem: asa em consola (PRESSUPOSTO) — numa asa escorada (p. ex. C172) a escora leva a maior parte do binário e estas ferragens ficam do lado conservativo",
-  "flutter (vigas + faixas): V_F = 58.6 m/s EAS, divergência 64.8 m/s, requisito 58.1 m/s — desconhecido"
+  "flutter (vigas + faixas): V_F = 92.8 m/s EAS, divergência 91.7 m/s, requisito 58.1 m/s — passa"
  ],
  "acoplamento": null,
  "estabilidade_casos": [
@@ -1223,121 +1230,119 @@
  ],
  "flutter": {
   "method": "vigas 3-D (Przemieniecki, Theory of Matrix Structural Analysis, 1968, cap. 5) + faixas quase-estacionárias (Wright & Cooper, Introduction to Aircraft Aeroelasticity and Loads, 2nd ed., 2015 cap. 11)",
-  "V_F_eas": 58.631983805867975,
-  "f_F_Hz": 4.967576446762037,
-  "V_div_eas": 64.81784736290106,
+  "V_F_eas": 92.83696514132784,
+  "f_F_Hz": 6.875667983105943,
+  "V_div_eas": 91.73560297976927,
   "V_required_eas": 58.1496063486542,
-  "margin": 0.00829545524902664,
-  "verdict": "desconhecido",
+  "margin": 0.5775790884935608,
+  "verdict": "passa",
   "modes": [
    {
-    "f_Hz": 4.646337382386935,
+    "f_Hz": 5.386135038422204,
+    "component": "fuselagem",
+    "energy_share": 0.3602748346516134,
+    "rotational_share": 0.02006631399392655
+   },
+   {
+    "f_Hz": 5.979457953795929,
+    "component": "asa",
+    "energy_share": 0.41187258550211997,
+    "rotational_share": 0.05521812542869554
+   },
+   {
+    "f_Hz": 8.730104125139489,
+    "component": "asa",
+    "energy_share": 0.8260902621241002,
+    "rotational_share": 0.025986847372044437
+   },
+   {
+    "f_Hz": 11.40887602652118,
     "component": "boom",
-    "energy_share": 0.34076898626307583,
-    "rotational_share": 0.014149398281001842
+    "energy_share": 0.4087222012761822,
+    "rotational_share": 0.021328257590598008
    },
    {
-    "f_Hz": 5.6403446466215685,
-    "component": "asa",
-    "energy_share": 0.4366087635347617,
-    "rotational_share": 0.053111709162206575
-   },
-   {
-    "f_Hz": 8.72479111116134,
-    "component": "asa",
-    "energy_share": 0.8726757462925929,
-    "rotational_share": 0.022429223384555712
-   },
-   {
-    "f_Hz": 12.012031094342118,
+    "f_Hz": 13.814979301843918,
     "component": "boom~m",
-    "energy_share": 0.4726619194506513,
-    "rotational_share": 0.02092935162732134
+    "energy_share": 0.32509053667066035,
+    "rotational_share": 0.02613235467739015
    },
    {
-    "f_Hz": 14.340122418643425,
-    "component": "boom",
-    "energy_share": 0.3792028423193827,
-    "rotational_share": 0.025479434288374306
-   },
-   {
-    "f_Hz": 18.857526756003086,
+    "f_Hz": 17.859997808599033,
     "component": "asa",
-    "energy_share": 0.6325511697157361,
-    "rotational_share": 0.24860941436264497
+    "energy_share": 0.5754928538172995,
+    "rotational_share": 0.20531429423163522
    },
    {
-    "f_Hz": 27.896974101813136,
+    "f_Hz": 26.89958229915111,
     "component": "asa",
-    "energy_share": 0.7645045705422983,
-    "rotational_share": 0.00762540721208047
+    "energy_share": 0.7513202873682491,
+    "rotational_share": 0.006147099770902832
    },
    {
-    "f_Hz": 30.129027450044127,
+    "f_Hz": 28.71827866368759,
     "component": "asa",
-    "energy_share": 0.575059258901456,
-    "rotational_share": 0.3043450453655621
+    "energy_share": 0.48927331893406634,
+    "rotational_share": 0.20092995876588765
    },
    {
-    "f_Hz": 33.04253251486977,
+    "f_Hz": 32.25725447114528,
+    "component": "estabilizador",
+    "energy_share": 0.3592898447995418,
+    "rotational_share": 0.4194282056755601
+   },
+   {
+    "f_Hz": 33.08289890818177,
+    "component": "estabilizador",
+    "energy_share": 0.5042163590861619,
+    "rotational_share": 0.31165152886027964
+   },
+   {
+    "f_Hz": 35.25385750650619,
     "component": "asa",
-    "energy_share": 0.5698716254149672,
-    "rotational_share": 0.02775505362543683
+    "energy_share": 0.49789265565411106,
+    "rotational_share": 0.11618121925343221
    },
    {
-    "f_Hz": 37.12290373238606,
-    "component": "boom",
-    "energy_share": 0.3623113993469943,
-    "rotational_share": 0.873130111055972
+    "f_Hz": 41.97715343266242,
+    "component": "estabilizador",
+    "energy_share": 0.45829566034918284,
+    "rotational_share": 0.03636515746481619
    },
    {
-    "f_Hz": 44.55104364791668,
-    "component": "boom~m",
-    "energy_share": 0.397128137383131,
-    "rotational_share": 0.704106085082127
+    "f_Hz": 42.376865671669876,
+    "component": "fuselagem",
+    "energy_share": 0.25362875833054005,
+    "rotational_share": 0.5121723641482827
    },
    {
-    "f_Hz": 50.97349987808326,
+    "f_Hz": 43.32113047213659,
+    "component": "estabilizador",
+    "energy_share": 0.37198625356337867,
+    "rotational_share": 0.016520808605034572
+   },
+   {
+    "f_Hz": 49.49661625562775,
     "component": "asa",
-    "energy_share": 0.42669277931474503,
-    "rotational_share": 0.5210925547402072
+    "energy_share": 0.37685840444576263,
+    "rotational_share": 0.41004136493892646
    },
    {
-    "f_Hz": 53.80356635958659,
+    "f_Hz": 52.02083003934526,
     "component": "asa",
-    "energy_share": 0.3275652568686633,
-    "rotational_share": 0.02602431473563532
-   },
-   {
-    "f_Hz": 57.95134811495868,
-    "component": "boom~m",
-    "energy_share": 0.3639933005946314,
-    "rotational_share": 0.08193264997421167
-   },
-   {
-    "f_Hz": 58.73997002294502,
-    "component": "boom",
-    "energy_share": 0.3970768924313177,
-    "rotational_share": 0.12516597921059092
-   },
-   {
-    "f_Hz": 60.96093036938367,
-    "component": "boom~m",
-    "energy_share": 0.33098965882688536,
-    "rotational_share": 0.02543933257728402
+    "energy_share": 0.5378008421993966,
+    "rotational_share": 0.39308154692198055
    }
   ],
   "V_F_strip_eas": 113.58846605691262,
   "V_D_eas": 48.458005290545174,
   "evaluated": true,
-  "verdict_computed": "passa",
   "notes": [
    "asa: sem item no build-up; massa do caixão paramétrico (11.96 kg)",
-   "estabilizador: sem item no build-up; massa do caixão paramétrico (0.90 kg)",
-   "deriva: sem item no build-up; massa do caixão paramétrico (0.51 kg)",
-   "massa: superfícies 13.4 kg (build-up) ∝ corda; resto do W0 153.7 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
+   "estabilizador: sem item no build-up; massa do caixão paramétrico (0.45 kg)",
+   "massa: superfícies 12.4 kg (build-up) ∝ corda; resto do W0 154.6 kg nos nós dos corpos ∝ massa estrutural local, inércia de rolamento m R²/2 — PRESSUPOSTO; combustível na asa não separado (declarar o caso de tanques cheios)",
    "ESTIMATIVA de baixa fidelidade (quase-estacionária, ρ0 → EAS): flutter de corpo livre, superfícies de comando (massa/folgas/compensação) e efeitos de compressibilidade fora do âmbito — certificação pede :mod:`hifi.flutter` ou ensaio",
-   "booms boom, boom~m levam a cauda, mas a empenagem do layout está ao centro (presa ao corpo principal): V_F calculado 58.6 m/s fica relatado, veredicto desconhecido"
+   "empenagem na posição da montagem, presa aos booms boom, boom~m pela raiz de cada painel"
   ]
  },
  "seccao": {
@@ -1464,5 +1469,7 @@
    },
    "note": null
   }
- ]
+ ],
+ "escora": null,
+ "escora_membros": []
 }
