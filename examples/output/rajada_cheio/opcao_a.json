@@ -198,45 +198,45 @@
    "aborted": null,
    "takeoff_ground_roll_m": 325.1384593403117,
    "touchdown_side_load_status": "passa",
-   "inboard_ratio": 0.5953700779571515,
-   "outboard_ratio": 0.624761217961247,
-   "residual_crab_deg": -0.27716304991952967,
+   "inboard_ratio": 0.5948328327373055,
+   "outboard_ratio": 0.2201919505172078,
+   "residual_crab_deg": -0.2756837581640725,
    "tip_skid_ok": true,
    "touchdown_diag": {
-    "phi_td_deg": -1.014061231846161,
-    "drift_m_s": 0.34738386498910845,
+    "phi_td_deg": -1.0195581736495318,
+    "drift_m_s": 0.340183946570066,
     "main_side_N": {
-     "main_L": {
-      "inboard_N": 57.70897725428951,
+     "main_R": {
+      "inboard_N": 446.5842194504348,
       "outboard_N": 0.0
      },
-     "main_R": {
-      "inboard_N": 446.9875684654081,
-      "outboard_N": 309.575397383902
+     "main_L": {
+      "inboard_N": 0.0,
+      "outboard_N": 109.10730151359896
      }
     },
     "main_vertical_peak_N": {
-     "main_L": 499.30652734208854,
-     "main_R": 934.7461727108674
+     "main_R": 884.2507764463371,
+     "main_L": 299.559327142141
     },
     "W_N": 1501.5452909528908,
-    "side_load_margin": 0.37523878203875305,
+    "side_load_margin": 0.4051671672626945,
     "bumper_contacts_N": {
-     "tip_R": 73.77130250552088
+     "tip_R": 79.60119905597438
     },
     "issue": null
    },
-   "sink_at_touchdown_m_s": 1.057311186164002,
+   "sink_at_touchdown_m_s": 1.0619797240415834,
    "touchdown_dt_sensitivity": {
     "0.01": {
      "side_load_status": "passa",
-     "inboard_ratio": 0.6024877507292115,
-     "outboard_ratio": 0.10553088181230774
+     "inboard_ratio": 0.6049436194590676,
+     "outboard_ratio": 0.21293027429270842
     },
     "0.025": {
-     "side_load_status": "excede",
-     "inboard_ratio": 0.604159477576895,
-     "outboard_ratio": 1.2343025845245374
+     "side_load_status": "passa",
+     "inboard_ratio": 0.6113525978382912,
+     "outboard_ratio": 0.24541412095396234
     }
    },
    "yaw_split_rate_limited_fraction": 0.0017603338114486895,
@@ -288,7 +288,7 @@
    "gear:overturn": true,
    "gear:rotation": true
   },
-  "elapsed_s": 261.8485836982727
+  "elapsed_s": 256.68510031700134
  },
  "opcao_a": {
   "label": "opcao_a",
@@ -470,45 +470,45 @@
    "aborted": null,
    "takeoff_ground_roll_m": 331.8388103867036,
    "touchdown_side_load_status": "excede",
-   "inboard_ratio": 1.197458766937085,
-   "outboard_ratio": 0.9390784940139136,
-   "residual_crab_deg": -0.17910817941541896,
+   "inboard_ratio": 1.2280788567177892,
+   "outboard_ratio": 0.3277595256442913,
+   "residual_crab_deg": -0.17797801633337842,
    "tip_skid_ok": true,
    "touchdown_diag": {
-    "phi_td_deg": -0.8810858610696761,
-    "drift_m_s": 0.4136414652280738,
+    "phi_td_deg": -0.8849071466621159,
+    "drift_m_s": 0.40589257931236006,
     "main_side_N": {
-     "main_L": {
-      "inboard_N": 130.91940988397857,
-      "outboard_N": 189.64947310294812
-     },
      "main_R": {
-      "inboard_N": 945.943608895884,
-      "outboard_N": 489.6102596316503
+      "inboard_N": 970.1322315287644,
+      "outboard_N": 0.0
+     },
+     "main_L": {
+      "inboard_N": 0.0,
+      "outboard_N": 170.88499786799545
      }
     },
     "main_vertical_peak_N": {
-     "main_L": 813.1614176420802,
-     "main_R": 1243.8221973141085
+     "main_R": 1271.897979252965,
+     "main_L": 471.6571907253964
     },
     "W_N": 1579.9184656945843,
-    "side_load_margin": -0.19745876693708508,
+    "side_load_margin": -0.22807885671778916,
     "bumper_contacts_N": {
-     "tip_R": 182.52201430193963
+     "tip_R": 175.06387473151833
     },
     "issue": null
    },
-   "sink_at_touchdown_m_s": 1.2553382213241735,
+   "sink_at_touchdown_m_s": 1.26481839830865,
    "touchdown_dt_sensitivity": {
     "0.01": {
      "side_load_status": "excede",
-     "inboard_ratio": 1.2289619583141072,
-     "outboard_ratio": 0.19061946197889384
+     "inboard_ratio": 1.232300472905708,
+     "outboard_ratio": 0.35578349813234555
     },
     "0.025": {
      "side_load_status": "excede",
-     "inboard_ratio": 1.1917054292506115,
-     "outboard_ratio": 0.379338951535057
+     "inboard_ratio": 1.2128974245938982,
+     "outboard_ratio": 0.6182633401889948
     }
    },
    "yaw_split_rate_limited_fraction": 0.0011385816525699415,
@@ -560,7 +560,7 @@
    "gear:overturn": true,
    "gear:rotation": true
   },
-  "elapsed_s": 236.23143815994263
+  "elapsed_s": 223.46313524246216
  },
  "delta": {
   "W0_kg": 8.001429950931197,

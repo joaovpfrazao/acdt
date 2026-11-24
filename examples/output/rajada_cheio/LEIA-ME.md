@@ -9,3 +9,5 @@ docs/tutorial-asa-voadora-sem-deriva.md §5, e a decisão é do João.
 `python examples/studies/rajada_cheio/estudo_opcao_a.py` (cerca de 8 min; base e opção a correm com o mesmo código).
 É `applied: false` e só usa os `fixed` de `examples/studies/rajada_cheio/opcao_a.yaml`, aplicados em memória.
 Resumo e tabela em docs/tutorial-asa-voadora-sem-deriva.md §5.1.
+
+`opcao_a.json` foi regenerado a 24 nov 2026 com o toque convergido no passo (docs/tutorial-asa-voadora-sem-deriva.md §5.2). Só os números do toque na missão 6-DOF mudaram.

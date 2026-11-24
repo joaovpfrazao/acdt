@@ -2101,6 +2101,13 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Veredicto**: estudo **validado** como redimensionamento; nada é aplicado ao exemplo nem aos valores por omissão. A falha nova no toque precisa de uma decisão do João.
 * **Ficheiros**: `examples/studies/rajada_cheio/{opcao_a.yaml,estudo_opcao_a.py}`, `examples/output/rajada_cheio/opcao_a.json`, `assembly/tailless_followup.py` (chave opcional), `docs/tutorial-asa-voadora-sem-deriva.md` §5.1, `tests/test_rajada_cheio_estudo.py`.
 
+## 50. Toque 14 CFR 23.485 convergido no passo do 6-DOF + decisão da carga lateral com a opção (a) (24 nov 2026)
+
+* **O que faz**: a missão 6-DOF integra a janela do toque em sub-passos de ≤ 2,5 ms (`flightsim/mission.py`, `TOUCHDOWN_SUBSTEP_S`; a chave opcional `touchdown_substep_s` da missão, com 0 a desligar), amostra os picos em cada sub-passo e muda para a lei de rolagem no instante do contacto (localização do evento). Causas da sensibilidade ao passo: a lei do arredondamento ficava aplicada mais um passo no solo, e o atrito lateral tanh(v_y/v_ε) é rígido para RK4 a 15–25 ms. Chaves opcionais novas: `td_sink_m_s` no segmento de aterragem (alvo de afundamento; sem ela fica FLARE) e `side_factor` em `gear_devices.size_gear_side_load_structure` (por omissão 1). Estudo de decisão `examples/studies/toque_cheio/` (`applied: false`).
+* **Medida**: veredicto convergido (5/10/20/25 ms): base, razão interior 0,595–0,611, **passa**; opção (a), 1,213–1,232, **excede**. Menor variante que passa: decrab a 45 m (0,85; janela estreita) e pernas a 1,3 × 23.485 (0,91; pernas +0,21 kg, W0 +0,42 kg). O afundamento alvo, a rampa e a bitola até 0,80 m não passam (a rampa de 2,5° e a semi-bitola de 0,80 m ficam no limite, ou seja, desconhecido).
+* **Veredicto**: convergência **validada** (`tests/test_touchdown_convergence.py`, que falha no código anterior). **Recomendação** (d), pernas a 1,3 × 23.485, marcada como recomendação; a decisão é do João. Ferragens e ligação à asa: desconhecidas. Nada é aplicado ao exemplo nem aos valores por omissão.
+* **Ficheiros**: `flightsim/mission.py`, `assembly/gear_devices.py`, `examples/studies/toque_cheio/`, `examples/output/toque_cheio/`, `examples/output/rajada_cheio/opcao_a.json` (regenerado), `docs/tutorial-asa-voadora-sem-deriva.md` §5.1–5.3, `tests/test_touchdown_convergence.py`, `tests/data/toque_tailless_*_flight_model.json`.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

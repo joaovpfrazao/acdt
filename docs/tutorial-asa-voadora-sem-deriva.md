@@ -323,9 +323,9 @@ exemplo e os valores por omissão não mudam. Resultados em `examples/output/raj
 | Margem de taxa (disponível / pico): vazio / carga / combustível / cheio | 1,94 / 1,15 / 1,57 / — | 2,62 / 1,41 / 1,77 / **1,071** |
 | Vento cruzado 10,1 kt (`hq:yaw_crosswind`) | passa (máx. 14,7 kt) | passa (máx. 14,2 kt) |
 | Missão 6-DOF, corrida de descolagem com vento cruzado (requisito 300 m) | 325 m (já acima; tabela de opções existente) | 332 m |
-| Missão 6-DOF, carga lateral no toque (14 CFR 23.485), dt 0,02 s | passa (0,60 / 0,62) | **excede: interior 1,20, falha (nova)** |
-| Mesma carga com dt 0,01 / 0,025 s | passa / excede (exterior 1,23) | excede (1,23) / excede (1,19) |
-| Descida e deriva no toque | 1,06 m/s, 0,35 m/s | 1,26 m/s, 0,41 m/s |
+| Missão 6-DOF, carga lateral no toque (14 CFR 23.485), convergida no passo (§5.2), dt 0,02 s | passa (interior 0,595, exterior 0,22) | **excede: interior 1,228, falha (nova)** |
+| Mesma carga com dt 0,01 / 0,025 s | passa (0,605) / passa (0,611) | excede (1,232) / excede (1,213) |
+| Descida e deriva no toque | 1,06 m/s, 0,34 m/s | 1,26 m/s, 0,41 m/s |
 
 Leitura:
 
@@ -335,9 +335,88 @@ Leitura:
 * **Falha nova, `hq:phugoid` da célula nua**: ζ desce de 0,0419 para 0,0391, abaixo do limite do Nível 1 (0,04). O
   caso de projeto do UAV é com piloto automático (manutenção de atitude), que fica no Nível 1 com ζ 0,965, por isso
   isto é informação. Mas antes estava no limite e agora está do lado errado.
-* **Falha nova na missão 6-DOF: carga lateral do trem principal no toque.** A razão interior fica em 1,20 > 1 nos três
-  passos de integração (0,01 / 0,02 / 0,025 s). A base passa a 0,02 s, mas já excede a 0,025 s (exterior 1,23). O
-  veredicto do toque é sensível à trajetória, e com a opção (a) excede de forma consistente: descida 1,26 m/s e
-  deriva 0,41 m/s. Precisa de uma decisão própria: aproximação, decrab, bitola ou carga de projeto do trem.
+* **Falha nova na missão 6-DOF: carga lateral do trem principal no toque.** Com o veredicto já convergido no passo (§5.2), a razão interior fica em 1,21–1,23 > 1 nos passos 0,01 / 0,02 / 0,025 s, contra 0,60–0,61 na base. Opções em §5.3.
 * O resto mantém-se: equilíbrio, margem estática, rolamento holandês, espiral, vento cruzado e autoridade em
   turbulência. Nenhuma verificação passou a desconhecida.
+
+### 5.2 Veredicto do toque (14 CFR 23.485) convergido no passo do 6-DOF (24 nov 2026)
+
+Antes desta correção, o veredicto da carga lateral no toque mudava com o passo da missão. A base passava a 0,01 e
+0,02 s e excedia a 0,025 s (exterior 1,23); a opção (a) dava razões de 1,19 a 1,23. A razão interior já era estável;
+os saltos estavam todos na razão exterior, que é a que oscilava. Há duas causas no 6-DOF (`flightsim/mission.py`,
+`flightsim/sixdof.py`):
+
+1. **Mudança de lei atrasada (deteção de evento).** O contacto só era detetado no início do passo seguinte. A lei do
+   arredondamento (asa baixa, elevon ≈ −17°) ainda ficava aplicada no solo durante mais um passo inteiro (20–25 ms)
+   antes da lei de rolagem. Nesse intervalo, a velocidade lateral da roda do nariz (deriva ~0,4 m/s) criava uma
+   guinada forte e picos espúrios para fora nas rodas principais. O pico dependia de quanto tempo dentro do passo o
+   contacto tinha começado. Correção: no contacto, o passo pára no sub-passo do evento e a lei de rolagem entra na
+   mesma iteração.
+2. **Lei de atrito lateral rígida para RK4 explícito.** F_y = −μ N tanh(v_y / v_ε), com v_ε = 0,5 m/s, comporta-se
+   como um amortecedor lateral c ≈ μN/v_ε ≈ 1,2 kN·s/m por roda principal. Correção: na janela do toque (h < 5 m no
+   arredondamento, ≤ 3 s depois do toque) a integração faz-se em sub-passos de ≤ 2,5 ms (`TOUCHDOWN_SUBSTEP_S`). Os
+   comandos ficam fixos ao ritmo do piloto automático e os picos são amostrados em cada sub-passo. Só com a correção 1,
+   sem sub-passos, a 20 ms a razão exterior dava 0,08 na base e 0,11 na opção (a), contra 0,22 e 0,33 com
+   sub-passos: os picos ficavam por amostrar entre passos.
+
+Convergência (razão máxima carga/limite, missão com vento cruzado completa):
+
+| Passo da missão | 5 ms | 10 ms | 20 ms | 25 ms |
+|---|---|---|---|---|
+| Base: interior / exterior | 0,606 / 0,18 | 0,605 / 0,21 | 0,595 / 0,22 | 0,611 / 0,25 |
+| Opção (a): interior / exterior | 1,221 / 0,31 | 1,232 / 0,36 | 1,228 / 0,33 | 1,213 / 0,62 |
+
+Com o passo da missão a 20 ms, mudar o sub-passo para 5 / 2,5 / 1,25 ms dá 1,252 / 1,247 / 1,243 na opção (a).
+
+Os valores das corridas de 5 ms e do varrimento de sub-passo vêm de corridas de diagnóstico sem `res`. Nessas
+corridas, a subida usa o modelo de voo e não `PerfModel`, por isso as trajetórias diferem um pouco das do pipeline.
+As outras colunas vêm de `examples/output/rajada_cheio/opcao_a.json`.
+
+A dispersão fica em ±1,5 % na base e ±1 % na opção (a), dentro da banda numérica de ±5 % de `side_load_band`. Os
+veredictos ficam convergidos: **base passa** e **opção (a) excede**. O teste `tests/test_touchdown_convergence.py`
+usa os dois modelos de voo gravados numa aterragem curta. Exige o mesmo veredicto e uma dispersão ≤ 10 % a 10 / 20 /
+25 ms, e ≤ 5 % entre sub-passos. No código anterior o teste falha: a opção (a) dava 0,98 / 0,91 / 1,02, ou seja,
+três veredictos diferentes.
+
+PRESSUPOSTO, que fica como estava: a lei de atrito (μ_lat 0,8, v_ε 0,5 m/s) e a mola/amortecedor vertical
+(deflexão estática 0,07 m, ζ 0,7). A convergência é numérica e não valida o modelo de pneu.
+
+### 5.3 Decisão: carga lateral no toque com a opção (a) (24 nov 2026, estudo `applied: false`)
+
+O estudo `examples/studies/toque_cheio/` parte do desenho da opção (a) (W0 157,67 kg; razão interior 1,228 no toque)
+e testa quatro famílias. Para cada uma procura-se a variante mais pequena que passa. **Nada é aplicado.**
+Resultados em `examples/output/toque_cheio/toque_cheio.json`.
+
+Critério: razão máxima entre a carga lateral do 6-DOF e o limite de 23.485(c) (0,5 W para dentro, 0,33 W para fora),
+com a banda numérica de ±5 % (`passa` ≤ 0,95; `no_limite` = desconhecido; `excede` > 1,05). Na família (d), a razão
+é ao limite de projeto k × 23.485.
+
+| Família | Variante | Razão máx. | Veredicto | Afundamento / deriva no toque | Custo / efeitos |
+|---|---|---|---|---|---|
+| (a) Afundamento alvo do arredondamento (0,3 m/s) | 0,2 / 0,15 / 0,1 / 0,05 m/s | 1,27 / 1,26 / 1,26 / 1,28 | falha em todas | 1,33–1,50 m/s / 0,39–0,41 m/s | o afundamento real sobe: a lei não atinge o alvo (o atraso do arredondamento domina) |
+| (a) Ângulo da rampa (2°) | 1,5° / 2,5° / 3° | 2,03 / 0,99 / 1,94 | falha / **desconhecido** (no limite) / falha | 2,08 / 1,61 / 2,08 m/s | não monótono; nenhuma variante passa |
+| (b) Decrab (asa baixa a partir de 30 m) | 60 m | 28,9 | falha | 24,6 m/s | perda de controlo antes do toque (desvio de 18°, colisão da cauda) |
+| (b) | **45 m** | **0,85** | **passa** | 1,16 / 0,34 m/s | sem massa; corrida no solo 249 m |
+| (b) | 20 m / 10 m | 1,23 / 1,24 | falha | 1,26 / 0,40–0,44 m/s | — |
+| (b) | decrab só no arredondamento | 0,93 | passa (margem de 2 %) | 1,03 / **0,65 m/s** | deriva maior no toque |
+| (b) | sem decrab (toque caranguejado) | 1,65 | falha | 1,49 m/s; desvio 9,9° | — |
+| (c) Semi-bitola (0,48 m), redimensionado | 0,55 / 0,60 / 0,70 m | 1,19 / 1,17 / 1,07 | falha | 1,24–1,27 / ~0,40 m/s | W0 igual (157,67 kg) |
+| (c) | 0,80 m | 0,97 | **desconhecido** (no limite) | 1,24 / 0,40 m/s | nenhuma variante até 0,80 m passa; `asm:gear_max_track_9532` já falhava na base |
+| (d) Fator de projeto lateral das pernas | 1,1 / 1,2 | 1,12 / 1,02 | falha / desconhecido | — | +0,10 kg |
+| (d) | **1,3 × 23.485**, redimensionado | **0,91** (1,185 / 1,3) | **passa** | 1,19 / 0,40 m/s | pernas +0,21 kg (0,39 → 0,60 kg); **W0 +0,42 kg** (158,09 kg) |
+
+Leitura:
+
+* A carga no toque é muito sensível às condições da aproximação. Basta mudar a rampa de 2° para 1,5° ou 3° para a
+  razão subir para ~2. O decrab também não é monótono: 45 m passa, 30 m e 20 m falham e 60 m perde o controlo.
+* As famílias (a) e (c) não dão nenhuma variante que passe com margem.
+* A família (d) passa com 9 % de margem e custo de massa pequeno. O modelo de pernas existente (consola de Al 2024-T3,
+  FS 1,5) cresce a parede em degraus de 25 %. As ferragens de ligação e a estrutura da asa no ponto do trem **não
+  são avaliadas**: ficam desconhecidas, não passam.
+
+**Recomendação (só recomendação; a decisão fica com o João):** a família (d), pernas projetadas para 1,3 × as
+cargas laterais de 23.485 (+0,21 kg; W0 158,09 kg). É a única que passa com margem sem mudar o procedimento de voo,
+e cobre a aproximação nominal medida. Como reforço opcional, a variante de decrab a 45 m baixa a carga para 0,85.
+Mas sozinha não se recomenda, porque a janela é estreita (30 m falha, 60 m perde o controlo). Antes de aplicar, falta
+avaliar as ferragens e a ligação à asa, e a dispersão das condições de aproximação (rajadas, erro de rampa).
+
