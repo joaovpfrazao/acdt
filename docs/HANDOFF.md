@@ -2102,3 +2102,10 @@ Olhais, cavilhas e berço tubular do motor ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA
 e o exemplo do manual é reproduzido num teste. Pendente: carga transversal/oblíqua nos olhais, casquilhos, escora
 da asa (as ferragens da raiz do C172 são um limite superior), tração do hélice no berço, n.º de cilindros nos
 exemplos (o estudo declara 4 só em memória).
+
+## Estrutura paramétrica — incremento C (24 nov 2026, ramo `estrutura-param-C`)
+
+Acoplamento `iterar` da estrutura paramétrica ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §8,
+CAPABILITIES §55): massa por itens de correção no build-up e CG pelas estações do balanço, ponto fixo no W0. C172
+1137,8 → 1115,9 kg (âmbito incompleto: a asa paramétrica não tem superfícies de comando/escora), twin-boom
+167,0 → 168,9 kg. Pendente: âmbito completo, estações por parte no modo montagem.

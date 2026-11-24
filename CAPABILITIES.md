@@ -2170,6 +2170,19 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Ficheiros**: `src/acdt/core/structures/fittings.py`, `structure_layout.py`, `tests/test_structure_layout.py`,
   `docs/ESTRUTURA_PARAMETRICA.md` §7.
 
+## 55. Estrutura paramétrica C: acoplamento `iterar` (massa e CG no ciclo do W0) (24 nov 2026)
+
+* **O que faz**: `structure_layout.coupling: iterar` corre o ponto fixo dimensionamento ↔ estrutura paramétrica
+  (`size_with_structure`): itens de correção `estrutura_parametrica:*` no build-up de massas e estações do balanço
+  no CG paramétrico de cada parte (massa e momento iguais aos da estrutura paramétrica); modo montagem com correção
+  única. Converge em |ΔW0|/W0 < 10⁻³; sem build-up de massas fica não avaliado. Só em memória.
+* **Medida**: C172 W0 1137,8 → 1115,9 kg em 3 voltas (asa paramétrica −31 kg face a Raymer, ligações +15 kg);
+  twin-boom 167,0 → 168,9 kg em 4 voltas.
+* **Veredicto**: implementado; o W0 acoplado tem âmbito incompleto (sem superfícies de comando, piso, portas) e
+  não deve ser lido como redução de massa.
+* **Ficheiros**: `structure_layout.py`, `domains/aircraft/__init__.py`, `sizing.py` (campo `structure_coupling`),
+  `tests/test_structure_layout.py`, `docs/ESTRUTURA_PARAMETRICA.md` §8.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

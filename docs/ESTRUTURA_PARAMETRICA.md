@@ -221,7 +221,37 @@ consola), por isso as ferragens da raiz são um limite superior: com a escora, o
 berço do motor do C172 (1,4 kg só de tubos) fica abaixo de um berço real, que tem também apoios elásticos, olhais e
 soldaduras (não modelados). Nenhuma ferragem falha; os desconhecidos novos são os berços sem binário avaliado.
 
-## 8. Próximos incrementos
+## 8. Acoplamento `iterar`: massa e CG da estrutura paramétrica no W0 e no balanço (incremento C)
+
+Com `assumptions.structure_layout: {enabled: true, coupling: iterar}`, a etapa de dimensionamento corre um ponto
+fixo (`size_with_structure`, por fora dos acoplamentos térmico e de gelo, como estes): dimensionamento →
+estrutura paramétrica sobre esse resultado → nova volta com
+
+* **massa**: para cada parte com item no build-up de massas (asa, fuselagem, estabilizador, deriva) um item de
+  correção `estrutura_parametrica:<item>` = massa paramétrica − item atual (pode ser negativo); booms e ligações, sem
+  item no build-up, entram inteiros. Com a montagem (`assumptions.assembly`), as partes já são itens `asm:<parte>` com
+  nomes do utilizador: entra uma correção única (Σ paramétrica − Σ asm) no CG paramétrico (PRESSUPOSTO);
+* **CG e inércia**: as estações do balanço (`stability.stations`) do item original e da correção passam para o CG
+  paramétrico da parte (`["m", x]`), por isso item + correção têm a massa e o momento da estrutura paramétrica; as
+  inércias por soma de componentes (Roskam Parte V) e o balanço operacional usam essas estações.
+
+Pára quando |ΔW0|/W0 < `tol` (10⁻³) ou ao fim de `max_iter` (8) voltas. Exige o build-up de massas (`res.weights`);
+sem ele, ou se o dimensionamento não converge, fica «não avaliado» com o motivo. Membros sem massa (desconhecidos)
+não entram e ficam listados. Tudo só em memória (o yaml do exemplo não muda; o teste confirma).
+
+| Caso | W0 relatório | W0 iterar | Voltas | Correções na última volta | CG MTOW (x, SM) |
+|---|---|---|---|---|---|
+| C172 | 1137,8 kg | **1115,9 kg** (−21,9 kg) | 3 | asa −31,4; estab. −1,0; deriva −2,0; fuselagem +7,8; ligações +14,9 kg | 2,193 → 2,297 m; SM 0,10 → 0,11 (crítico passa a ZFW, 0,10) |
+| Twin-boom | 167,0 kg | **168,9 kg** (+1,8 kg) | 4 | correção da montagem +0,72 kg | 0,761 → 0,767 m; SM 0,114 |
+
+Leitura: no C172 a asa paramétrica (caixão em consola: revestimentos, almas, nervuras, bordos e não-ótimo) pesa
+31 kg menos do que a Raymer 15.46, que inclui superfícies de comando, flaps, ferragens e a escora; a fuselagem
+paramétrica ainda não tem piso, portas e janelas (incremento D). O W0 acoplado é por isso um resultado de
+**âmbito incompleto**, não uma redução de massa a aplicar. Quando o âmbito da estrutura paramétrica cobrir esses
+itens, a comparação fica direta. O posicionamento da asa no estágio de estabilidade reajusta-se ao novo CG (a
+margem estática alvo mantém-se no caso crítico).
+
+## 9. Próximos incrementos
 
 1. Fuselagem: piso e vigas de piso, portas/aberturas (molduras), secções não circulares, longarinas reais
    (cargas de flexão lateral e torção), alma das anteparas sob cargas concentradas, pressurização no anel.
@@ -230,6 +260,7 @@ soldaduras (não modelados). Nenhuma ferragem falha; os desconhecidos novos são
 3. ~~Apoios e ferragens: berço do motor, olhais e cavilhas das ligações~~ — feito (§7). Falta: olhais sob carga
    transversal/oblíqua (AFFDL-TR-69-42 Fig. 9-8, interação 1,6), casquilhos, juntas aparafusadas em tração
    (parafusos em tração e corte combinados), escora da asa, apoios elásticos do motor.
-4. Acoplamento `iterar`: massa estrutural paramétrica no fecho do W0, CG/inércia no balanço.
+4. ~~Acoplamento `iterar`~~ — feito (§8). Falta: âmbito completo (superfícies de comando, piso, portas) antes de
+   ler o W0 acoplado como estimativa; estações por parte no modo montagem.
 5. Estimativa de flutter com o modelo de vigas (modos da asa + massas concentradas) ligada a `aeroelasticity.py`.
 6. Exportação para CalculiX por subprocesso (via Build, no PC do João) e comparação viga vs casca.
