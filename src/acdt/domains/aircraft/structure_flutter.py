@@ -68,7 +68,8 @@ def frame_element_k(p1: np.ndarray, p2: np.ndarray, E: float, G: float, A: float
     T = np.zeros((12, 12))
     for i in range(4):
         T[3 * i:3 * i + 3, 3 * i:3 * i + 3] = R
-    return T.T @ k @ T
+    kg: np.ndarray = T.T @ k @ T
+    return kg
 
 
 def point_mass_matrix(m: float, r: np.ndarray, J: np.ndarray) -> np.ndarray:
@@ -203,28 +204,46 @@ def aero_matrices(strip_list: list[dict[str, Any]], phi: np.ndarray, node_ix: di
 
 def flutter_sweep(omega: np.ndarray, AK: np.ndarray, AD: np.ndarray, rho: float, V_max: float, n: int = 400
                   ) -> dict[str, Any]:
-    """Valores próprios de q̈ = (−Ω² + ½ρV² A_K) q + ½ρV A_D q̇ em V ∈ (0, V_max]."""
+    """Valores próprios de q̈ = (−Ω² + ½ρV² A_K) q + ½ρV A_D q̇ em V ∈ (0, V_max]; o cruzamento do amortecimento
+    é refinado por bisseção. g = −ζ máximo das raízes oscilatórias; modos sem acoplamento aerodinâmico (p. ex.
+    flexão no plano) têm ζ = 0 exato e só ruído numérico → limiar 1e-6."""
     m = len(omega)
     Om = np.diag(omega**2)
-    VF, fF, Vdiv = math.inf, math.nan, math.inf
-    prev_max = None
-    Vs = np.linspace(V_max / n, V_max, n)
-    for V in Vs:
+
+    def eig(V: float) -> np.ndarray:
         q = 0.5 * rho * V**2
         A = np.block([[np.zeros((m, m)), np.eye(m)], [-Om + q * AK, (q / V) * AD]])
-        lam = np.linalg.eigvals(A)
+        return np.linalg.eigvals(A)
+
+    def g_of(lam: np.ndarray) -> tuple[float, float]:
         osc = lam[np.abs(lam.imag) > 1e-6]
+        if not osc.size:
+            return -math.inf, math.nan
+        r = osc.real / np.abs(osc)
+        k = int(np.argmax(r))
+        return float(r[k]), float(abs(osc[k].imag) / (2 * math.pi))
+
+    def div_of(lam: np.ndarray) -> bool:
         real = lam[np.abs(lam.imag) <= 1e-6]
-        if not math.isfinite(Vdiv) and real.size and np.any(real.real > 1e-9):
-            Vdiv = float(V)
-        g = float(np.max(osc.real)) if osc.size else -math.inf
-        if not math.isfinite(VF) and g > 0:
-            if prev_max is not None and prev_max[1] < 0:
-                VF = float(prev_max[0] + (V - prev_max[0]) * (-prev_max[1]) / (g - prev_max[1]))
-            else:
-                VF = float(V)
-            fF = float(abs(osc[int(np.argmax(osc.real))].imag) / (2 * math.pi))
-        prev_max = (V, g)
+        return bool(real.size and np.any(real.real > 1e-9))
+
+    VF, fF, Vdiv = math.inf, math.nan, math.inf
+    Vprev = 0.0
+    for V in np.linspace(V_max / n, V_max, n):
+        lam = eig(float(V))
+        if not math.isfinite(Vdiv) and div_of(lam):
+            lo, hi = Vprev, float(V)
+            for _ in range(30):
+                mid = 0.5 * (lo + hi)
+                lo, hi = (lo, mid) if (mid > 0 and div_of(eig(mid))) else (mid, hi)
+            Vdiv = hi
+        if not math.isfinite(VF) and g_of(lam)[0] > 1e-6:
+            lo, hi = Vprev, float(V)
+            for _ in range(30):
+                mid = 0.5 * (lo + hi)
+                lo, hi = (lo, mid) if (mid > 0 and g_of(eig(mid))[0] > 1e-6) else (mid, hi)
+            VF, fF = hi, g_of(eig(hi))[1]
+        Vprev = float(V)
         if math.isfinite(VF) and math.isfinite(Vdiv):
             break
     return {"V_F": VF, "f_F": fF, "V_div": Vdiv}
@@ -351,5 +370,16 @@ def layout_flutter(res: Any, layout: dict[str, Any], recs: list[dict[str, Any]],
               "ESTIMATIVA de baixa fidelidade (quase-estacionária, ρ0 → EAS): flutter de corpo livre, superfícies de "
               "comando (massa/folgas/compensação) e efeitos de compressibilidade fora do âmbito — certificação pede "
               ":mod:`hifi.flutter` ou ensaio"]
+    # empenagem lida ao centro mas presa a um boom (twin-boom): o modelo liga a raiz a um só nó de um dos booms
+    # (assimétrico) — o número fica relatado, o veredicto passa a desconhecido
+    # twin-boom: os booms levam a cauda (cargas «voo_cauda»), mas o layout regista a empenagem ao centro, presa ao
+    # casulo — no modelo de vigas os booms ficam consolas sem a massa da cauda. Número relatado, veredicto
+    # desconhecido até a empenagem ligar aos booms
+    tb = [str(b.get("id")) for b in layout.get("booms", []) if b.get("evaluated") and b.get("carries_tail")]
+    if tb:
+        r["verdict_computed"] = r["verdict"]
+        r["verdict"] = "desconhecido"
+        notes.append(f"booms {', '.join(tb)} levam a cauda, mas a empenagem do layout está ao centro (presa ao corpo "
+                     f"principal): V_F calculado {r['V_F_eas']:.1f} m/s fica relatado, veredicto desconhecido")
     r["notes"] = notes
     return r

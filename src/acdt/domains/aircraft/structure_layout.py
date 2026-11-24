@@ -860,6 +860,7 @@ def boom_layout(bd: dict[str, Any], o: dict[str, Any], mat: dict[str, Any], nono
     out["notes"] = [f"cargas do boom LIMITE ({', '.join(str(ld.get('id')) for ld in loads)}); consolas a partir da "
                     f"ligação x = {xa + x0:.3f} m; casca circular de diâmetro equivalente {D:.3f} m (PRESSUPOSTO)"]
     out["root_moment_limit_Nm"] = float(np.max(M))
+    out["carries_tail"] = any(str(ld.get("kind")) == "tail" for ld in (bd.get("loads") or []))
     out["geometry"] = {"x0_m": x0, "length_m": Lb, "diameter_m": D, "x_attach_m": xa + x0,
                        "y_m": float(bd.get("y_m") or 0.0), "z_m": float(bd.get("z_m") or 0.0)}
     return out

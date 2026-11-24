@@ -509,5 +509,7 @@ def test_twin_boom_whole_aircraft_flutter():
     d.setdefault("assumptions", {})["structure_layout"] = {"enabled": True}
     r = run_pipeline("aircraft", MissionSpec.from_dict(d, p))["result"].structure_layout
     fl = r["flutter"]
-    assert fl["evaluated"] and fl["verdict"] in ("passa", "falha")
+    assert fl["evaluated"] and math.isfinite(fl["V_F_eas"]) or math.isinf(fl["V_F_eas"])
     assert any(m["component"].startswith("boom") for m in fl["modes"])
+    # empenagem ao centro presa a um só boom: número relatado, veredicto desconhecido
+    assert fl["verdict"] == "desconhecido" and fl["verdict_computed"] in ("passa", "falha")
