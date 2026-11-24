@@ -3,7 +3,7 @@
  "exemplo": "examples/cessna172_check.yaml",
  "applied": false,
  "W0_kg": 1153.9247818860601,
- "tempo_s": 50.41743063926697,
+ "tempo_s": 51.34046268463135,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 70,
@@ -243,7 +243,8 @@
   "frame_h_m": 0.034656708949625914,
   "frame_b_m": 0.020794025369775548,
   "n_stringers": 31,
-  "n_longerons": 0
+  "n_longerons": 0,
+  "longeron_theta_deg": []
  },
  "notas": [
   "ligação da asa: longarinas a x = 2.057 m e 2.788 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",

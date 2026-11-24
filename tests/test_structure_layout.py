@@ -513,3 +513,16 @@ def test_twin_boom_whole_aircraft_flutter():
     assert any(m["component"].startswith("boom") for m in fl["modes"])
     # empenagem ao centro presa a um só boom: número relatado, veredicto desconhecido
     assert fl["verdict"] == "desconhecido" and fl["verdict_computed"] in ("passa", "falha")
+# ------------------------------------------------------------------ render 3-D da estrutura
+def test_layout_geometry_and_render(c172, tmp_path):
+    from acdt.domains.aircraft.structure_render import render_layout
+    r = c172.structure_layout
+    g = r["geometry"]
+    assert [b["comp"] for b in g["bodies"]] == ["fuselagem"]
+    assert {s["comp"] for s in g["surfaces"]} == {"asa", "estabilizador", "deriva"}
+    fus = g["bodies"][0]
+    assert len(fus["frames"]) == sum(1 for m in r["members"] if m["kind"].startswith("caverna"))
+    assert fus["bulkheads"] and fus["floor"] and fus["n_stringers"] > 0
+    for mode in ("kind", "RF"):
+        p = render_layout(r, tmp_path / f"c172_{mode}.png", color_by=mode, dpi=60)
+        assert p.exists() and p.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n" and p.stat().st_size > 10_000

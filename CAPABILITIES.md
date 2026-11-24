@@ -2204,6 +2204,19 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
   `size_floor_panel`, `size_floor_beam`, `ShellStation` w/h/n_exp/p_lim/cutouts), `structure_layout.py`,
   `tests/test_structure_layout.py`, `docs/ESTRUTURA_PARAMETRICA.md` §9.
 
+## 57. Estrutura paramétrica: render 3-D da estrutura (24 nov 2026)
+
+* **O que faz**: `structure_render.render_layout` (PNG, matplotlib fora do ecrã) desenha o avião com toda a estrutura
+  tal como a tabela de membros e a geometria do layout (`structure_layout["geometry"]`, nova) a descrevem; cores por
+  tipo de membro ou por RF_min; CLI `python -m acdt.domains.aircraft.structure_render`; saída no estudo
+  (`render: true`).
+* **Medida**: `examples/output/estrutura_parametrica/c172_estrutura_3d(_rf).png` e
+  `twin_boom_estrutura_3d(_rf).png`.
+* **Veredicto**: implementado; o desenho expõe as simplificações do layout (superfícies no plano z0, uma deriva ao
+  centro no twin-boom).
+* **Ficheiros**: `structure_render.py`, `structure_layout.py` (`layout_geometry`), estudo, `tests/test_structure_layout.py`,
+  `docs/ESTRUTURA_PARAMETRICA.md` §10.
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

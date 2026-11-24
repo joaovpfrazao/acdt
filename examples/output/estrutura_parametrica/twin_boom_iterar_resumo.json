@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_twin_boom_shortcut.yaml",
  "applied": false,
  "W0_kg": 168.87840020070337,
- "tempo_s": 42.0063214302063,
+ "tempo_s": 43.91701030731201,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 63,
@@ -295,7 +295,8 @@
   "frame_h_m": 0.015,
   "frame_b_m": 0.009,
   "n_stringers": 11,
-  "n_longerons": 0
+  "n_longerons": 0,
+  "longeron_theta_deg": []
  },
  "notas": [
   "ligação da asa: longarinas a x = 0.700 m e 0.910 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
