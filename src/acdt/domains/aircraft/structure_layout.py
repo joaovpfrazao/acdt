@@ -50,7 +50,10 @@ DEFAULTS: dict[str, Any] = {
         "tail_theta_deg": [90.0, -90.0],
         "loads": [],                  # [{id, kind, x_m | x_frac, theta_deg, Fz_N, Fy_N, M_Nm, mass_kg, case}]
     },
-    "booms": [],                      # [{id, x0_m, length_m, diameter_m, y_m, z_m, loads: [{x_m, Fz_N, Fy_N, T_Nm}]}]
+    "booms": [],                      # [{id, x0_m, length_m, diameter_m, y_m, z_m, x_attach_m, loads: [{x_m, Fz_N, Fy_N, T_Nm}]}]
+    "booms_from_assembly": True,      # corpos com papel «boom» na montagem + cauda/rotores que lá se apoiam
+    "rotor_thrust_factor": 1.5,       # T_lim/(W0 g/n) dos rotores de elevação — PRESSUPOSTO, declarar
+    "tails": {"method": "buckling"},  # buckling: dimensionador por estabilidade da asa; strength: caixão L1
     "export": {"beam_model": True},
 }
 
@@ -128,53 +131,127 @@ def budget(members: list[dict[str, Any]]) -> dict[str, Any]:
                     "superfícies sustentadoras distribuídas ∝ corda na envergadura — PRESSUPOSTO"}
 
 
-# ------------------------------------------------------------------------------------------------ wrapped surfaces
-def wing_members(res: Any, x_wing: float) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
-    """Embrulha o caixão já dimensionado (:mod:`.structures`) — sem o redimensionar."""
-    st = getattr(res, "structures", None)
-    if st is None or getattr(st, "box", None) is None:
-        return [member("asa", "asa", "caixao", None, x_wing, verdict="desconhecido", method="caixão em falta",
-                       source="structures (não correu)")], None
-    box, wing = st.box, res.config.wing
-    y = np.asarray(box.y, float)
-    c = np.asarray(wing.c_root + (wing.c_tip - wing.c_root) * y / (wing.span / 2), float)
+# ------------------------------------------------------------------------------------------------ lifting surfaces
+_BOX_KINDS = {"caps": "banzo_longarina", "webs": "alma_longarina", "web_uprights": "montante_alma",
+              "box_skins": "revestimento_caixao", "covers_skin_stringers": "painel_reforcado", "core": "nucleo",
+              "LE_TE_skins": "revestimento_bordos", "ribs": "nervura", "nonoptimum": "nao_otimo"}
+
+
+def box_members(comp: str, box: dict[str, Any], x: float, y0: float = 0.0, z0: float = 0.0, axis: str = "y",
+                mirror: bool = True, source: str = "") -> list[dict[str, Any]]:
+    """Linhas da tabela de membros de um caixão já dimensionado (asa ou empenagem; ``box`` no formato de
+    :func:`.structures_l1._tail_box_summary`). A massa distribui-se ∝ corda na envergadura (PRESSUPOSTO) para a
+    inércia própria; com ``mirror`` o caixão tem duas metades simétricas (centroide no plano de simetria)."""
+    y = np.asarray(box["y"], float)
+    c = box["c_root_m"] + (box["c_tip_m"] - box["c_root_m"]) * y / max(box["semispan_m"], 1e-9)
     w = c / np.trapezoid(c, y)
-    y2 = float(np.trapezoid(w * y**2, y))      # ⟨y²⟩ de uma semiasa (massa ∝ corda — PRESSUPOSTO)
-    buck_ok = box.buckling is None or bool(box.buckling.ok)
+    y1 = float(np.trapezoid(w * y, y))
+    y2 = float(np.trapezoid(w * y**2, y))
+    buck_ok = box.get("buckling_ok")
     rows = []
-    kinds = {"caps": "banzo_longarina", "webs": "alma_longarina", "web_uprights": "montante_alma",
-             "box_skins": "revestimento_caixao", "covers_skin_stringers": "painel_reforcado", "core": "nucleo",
-             "LE_TE_skins": "revestimento_bordos", "ribs": "nervura", "nonoptimum": "nao_otimo"}
-    for key, m in box.masses.items():
+    for key, m in box["masses"].items():
         if key in ("ideal", "total"):
             continue
         m = float(m)
         if key in ("caps", "webs", "web_uprights"):
             ver = "passa"           # dimensionados a RF = 1 (A = M_u/(h σ), t = q/τ, Kuhn) ou espessura mínima
         elif key in ("box_skins", "covers_skin_stringers", "core"):
-            ver = "passa" if buck_ok else "falha"
+            ver = "desconhecido" if buck_ok is None else ("passa" if buck_ok else "falha")
         else:
             ver = "desconhecido"    # espessura mínima / fator — não verificado
-        rows.append(member(f"asa.{key}", "asa", kinds.get(key, key), m, x_wing, 0.0, 0.0, I_own=(m * y2, 0.0, m * y2),
-                           verdict=ver, method=f"caixão {box.method} (Megson/Bruhn) — {box.material}",
-                           source="structures.box (existente)"))
-    beam = {"y": y.tolist(), "EI": None if box.EI is None else np.asarray(box.EI, float).tolist(),
-            "GJ": None if box.GJ is None else np.asarray(box.GJ, float).tolist(), "x_m": x_wing}
-    return rows, beam
+        off = 0.0 if mirror else y1     # metade única (deriva): centroide fora do eixo
+        if axis == "z":
+            pos = (x, y0, z0 + off)
+            I_own = (m * (y2 - off**2), m * (y2 - off**2), 0.0)
+        else:
+            pos = (x, y0 + off, z0)
+            I_own = (m * (y2 - off**2), 0.0, m * (y2 - off**2))
+        rows.append(member(f"{comp}.{key}", comp, _BOX_KINDS.get(key, key), m, *pos, I_own=I_own, verdict=ver,
+                           method=f"caixão {box.get('method')} (Megson/Bruhn) — {box.get('material')}; secção: "
+                                  f"{box.get('section', '')}", source=source))
+    return rows
 
 
-def tail_members(res: Any, fus: dict[str, Any]) -> list[dict[str, Any]]:
+def wing_box_summary(res: Any) -> dict[str, Any] | None:
+    st = getattr(res, "structures", None)
+    if st is None or getattr(st, "box", None) is None:
+        return None
+    box, wing = st.box, res.config.wing
+    return {"y": np.asarray(box.y, float).tolist(), "masses": {k: float(v) for k, v in box.masses.items()},
+            "method": box.method, "material": box.material,
+            "buckling_ok": None if box.buckling is None else bool(box.buckling.ok),
+            "EI": None if box.EI is None else np.asarray(box.EI, float).tolist(),
+            "GJ": None if box.GJ is None else np.asarray(box.GJ, float).tolist(),
+            "section": "multicélula (Fase 5)" if "x_sc_c" in box.details else "duas mesas / Bredt",
+            "semispan_m": float(wing.span / 2), "c_root_m": float(wing.c_root), "c_tip_m": float(wing.c_tip)}
+
+
+def structures_material(res: Any) -> str:
+    """Material do caixão como em :func:`.sizing.structures_inputs` (``structures.material``)."""
+    from .weights_detailed import _merge_opts
+    A = res.spec.assumptions
+    mat = A["structures"]["material"]
+    if mat == "auto":
+        mat = "cfrp" if _merge_opts(A["weights"].get("components"))["material"] == "composite" else "al2024_t3"
+    return str(mat)
+
+
+def tail_boxes(res: Any, o: dict[str, Any]) -> tuple[dict[str, dict[str, Any] | None], list[str]]:
+    """Empenagens pelo caminho da asa: ``tails.method: buckling`` (omissão) redimensiona o caixão com o
+    dimensionador por estabilidade da asa (Fase 3: painéis reforçados, almas de Kuhn) sob a carga de projeto da L1
+    (carga uniforme, cima e baixo — PRESSUPOSTO), depois a secção multicélula da Fase 5 dá EI/GJ. ``strength``
+    usa o caixão L1 tal como está (só resistência). A deriva é encastrada só na raiz (``single_sided``: metade de
+    uma asa espelhada de altura b, M_raiz = L b/2); o caixão L1 da deriva trata-a como duas metades de altura b/2."""
+    from .structures_l1 import _tail_box_summary, _uniform_tail
     l1 = getattr(res, "structures_l1", None)
     tails = getattr(l1, "tails", None) or {}
-    rows = []
-    for key, comp, xk in (("htail_kg", "estabilizador", "x_ht_m"), ("vtail_kg", "deriva", "x_vt_m")):
-        m = tails.get(key)
-        rows.append(member(f"{comp}.caixao", comp, "caixao", None if m is None else float(m),
-                           float(fus.get(xk, 0.0) or 0.0), 0.0, 0.0,
-                           verdict="passa" if m is not None else "desconhecido",
-                           method="caixão de duas longarinas, carga uniforme (structures_l1)",
-                           source="structures_l1.tails (existente)"))
-    return rows
+    meth = str((o.get("tails") or {}).get("method", "buckling"))
+    notes: list[str] = []
+    out: dict[str, dict[str, Any] | None] = {}
+    nonopt = float(res.spec.assumptions["structures"].get("nonoptimum_factor", 1.25))
+    mat = structures_material(res)
+    for key, surf in (("htail", res.config.htail), ("vtail", res.config.vtail)):
+        lift = tails.get(f"{key}_limit_lift_N")
+        if surf is None or lift is None:
+            out[key] = None
+            continue
+        if meth == "buckling":
+            try:
+                ss = key == "vtail"
+                box = _uniform_tail(surf, float(lift), mat, nonopt, method="buckling", single_sided=ss)
+                out[key] = _tail_box_summary(surf, box, mat, single_sided=ss)
+                continue
+            except Exception as ex:  # noqa: BLE001 — recua para o caixão L1, com nota
+                notes.append(f"{key}: dimensionamento por estabilidade falhou ({type(ex).__name__}: {ex}); caixão L1")
+        out[key] = tails.get(f"{key}_box")
+    return out, notes
+
+
+def surface_records(res: Any, o: dict[str, Any], fus: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
+    """Superfícies sustentadoras: asa (caixão existente) e empenagens (caminho da asa). Cada registo leva a
+    posição de encastramento e o eixo da envergadura para a tabela de membros e o modelo de vigas."""
+    recs: list[dict[str, Any]] = []
+    x_w = float(fus.get("x_wing_m") or 0.35 * res.config.fuselage.length)
+    wb = wing_box_summary(res)
+    recs.append({"comp": "asa", "box": wb, "x": x_w, "y0": 0.0, "z0": 0.0, "axis": "y", "mirror": True,
+                 "source": "structures.box (existente)"})
+    tb, notes = tail_boxes(res, o)
+    meth = str((o.get("tails") or {}).get("method", "buckling"))
+    src = ("structures_l1 cargas + structures.box_beam_sizing_buckling + secção Fase 5" if meth == "buckling"
+           else "structures_l1.tails (existente)")
+    recs.append({"comp": "estabilizador", "box": tb.get("htail"), "x": float(fus.get("x_ht_m") or 0.0), "y0": 0.0,
+                 "z0": 0.0, "axis": "y", "mirror": True, "source": src})
+    recs.append({"comp": "deriva", "box": tb.get("vtail"), "x": float(fus.get("x_vt_m") or 0.0), "y0": 0.0,
+                 "z0": 0.0, "axis": "z", "mirror": False, "source": src})
+    return recs, notes
+
+
+def surface_members(rec: dict[str, Any]) -> list[dict[str, Any]]:
+    if rec["box"] is None:
+        return [member(f"{rec['comp']}.caixao", rec["comp"], "caixao", None, rec["x"], verdict="desconhecido",
+                       method="caixão em falta", source=rec["source"])]
+    return box_members(rec["comp"], rec["box"], rec["x"], rec["y0"], rec["z0"], rec["axis"], rec["mirror"],
+                       rec["source"])
 
 
 # ------------------------------------------------------------------------------------------------ fuselage
@@ -463,8 +540,37 @@ def fuselage_layout(res: Any, o: dict[str, Any], mat: dict[str, Any]) -> dict[st
     return out
 
 
+def _boom_loads_integrate(s: np.ndarray, xa: float, pts: list[tuple[float, float, float, float]]
+                          ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Duas consolas a partir da ligação ``xa``: cargas atrás de xa fletem a parte de trás, à frente a da frente.
+    ``pts`` = [(p, Fz, Fy, T)] (p relativo ao início do boom), somadas com sinal por plano (z, y) e combinadas
+    vetorialmente; na própria ligação fica o maior dos dois lados (cada consola descarrega na ferragem).
+    Devolve |V|, |M|, |T| por estação."""
+    acc = {side: [np.zeros_like(s) for _ in range(5)] for side in ("tras", "frente")}
+    for p, Fz, Fy, Tq in pts:
+        side = "tras" if p >= xa else "frente"
+        on = ((s >= xa) & (s <= p)) if side == "tras" else ((s <= xa) & (s >= p))
+        arm = np.abs(p - s)
+        Vz, Mz, Vy, My, T = acc[side]
+        Vz += np.where(on, Fz, 0.0)
+        Mz += np.where(on, Fz * arm, 0.0)
+        Vy += np.where(on, Fy, 0.0)
+        My += np.where(on, Fy * arm, 0.0)
+        T += np.where(on, Tq, 0.0)
+    res = []
+    for k in range(3):
+        if k == 2:
+            a_, f_ = np.abs(acc["tras"][4]), np.abs(acc["frente"][4])
+        else:
+            a_ = np.hypot(acc["tras"][k], acc["tras"][k + 2])          # (Vz, Vy) ou (Mz, My)
+            f_ = np.hypot(acc["frente"][k], acc["frente"][k + 2])
+        res.append(np.where(s > xa, a_, np.where(s < xa, f_, np.maximum(a_, f_))))
+    return res[0], res[1], res[2]
+
+
 def boom_layout(bd: dict[str, Any], o: dict[str, Any], mat: dict[str, Any], nonopt: float) -> dict[str, Any]:
-    """Boom em consola a partir da raiz (x0): cargas pontuais do utilizador → V, M, T por integração da ponta."""
+    """Boom (corpo tubular) ligado à asa em ``x_attach_m`` (omissão: início do boom), com cargas LIMITE pontuais
+    (cauda, rotor, trem — ``loads: [{id, x_m, Fz_N, Fy_N, T_Nm}]``, x global): duas consolas a partir da ligação."""
     bid = str(bd.get("id") or "boom")
     try:
         x0, Lb, D = float(bd["x0_m"]), float(bd["length_m"]), float(bd["diameter_m"])
@@ -473,40 +579,142 @@ def boom_layout(bd: dict[str, Any], o: dict[str, Any], mat: dict[str, Any], nono
     loads = bd.get("loads") or []
     if not loads:
         return {"evaluated": False, "reason": f"{bid}: sem cargas declaradas — desconhecido", "members": []}
+    xa_raw = bd.get("x_attach_m")
+    xa = min(max((x0 if xa_raw is None else float(xa_raw)) - x0, 0.0), Lb)
     s = np.linspace(0.0, Lb, 41)
-    pts = sorted(float(ld["x_m"]) - x0 for ld in loads)
-    s = np.unique(np.concatenate([s, [p for p in pts if 0 <= p <= Lb]]))
+    pts = [(float(ld["x_m"]) - x0, float(ld.get("Fz_N") or 0.0), float(ld.get("Fy_N") or 0.0),
+            float(ld.get("T_Nm") or 0.0)) for ld in loads]
+    s = np.unique(np.concatenate([s, [p for p, *_r in pts if 0 <= p <= Lb], [xa]]))
+    cases = [str(ld.get("case") or "limite") for ld in loads]
     V = np.zeros_like(s)
     M = np.zeros_like(s)
     T = np.zeros_like(s)
-    fl: dict[str, list[Any]] = {"limite": []}
-    for ld in loads:
-        p = float(ld["x_m"]) - x0
-        F = math.hypot(float(ld.get("Fz_N") or 0.0), float(ld.get("Fy_N") or 0.0))
-        V += np.where(s <= p, F, 0.0)
-        M += np.where(s <= p, F * (p - s), 0.0)
-        T += np.where(s <= p, abs(float(ld.get("T_Nm") or 0.0)), 0.0)
-        fl["limite"].append((p, str(ld.get("id") or "carga"),
-                             [fr.RingLoad(180.0, Fy=float(ld.get("Fy_N") or 0.0), Fz=float(ld.get("Fz_N") or 0.0))]
-                             + ([fr.RingLoad(0.0, M=float(ld["T_Nm"]))] if ld.get("T_Nm") else [])))
+    fl: dict[str, list[Any]] = {}
+    for c in dict.fromkeys(cases):       # envolvente dos casos (cada caso com as suas cargas em simultâneo)
+        sel = [pt for pt, ci in zip(pts, cases) if ci == c]
+        Vc, Mc, Tc = _boom_loads_integrate(s, xa, sel)
+        V, M, T = np.maximum(V, Vc), np.maximum(M, Mc), np.maximum(T, Tc)
+        fl[c] = []
+    for ld, (p, Fz, Fy, Tq), c in zip(loads, pts, cases):
+        fl[c].append((min(max(p, 0.0), Lb), str(ld.get("id") or "carga"),
+                      [fr.RingLoad(180.0, Fy=Fy, Fz=Fz)] + ([fr.RingLoad(0.0, M=Tq)] if Tq else [])))
     fo = _merge(DEFAULTS["fuselage"], {k: v for k, v in bd.items() if k in DEFAULTS["fuselage"]})
     fo["frame_pitch_m"] = fo.get("frame_pitch_m") or 0.3
     if fo["stringers"].get("n") is None:
-        fo["stringers"]["n"] = 8
+        fo["stringers"]["n"] = max(4, math.ceil(math.pi * D / float(fo["stringers"].get("pitch_m") or 0.12)))
     if fo["longerons"].get("n") is None:
         fo["longerons"]["n"] = 0
     R = np.full_like(s, D / 2)
-    bks = [{"id": "raiz", "x_m": 0.0, "pressure_Pa": 0.0}]
+    bks = [{"id": "ligacao", "x_m": xa, "pressure_Pa": 0.0}]
     out = analyse_body(bid, s, R, M, V, T, fl, bks, fo, mat, nonopt, float(bd.get("y_m") or 0.0),
                        float(bd.get("z_m") or 0.0), x0)
     out["evaluated"] = True
-    out["notes"] = ["cargas do boom: LIMITE declaradas pelo utilizador (cauda/rotor/trem), consola da raiz"]
+    out["notes"] = [f"cargas do boom LIMITE ({', '.join(str(ld.get('id')) for ld in loads)}); consolas a partir da "
+                    f"ligação x = {xa + x0:.3f} m; casca circular de diâmetro equivalente {D:.3f} m (PRESSUPOSTO)"]
+    out["root_moment_limit_Nm"] = float(np.max(M))
+    out["geometry"] = {"x0_m": x0, "length_m": Lb, "diameter_m": D, "x_attach_m": xa + x0,
+                       "y_m": float(bd.get("y_m") or 0.0), "z_m": float(bd.get("z_m") or 0.0)}
     return out
 
 
+_ROTOR_WORDS = ("rotor", "lift", "elevac", "vtol")
+
+
+def booms_from_assembly(asm_spec: dict[str, Any] | None, W0_kg: float, tails: dict[str, Any], o: dict[str, Any],
+                        x_attach: float | None) -> tuple[list[dict[str, Any]], list[str]]:
+    """Booms da geometria de montagem (``assembly``): corpos com papel «boom» (as imagens espelhadas contam como
+    booms separados), com as cargas que lá se apoiam:
+
+    * empenagens (superfícies cujo papel contém «tail»/«cauda»/«empenagem») na extensão do boom mais próximo:
+      sustentação de projeto do estabilizador e da deriva da L1 repartida igualmente pelos booms que levam cauda
+      (PRESSUPOSTO; uma cauda em V/V invertido entra com as superfícies equivalentes da L1), mais a torção L_deriva ×
+      0,4 × semienvergadura da deriva (o mesmo braço da L1, PRESSUPOSTO);
+    * rotores de elevação (discos cujo papel contém rotor/lift; hélices de propulsão excluídas): T_lim =
+      ``rotor_thrust_factor`` × W0 g / n_rotores (fator PRESSUPOSTO, 1,5 por omissão — declarar o do projeto);
+      o binário de reação do rotor não é conhecido aqui e fica fora (desconhecido, listado).
+
+    Eixo dos booms paralelo a x (PRESSUPOSTO). Ligação à asa em ``x_attach`` (centro aerodinâmico da asa)."""
+    notes: list[str] = []
+    if not asm_spec:
+        return [], notes
+    from .assembly.assembly import Assembly
+    from .assembly.components import Body, Disc, Surface
+    try:
+        asm = Assembly.from_dict(asm_spec.get("assembly", asm_spec))
+    except Exception as ex:  # noqa: BLE001
+        return [], [f"montagem ilegível para booms: {type(ex).__name__}: {ex}"]
+    booms: list[dict[str, Any]] = []
+    for c in asm.components:
+        if isinstance(c, Body) and "boom" in (c.role or "").lower():
+            st = c.stations
+            xs = [float(s_["x"]) for s_ in st]
+            D = max(math.sqrt(float(s_["w"]) * float(s_.get("h") or s_["w"])) for s_ in st)
+            ox, oy, oz = (float(v) for v in c.origin)
+            if c.mirrored_image:
+                oy = -oy
+            booms.append({"id": c.name, "x0_m": ox + min(xs), "length_m": max(xs) - min(xs), "diameter_m": D,
+                          "y_m": oy, "z_m": oz, "loads": [],
+                          "x_attach_m": x_attach if x_attach is not None else ox + min(xs)})
+    if not booms:
+        return [], notes
+
+    def nearest(x: float, y: float, z: float, margin: float = 0.5) -> dict[str, Any] | None:
+        best, dbest = None, math.inf
+        for b in booms:
+            if b["x0_m"] - margin <= x <= b["x0_m"] + b["length_m"] + margin:
+                d = math.hypot(y - b["y_m"], z - b["z_m"])
+                if d < dbest:
+                    best, dbest = b, d
+        return best
+
+    tail_hits: list[tuple[dict[str, Any], float]] = []
+    for c in asm.components:
+        role = (c.role or "").lower()
+        if isinstance(c, Surface) and any(w in role for w in ("tail", "cauda", "empenagem")):
+            ox, oy, oz = (float(v) for v in c.origin)
+            if c.mirrored_image:
+                oy = -oy
+            b = nearest(ox, oy, oz)
+            if b is not None and b not in [t[0] for t in tail_hits]:
+                tail_hits.append((b, ox))
+    if tail_hits:
+        L_ht = float(tails.get("htail_limit_lift_N") or 0.0)
+        L_vt = float(tails.get("vtail_limit_lift_N") or 0.0)
+        vb = tails.get("vtail_box") or {}
+        z_cp = 0.4 * float(vb.get("semispan_m") or 0.0)
+        n = len(tail_hits)
+        for b, x in tail_hits:
+            b["loads"].append({"id": "cauda", "kind": "tail", "case": "voo_cauda", "x_m": min(x, b["x0_m"] + b["length_m"]),
+                               "Fz_N": -L_ht / n, "Fy_N": L_vt / n, "T_Nm": L_vt / n * z_cp})
+        notes.append(f"cauda nos booms: L_estab {L_ht:.0f} N e L_deriva {L_vt:.0f} N (L1) repartidas por {n} booms "
+                     "— PRESSUPOSTO")
+    rotors = [c for c in asm.components if isinstance(c, Disc)
+              and any(w in (c.role or "").lower() for w in _ROTOR_WORDS) and "propul" not in (c.role or "").lower()]
+    if rotors:
+        k = float(o.get("rotor_thrust_factor") or 1.5)
+        T = k * W0_kg * G0 / len(rotors)
+        for c in rotors:
+            ox, oy, oz = (float(v) for v in c.origin)
+            if c.mirrored_image:
+                oy = -oy
+            b = nearest(ox, oy, oz)
+            if b is None:
+                notes.append(f"rotor {c.name}: sem boom próximo — carga não atribuída (desconhecida)")
+                continue
+            b["loads"].append({"id": f"rotor:{c.name}", "kind": "rotor", "case": "pairar_rotores", "x_m": min(max(ox, b["x0_m"]),
+                                                                                b["x0_m"] + b["length_m"]),
+                               "Fz_N": T, "Fy_N": 0.0, "T_Nm": 0.0})
+        notes.append(f"rotores de elevação: {len(rotors)} × T_lim = {k:g} × W0 g / n = {T:.0f} N (fator PRESSUPOSTO); "
+                     "binário de reação dos rotores não modelado (desconhecido)")
+    return booms, notes
+
+
 # ------------------------------------------------------------------------------------------------ beam model
-def beam_model(mat: dict[str, Any], fus: dict[str, Any] | None, wing: dict[str, Any] | None, members: list[dict[str, Any]]) -> dict[str, Any]:
-    """Modelo de vigas neutro ``acdt.beam/1``: nós, barras (A, I1, I2, J), material e massas concentradas."""
+def beam_model(mat: dict[str, Any], bodies: list[dict[str, Any]], surfaces: list[dict[str, Any]],
+               members: list[dict[str, Any]]) -> dict[str, Any]:
+    """Modelo de vigas neutro ``acdt.beam/1`` do avião inteiro: corpos (fuselagem, booms: eixo x a (y0, z0)) e
+    superfícies (asa/estabilizador em ±y, deriva em +z) com EI/GJ por estação; cada superfície liga ao nó de corpo
+    mais próximo da sua raiz (ou cria um). Massas concentradas no nó mais próximo; barras sem massa."""
     nodes: list[dict[str, Any]] = []
     elems: list[dict[str, Any]] = []
     E, G = mat["E"], mat["G"]
@@ -515,47 +723,76 @@ def beam_model(mat: dict[str, Any], fus: dict[str, Any] | None, wing: dict[str, 
         nodes.append({"id": len(nodes) + 1, "xyz": [x, y, z]})
         return len(nodes)
 
-    missing = []
-    fus_ids: list[int] = []
-    if fus and fus.get("x"):
-        xs = fus["x"]
-        fus_ids = [node(float(x), 0.0, 0.0) for x in xs]
-        for k in range(len(xs) - 1):
-            elems.append({"id": len(elems) + 1, "component": "fuselagem", "nodes": [fus_ids[k], fus_ids[k + 1]],
-                          "A": 0.5 * (fus["A"][k] + fus["A"][k + 1]), "I1": 0.5 * (fus["I"][k] + fus["I"][k + 1]),
-                          "I2": 0.5 * (fus["I"][k] + fus["I"][k + 1]), "J": 0.5 * (fus["J"][k] + fus["J"][k + 1])})
-    else:
-        missing.append("fuselagem")
-    if wing and wing.get("EI") and wing.get("GJ"):
-        xw = float(wing["x_m"])
-        root = fus_ids[int(np.argmin([abs(n["xyz"][0] - xw) for n in nodes]))] if fus_ids else node(xw, 0.0, 0.0)
-        for side in (1.0, -1.0):
+    missing: list[str] = []
+    body_nodes: list[int] = []
+    owner: dict[int, str] = {}
+    attach: list[tuple[str, list[int], float, dict[str, Any]]] = []
+    for bd in bodies:
+        bm = bd.get("beam")
+        if not bm or not bm.get("x"):
+            missing.append(str(bd["comp"]))
+            continue
+        ids = [node(float(x), float(bd.get("y0", 0.0)), float(bd.get("z0", 0.0))) for x in bm["x"]]
+        if bd.get("attach_x") is not None and body_nodes:
+            attach.append((str(bd["comp"]), ids, float(bd["attach_x"]), bm))   # boom: liga depois à asa
+        else:
+            body_nodes += ids
+        owner.update({i: str(bd["comp"]) for i in ids})
+        for k in range(len(ids) - 1):
+            Iav = 0.5 * (bm["I"][k] + bm["I"][k + 1])
+            elems.append({"id": len(elems) + 1, "component": bd["comp"], "nodes": [ids[k], ids[k + 1]],
+                          "A": 0.5 * (bm["A"][k] + bm["A"][k + 1]), "I1": Iav, "I2": Iav,
+                          "J": 0.5 * (bm["J"][k] + bm["J"][k + 1])})
+    for sf in surfaces:
+        bx = sf.get("box")
+        if not bx or not bx.get("EI") or not bx.get("GJ"):
+            missing.append(f"{sf['comp']} (EI/GJ do caixão)")
+            continue
+        xr, yr, zr = float(sf["x"]), float(sf.get("y0", 0.0)), float(sf.get("z0", 0.0))
+        cand = body_nodes + [i for _c, ids_b, _x, _b in attach for i in ids_b]
+        if cand:
+            d = [math.dist(nodes[i - 1]["xyz"], [xr, yr, zr]) for i in cand]
+            root = cand[int(np.argmin(d))]
+        else:
+            root = node(xr, yr, zr)
+        for side in ((1.0, -1.0) if sf.get("mirror", True) else (1.0,)):
             prev = root
-            for k, y in enumerate(wing["y"]):
-                if y <= 1e-9:
+            for k, s_ in enumerate(bx["y"]):
+                if s_ <= 1e-9:
                     continue
-                nid = node(xw, side * float(y), 0.0)
-                EI = 0.5 * (wing["EI"][k - 1] + wing["EI"][k])
-                GJ = 0.5 * (wing["GJ"][k - 1] + wing["GJ"][k])
-                elems.append({"id": len(elems) + 1, "component": "asa", "nodes": [prev, nid], "A": 1e-4,
+                pos = [xr, yr + side * float(s_), zr] if sf.get("axis", "y") == "y" else [xr, yr, zr + float(s_)]
+                nid = node(*pos)
+                EI = 0.5 * (bx["EI"][k - 1] + bx["EI"][k])
+                GJ = 0.5 * (bx["GJ"][k - 1] + bx["GJ"][k])
+                elems.append({"id": len(elems) + 1, "component": sf["comp"], "nodes": [prev, nid], "A": 1e-4,
                               "I1": EI / E, "I2": 10 * EI / E, "J": GJ / G})
+                owner[nid] = str(sf["comp"])
                 prev = nid
-    else:
-        missing.append("asa (EI/GJ do caixão)")
-    missing.append("empenagens e booms (EI/GJ não guardados — próximo incremento)")
+    for comp, ids, xa, bm in attach:   # ligação rígida do boom ao nó mais próximo de outro componente
+        k = int(np.argmin([abs(nodes[i - 1]["xyz"][0] - xa) for i in ids]))
+        others = [i for i in owner if owner[i] != comp and i not in ids]
+        if not others:
+            missing.append(f"{comp}: sem nó de ligação")
+            continue
+        j = others[int(np.argmin([math.dist(nodes[i - 1]["xyz"], nodes[ids[k] - 1]["xyz"]) for i in others]))]
+        elems.append({"id": len(elems) + 1, "component": f"ligacao:{comp}", "nodes": [j, ids[k]],
+                      "A": 10 * max(bm["A"]), "I1": 10 * max(bm["I"]), "I2": 10 * max(bm["I"]),
+                      "J": 10 * max(bm["J"])})
     masses = []
     for m in members:
         if not nodes or m["mass_kg"] is None or m["mass_kg"] <= 0:
             continue
-        p = np.array([m["x_m"], m["y_m"], m["z_m"]])
-        nid = int(np.argmin([np.linalg.norm(np.array(n["xyz"]) - p) for n in nodes])) + 1
+        p = [m["x_m"], m["y_m"], m["z_m"]]
+        nid = int(np.argmin([math.dist(n["xyz"], p) for n in nodes])) + 1
         masses.append({"node": nid, "mass_kg": m["mass_kg"], "member": m["id"]})
     return {"format": "acdt.beam/1", "units": "SI (m, N, kg, Pa)",
             "material": {"id": 1, "E": E, "G": G, "nu": mat["nu"], "rho": 0.0, "source": mat["source"]},
             "nodes": nodes, "elements": elems, "point_masses": masses, "missing": missing,
             "note": "barras sem massa (ρ = 0): a massa estrutural entra só como massas concentradas no nó mais próximo; "
-                    "A da asa simbólica (1e-4 m²) e I2 = 10 I1 (rigidez no plano — PRESSUPOSTO); eixo I1 = flexão "
-                    "vertical. Para análise externa (p. ex. CalculiX por subprocesso via Build)."}
+                    "nas superfícies A simbólica (1e-4 m²), I1 = EI/E (flexão para fora do plano), I2 = 10 I1 "
+                    "(rigidez no plano — PRESSUPOSTO), J = GJ/G; a raiz de cada superfície partilha o nó de corpo mais "
+                    "próximo (ligação rígida — PRESSUPOSTO); cada boom liga ao nó mais próximo de outro componente na estação "
+                    "de ligação por um elemento 10× mais rígido que o boom (PRESSUPOSTO). Para análise externa (p. ex. CalculiX via Build)."}
 
 
 def _f8(v: float) -> str:
@@ -587,6 +824,17 @@ def to_nastran(model: dict[str, Any]) -> str:
 
 
 # ------------------------------------------------------------------------------------------------ stage
+def _assembly_spec(res: Any) -> dict[str, Any] | None:
+    a = res.spec.assumptions.get("assembly") if isinstance(res.spec.assumptions, dict) else None
+    if not a:
+        return None
+    lp = getattr(res, "assembly_loop", None)
+    if lp and lp.get("spec_scaled"):
+        return dict(lp["spec_scaled"])
+    from .assembly.loop import load_spec
+    return dict(load_spec(res.spec, a))
+
+
 def analyse_layout(res: Any) -> dict[str, Any]:
     o = options(res.spec)
     mkey = _material_key(res, o)
@@ -595,27 +843,43 @@ def analyse_layout(res: Any) -> dict[str, Any]:
     members: list[dict[str, Any]] = []
     fus: dict[str, Any] = (fuselage_layout(res, o, mat) if o["fuselage"].get("enabled", True)
                            else {"evaluated": False, "reason": "desligada"})
-    x_w = float(((getattr(res.structures_l1, "fuselage", None) or {}).get("x_wing_m"))
-                or 0.35 * res.config.fuselage.length) if getattr(res, "structures_l1", None) else 0.0
-    wrows, wbeam = wing_members(res, x_w)
-    members += wrows
-    members += tail_members(res, (getattr(res.structures_l1, "fuselage", None) or {})
-                            if getattr(res, "structures_l1", None) else {})
+    l1 = getattr(res, "structures_l1", None)
+    fus_l1 = (getattr(l1, "fuselage", None) or {}) if l1 is not None else {}
+    recs, n_s = surface_records(res, o, fus_l1)
+    notes += n_s
+    for rec in recs:
+        members += surface_members(rec)
     if fus.get("evaluated"):
         members += fus["members"]
     else:
         members.append(member("fuselagem", "fuselagem", "casca", None, 0.0, verdict="desconhecido",
                               method=str(fus.get("reason"))))
     nonopt = float(res.spec.assumptions["structures"].get("nonoptimum_factor", 1.25))
+    boom_defs = list(o.get("booms") or [])
+    if o.get("booms_from_assembly", True):
+        try:
+            ab, n_b = booms_from_assembly(_assembly_spec(res), float(res.sizing.W0),
+                                          (getattr(l1, "tails", None) or {}) if l1 is not None else {}, o,
+                                          fus_l1.get("x_wing_m"))
+        except Exception as ex:  # noqa: BLE001 — booms da montagem ficam desconhecidos, com a razão
+            ab, n_b = [], [f"booms da montagem não lidos: {type(ex).__name__}: {ex}"]
+        user_ids = {str(b.get("id")) for b in boom_defs}
+        boom_defs += [b for b in ab if b["id"] not in user_ids]
+        notes += n_b
     booms = []
-    for bd in o.get("booms") or []:
+    bodies = [{"comp": "fuselagem", "beam": fus.get("beam") if fus.get("evaluated") else None}]
+    for bd in boom_defs:
         b = boom_layout(bd, o, mat, nonopt)
-        booms.append({k: v for k, v in b.items() if k != "members"})
+        booms.append({k: v for k, v in b.items() if k not in ("members", "shell_table")})
         if b.get("evaluated"):
             members += b["members"]
+            bodies.append({"comp": b["members"][0]["component"], "beam": b["beam"],
+                           "y0": b["geometry"]["y_m"], "z0": b["geometry"]["z_m"],
+                           "attach_x": b["geometry"]["x_attach_m"]})
         else:
-            members.append(member(str(bd.get("id") or "boom"), str(bd.get("id") or "boom"), "boom", None, 0.0,
-                                  verdict="desconhecido", method=str(b.get("reason"))))
+            members.append(member(str(bd.get("id") or "boom"), str(bd.get("id") or "boom"), "boom", None,
+                                  float(bd.get("x0_m") or 0.0), float(bd.get("y_m") or 0.0),
+                                  float(bd.get("z_m") or 0.0), verdict="desconhecido", method=str(b.get("reason"))))
     bud = budget(members)
     counts: dict[str, int] = {}
     for m in members:
@@ -629,17 +893,24 @@ def analyse_layout(res: Any) -> dict[str, Any]:
     out: dict[str, Any] = {"evaluated": True, "level": LEVEL, "material": mat, "coupling_mode": o["coupling"],
                            "members": members, "budget": bud, "verdict_counts": counts, "verdict": overall,
                            "fuselage": {k: v for k, v in fus.items() if k not in ("members",)},
-                           "booms": booms, "notes": notes}
+                           "booms": booms, "notes": notes,
+                           "surfaces": {r["comp"]: None if r["box"] is None else
+                                        {"mass_kg": r["box"]["masses"].get("total"), "method": r["box"].get("method"),
+                                         "section": r["box"].get("section"), "buckling_ok": r["box"].get("buckling_ok"),
+                                         "source": r["source"]} for r in recs}}
     if o["coupling"] == "iterar":
         notes.append("acoplamento iterar ainda não implementado: resultado relatado, não aplicado ao dimensionamento")
-    l1 = getattr(res, "structures_l1", None)
     if l1 is not None and fus.get("evaluated"):
         fm = bud["by_component_kg"].get("fuselagem")
         out["comparison"] = {"fuselage_layout_kg": fm, "fuselage_L1_kg": l1.masses.get("fuselage_kg"),
                              "fuselage_raymer_kg": l1.masses.get("fuselage_raymer_kg"),
-                             "wing_box_kg": l1.masses.get("wing_box_kg")}
+                             "wing_box_kg": l1.masses.get("wing_box_kg"),
+                             "htail_layout_kg": bud["by_component_kg"].get("estabilizador"),
+                             "htail_L1_kg": l1.masses.get("htail_kg"),
+                             "vtail_layout_kg": bud["by_component_kg"].get("deriva"),
+                             "vtail_L1_kg": l1.masses.get("vtail_kg")}
     if o.get("export", {}).get("beam_model", True):
-        out["beam_model"] = beam_model(mat, fus.get("beam") if fus.get("evaluated") else None, wbeam, members)
+        out["beam_model"] = beam_model(mat, bodies, recs, members)
     return out
 
 
