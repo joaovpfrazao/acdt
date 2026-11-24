@@ -73,3 +73,19 @@ def test_opcao_a_output_consistent():
         assert c["veredicto"] in ("passa", "falha", "desconhecido")
     # falhas novas listadas a partir das verificações que mudaram para False
     assert set(out["new_failures"]) == {k for k, v in out["checks_changed"].items() if v["opcao_a"] is False}
+
+
+def test_toque_cheio_study_not_applied_and_consistent():
+    st = yaml.safe_load((ROOT / "examples/studies/toque_cheio/toque_cheio.yaml").read_text(encoding="utf-8"))
+    assert st["applied"] is False
+    out = json.loads((ROOT / "examples/output/toque_cheio/toque_cheio.json").read_text(encoding="utf-8"))
+    assert out["applied"] is False and out["baseline"]["status"] == "excede"
+    m = {"passa": True, "excede": False, "no_limite": None, "nao_avaliado": None}
+    for fam in ("a_sink", "b_decrab", "c_track", "d_side_factor"):
+        for r in out[fam]:
+            assert m[r["status"]] is r["ok"]
+            assert r["veredicto"] == {True: "passa", False: "falha"}.get(r["ok"], "desconhecido")
+    d = out["d_resized"]
+    assert d["converged"] and d["mission"]["ok"] is True and d["dW0_kg"] > 0
+    sp = out["smallest_passing"]
+    assert sp["b_decrab"]["ok"] is True

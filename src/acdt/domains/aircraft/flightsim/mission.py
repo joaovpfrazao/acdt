@@ -116,6 +116,17 @@ def side_load_band(inboard_ratio: float, outboard_ratio: float, tol: float = SID
             "side_load_tolerance": tol, "side_load_tolerance_source": SIDE_LOAD_TOL_SOURCE}
 
 
+# Touchdown contact window (h < 5 m in the flare, ≤ 3 s after touchdown): the 6-DOF is sub-stepped at ≤ 2.5 ms
+# with the controls held at the mission step, peaks are sampled at every sub-step, and the step stops at the first
+# contact so the roll-out law starts at the event (24 nov 2026, toque-convergido). Causes of the dt-sensitive 23.485
+# verdict (example, before: outboard ratio 0,10–0,19 at 5–12,5 ms, 0,56–1,23 at 15–25 ms): (i) the flare law (wing
+# low) stayed on the ground for up to one extra mission step after contact; (ii) the tyre side-friction law
+# F_y = −μ N tanh(v_y/v_ε) (v_ε 0,5 m/s) is a lateral damper c ≈ μN/v_ε ≈ 1,2 kN·s/m per main wheel — through the CG
+# height an estimated roll |λ| ≈ 30–50 s⁻¹, stiff for explicit RK4 at 15–25 ms (|λ|·dt ≈ 0,5–1,3). Convergence (mission step
+# 10/20/25 ms, sub-step 5/2,5/1,25 ms) is tested in tests/test_touchdown_convergence.py.
+TOUCHDOWN_SUBSTEP_S = 0.0025
+
+
 @dataclass
 class SegRec:
     name: str
@@ -156,6 +167,8 @@ class MissionRunner:
         self.dist = 0.0
         self.aborted = None
         self.max_t = float(mission.get("max_time_s", 6 * 3600))
+        ts = mission.get("touchdown_substep_s", TOUCHDOWN_SUBSTEP_S)
+        self.td_substep = float(ts) if ts else None
         self._every = max(1, int(round(self.log_dt / self.dt)))
         self._aft = None   # AftMonitor during take-off / landing (ground_clearance)
 
@@ -186,13 +199,14 @@ class MissionRunner:
                 "alpha": math.atan2(vr[2], vr[0]), "ne": (x[0], x[1]),
                 "on_ground": self.on_ground()}
 
-    def on_ground(self) -> bool:
+    def on_ground(self, x=None) -> bool:
         """Fresh contact check (the 6-DOF's contact_loads may belong to a trim evaluation)."""
-        if -self.x[2] > 30.0:
+        x = self.x if x is None else x
+        if -x[2] > 30.0:
             return False
-        R = dcm_body_to_ned(self.x[6:10])
+        R = dcm_body_to_ned(x[6:10])
         for _, rb, *_r in self.sim.ground.contacts:
-            if (self.x[0:3] + R @ rb)[2] > 0:
+            if (x[0:3] + R @ rb)[2] > 0:
                 return True
         return False
 
@@ -243,7 +257,12 @@ class MissionRunner:
         th_c = ap.loops["V2"](V_c - m["Va"], self.dt)
         return ap.pitch(th_c, m["theta"], m["q"]), thr
 
-    def tick(self, c: Controls):
+    def tick(self, c: Controls, substep: float | None = None, sample=None, stop=None):
+        """One mission step of ``dt`` with the controls held (zero-order hold at the autopilot rate). With
+        ``substep`` < dt the 6-DOF is integrated in n = ⌈dt/substep⌉ equal RK4 sub-steps and ``sample(x)`` is called
+        after each (touchdown contact window: the tyre side-friction law is stiff, see TOUCHDOWN_SUBSTEP_S).
+        ``stop(x)`` True after a sub-step ends the step there (event location: first ground contact), so the
+        autopilot switches law at the event instead of up to one ``dt`` later."""
         self.c = c
         m_dt = self.dt
         mm = self.meas()
@@ -251,7 +270,22 @@ class MissionRunner:
         if self.k % self._every == 0:
             self._log(c)
         x0 = self.x
-        self.x = self.sim.step(self.t, self.x, c, m_dt)
+        if substep and substep < m_dt:
+            n = int(math.ceil(m_dt / substep - 1e-9))
+            h_ = m_dt / n
+            x_ = self.x
+            for i in range(n):
+                x_ = self.sim.step(self.t + i * h_, x_, c, h_)
+                if sample is not None:
+                    sample(x_)
+                if stop is not None and i < n - 1 and stop(x_):
+                    m_dt = (i + 1) * h_
+                    break
+            self.x = x_
+        else:
+            self.x = self.sim.step(self.t, self.x, c, m_dt)
+            if sample is not None:
+                sample(self.x)
         self.dist += math.hypot(self.x[0] - x0[0], self.x[1] - x0[1])
         if self._aft is not None and -self.x[2] < 30.0:
             self._aft.sample(self.x, dcm_body_to_ned(self.x[6:10]), getattr(self.sim, "contact_loads", None))
@@ -689,7 +723,24 @@ class MissionRunner:
         skids = (fm.mass.gear or {}).get("kind", "none") == "none"
         decel, t_over, n_decel, Va_prev, Vdot_f = False, 0.0, 0, m["Va"], 0.0
         x_screen = t_td = sink_td = V_td = None
-        kd = FLARE
+        # opt-in per landing segment (24 nov 2026): target touchdown sink of the flare law; absent →
+        # FLARE (unchanged)
+        kd = {**FLARE, **({"td_sink_m_s": float(s["td_sink_m_s"])} if s.get("td_sink_m_s") is not None else {})}
+
+        def sample_td(x_) -> None:
+            """Peak touchdown loads at every (sub-)step state of the contact window."""
+            self.sim._ground(x_, dcm_body_to_ned(x_[6:10]), self.c)
+            for nm, fy in self.sim.contact_side.items():
+                N_ = self.sim.contact_loads.get(nm, 0.0)
+                if nm.startswith("main"):
+                    inb = fy if nm.endswith("L") else -fy      # +y body is inboard for the left wheel
+                    d_ = td["side"].setdefault(nm, {"inboard_N": 0.0, "outboard_N": 0.0})
+                    d_["inboard_N"] = max(d_["inboard_N"], inb)
+                    d_["outboard_N"] = max(d_["outboard_N"], -inb)
+                    td["N"][nm] = max(td["N"].get(nm, 0.0), N_)
+                elif nm not in ("nose", "tail") and N_ > 0:
+                    td["bumpers"][nm] = max(td["bumpers"].get(nm, 0.0), N_)
+
         while True:
             m = self.meas()
             p = np.array(m["ne"])
@@ -743,7 +794,8 @@ class MissionRunner:
                                "track_vs_runway_deg": math.degrees(wrap(m["chi"] - chi_r)),
                                "drift_m_s": float(-u[1] * vn[0] + u[0] * vn[1]), "phi_td_deg": math.degrees(m["phi"]),
                                "beta_td_deg": math.degrees(m["beta"])})
-            else:  # roll-out: idle, wings level, brakes after 1 s, nose-wheel steering
+            # touchdown → roll-out law in the same step (event: no extra dt of flare controls on the ground)
+            if phase == "rollout":  # roll-out: idle, wings level, brakes after 1 s, nose-wheel steering
                 thr = 0.0
                 if skids:  # belly landing: hold the touchdown attitude (stick back) against the skid friction
                     de = self.ap.pitch(th_td, m["theta"], m["q"]) if m["Va"] > 3.0 else 0.0
@@ -758,19 +810,10 @@ class MissionRunner:
                 self.brake = 1.0 if self.t - t_td > 1.0 else 0.0
                 if m["Vg"] < 0.5:
                     break
-            self.tick(Controls(de=de, da=da, dr=dr, throttle=thr, flap=self.flap_to(flap), brake=self.brake))
-            if phase in ("flare", "rollout") and -self.x[2] < 5.0 and (t_td is None or self.t - t_td <= 3.0):
-                self.sim._ground(self.x, dcm_body_to_ned(self.x[6:10]), self.c)   # loads at this state
-                for nm, fy in self.sim.contact_side.items():
-                    N_ = self.sim.contact_loads.get(nm, 0.0)
-                    if nm.startswith("main"):
-                        inb = fy if nm.endswith("L") else -fy      # +y body is inboard for the left wheel
-                        d_ = td["side"].setdefault(nm, {"inboard_N": 0.0, "outboard_N": 0.0})
-                        d_["inboard_N"] = max(d_["inboard_N"], inb)
-                        d_["outboard_N"] = max(d_["outboard_N"], -inb)
-                        td["N"][nm] = max(td["N"].get(nm, 0.0), N_)
-                    elif nm not in ("nose", "tail") and N_ > 0:
-                        td["bumpers"][nm] = max(td["bumpers"].get(nm, 0.0), N_)
+            win = phase in ("flare", "rollout") and -self.x[2] < 5.0 and (t_td is None or self.t - t_td <= 3.0)
+            self.tick(Controls(de=de, da=da, dr=dr, throttle=thr, flap=self.flap_to(flap), brake=self.brake),
+                      substep=self.td_substep if win else None, sample=sample_td if win else None,
+                      stop=(self.on_ground if (win and phase != "rollout") else None))
             if self.t - rec.t0 > 1800:
                 rec.notes.append("aterragem não concluída em 30 min")
                 self.aborted = "landing"

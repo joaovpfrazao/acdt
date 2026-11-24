@@ -604,8 +604,12 @@ def size_gear_side_load_structure(layout: dict, W_N: float, *,
                                   nose_fraction: float | None = None,
                                   diameter_m: float | None = None,
                                   n_ult: float = 1.5,
-                                  length_opts: dict | None = None) -> dict:
+                                  length_opts: dict | None = None,
+                                  side_factor: float = 1.0) -> dict:
     """Vertical-leg beam/column check under 14 CFR 23.485 side load + 1.33 × static vertical.
+
+    ``side_factor`` (default 1, i.e. 23.485 as written) multiplies both side loads: a gear designed above the
+    regulatory minimum (design choice, e.g. to the measured 6-DOF touchdown side load).
 
     23.485(c) (pré-Amdt 23-64; Amdt 23-45): 0,5 W inboard on one main wheel, 0,33 W
     outboard on the other, combined with a vertical load of 1.33 times the static
@@ -637,7 +641,7 @@ def size_gear_side_load_structure(layout: dict, W_N: float, *,
     # static load on *one* main wheel; 1.33 × that is the 23.485 vertical at the wheel
     P_stat = W_N * (1.0 - nf) / 2.0
     P_vert = 1.33 * P_stat
-    F_in, F_out = 0.5 * W_N, 0.33 * W_N
+    F_in, F_out = 0.5 * W_N * float(side_factor), 0.33 * W_N * float(side_factor)
     F_side = max(F_in, F_out)  # inboard 0.5 W is critical
     L = legs["main_m"]
     # size a circular tube: σ = P/A + M (d/2)/I ≤ Fcy / n_ult; τ = V/A ≤ Fsu / n_ult
@@ -677,7 +681,7 @@ def size_gear_side_load_structure(layout: dict, W_N: float, *,
         "sigma_MPa": float(sig / 1e6), "tau_MPa": float(tau / 1e6),
         "allow_sigma_MPa": float(allow_c / 1e6), "allow_tau_MPa": float(allow_s / 1e6),
         "RF_bending": float(rf_c), "RF_shear": float(rf_s), "RF_buckling": float(rf_buck),
-        "P_cr_N": float(P_cr), "mass_two_mains_kg": float(mass),
+        "P_cr_N": float(P_cr), "mass_two_mains_kg": float(mass), "side_factor": float(side_factor),
         "K_euler": 2.0, "K_note": "PRESSUPOSTO: consola (K = 2) sem braço de arrasto",
     }
 
