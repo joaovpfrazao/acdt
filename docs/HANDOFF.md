@@ -2118,3 +2118,10 @@ Piso (Roark Tab. 11.4 caso 1a + vigas M = wL²/8), aberturas com soleiras e cave
 fuselagem paramétrica de 106 para 126 kg e o W0 `iterar` para 1153,9 kg. Pendente: assentos 9 g, cantos de janelas,
 flexão do anel não circular sob pressão, longarinas reais.
 
+## Estrutura paramétrica — render 3-D (24 nov 2026, ramo `estrutura-param-render`)
+
+`structure_render.render_layout` + geometria do layout ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §10,
+CAPABILITIES §57): imagens do C172 e do twin-boom em `examples/output/estrutura_parametrica/`. O render mostra
+que as superfícies estão todas no plano z0 do registo e que o twin-boom tem uma deriva ao centro — candidatos a
+corrigir no layout.
+

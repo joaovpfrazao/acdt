@@ -293,7 +293,23 @@ modelada → desconhecido.
 Com o piso, o C172 `iterar` passa a 1137,8 → 1153,9 kg (a área do piso é integrada no intervalo declarado, contínua
 com o comprimento da fuselagem — com a área entre cavernas o ponto fixo oscilava entre 1150 e 1153 kg).
 
-## 10. Próximos incrementos
+## 10. Render 3-D da estrutura (`structure_render.py`)
+
+`render_layout(res.structure_layout, "aviao.png", color_by="kind" | "RF")` desenha, fora do ecrã (matplotlib
+Agg), o que a tabela de membros e a nova chave `geometry` do layout descrevem: revestimento exterior
+semitransparente (fuselagem, booms, plantas das superfícies), longarinas e nervuras dos caixões (passo do
+dimensionamento: `box.rib_pitch` ou 0,6 CMA), cavernas (fortes a vermelho e mais grossas), anteparas, reforçadores
+e longarinas da fuselagem, piso (vigas e painel), soleiras das aberturas, ferragens e berço do motor. Com
+`color_by="RF"` cada peça toma a cor do RF_min do seu membro (vermelho RF = 1, verde RF ≥ 3, cinzento =
+desconhecido). Linha de comandos: `python -m acdt.domains.aircraft.structure_render exemplo.yaml saida.png [--rf]`.
+No estudo, os casos com `render: true` gravam `<caso>_estrutura_3d.png` e `<caso>_estrutura_3d_rf.png` em
+`examples/output/estrutura_parametrica/` (C172 com portas e twin-boom com casulo superelíptico).
+
+O desenho mostra as simplificações do layout tal como estão: superfícies no plano z0 do registo (a asa alta do C172
+aparece no eixo; diedro não modelado), empenagem do twin-boom ao centro (uma só deriva — ver pendentes da §6) e
+longarinas e nervuras sem a geometria das mesas.
+
+## 11. Próximos incrementos
 
 1. ~~Fuselagem: piso, aberturas, secções não circulares, pressurização~~ — feito (§9). Falta: longarinas reais
    (flexão lateral e torção), alma das anteparas sob cargas concentradas, cantos das janelas, assentos 9 g, flexão

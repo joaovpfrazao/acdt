@@ -24,6 +24,7 @@ cases:
   # real não é pressurizado: 25 kPa só para exercitar o caminho) — só em memória
   - id: c172_detalhe
     example: examples/cessna172_check.yaml
+    render: true          # imagem 3-D da estrutura (structure_render.render_layout)
     structure_layout:
       enabled: true
       fittings: {engine_mount: {n_cylinders: 4}}
@@ -34,6 +35,7 @@ cases:
           - {id: porta_dir, x0_m: 1.6, x1_m: 2.5, theta_deg: 90.0, width_deg: 50.0}
   - id: twin_boom_detalhe
     example: examples/uav_twin_boom_shortcut.yaml
+    render: true
     structure_layout:
       enabled: true
       fuselage:

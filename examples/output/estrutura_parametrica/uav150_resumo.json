@@ -3,7 +3,7 @@
  "exemplo": "examples/uav_150kg_stanag4671.yaml",
  "applied": false,
  "W0_kg": 153.21267779959328,
- "tempo_s": 6.4449450969696045,
+ "tempo_s": 6.5522215366363525,
  "veredicto": "desconhecido",
  "contagem": {
   "passa": 47,
@@ -243,7 +243,8 @@
   "frame_h_m": 0.015,
   "frame_b_m": 0.009,
   "n_stringers": 11,
-  "n_longerons": 0
+  "n_longerons": 0,
+  "longeron_theta_deg": []
  },
  "notas": [
   "ligação da asa: longarinas a x = 0.651 m e 0.851 m (corda de raiz no centro aerodinâmico — PRESSUPOSTO); fixações a θ = 90°, -90°",
