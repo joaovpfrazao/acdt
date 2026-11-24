@@ -7326,6 +7326,101 @@
    "node": 108,
    "mass_kg": 0.5688843717347282,
    "member": "boom~m.nao_otimo"
+  },
+  {
+   "node": 135,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.1"
+  },
+  {
+   "node": 135,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.2"
+  },
+  {
+   "node": 215,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.3"
+  },
+  {
+   "node": 215,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.4"
+  },
+  {
+   "node": 135,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.5"
+  },
+  {
+   "node": 135,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.6"
+  },
+  {
+   "node": 215,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.7"
+  },
+  {
+   "node": 215,
+   "mass_kg": 0.2628243591472983,
+   "member": "ferragem.asa_fuselagem.8"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.1"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.2"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.3"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.4"
+  },
+  {
+   "node": 5,
+   "mass_kg": 0.004779959783391,
+   "member": "ferragem.trem_frente.1"
+  },
+  {
+   "node": 5,
+   "mass_kg": 0.004779959783391,
+   "member": "ferragem.trem_frente.2"
+  },
+  {
+   "node": 52,
+   "mass_kg": 0.008563052935602012,
+   "member": "ferragem.boom.1"
+  },
+  {
+   "node": 158,
+   "mass_kg": 0.008563052935602012,
+   "member": "ferragem.boom.2"
+  },
+  {
+   "node": 95,
+   "mass_kg": 0.008563052935602012,
+   "member": "ferragem.boom~m.1"
+  },
+  {
+   "node": 238,
+   "mass_kg": 0.008563052935602012,
+   "member": "ferragem.boom~m.2"
+  },
+  {
+   "node": 8,
+   "mass_kg": 0.412193887185757,
+   "member": "berco_motor"
   }
  ],
  "missing": [],

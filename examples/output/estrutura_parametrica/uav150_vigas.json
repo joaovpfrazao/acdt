@@ -5456,6 +5456,121 @@
    "node": 22,
    "mass_kg": 2.4196492160354377,
    "member": "fuselagem.nao_otimo"
+  },
+  {
+   "node": 50,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.1"
+  },
+  {
+   "node": 50,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.2"
+  },
+  {
+   "node": 130,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.3"
+  },
+  {
+   "node": 130,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.4"
+  },
+  {
+   "node": 50,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.5"
+  },
+  {
+   "node": 50,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.6"
+  },
+  {
+   "node": 130,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.7"
+  },
+  {
+   "node": 130,
+   "mass_kg": 0.21448105410171758,
+   "member": "ferragem.asa_fuselagem.8"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.1"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.2"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.3"
+  },
+  {
+   "node": 21,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_principal.4"
+  },
+  {
+   "node": 5,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_frente.1"
+  },
+  {
+   "node": 5,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.trem_frente.2"
+  },
+  {
+   "node": 207,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.estabilizador.1"
+  },
+  {
+   "node": 227,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.estabilizador.2"
+  },
+  {
+   "node": 36,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.estabilizador.3"
+  },
+  {
+   "node": 36,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.estabilizador.4"
+  },
+  {
+   "node": 251,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.deriva.1"
+  },
+  {
+   "node": 251,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.deriva.2"
+  },
+  {
+   "node": 251,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.deriva.3"
+  },
+  {
+   "node": 251,
+   "mass_kg": 0.003834186495338247,
+   "member": "ferragem.deriva.4"
+  },
+  {
+   "node": 8,
+   "mass_kg": 0.412193887185757,
+   "member": "berco_motor"
   }
  ],
  "missing": [],

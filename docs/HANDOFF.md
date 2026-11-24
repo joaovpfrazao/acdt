@@ -2094,3 +2094,11 @@ montagem com cargas da cauda e dos rotores de elevação (duas consolas a partir
 inteiro ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §6, CAPABILITIES §53). Estudo `applied: false` com o
 twin-boom. Pendente: decisão do João sobre o caixão L1 da deriva (momento na raiz 4× menor do que encastrada só na
 raiz; as massas L1 e o W0 não foram mexidos), binário de reação dos rotores, duas derivas no twin-boom.
+
+## Estrutura paramétrica — incremento B (24 nov 2026, ramo `estrutura-param-B`)
+
+Olhais, cavilhas e berço tubular do motor ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §7, CAPABILITIES
+§54), por AFFDL-TR-69-42 §9 (Melcon & Hoblit) e 14 CFR 23.361/23.363/23.625. As figuras 9-2 e 9-4 foram lidas à mão
+e o exemplo do manual é reproduzido num teste. Pendente: carga transversal/oblíqua nos olhais, casquilhos, escora
+da asa (as ferragens da raiz do C172 são um limite superior), tração do hélice no berço, n.º de cilindros nos
+exemplos (o estudo declara 4 só em memória).

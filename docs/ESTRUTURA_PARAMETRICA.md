@@ -164,14 +164,72 @@ frente da ligação ficam «desconhecido» (sem carga nesse troço) e a cauda é
 (duas derivas reais não separadas — PRESSUPOSTO). O caso VTOL (quadplane com 4 rotores de elevação em 2 booms) está
 coberto por um teste com uma montagem em linha, porque os exemplos `examples/vtol/` não têm geometria de montagem.
 
-## 7. Próximos incrementos
+## 7. Ferragens e berço do motor (incremento B)
+
+Módulo genérico `acdt/core/structures/fittings.py` e `fittings_layout` em `structure_layout` (opção `fittings`,
+ligada por omissão quando a disciplina está ligada). Cada ferragem entra na tabela de membros (componente
+`ligacoes`, tipos `ferragem` e `berco_motor`) com massa, posição, RF, veredicto, método e a origem da carga.
+
+**Olhal + garfo + cavilha sob carga axial** — Melcon & Hoblit (*Product Engineering*, 1953) como codificado no
+*Stress Analysis Manual* AFFDL-TR-69-42 (Maddux et al., 1969) §9.3–9.4, o mesmo método de Bruhn (1973) cap. D1:
+
+* apoio/corte à frente do furo: F_bru,L = K (a/D) F_tu (e/D < 1,5) ou K F_tu (e/D ≥ 1,5) (Eq. 9-1), P = F D t ou
+  1,304 F_bry,L D t se F_tu > 1,304 F_ty (Eq. 9-3). K da **Fig. 9-2** (D/t ≤ 5); acima de D/t = 5 a Fig. 9-3 não
+  foi lida e o modo fica **desconhecido**;
+* secção útil: P = K_n F_tu (w − D) t (Eq. 9-4, 9-6), K_n da **Fig. 9-4** (painéis F_ty/F_tu = 0,6 e 0,8, curvas
+  F_tu/(E ε_u) = 0,1 e 1,0). Sem alongamento declarado (`fittings.eps_u`) usa-se a curva 1,0, a mais baixa
+  (conservativa); F_ty/F_tu < 0,6 fica desconhecido;
+* cavilha: corte duplo P = 1,571 D² F_su (Eq. 9-12) e flexão P = 0,1963 k_b D³ F_tu / (t1/2 + g + t2/4)
+  (Eq. 9-13 a 9-15, k_b = 1,56); a redistribuição do pino fraco (Eq. 9-16) não é usada (conservativo).
+
+As tabelas de K e K_n foram **lidas à mão** das figuras do manual (±0,02 em K, ±0,03 em K_n). A leitura reproduz o
+exemplo do manual §9.6: K = 1,46 a e/D = 1,24 e 1,33 a 1,5; apoio do olhal macho 76 800 lbf (manual 77 000), corte
+da cavilha 72 460 lbf (72 400), flexão da cavilha 30 040 lbf (30 100). O K_n lido (0,72) fica abaixo do 0,74 do
+exemplo. Dimensionamento: cavilha AN mais pequena e espessura em passos de 0,5 mm com D/t ≤ 5, e = 1,5 D,
+w = 3 D, garfo de 2 orelhas de t/2 + 0,5 mm (PRESSUPOSTO). Olhal em Al 7075-T6 e cavilha em aço 4130 por omissão.
+Carga última = 1,5 × fator de ferragem 1,15 (14 CFR 23.625) × carga limite.
+
+**Ligações avaliadas** (cargas LIMITE das fontes já existentes; partilhas PRESSUPOSTO):
+
+| Ligação | Carga | Olhais |
+|---|---|---|
+| asa–fuselagem | M_raiz (`structures.beam`, asa em consola) / h (0,9 t/c c_raiz) / 2 longarinas | 8 (2 longarinas × banzo superior/inferior × 2 lados) |
+| trem principal / frente | reações de aterragem da viga L1 (23.473) / pernas / 2 | 4 / 2 |
+| estabilizador | sustentação de projeto / 4 (contínuo através da fuselagem) | 4 |
+| deriva | T_fin (= L_deriva × z_cp, viga L1) / h_raiz / 2 longarinas | 4 |
+| booms | M na ligação / diâmetro do boom | 2 por boom |
+
+Quando a cauda está nos booms, as ferragens da cauda na fuselagem não são geradas.
+
+**Berço tubular do motor**: treliça de 8 tubos de aço 4130 entre 4 nós na parede de fogo e 4 apoios do motor
+(quadrados de 0,30 D e 0,20 D de meio-lado, comprimento 0,35 D, CG do motor no plano dos apoios — PRESSUPOSTO,
+declaráveis), nós articulados, forças por mínimos quadrados do equilíbrio do motor (rigidez igual, PRESSUPOSTO).
+Tubos: tração F_tu e compressão por Euler–Johnson (Bruhn C2), K = 1, FS 1,5, de 12,7 × 0,89 mm para cima. Casos:
+n_lim vertical; 14 CFR 23.363 lateral 1,33 g com 1 g vertical; 14 CFR 23.361 binário médio P/ω × fator por
+n.º de cilindros (23.361(c): 1,33 para ≥ 5, 2/3/4/8 para 4/3/2/1) com 0,75 n_lim (regulamento anterior à emenda
+23-64). Sem P/W, rpm ou motor alternativo, ou sem n.º de cilindros declarado, o berço fica **desconhecido**. A tração
+do hélice só entra se declarada (`engine_mount.thrust_N`).
+
+| Caso | Asa–fuselagem | Trem principal | Cauda | Booms | Berço do motor | Total ligações |
+|---|---|---|---|---|---|---|
+| C172 (4 cilindros, só em memória) | 8 × AN16, 13,5 kg, RF 1,01 | 4 × AN5, 0,16 kg | estab. 4 × AN3, deriva 4 × AN4, 0,11 kg | — | 1,39 kg, RF 1,09, passa (binário 2 × 405 N·m) | 15,2 kg |
+| UAV 150 kg | 8 × AN8, 1,72 kg | 4 × AN3 | 0,03 kg | — | 0,41 kg, desconhecido (sem binário) | 2,18 kg |
+| Twin-boom | 8 × AN9, 2,10 kg | 4 × AN3 | (cauda nos booms) | 2 × 2 × AN3, 0,03 kg | 0,41 kg, desconhecido | 2,57 kg |
+
+Leitura: o C172 tem asa escorada, mas a escora não está modelada no acdt (o caixão da asa também é dimensionado em
+consola), por isso as ferragens da raiz são um limite superior: com a escora, o binário na raiz é muito menor. O
+berço do motor do C172 (1,4 kg só de tubos) fica abaixo de um berço real, que tem também apoios elásticos, olhais e
+soldaduras (não modelados). Nenhuma ferragem falha; os desconhecidos novos são os berços sem binário avaliado.
+
+## 8. Próximos incrementos
 
 1. Fuselagem: piso e vigas de piso, portas/aberturas (molduras), secções não circulares, longarinas reais
    (cargas de flexão lateral e torção), alma das anteparas sob cargas concentradas, pressurização no anel.
 2. ~~Empenagens pelo caminho `wingbox` e no modelo de vigas; booms ligados à geometria de `assembly`~~ — feito
    (§6). Falta: binário de reação dos rotores, duas derivas separadas no twin-boom.
-3. Apoios e ferragens: berço do motor (treliça tubular, Euler–Johnson), ligações asa–fuselagem e trem (parafusos e
-   olhais com métodos citados), cargas dos rotores de VTOL nos booms.
+3. ~~Apoios e ferragens: berço do motor, olhais e cavilhas das ligações~~ — feito (§7). Falta: olhais sob carga
+   transversal/oblíqua (AFFDL-TR-69-42 Fig. 9-8, interação 1,6), casquilhos, juntas aparafusadas em tração
+   (parafusos em tração e corte combinados), escora da asa, apoios elásticos do motor.
 4. Acoplamento `iterar`: massa estrutural paramétrica no fecho do W0, CG/inércia no balanço.
 5. Estimativa de flutter com o modelo de vigas (modos da asa + massas concentradas) ligada a `aeroelasticity.py`.
 6. Exportação para CalculiX por subprocesso (via Build, no PC do João) e comparação viga vs casca.
