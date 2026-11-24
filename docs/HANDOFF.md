@@ -2086,3 +2086,11 @@ verificações clássicas e dimensionamento por membro, asa e empenagens embrulh
 única de membros, massa/CG/inércia e modelo de vigas `acdt.beam/1` + `.bdf`. Estudo `applied: false` no C172
 (fuselagem 106,0 kg vs Raymer 97,6 kg) e no UAV 150 kg. Pendente: acoplamento `iterar`, piso/aberturas, empenagens e
 booms no modelo de vigas, ferragens e berço do motor, flutter com o modelo de vigas, CalculiX via Build.
+
+## Estrutura paramétrica — incremento A (24 nov 2026, ramo `estrutura-param-A`)
+
+Empenagens pelo caminho do caixão da asa (estabilidade + secção Fase 5), deriva encastrada só na raiz, booms lidos da
+montagem com cargas da cauda e dos rotores de elevação (duas consolas a partir da ligação) e modelo de vigas do avião
+inteiro ([ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §6, CAPABILITIES §53). Estudo `applied: false` com o
+twin-boom. Pendente: decisão do João sobre o caixão L1 da deriva (momento na raiz 4× menor do que encastrada só na
+raiz; as massas L1 e o W0 não foram mexidos), binário de reação dos rotores, duas derivas no twin-boom.

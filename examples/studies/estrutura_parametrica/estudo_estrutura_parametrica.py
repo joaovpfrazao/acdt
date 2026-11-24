@@ -64,7 +64,10 @@ def run_case(case: dict, out: Path) -> dict:
             "orcamento": r["budget"], "comparacao": r["comparison"], "cavernas_pesadas": heavy,
             "pior_estacao_casca": r["fuselage"].get("worst_shell_station"),
             "layout": r["fuselage"].get("layout"), "notas": r["fuselage"].get("notes"),
-            "material": r["material"]["name"]}
+            "material": r["material"]["name"], "superficies": r.get("surfaces"),
+            "booms": [{k: b.get(k) for k in ("evaluated", "reason", "geometry", "root_moment_limit_Nm", "notes")}
+                      for b in r.get("booms", [])],
+            "notas_layout": r.get("notes"), "vigas_em_falta": r["beam_model"].get("missing")}
     (out / f"{cid}_resumo.json").write_text(json.dumps(_clean(summ), indent=1, ensure_ascii=False), encoding="utf-8")
     (out / f"{cid}_vigas.json").write_text(json.dumps(_clean(r["beam_model"]), indent=1, ensure_ascii=False),
                                            encoding="utf-8")
@@ -81,7 +84,10 @@ def main(out_dir: str | None = None) -> list[dict]:
     for s in rows:
         c = s["comparacao"]
         print(f"{s['caso']}: W0 {s['W0_kg']:.1f} kg; fuselagem paramétrica {c['fuselage_layout_kg']:.1f} kg vs L1 "
-              f"{c['fuselage_L1_kg']:.1f} kg vs Raymer {c['fuselage_raymer_kg']:.1f} kg; {s['contagem']}")
+              f"{c['fuselage_L1_kg']:.1f} kg vs Raymer {c['fuselage_raymer_kg']:.1f} kg; estabilizador "
+              f"{c['htail_layout_kg']:.2f} vs L1 {c['htail_L1_kg']:.2f} kg; deriva {c['vtail_layout_kg']:.2f} vs L1 "
+              f"{c['vtail_L1_kg']:.2f} kg; booms {[round(b['root_moment_limit_Nm'] or 0, 1) for b in s['booms']]} N·m; "
+              f"{s['contagem']}")
     return rows
 
 

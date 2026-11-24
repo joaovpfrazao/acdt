@@ -9,3 +9,6 @@ cases:
   - id: uav150
     example: examples/uav_150kg_stanag4671.yaml
     structure_layout: {enabled: true}
+  - id: twin_boom
+    example: examples/uav_twin_boom_shortcut.yaml
+    structure_layout: {enabled: true}
