@@ -442,3 +442,32 @@ escoras, deriva no topo), `twin_boom_estrutura_3d*.png` (cauda em V invertido no
    feito (§12, V_F 94,5 m/s). Falta: superfícies de comando (massa e compensação), caso de tanques cheios,
    flutter de corpo livre, aerodinâmica não estacionária (Theodorsen / p-k).
 6. Exportação para CalculiX por subprocesso (via Build, no PC do João) e comparação viga vs casca.
+
+## 14. Modo compósito monocasca (`construction: composito_monocasca`, planadores)
+
+Uma estrutura em compósito não usa o campo de reforçadores da construção metálica. Com
+`structure_layout.construction: composito_monocasca` (por omissão `metalica`; outro valor dá erro):
+
+* **Fuselagem:** casca em sanduíche sem reforçadores (`n_stringers = 0`). Só há cavernas/anteparas nas estações
+  especiais: por omissão a ligação da asa e a cauda, mais a parede de fogo se houver motor; o utilizador declara as
+  restantes em `bulkheads`. A massa das anteparas é a de uma placa em sanduíche (`composite.bulkhead_core_t_m`).
+* **Dimensionamento da casca** em cada estação: N_u = 1,5|M|/(πR²) e q_u = 1,5(V/(πR) + T/(2πR²));
+  `acdt.core.structures.sandwich.size_wall` escolhe a parede mais leve da grelha de faces
+  (`face_t_min_m`…`face_t_max_m`, passo `face_t_step_m`) e núcleos (`core_t_m`) com RF ≥ 1 em todos os modos:
+  * faces à compressão, tração e corte;
+  * encurvadura de flexão N_cr = 2√(D·Eh)/R com γ = 1 − 0,731(1 − e^−φ) (NASA SP-8007, sanduíche);
+  * encurvadura de torção (SP-8007 com casca isotrópica equivalente t_e = √(12(1−ν²)D/Eh), γ_t = 0,67; cilindro
+    longo de Timoshenko & Gere);
+  * interação R_b + R_s² ≤ 1 (Bruhn C8);
+  * enrugamento 0,5(E_f E_c G_c)^(1/3) (Hoff-Mautner).
+  O comprimento de baía é o espaçamento médio entre cavernas. Membros: `revestimento` (faces, passa/falha),
+  `nucleo` (desconhecido — sem verificação de corte do núcleo nem de descolamento), `aberturas` (desconhecido se
+  houver aberturas) e `nao_otimo`.
+* **Asas e empenagens:** nervuras só nas estações declaradas em `composite.rib_stations_eta.{asa, estabilizador,
+  deriva}` (raiz, aileron, travão, dobradiça, ponta). A massa das nervuras escala com nº declarado / nº do passo
+  regular, e o render desenha-as nessas estações.
+* **Cauda em T:** `surfaces.estabilizador.on_fin_tip: true` põe a raiz do estabilizador no topo da deriva.
+* **Caixão da asa:** com `structures.secondary_skin: sanduiche`, os bordos de ataque e de fuga são sanduíche
+  mínimo (duas faces à espessura mínima + núcleo mínimo) em vez de laminado simples.
+
+Exemplo completo e comparação com o avião real (LS4): [PLANADOR_COMPOSITO.md](PLANADOR_COMPOSITO.md).

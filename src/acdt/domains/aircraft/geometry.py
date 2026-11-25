@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+from typing import Any
 
 LB, FT = 0.45359237, 0.3048
 
@@ -132,13 +133,31 @@ class Fuselage:
     length: float
     max_diameter: float
     frames: FuselageFrameLayout = field(default_factory=FuselageFrameLayout)
+    # perfil do corpo de revolução equivalente: quebras ((x/L, R/Rmax), ...) — p. ex. casulo e cone de cauda fino de
+    # um planador (geometry.fuselage_profile). None → perfil por omissão de structures_l1._radius (aviação geral).
+    profile: tuple[tuple[float, float], ...] | None = None
 
     @property
     def fineness(self) -> float:
         return self.length / self.max_diameter
 
+    def radius(self, x: Any) -> Any:
+        """Raio equivalente R(x) [m] pelo perfil declarado (interpolação linear das quebras)."""
+        import numpy as np
+        if not self.profile:
+            raise ValueError("Fuselage.radius: sem perfil declarado")
+        xp = np.array([float(a) for a, _ in self.profile]) * self.length
+        rp = np.array([float(b) for _, b in self.profile]) * self.max_diameter / 2
+        return np.interp(np.asarray(x, float), xp, rp)
+
     def wetted_area(self) -> float:
-        """Torenbeek (1982) App. F body-of-revolution approximation."""
+        """Torenbeek (1982) App. F body-of-revolution approximation; com ``profile`` declarado, a área lateral do
+        corpo de revolução equivalente ∫ 2π R(x) √(1 + R'²) dx (PRESSUPOSTO: secção circular equivalente)."""
+        if self.profile:
+            import numpy as np
+            x = np.linspace(0.0, self.length, 401)
+            R = self.radius(x)
+            return float(np.trapezoid(2 * math.pi * R * np.sqrt(1 + np.gradient(R, x) ** 2), x))
         f = self.fineness
         return math.pi * self.max_diameter * self.length * (1 - 2 / f) ** (2 / 3) * (1 + 1 / f**2)
 

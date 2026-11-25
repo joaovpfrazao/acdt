@@ -20,6 +20,12 @@ analysis, all evaluated on that layout:
      USAR.337 (n ≥ min(2.1 + 10 900/(W+4536) [kg], 3.8); n_neg ≥ 0.4 n), USAR.341 (gust loads per
      USAR.333(c); AMC.341 refers to ESDU 04024 — the Pratt formula above is used as the
      classical first cut), USAR.303 (factor of safety 1.5).
+   * CS-22 Amdt. 3 (planadores, ED Decision 2021/013/R): 22.333 (envelope de manobra A–D–E–G; rajadas
+     15 m/s a VB e 7,5 m/s a VD), 22.335 (VA = VS1 √n1, VB ≥ VA — usado VB = VA; VD escolhido pelo requerente
+     mas ≥ 18 ∛(W/S [daN/m²]) √(1/CD,min) km/h na categoria U, 3,5 W/S + 200 km/h na A), 22.337 (U: n1 +5,3,
+     n2 +4,0 a VD, n3 −1,5 a VD, n4 −2,65; A: ±7,0/−5,0), 22.341 (n = 1 ± (k/2) ρ0 U V a/(m g/S),
+     k = 0,96 (μ/(H/l_m))/(0,475 + μ/(H/l_m)), μ = 2 (m/S)/(ρ l_m a), H = (12,17 + 0,191 μ) l_m; n positivo
+     não precisa de exceder 1,25 (V/VS1)²), 22.1505 (VNE ≤ 0,9 VDF ≤ 0,9 VD).
 2. **Spanwise lift** by Schrenk's approximation (Schrenk 1940, NACA TM 948): average of the
    planform chord and the elliptic chord of equal area; cross-checked against AVL strips.
 3. **Shear, bending and torsion** by integration from the tip (beam theory: Megson,
@@ -65,6 +71,20 @@ MATERIALS = {
              "core": {"name": "PVC/PMI foam (ASSUMPTION)", "rho": 75.0, "E": 70e6, "G": 30e6, "t_min": 2.0e-3},
              "note": "allowables are ASSUMPTIONS (knock-down for environment/damage)"},
 }
+
+
+def resolve_material(mat, composite: bool = False):
+    """``structures.material``: ``auto`` (cfrp se weights.components.material = composite, senão al2024_t3), uma
+    chave de :data:`MATERIALS`, ou um caixão compósito da biblioteca de materiais equivalentes (Fase 6,
+    :func:`acdt.core.materials.composite_box_material`) dado como ``{skin, cap, core}`` — p. ex. planador em vidro
+    ``{skin: gfrp_pm45, cap: gfrp_ud_cap, core: pvc_foam_h80}``. Devolve a chave (str) ou o dicionário."""
+    if isinstance(mat, dict):
+        from acdt.core.materials import composite_box_material
+        return composite_box_material(mat.get("skin", "cfrp_qi"), mat.get("cap", "cfrp_cap"),
+                                      mat.get("core", "pvc_foam_h80"))
+    if mat == "auto":
+        return "cfrp" if composite else "al2024_t3"
+    return mat
 
 
 # ---------------------------------------------------------------- V-n diagram
@@ -121,6 +141,11 @@ class VnDiagram:
         """Manoeuvre envelope boundary (V EAS, n) — positive then negative side."""
         V = np.linspace(0, self.VD, n_pts)
         q = 0.5 * RHO0 * V**2
+        if self.regulation == "cs_22":      # CS 22.333 Fig. 1: A (VA, n1) → D (VD, n2); G (VA, n4) → E (VD, n3)
+            g = self.gust
+            hi = np.where(V <= self.VA, self.n_pos, np.interp(V, [self.VA, self.VD], [self.n_pos, g["n2_VD"]]))
+            lo = np.where(V <= self.VA, self.n_neg, np.interp(V, [self.VA, self.VD], [self.n_neg, g["n3_VD"]]))
+            return V, np.minimum(q * self.CLmax / self.W_S, hi), np.maximum(q * self.CNmin / self.W_S, lo)
         n_up = np.minimum(q * self.CLmax / self.W_S, self.n_pos)
         n_lo = np.maximum(q * self.CNmin / self.W_S, np.where(V <= self.VC, self.n_neg,
                                                                self.n_neg * (self.VD - V) / (self.VD - self.VC)))
@@ -136,7 +161,9 @@ class VnDiagram:
 
 
 def regulation_min_n(W0_kg: float, category: str, regulation: str) -> float:
-    """Minimum positive limit manoeuvring load factor: 14 CFR/CS 23.337(a) or USAR.337(a)."""
+    """Minimum positive limit manoeuvring load factor: 14 CFR/CS 23.337(a), USAR.337(a) or CS 22.337 (n1)."""
+    if regulation == "cs_22":
+        return CS22_N[cs22_category(category)][0]
     if regulation == "stanag_4671":
         return min(2.1 + 10900 / (W0_kg + 4536), 3.8)
     if category == "utility":
@@ -146,14 +173,88 @@ def regulation_min_n(W0_kg: float, category: str, regulation: str) -> float:
     return min(2.1 + 24000 / (W0_kg / LB + 10000), 3.8)
 
 
+CS22_N = {"U": (5.3, 4.0, -1.5, -2.65), "A": (7.0, 7.0, -5.0, -5.0)}   # CS 22.337: n1, n2, n3, n4
+
+
+def cs22_category(category: str) -> str:
+    """Categoria CS-22 (U utilitária / A acrobática) a partir de structural_category."""
+    c = str(category or "U").strip().lower()
+    return "A" if c in ("a", "aerobatic", "acrobatic") else "U"
+
+
+def cs22_vd_min(ws_N_m2: float, CD_min: float | None, category: str = "U") -> float | None:
+    """VD mínimo de CS 22.335(f) [m/s EAS]; W/S em daN/m². U precisa de CD,min (desconhecido → None)."""
+    ws_daN = ws_N_m2 / 10.0
+    if cs22_category(category) == "A":
+        return (3.5 * ws_daN + 200.0) / 3.6
+    if not CD_min or CD_min <= 0:
+        return None
+    return 18.0 * ws_daN ** (1 / 3) * math.sqrt(1.0 / CD_min) / 3.6
+
+
+def cs22_gust_k(ws_N_m2: float, lm: float, a: float, rho: float) -> tuple[float, float]:
+    """CS 22.341(a): (k, μ) com μ = 2 (m/S)/(ρ l_m a), H/l_m = 12,17 + 0,191 μ."""
+    mu = 2 * (ws_N_m2 / G0) / (rho * lm * a)
+    r = mu / (12.17 + 0.191 * mu)
+    return 0.96 * r / (0.475 + r), mu
+
+
+def _v_n_cs22(W0_kg: float, S: float, CLmax: float, CLalpha: float, lm: float, category: str, altitude: float,
+              CNmin: float, n_pos: float | None, VD_eas: float | None, CD_min: float | None,
+              V_cruise_eas: float) -> VnDiagram:
+    cat = cs22_category(category)
+    n1, n2, n3, n4 = CS22_N[cat]
+    notes: list[str] = []
+    if n_pos is not None and n_pos > n1:
+        n1 = float(n_pos)
+    elif n_pos is not None and n_pos < n1 - 1e-9:
+        notes.append(f"n_lim = {n_pos:.2f} < n1 = {n1:.2f} de CS 22.337 — ignorado (n1 regulamentar usado)")
+    ws = W0_kg * G0 / S
+    VS1 = math.sqrt(2 * ws / (RHO0 * CLmax))
+    VA = VS1 * math.sqrt(n1)
+    VB = VA
+    vd_min = cs22_vd_min(ws, CD_min, cat)
+    if VD_eas:
+        VD = float(VD_eas)
+        if vd_min is not None and VD < vd_min - 1e-6:
+            notes.append(f"VD = {VD * 3.6:.0f} km/h < mínimo de CS 22.335(f) {vd_min * 3.6:.0f} km/h — falha")
+    elif vd_min is not None:
+        VD = vd_min
+        notes.append(f"VD = mínimo de CS 22.335(f) com CD,min {CD_min:.4f}: {VD * 3.6:.0f} km/h EAS")
+    else:
+        VD = 1.25 * max(V_cruise_eas, VA)
+        notes.append("VD sem valor declarado (structures.VD_eas_m_s) nem CD,min: 1,25 max(V_cruzeiro, VA) — "
+                     "PRESSUPOSTO, declarar VD (VNE/0,9, CS 22.1505)")
+    rho = isa(altitude).rho
+    k, mu = cs22_gust_k(ws, lm, CLalpha, rho)
+
+    def ng(V: float, U: float, s: int) -> float:
+        n = 1 + s * k / 2 * RHO0 * U * V * CLalpha / ws
+        return min(n, 1.25 * (V / VS1) ** 2) if s > 0 else n       # CS 22.341(b): n positivo limitado
+    gust = {"Ude_VC": 15.0, "Ude_VD": 7.5, "n_VC_pos": ng(VB, 15.0, 1), "n_VC_neg": ng(VB, 15.0, -1),
+            "n_VD_pos": ng(VD, 7.5, 1), "n_VD_neg": ng(VD, 7.5, -1), "n2_VD": n2, "n3_VD": n3,
+            "VB_EAS_m_s": VB, "VD_min_EAS_m_s": vd_min, "lm_m": lm, "category_cs22": cat}
+    clauses = ["CS 22.333 (envelope A–D–E–G; rajadas 15 m/s a VB, 7,5 m/s a VD)", "CS 22.335(a) VA = VS1 √n1",
+               "CS 22.335(c) VB ≥ VA (usado VB = VA)", "CS 22.335(f) VD mínimo", f"CS 22.337 categoria {cat}",
+               "CS 22.341 k = 0,96 (μ/(H/l_m))/(0,475 + μ/(H/l_m)), H = (12,17 + 0,191 μ) l_m"]
+    return VnDiagram("cs_22", cat, ws, VS1, VA, VB, VD, VB, n1, n4, gust, mu, k, CLalpha, CLmax, CNmin,
+                     clauses, notes)
+
+
 def v_n_diagram(W0_kg: float, S: float, CLmax: float, CLalpha: float, mac: float, V_cruise_eas: float,
                 category: str = "normal", regulation: str = "cs_23", altitude: float = 0.0,
                 CNmin: float | None = None, n_pos: float | None = None, VH_eas: float | None = None,
-                VD_eas: float | None = None) -> VnDiagram:
-    """Flight and gust V-n envelope (see module docstring for the clauses). Speeds EAS [m/s]."""
+                VD_eas: float | None = None, CD_min: float | None = None,
+                lm: float | None = None) -> VnDiagram:
+    """Flight and gust V-n envelope (see module docstring for the clauses). Speeds EAS [m/s].
+    ``regulation='cs_22'`` (planadores): ``lm`` corda média geométrica S/b (None → ``mac``), ``CD_min`` para o VD
+    mínimo de 22.335(f)."""
     W = W0_kg * G0
     ws = W / S
     CNmin = -0.8 * CLmax if CNmin is None else CNmin
+    if regulation == "cs_22":
+        return _v_n_cs22(W0_kg, S, CLmax, CLalpha, lm or mac, category, altitude, CNmin, n_pos, VD_eas, CD_min,
+                         V_cruise_eas)
     nmin_reg = regulation_min_n(W0_kg, category, regulation)
     notes, clauses = [], []
     if n_pos is None:
@@ -502,7 +603,7 @@ def sandwich_core(Nx, Nxy, b, t_f, Ef, nu, core, t_lim=0.05):
 def box_beam_sizing_buckling(wing, loads: BeamLoads, material: str | dict = "al2024_t3", n_ult_factor: float = 1.5,
                              nonoptimum_factor: float = 1.25, rib_pitch: float | None = None,
                              areal_density_floor: float = 0.0, n_neg_ratio: float = 0.4,
-                             fuselage_width: float = 0.0) -> WingBoxResult:
+                             fuselage_width: float = 0.0, secondary_sandwich: bool = False) -> WingBoxResult:
     """Phase 3 stability-driven two-spar box (same layout, loads and factors as :func:`box_beam_sizing`).
 
     **Metal (stiffened covers, Z-stringers):** the covers carry bending, N = M_u/(h w) [N/m].
@@ -617,7 +718,13 @@ def box_beam_sizing_buckling(wing, loads: BeamLoads, material: str | dict = "al2
                   f"Almas: núcleo sanduíche onde τ > τ_cr (máx. {web_core.max() * 1e3:.1f} mm)"]
     # secondary items as in the strength box
     perim_rest = np.maximum(2.04 * c - 2 * w, 0)
-    sec_skin = 2 * np.trapezoid(perim_rest * tmin * rho, y)
+    sec_areal = tmin * rho
+    if composite and secondary_sandwich and m.get("core"):
+        # bordo de ataque/fuga em sanduíche (faces à espessura mínima + núcleo mínimo) em vez de laminado simples:
+        # casca sem reforçadores entre poucas nervuras (planadores: "GRP mostly with synthetic foam cores")
+        sec_areal = 2 * tmin * rho + float(m["core"].get("t_min", 0.0)) * float(m["core"]["rho"])
+        notes.append(f"bordos de ataque/fuga em sanduíche mínimo: {sec_areal:.2f} kg/m² (structures.secondary_skin)")
+    sec_skin = 2 * np.trapezoid(perim_rest * sec_areal, y)
     if areal_density_floor:
         floor = 2 * np.trapezoid(2.04 * c * areal_density_floor, y)
         tot = covers + sec_skin
@@ -720,14 +827,31 @@ def wing_structure(res_like: dict) -> StructuresResult:
     w = d["wing"]
     vn = v_n_diagram(d["W0"], w.S, d["CLmax"], d["CLalpha"], w.mac, d["V_cruise_eas"], d.get("category", "normal"),
                      d.get("regulation", "cs_23"), d.get("altitude", 0.0), d.get("CNmin"), d.get("n_pos"),
-                     d.get("VH_eas"))
+                     d.get("VH_eas"), d.get("VD_eas"), d.get("CD_min"), w.S / w.span if w.span else None)
     n = vn.n_limit_pos
     # critical bending case: positive limit n; torsion at VD (highest q) with the same n — conservative
     # combination for a first cut (PHAA/PLAA cases of Bruhn A3 treated as one envelope corner)
     V_crit = vn.VD
     cond = f"n = {n:.2f} ({vn.governing}), q a VD = {V_crit:.1f} m/s EAS"
     wm = d.get("wing_mass_raymer") or 0.0
-    load = span_load(w, d["W0"] * G0, n, wm, d.get("avl_strips"))
+    # massa extra distribuída na asa que alivia a flexão (p. ex. lastro de água nos tanques da asa — ∝ corda,
+    # PRESSUPOSTO) e caso da massa máxima das partes não sustentadoras (TCDS de planadores): ar = (W_nlp + asa) n g,
+    # alívio = asa. Fica o caso de maior momento na raiz (envolvente simples dos dois carregamentos).
+    extra = float(d.get("wing_relief_extra_kg") or 0.0)
+    load = span_load(w, d["W0"] * G0, n, wm + extra, d.get("avl_strips"))
+    nlp = d.get("non_lifting_max_kg")
+    if extra:
+        cond += f"; alívio extra na asa {extra:.1f} kg (structures.wing_relief_extra_kg)"
+    if nlp:
+        load_nlp = span_load(w, (float(nlp) + wm) * G0, n, wm, d.get("avl_strips"))
+        m_a = float(np.trapezoid((load.lift - load.inertia) * load.y, load.y))
+        m_b = float(np.trapezoid((load_nlp.lift - load_nlp.inertia) * load_nlp.y, load_nlp.y))
+        if m_b > m_a:
+            load = load_nlp
+            cond += (f"; caso das partes não sustentadoras {float(nlp):.0f} kg + asa {wm:.1f} kg governa "
+                     f"(M_raiz {m_b / max(m_a, 1e-9):.2f}× o do W0)")
+        else:
+            cond += f"; caso W0 governa face às partes não sustentadoras {float(nlp):.0f} kg"
     qd = 0.5 * RHO0 * V_crit**2
     mat = d.get("material", "al2024_t3")
 
@@ -739,7 +863,8 @@ def wing_structure(res_like: dict) -> StructuresResult:
             return box_s, box_s
         return box_s, box_beam_sizing_buckling(
             w, beam, mat, 1.5, d.get("nonoptimum_factor", 1.25), areal_density_floor=d.get("areal_density_floor", 0.0),
-            n_neg_ratio=abs(vn.n_limit_neg / vn.n_limit_pos) if vn.n_limit_pos else 0.4)
+            n_neg_ratio=abs(vn.n_limit_neg / vn.n_limit_pos) if vn.n_limit_pos else 0.4,
+            secondary_sandwich=str(d.get("secondary_skin", "monolitica")) == "sanduiche")
 
     beam = shear_moment_diagram(load, w, qd, d.get("cm0", 0.0))
     box_s, box = size(beam)

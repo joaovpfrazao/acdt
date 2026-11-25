@@ -112,9 +112,9 @@ _BUILTIN = [
                     ("target",), choices=("sim", "nao"), reference="icing.py (docs/GELO.md)"),
     RequirementType("regulatory_category", "category", "Regulatory / certification basis", ("check", "systems"),
                     ("target",), choices=("easa_open", "easa_specific", "easa_certified", "stanag_4703",
-                                          "stanag_4671", "cs_23", "cs_vla", "cs_lsa", "far_23")),
+                                          "stanag_4671", "cs_23", "cs_vla", "cs_lsa", "far_23", "cs_22")),
     RequirementType("propulsion_type", "category", "Propulsion preference", ("context",), ("target",),
-                    choices=("electric", "piston_prop", "turboprop", "jet")),
+                    choices=("electric", "piston_prop", "turboprop", "jet", "none")),
     RequirementType("mtow_objective", "mass", "Minimise take-off mass (trade objective)", ("trade",), ("objective",)),
 ]
 for _rt in _BUILTIN:
@@ -132,6 +132,8 @@ CATEGORY_LIMITS: dict[str, dict[str, float]] = {
     "cs_lsa": {"mtow_max": 600.0, "stall_speed_max": 45 * 1852 / 3600},
     # CS-VLA: MTOM <= 750 kg; VS0 <= 45 KCAS
     "cs_vla": {"mtow_max": 750.0, "stall_speed_max": 45 * 1852 / 3600},
+    # CS-22 Amdt 3 CS 22.1(a)(1): planadores com massa máxima ≤ 750 kg (motoplanadores ≤ 850 kg — não distinguido)
+    "cs_22": {"mtow_max": 750.0},
     # CS-23 Amdt 5 / 14 CFR Part 23 Amdt 64: MTOM <= 8 618 kg (19 000 lb), max 19 pax (CS 23.2005).
     # Stall-speed limits are now in consensus means of compliance (e.g. ASTM F3179) -> not imposed here.
     "cs_23": {"mtow_max": 8618.0},
@@ -152,7 +154,7 @@ def validate_aircraft(rs: RequirementSet) -> list[Issue]:
     vc, vm = rs.value("cruise_speed"), rs.value("max_speed")
     if vc is not None and vm is not None and vc > vm:
         issues.append(Issue("error", "cruise_speed > max_speed", ("cruise_speed", "max_speed")))
-    if rs.get("range") is None and rs.get("endurance") is None:
+    if rs.get("range") is None and rs.get("endurance") is None and rs.value("propulsion_type") != "none":
         issues.append(Issue("warning", "No range/endurance given: fuel/energy fraction from "
                             "a 30 min loiter default (assumption)", ("range", "endurance")))
     if rs.get("payload_mass") is None:

@@ -329,6 +329,8 @@ def size_takeoff_weight(payload: float, crew: float, legs: list[MissionLeg], pro
 
     def fractions(W0):
         we = ew.fraction(W0)
+        if prop.kind == "none":         # sem propulsão (planador): sem combustível nem bateria de propulsão
+            return we, 0.0, None
         if prop.kind == "electric":
             wf = battery_energy(W0, legs, prop, climb_alt) / prop.e_spec / W0
             E = wf * W0 * prop.e_spec

@@ -35,6 +35,22 @@ from acdt.core.structures import frames as fr
 LEVEL = "L1"
 DEFAULTS: dict[str, Any] = {
     "enabled": False, "coupling": "relatorio", "material": "auto",
+    # construção: "metalica" (omissão: cavernas a passo regular + reforçadores + revestimento, aviação ligeira) ou
+    # "composito_monocasca" (casca em sanduíche/monolítica SEM reforçadores, cavernas só nas estações de carga e
+    # anteparas declaradas, poucas nervuras em estações declaradas — prática dos planadores e ligeiros em compósito)
+    "construction": "metalica",
+    "composite": {
+        "shell_material": "gfrp_qi",  # faces da casca (equivalente isotrópico CLT da biblioteca)
+        "core_material": "pvc_foam_h80",
+        # grelhas de dimensionamento: faces de 0,5 mm (2 camadas ≈ 0,25 mm — espessura mínima de manuseamento,
+        # PRESSUPOSTO) a 3 mm; núcleo 0 (monolítico) a 15 mm
+        "face_t_min_m": 0.5e-3, "face_t_max_m": 3.0e-3, "face_t_step_m": 0.25e-3,
+        "core_t_m": [0.0, 3e-3, 5e-3, 8e-3, 10e-3, 15e-3],
+        "bulkhead_core_t_m": 10e-3,   # antepara em sanduíche: núcleo PRESSUPOSTO, faces à espessura mínima
+        # estações das nervuras (η = y/semienvergadura) por superfície; None → raiz e ponta (declarar as de
+        # ailerons, travões, charneiras)
+        "rib_stations_eta": {"asa": None, "estabilizador": None, "deriva": None},
+    },
     "tol": 1e-3, "max_iter": 8,       # coupling iterar: |ΔW0|/W0 entre voltas e n.º máximo de voltas
     "fuselage": {
         "enabled": True, "frame_pitch_m": None,
@@ -99,6 +115,14 @@ def options(spec: Any) -> dict[str, Any]:
     return _merge(DEFAULTS, user)
 
 
+def is_composite(o: dict[str, Any]) -> bool:
+    """``construction: composito_monocasca`` (casca sem reforçadores, poucas cavernas/nervuras)."""
+    c = str(o.get("construction") or "metalica").lower()
+    if c not in ("metalica", "composito_monocasca"):
+        raise ValueError(f"structure_layout.construction {c!r}: usar 'metalica' ou 'composito_monocasca'")
+    return c == "composito_monocasca"
+
+
 def _not_evaluated(reason: str) -> dict[str, Any]:
     return {"evaluated": False, "level": LEVEL, "reason": reason, "members": [], "budget": None}
 
@@ -113,8 +137,12 @@ def _material_key(res: Any, o: dict[str, Any]) -> str:
     k = o.get("material", "auto")
     if k and k != "auto":
         return str(k)
+    if is_composite(o):
+        return str((o.get("composite") or {}).get("shell_material") or "gfrp_qi")
     sa = res.spec.assumptions.get("structures", {})
     mk = sa.get("material", "auto")
+    if isinstance(mk, dict):      # caixão compósito {skin, cap, core}: a casca usa o material das peles
+        return str(mk.get("skin") or "cfrp_qi")
     if mk in ("cfrp",):
         return "cfrp_qi"
     if mk and mk != "auto" and mk in matlib.library():
@@ -165,7 +193,7 @@ _BOX_KINDS = {"caps": "banzo_longarina", "webs": "alma_longarina", "web_uprights
 
 def box_members(comp: str, box: dict[str, Any], x: float, y0: float = 0.0, z0: float = 0.0, axis: str = "y",
                 mirror: bool = True, source: str = "", span_vec: Any = None, share: float = 1.0,
-                prefix: str | None = None) -> list[dict[str, Any]]:
+                prefix: str | None = None, rib_factor: float | None = None) -> list[dict[str, Any]]:
     """Linhas da tabela de membros de um caixão já dimensionado (asa ou empenagem; ``box`` no formato de
     :func:`.structures_l1._tail_box_summary`). A massa distribui-se ∝ corda na envergadura (PRESSUPOSTO) para a
     inércia própria; com ``mirror`` o caixão tem duas metades simétricas (centroide no plano de simetria).
@@ -182,6 +210,8 @@ def box_members(comp: str, box: dict[str, Any], x: float, y0: float = 0.0, z0: f
         if key in ("ideal", "total"):
             continue
         m = float(m) * share
+        if key == "ribs" and rib_factor is not None:
+            m *= float(rib_factor)      # compósito: só as nervuras declaradas (rib_stations)
         if key in ("caps", "webs", "web_uprights"):
             ver = "passa"           # dimensionados a RF = 1 (A = M_u/(h σ), t = q/τ, Kuhn) ou espessura mínima
         elif key in ("box_skins", "covers_skin_stringers", "core"):
@@ -222,14 +252,14 @@ def wing_box_summary(res: Any) -> dict[str, Any] | None:
             "semispan_m": float(wing.span / 2), "c_root_m": float(wing.c_root), "c_tip_m": float(wing.c_tip)}
 
 
-def structures_material(res: Any) -> str:
-    """Material do caixão como em :func:`.sizing.structures_inputs` (``structures.material``)."""
+def structures_material(res: Any) -> Any:
+    """Material do caixão como em :func:`.sizing.structures_inputs` (``structures.material``): chave ou dicionário
+    de caixão compósito (:func:`.structures.resolve_material`)."""
+    from .structures import resolve_material
     from .weights_detailed import _merge_opts
     A = res.spec.assumptions
-    mat = A["structures"]["material"]
-    if mat == "auto":
-        mat = "cfrp" if _merge_opts(A["weights"].get("components"))["material"] == "composite" else "al2024_t3"
-    return str(mat)
+    return resolve_material(A["structures"]["material"],
+                            _merge_opts(A["weights"].get("components"))["material"] == "composite")
 
 
 def tail_boxes(res: Any, o: dict[str, Any]) -> tuple[dict[str, dict[str, Any] | None], list[str]]:
@@ -436,7 +466,44 @@ def surface_records(res: Any, o: dict[str, Any], fus: dict[str, Any], body: dict
                      "incidence_deg": float(oc.get("incidence_deg", 0.0) or 0.0),
                      "c_root_m": float(bx["c_root_m"]) if bx else 0.0, "c_tip_m": float(bx["c_tip_m"]) if bx else 0.0,
                      "source": src, "placement": f"z {z_t:.3f} m ({zwhy})"})
+    if (ov.get("estabilizador") or {}).get("on_fin_tip"):
+        # cauda em T: raiz do ¼ de corda do estabilizador no ¼ de corda da ponta da deriva
+        fin = next((r for r in recs if r["comp"] == "deriva"), None)
+        ht = next((r for r in recs if r["comp"] == "estabilizador"), None)
+        if fin is not None and ht is not None:
+            ht["root"] = [float(a + b_) for a, b_ in zip(fin["root"], fin["span_vec"])]
+            ht["placement"] = (f"cauda em T: ponta da deriva, z {ht['root'][2]:.3f} m "
+                               "(structure_layout.surfaces.estabilizador.on_fin_tip)")
     return recs, notes
+
+
+def rib_stations(res: Any, o: dict[str, Any], recs: list[dict[str, Any]]) -> list[str]:
+    """Compósito: nervuras só nas estações declaradas (``composite.rib_stations_eta``; None → raiz e ponta). A
+    massa de nervuras do caixão (passo ``box.rib_pitch`` ou 0,6 CMA, Fase 2) escala com n_declaradas/n_passo —
+    PRESSUPOSTO (nervura média igual). Grava ``rib_eta`` no registo para o render."""
+    if not is_composite(o):
+        return []
+    notes = []
+    se = (o.get("composite") or {}).get("rib_stations_eta") or {}
+    cfg = res.config
+    for r in recs:
+        src = {"asa": cfg.wing, "estabilizador": cfg.htail, "deriva": cfg.vtail}.get(r["comp"])
+        if src is None or r.get("box") is None:
+            continue
+        wing = src if r["comp"] == "asa" else src.as_wing()
+        eta = se.get(r["comp"])
+        if eta is None:
+            eta = [0.0, 1.0]
+            notes.append(f"{r['comp']}: estações das nervuras não declaradas — raiz e ponta (PRESSUPOSTO)")
+        eta = sorted({min(max(float(e), 0.0), 1.0) for e in eta})
+        semi = float(r["box"]["semispan_m"])
+        p = float(getattr(wing.box, "rib_pitch", None) or 0.6 * float(wing.mac))
+        n_pitch = math.ceil(semi / p) + 1
+        r["rib_eta"] = eta
+        r["rib_factor"] = len(eta) / n_pitch
+        notes.append(f"{r['comp']}: {len(eta)} nervuras por lado (η = {', '.join(f'{e:.2f}' for e in eta)}) em vez de "
+                     f"{n_pitch} a passo {p:.2f} m — massa de nervuras × {r['rib_factor']:.2f}")
+    return notes
 
 
 def _legacy(rec: dict[str, Any]) -> dict[str, Any]:
@@ -456,7 +523,7 @@ def surface_members(rec: dict[str, Any]) -> list[dict[str, Any]]:
                        verdict="desconhecido", method="caixão em falta", source=rec["source"])]
     return box_members(rec["comp"], rec["box"], rec["x"], rec["y0"], rec["z0"], rec["axis"], rec["mirror"],
                        rec["source"], span_vec=rec["span_vec"], share=float(rec.get("share", 1.0)),
-                       prefix=rec.get("id"))
+                       prefix=rec.get("id"), rib_factor=rec.get("rib_factor"))
 
 
 # ------------------------------------------------------------------------------------------------ fuselage
@@ -734,9 +801,14 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
                 ids_.append(lid)
     for bk in bulkheads:
         special.setdefault(round(float(bk["x_m"]), 4), []).append(str(bk["id"]))
-    reg = [float(v) for v in np.arange(x[0], x[-1] + 1e-9, pitch)]
+    comp = fo.get("_composite")
+    # compósito monocasca: só as cavernas das estações de carga e as anteparas (sem passo regular)
+    reg = [] if comp is not None else [float(v) for v in np.arange(x[0], x[-1] + 1e-9, pitch)]
     st_x = sorted(set([v for v in reg if all(abs(v - s) > 0.3 * pitch for s in special)] + list(special)))
     st_x = [v for v in st_x if x[0] - 1e-9 <= v <= x[-1] + 1e-9]
+    if comp is not None and len(st_x) >= 2:
+        # Shanley/anel: passo = baía média entre cavernas declaradas (não há passo regular)
+        pitch = float(np.mean(np.diff([float(x[0])] + st_x + [float(x[-1])])))
     rows: list[dict[str, Any]] = []
     frames_out = []
     for xs in st_x:
@@ -808,6 +880,12 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
         edge = str(bk.get("edge") or "simply_supported")
         pb = fr.size_pressure_bulkhead(Rb, 1.5 * p, mat, t_min, edge)
         m = mat["rho"] * math.pi * Rb**2 * pb["t_m"]
+        if comp is not None and p <= 0:
+            # antepara em sanduíche: faces à espessura mínima + núcleo declarado (PRESSUPOSTO)
+            core_m = matlib.get(str(comp.get("core_material") or "pvc_foam_h80"))
+            areal = (2 * float(comp.get("face_t_min_m") or 0.5e-3) * mat["rho"]
+                     + float(comp.get("bulkhead_core_t_m") or 0.0) * core_m.rho)
+            m = areal * math.pi * Rb**2
         ver = pb["verdict"] if p > 0 else "desconhecido"
         rows.append(member(f"{cid}.antepara.{bk['id']}", cid, "antepara", m, xs + x_off, y0, z0,
                            I_own=(0.5 * m * Rb**2, 0.25 * m * Rb**2, 0.25 * m * Rb**2),
@@ -816,6 +894,9 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
                            section={"t_m": pb["t_m"], "pressure_Pa": p, "edge": edge},
                            note=None if p > 0 else "sem pressão declarada: alma à espessura mínima; corte da alma "
                                                    "sob cargas concentradas não modelado (desconhecido)"))
+    if comp is not None:
+        return _composite_shell(cid, x, R, M, V, T, rows, frames_out, comp, mat, nonopt, x_off, y0, z0, pitch,
+                                h, b, cutouts, body_notes, wh, perim, w_s, h_s, n_exp, noncirc, p_cab)
     # casca reforçada por estação
     so, lo = fo["stringers"], fo["longerons"]
     n_l = int(lo.get("n") or 0)
@@ -887,6 +968,95 @@ def analyse_body(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.nd
                                      "longeron_theta_deg": list(lay.longeron_theta_deg) if n_l else []}}
 
 
+def _composite_shell(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: np.ndarray, T: np.ndarray,
+                     rows: list[dict[str, Any]], frames_out: list[dict[str, Any]], comp: dict[str, Any],
+                     mat: dict[str, Any], nonopt: float, x_off: float, y0: float, z0: float, pitch: float,
+                     h: float, b: float, cutouts: list[dict[str, Any]], body_notes: list[str], wh: Any, perim: Any,
+                     w_s: float | None, h_s: float | None, n_exp: float, noncirc: bool, p_cab: float
+                     ) -> dict[str, Any]:
+    """Casca monocasca em sanduíche/monolítica sem reforçadores (:mod:`acdt.core.structures.sandwich`): por estação
+    da viga L1, a parede mais leve da grelha (faces × núcleo) com RF ≥ 1 à carga última (1,5 × limite); a baía de
+    encurvadura é a distância entre as cavernas/anteparas vizinhas."""
+    from acdt.core.structures import sandwich as sw
+    fm = matlib.get(str(comp.get("shell_material") or "gfrp_qi"))
+    cm = matlib.get(str(comp.get("core_material") or "pvc_foam_h80"))
+    face = sw.Face(fm.E, fm.nu, fm.rho, fm.Fcy, fm.Ftu, fm.Fsu)
+    core = sw.Core(cm.E, cm.G, cm.rho)
+    t0, t1 = float(comp.get("face_t_min_m") or 0.5e-3), float(comp.get("face_t_max_m") or 3e-3)
+    dt = float(comp.get("face_t_step_m") or 0.25e-3)
+    t_faces = [t0 + k * dt for k in range(int(round((t1 - t0) / dt)) + 1)]
+    t_cores = [float(v) for v in (comp.get("core_t_m") or [0.0])]
+    xf = sorted(float(f["x_m"]) - x_off for f in frames_out)
+    edges = [float(x[0])] + xf + [float(x[-1])]
+    tab: list[dict[str, Any]] = []
+    for xi, ri, mi, vi, ti in zip(x, R, M, V, T):
+        Rr = max(float(ri), 1e-3)
+        k = int(np.searchsorted(edges, float(xi), side="right"))
+        L_bay = edges[min(k, len(edges) - 1)] - edges[max(k - 1, 0)]
+        N_u = 1.5 * abs(float(mi)) / (math.pi * Rr**2)
+        q_u = 1.5 * (abs(float(vi)) / (math.pi * Rr) + abs(float(ti)) / (2 * math.pi * Rr**2))
+        wall = sw.size_wall(N_u, q_u, Rr, max(L_bay, 1e-3), face, core, t_faces, t_cores)
+        P = perim(float(ri))
+        tab.append({"x_m": float(xi), "R_m": float(ri), "perimeter_m": P, "A_enc_m2": math.pi * Rr**2,
+                    "N_ult_N_m": N_u, "q_ult_N_m": q_u, "L_bay_m": L_bay, **wall})
+    tf = np.array([r["t_face_m"] for r in tab])
+    tc = np.array([r["t_core_m"] for r in tab])
+    Px = np.array([r["perimeter_m"] for r in tab])
+    dm_face = 2 * fm.rho * Px * tf
+    dm_core = cm.rho * Px * tc
+    m_face = float(np.trapezoid(dm_face, x))
+    m_core = float(np.trapezoid(dm_core, x))
+    L = float(x[-1] - x[0])
+    R2 = float(np.mean(R**2))
+    rf = min(r["RF_min"] for r in tab)
+    i_w = int(np.argmin([r["RF_min"] for r in tab]))
+    ok = all(r["ok"] for r in tab)
+    Iown = (R2, 0.5 * R2 + L**2 / 12, 0.5 * R2 + L**2 / 12)
+    xc = float(np.trapezoid(x * dm_face, x) / m_face) if m_face else 0.5 * L
+    rows.append(member(f"{cid}.revestimento", cid, "revestimento", m_face, xc + x_off, y0, z0,
+                       I_own=(m_face * Iown[0], m_face * Iown[1], m_face * Iown[2]), RF=rf, verdict="passa" if ok else "falha",
+                       method="casca sanduíche/monolítica sem reforçadores: faces N/(2 t_f), q/(2 t_f); encurvadura "
+                              "Donnell + NASA SP-8007 (flexão), torção SP-8007/Timoshenko, interação R_b + R_s² "
+                              "(Bruhn C8); enrugamento Hoff & Mautner — " + fm.name,
+                       section={"t_face_max_m": float(tf.max()), "t_face_min_m": float(tf.min()),
+                                "t_core_max_m": float(tc.max()), "material": fm.key},
+                       governing=tab[i_w]["governing"]))
+    if m_core > 0:
+        xk = float(np.trapezoid(x * dm_core, x) / m_core)
+        rows.append(member(f"{cid}.nucleo", cid, "nucleo", m_core, xk + x_off, y0, z0,
+                           I_own=(m_core * Iown[0], m_core * Iown[1], m_core * Iown[2]), verdict="desconhecido",
+                           method="núcleo da casca em sanduíche (" + cm.name + "): corte transversal e descolamento "
+                                  "não verificados", section={"t_core_max_m": float(tc.max()), "material": cm.key}))
+    body_notes.append(f"compósito monocasca: sem reforçadores; {len(frames_out)} cavernas/anteparas só nas estações "
+                      "de carga e declaradas; parede por estação na grelha faces × núcleo — flexibilidade ao corte do "
+                      "núcleo desprezada na encurvadura global (PRESSUPOSTO)")
+    if cutouts:
+        body_notes.append("compósito: aberturas (p. ex. canopy) declaradas mas o reforço do bordo em sanduíche não é "
+                          "modelado — desconhecido")
+        rows.append(member(f"{cid}.aberturas", cid, "abertura", None, x_off + 0.5 * L, y0, z0,
+                           verdict="desconhecido", method="bordo de abertura em casca compósita não modelado"))
+    if p_cab > 0:
+        body_notes.append("compósito: pressurização não modelada na casca em sanduíche — desconhecido")
+    ideal = sum(r["mass_kg"] for r in rows if r["mass_kg"] is not None)
+    rows.append(member(f"{cid}.nao_otimo", cid, "nao_otimo", (nonopt - 1.0) * ideal,
+                       float(sum(r["mass_kg"] * r["x_m"] for r in rows if r["mass_kg"] is not None) / ideal)
+                       if ideal else x_off, y0, z0, verdict="desconhecido",
+                       method=f"fator não-ótimo {nonopt:g} (Torenbeek 1982 App. C) — PRESSUPOSTO"))
+    beam: dict[str, list[float]] = {"x": (x + x_off).tolist(), "A": [], "I": [], "J": []}
+    for r in tab:
+        t_m = 2 * r["t_face_m"]
+        Rr = max(r["R_m"], 1e-3)
+        beam["A"].append(float(r["perimeter_m"] * t_m))
+        beam["I"].append(float(math.pi * Rr**3 * t_m))
+        beam["J"].append(float(4 * r["A_enc_m2"] ** 2 * t_m / r["perimeter_m"]))
+    return {"members": rows, "frames": frames_out, "shell_table": tab, "worst_shell_station": tab[i_w],
+            "notes_body": body_notes, "floor": None, "cutouts": cutouts, "pressure_Pa": p_cab,
+            "section": {"w_m": w_s, "h_m": h_s, "n_exp": n_exp, "noncircular": noncirc},
+            "beam": beam, "layout": {"construction": "composito_monocasca", "frame_pitch_m": pitch, "frame_h_m": h,
+                                     "frame_b_m": b, "n_stringers": 0, "n_longerons": 0, "longeron_theta_deg": [],
+                                     "n_frames": len(frames_out)}}
+
+
 def fuselage_layout(res: Any, o: dict[str, Any], mat: dict[str, Any]) -> dict[str, Any]:
     l1 = getattr(res, "structures_l1", None)
     fus = getattr(l1, "fuselage", None) or {}
@@ -898,7 +1068,11 @@ def fuselage_layout(res: Any, o: dict[str, Any], mat: dict[str, Any]) -> dict[st
     fo["skin_t_m"] = fo.get("skin_t_m") or cfg.fuselage.frames.skin_thickness
     if fo["longerons"].get("n") is None:
         fo["longerons"]["n"] = 0
-    if fo["stringers"].get("n") is None:
+    comp_mode = is_composite(o)
+    if comp_mode:
+        fo["stringers"]["n"] = 0          # monocasca: sem campo de reforçadores
+        fo["_composite"] = dict(o.get("composite") or {})
+    elif fo["stringers"].get("n") is None:
         fo["stringers"]["n"] = max(4, math.ceil(math.pi * cfg.fuselage.max_diameter
                                                 / float(fo["stringers"].get("pitch_m") or 0.12)))
     L = float(cfg.fuselage.length)
@@ -919,6 +1093,13 @@ def fuselage_layout(res: Any, o: dict[str, Any], mat: dict[str, Any]) -> dict[st
     for k, v in uc.items():
         cases.setdefault(k, []).extend(v)
     bks = fo.get("bulkheads")
+    if bks is None and comp_mode:
+        bks = [{"id": "ligacao_asa", "x_m": float(fus.get("x_wing_m", 0.35 * L)), "pressure_Pa": 0.0},
+               {"id": "cauda", "x_m": float(fus.get("x_vt_m") or fus.get("x_ht_m") or 0.9 * L), "pressure_Pa": 0.0}]
+        if float(fus.get("F_engine_limit_N") or 0.0) > 0:
+            bks.insert(0, {"id": "parede_de_fogo", "x_m": float(fus.get("x_engine_m", 0.12 * L)), "pressure_Pa": 0.0})
+        notes.append("compósito: anteparas por omissão na ligação da asa e na cauda (+ parede de fogo com motor) — "
+                     "PRESSUPOSTO, declarar fuselage.bulkheads (cockpit, assento, ligação da asa, cauda)")
     if bks is None:
         bks = [{"id": "parede_de_fogo", "x_m": float(fus.get("x_engine_m", 0.12 * L)), "pressure_Pa": 0.0},
                {"id": "fecho_traseiro", "x_m": 0.95 * L, "pressure_Pa": 0.0}]
@@ -1684,7 +1865,7 @@ def layout_geometry(res: Any, fus: dict[str, Any], booms: list[dict[str, Any]], 
                       "c_tip_m": float(r.get("c_tip_m") or bx["c_tip_m"]),
                       "sweep_c4_rad": float(getattr(src, "sweep_c4", 0.0)),
                       "front_spar_xc": float(wing.box.front_spar_xc), "rear_spar_xc": float(wing.box.rear_spar_xc),
-                      "rib_pitch_m": float(rp), "placement": r.get("placement")})
+                      "rib_pitch_m": float(rp), "rib_eta": r.get("rib_eta"), "placement": r.get("placement")})
     struts = [m for m in members if m["kind"] == "escora" and m.get("geometry")]
     return {"bodies": bodies, "surfaces": surfs,
             "struts": [{"id": m["id"], "p0_m": m["geometry"]["p0_m"], "p1_m": m["geometry"]["p1_m"]} for m in struts],
@@ -1710,6 +1891,7 @@ def analyse_layout(res: Any) -> dict[str, Any]:
         notes.append(f"montagem não lida: {type(ex).__name__}: {ex}")
     recs, n_s = surface_records(res, o, fus_l1, fus if fus.get("evaluated") else None, asm_spec)
     notes += n_s
+    notes += rib_stations(res, o, recs)
     for rec in recs:
         members += surface_members(rec)
     if fus.get("evaluated"):

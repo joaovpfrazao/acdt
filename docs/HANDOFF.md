@@ -2145,3 +2145,19 @@ Pendente:
 * caixão da asa redimensionado com a escora;
 * ligação da asa da viga-fuselagem L1 alinhada com a montagem (Δx de −0,90 m na asa voadora).
 
+
+## Planador em compósito — LS4 (25 nov 2026, ramo `sailplane-composito`)
+
+LS4 dimensionado pelo acdt e comparado com o avião real ([PLANADOR_COMPOSITO.md](PLANADOR_COMPOSITO.md),
+CAPABILITIES §60; modo compósito em [ESTRUTURA_PARAMETRICA.md](ESTRUTURA_PARAMETRICA.md) §14).
+
+* Novo: `propulsion_type: none` + polar de planeio; CS-22; `construction: composito_monocasca` (casca em sanduíche,
+  0 reforçadores, nervuras declaradas, cauda em T); `secondary_skin: sanduiche`; viga L1 de aterragem em forma fechada.
+* Geometria real: massa vazia 149 vs 238 kg, asa 63 vs 128 kg, (L/D)max 39,3 vs 40.
+
+Pendente:
+
+* perfil real do LS4 e planta real (afilamento PRESSUPOSTO);
+* massas reais de fuselagem, empenagem e trem;
+* caixão da asa também à rigidez/flutter (V_F 200 km/h EAS < VD) e fatores CS 22.619/625 e LBA nos banzos;
+* massas dos itens secundários da asa (travões, ailerons, lastro, gelcoat).

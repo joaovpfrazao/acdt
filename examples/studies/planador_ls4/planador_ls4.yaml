@@ -1,0 +1,18 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Estudo (applied: false, 24 nov 2026): o acdt dimensiona um planador tradicional em compósito (Rolladen-Schneider
+# LS4, examples/benchmarks/ls4/) e compara com o avião real (examples/benchmarks/ls4/reference_data.json, com fontes).
+# Nada é imposto ao modelo a partir dos resultados reais; o exemplo yaml fica igual (casos só em memória).
+applied: false
+example: examples/benchmarks/ls4/ls4.yaml
+reference: examples/benchmarks/ls4/reference_data.json
+output: examples/output/ls4
+cases:
+  # A — dimensionamento a partir dos requisitos: carga alar do LS4 no MTOM fixada (W/S), envergadura e área resultam
+  - id: dimensionado
+    note: "W/S = 472 kg / 10,5 m² fixada; S e b saem de W0 do acdt"
+  # B — geometria do LS4 imposta (S = 10,5 m², b = 15 m): ponto fixo em ws_fixed = W0 g / 10,5 — compara massas
+  #     e polar na geometria real (as diferenças de massa já não encolhem a asa)
+  - id: geometria_ls4
+    note: "S = 10,5 m² imposta por ponto fixo em constraints.ws_fixed"
+    wing_area_m2: 10.5
+polar_reference_mass_kg: 320.0     # massa da polar publicada (cumulus: 230 + 90 kg)
