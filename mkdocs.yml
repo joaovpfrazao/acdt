@@ -102,6 +102,7 @@ nav:
     - "Custo de produção em série (disciplina custo_serie, L0)": CUSTO_SERIE.md
     - "Custo do ciclo de vida e CO₂e (disciplina ciclo_vida, L0)": CICLO_VIDA.md
     - "Estrutura paramétrica (disciplina structure_layout, L1)": ESTRUTURA_PARAMETRICA.md
+    - "Planador em compósito — LS4 vs avião real": PLANADOR_COMPOSITO.md
     - "Qualidade de software — CI, tipos, cobertura e tolerâncias numéricas": QUALIDADE.md
   - Referência:
     - API Python (acdt.api): referencia/api.md

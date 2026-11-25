@@ -1014,7 +1014,7 @@ def _composite_shell(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: n
     Iown = (R2, 0.5 * R2 + L**2 / 12, 0.5 * R2 + L**2 / 12)
     xc = float(np.trapezoid(x * dm_face, x) / m_face) if m_face else 0.5 * L
     rows.append(member(f"{cid}.revestimento", cid, "revestimento", m_face, xc + x_off, y0, z0,
-                       I_own=tuple(m_face * v for v in Iown), RF=rf, verdict="passa" if ok else "falha",
+                       I_own=(m_face * Iown[0], m_face * Iown[1], m_face * Iown[2]), RF=rf, verdict="passa" if ok else "falha",
                        method="casca sanduíche/monolítica sem reforçadores: faces N/(2 t_f), q/(2 t_f); encurvadura "
                               "Donnell + NASA SP-8007 (flexão), torção SP-8007/Timoshenko, interação R_b + R_s² "
                               "(Bruhn C8); enrugamento Hoff & Mautner — " + fm.name,
@@ -1024,7 +1024,7 @@ def _composite_shell(cid: str, x: np.ndarray, R: np.ndarray, M: np.ndarray, V: n
     if m_core > 0:
         xk = float(np.trapezoid(x * dm_core, x) / m_core)
         rows.append(member(f"{cid}.nucleo", cid, "nucleo", m_core, xk + x_off, y0, z0,
-                           I_own=tuple(m_core * v for v in Iown), verdict="desconhecido",
+                           I_own=(m_core * Iown[0], m_core * Iown[1], m_core * Iown[2]), verdict="desconhecido",
                            method="núcleo da casca em sanduíche (" + cm.name + "): corte transversal e descolamento "
                                   "não verificados", section={"t_core_max_m": float(tc.max()), "material": cm.key}))
     body_notes.append(f"compósito monocasca: sem reforçadores; {len(frames_out)} cavernas/anteparas só nas estações "

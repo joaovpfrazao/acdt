@@ -2253,6 +2253,23 @@ O registo de cinco iterações em `examples/output/uav150_flying_wing_tailless_h
 * **Ficheiros**: `structure_layout.py`, `structure_flutter.py`, `structure_render.py`,
   `tests/test_structure_layout.py`, estudo `estrutura_parametrica`, `docs/ESTRUTURA_PARAMETRICA.md` §12.
 
+## 60. Planador em compósito — LS4 dimensionado e comparado com o avião real (25 nov 2026)
+
+* **Planador sem propulsão:** `propulsion_type: none` (W0 = We + carga) e polar de planeio
+  (`acdt.domains.aircraft.glide`: (L/D)max, afundamento mínimo, afundamento a V; Anderson §5.4).
+* **CS-22** (`regulatory_category`/`structures.regulation: cs_22`): fatores da categoria U, rajadas CS 22.333, fator k e
+  teto CS 22.341, VD mínimo CS 22.335, MTOM ≤ 750 kg; alívio do lastro de água e caso das partes não sustentadoras.
+* **Estrutura paramétrica em modo compósito monocasca** (`construction: composito_monocasca`): casca em sanduíche
+  sem reforçadores, poucas cavernas, nervuras nas estações declaradas, cauda em T (`on_fin_tip`); verificação de
+  parede em sanduíche (`acdt.core.structures.sandwich`: faces, SP-8007 flexão e torção, Bruhn C8, Hoff-Mautner).
+* **Bordos da asa em sanduíche** (`structures.secondary_skin: sanduiche`) e `geometry.fuselage_profile`.
+* **Correção:** momento da viga L1 da fuselagem na aterragem em forma fechada (sem momento residual na cauda).
+* **Exemplo LS4** (`examples/benchmarks/ls4`, estudo `examples/studies/planador_ls4`): à geometria real, W0 383 kg
+  (com 110 kg de piloto e 124 kg de água), massa vazia 149 vs 238 kg (−37 %), asa 63 vs 128 kg (−51 %),
+  (L/D)max 39,3 vs 40 (−2 %), CG dentro do TCDS. A diferença da asa vem de itens secundários não modelados, dos
+  fatores de ligação e da rigidez (flutter a 200 km/h EAS, abaixo de VD) — ver
+  [PLANADOR_COMPOSITO.md](docs/PLANADOR_COMPOSITO.md).
+
 ## Roadmap (prioridades definidas pelo utilizador, outubro 2026)
 
 ### Já planeado

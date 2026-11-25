@@ -89,6 +89,9 @@ def metrics(res, ref: dict, m_ref: float) -> dict:
         "htail_layout_kg": float(byc.get("estabilizador", float("nan"))),
         "vtail_layout_kg": float(byc.get("deriva", float("nan"))),
         "fittings_layout_kg": float(byc.get("ligacoes", float("nan"))),
+        "fuselage_group_kg": float(byc.get("fuselagem", 0.0)) + float(byc.get("deriva", 0.0))
+        + float(byc.get("ligacoes", 0.0)) + sum(float(items.get(k) or 0.0) for k in
+                                                 ("main_gear", "nose_gear", "flight_controls", "avionics")),
         "main_gear_kg": items.get("main_gear"), "tail_wheel_kg": items.get("nose_gear"),
         "flight_controls_kg": items.get("flight_controls"), "avionics_kg": items.get("avionics"),
         "cg_mm_aft_LE": [min(cg), max(cg)],
@@ -129,6 +132,13 @@ def table(c: dict, ref: dict) -> list[list[str]]:
          "desconhecido", "—"],
         ["empenagens H + V [kg]", f"{c['htail_layout_kg'] + c['vtail_layout_kg']:.1f}", "desconhecido",
          "desconhecido", "—"],
+        ["fuselagem + deriva + trem + comandos + aviónica (análogo Std Cirrus) [kg]",
+         f"{c['fuselage_group_kg']:.1f}", f"{v['analog_std_cirrus']['value']['fuselage_kg']:.1f}",
+         _d(c["fuselage_group_kg"], v["analog_std_cirrus"]["value"]["fuselage_kg"]), "hoff_gratton (análogo)"],
+        ["estabilizador (análogo Std Cirrus) [kg]", f"{c['htail_layout_kg']:.1f}",
+         f"{v['analog_std_cirrus']['value']['htail_kg']:.1f}",
+         _d(c["htail_layout_kg"], v["analog_std_cirrus"]["value"]["htail_kg"]), "hoff_gratton (análogo)"],
+        ["asa / massa vazia", f"{c['wing_layout_kg'] / c['We_kg']:.2f}", "0,46–0,55", "—", "hoff_gratton"],
         ["trem (Raymer 15.50/15.51, extrapolado) [kg]", f"{(c['main_gear_kg'] or 0) + (c['tail_wheel_kg'] or 0):.1f}",
          "desconhecido", "desconhecido", "—"],
         ["S [m²]", f"{c['S_m2']:.2f}", f"{v['wing_area_m2']['value']:.2f}", _d(c["S_m2"], v["wing_area_m2"]["value"]),

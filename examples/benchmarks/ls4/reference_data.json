@@ -2,51 +2,271 @@
   "_comment": "Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0. Dados públicos do Rolladen-Schneider LS4 (planador Classe Standard, GRP) para comparar com o acdt. Cada valor tem a fonte; 'qualidade': primaria (TCDS/manual de voo), secundaria (livro de referência via Wikipedia, documento IGC/FAI com dado do fabricante), terciaria (base de dados não verificada). Valor sem fonte = desconhecido (null), nunca zero.",
   "aircraft": "Rolladen-Schneider LS4 (variante base; TCDS EASA A.095 Secção L)",
   "sources": {
-    "tcds": {"ref": "EASA TCDS A.095 (Rolladen-Schneider / DG Flugzeugbau LS-series), Issue 13, 04 Mar 2026, Section L (LS4)", "url": "https://www.easa.europa.eu/en/downloads/7339/en", "qualidade": "primaria"},
-    "fm": {"ref": "LS4 Flight Manual, revisão TN 4049 (DG Flugzeugbau, fev. 2019)", "url": "https://www.aeroclubdesardennes.be/assets/files/FM_LS4_TN4049.pdf", "qualidade": "primaria"},
-    "janes": {"ref": "Jane's All the World's Aircraft 1988-89, p. 628 (citado na Wikipedia)", "url": "https://en.wikipedia.org/wiki/Rolladen-Schneider_LS4", "qualidade": "secundaria"},
-    "fai_refmass": {"ref": "IGC Bureau 2012, proposta de massas de referência (massa típica das asas por tipo; LS4/4-a: Werner Scholz / LS)", "url": "https://www-2025.fai.org/sites/default/files/documents/8_1_3_a_refmass_bureau_edited.pdf", "qualidade": "secundaria"},
-    "cumulus": {"ref": "Cumulus Soaring, Polar Data Rolladen-Schneider ('Not Verified')", "url": "https://www.cumulus-soaring.com/store/polar-data-rolladen-schneider", "qualidade": "terciaria"},
-    "spottingworld": {"ref": "plane.spottingworld.com, Rolladen-Schneider LS4", "url": "https://plane.spottingworld.com/Rolladen-Schneider_LS4", "qualidade": "terciaria"},
-    "cs22": {"ref": "EASA CS-22 Amendment 3", "url": "https://www.easa.europa.eu/en/downloads/131414/en", "qualidade": "primaria"},
-    "uiuc": {"ref": "D. Lednicer, The Incomplete Guide to Airfoil Usage (UIUC)", "url": "https://m-selig.ae.illinois.edu/ads/aircraft.html", "qualidade": "secundaria"},
-    "patching_wood": {"ref": "Patching & Wood 1991, ensaio de fadiga de asa de planador em GFRP (OSTIV, Technical Soaring)", "url": "https://journals.sfu.ca/ts/index.php/ts/article/view/708", "qualidade": "secundaria"}
+    "tcds": {
+      "ref": "EASA TCDS A.095 (Rolladen-Schneider / DG Flugzeugbau LS-series), Issue 13, 04 Mar 2026, Section L (LS4)",
+      "url": "https://www.easa.europa.eu/en/downloads/7339/en",
+      "qualidade": "primaria"
+    },
+    "fm": {
+      "ref": "LS4 Flight Manual, revisão TN 4049 (DG Flugzeugbau, fev. 2019)",
+      "url": "https://www.aeroclubdesardennes.be/assets/files/FM_LS4_TN4049.pdf",
+      "qualidade": "primaria"
+    },
+    "janes": {
+      "ref": "Jane's All the World's Aircraft 1988-89, p. 628 (citado na Wikipedia)",
+      "url": "https://en.wikipedia.org/wiki/Rolladen-Schneider_LS4",
+      "qualidade": "secundaria"
+    },
+    "fai_refmass": {
+      "ref": "IGC Bureau 2012, proposta de massas de referência (massa típica das asas por tipo; LS4/4-a: Werner Scholz / LS)",
+      "url": "https://www-2025.fai.org/sites/default/files/documents/8_1_3_a_refmass_bureau_edited.pdf",
+      "qualidade": "secundaria"
+    },
+    "cumulus": {
+      "ref": "Cumulus Soaring, Polar Data Rolladen-Schneider ('Not Verified')",
+      "url": "https://www.cumulus-soaring.com/store/polar-data-rolladen-schneider",
+      "qualidade": "terciaria"
+    },
+    "spottingworld": {
+      "ref": "plane.spottingworld.com, Rolladen-Schneider LS4",
+      "url": "https://plane.spottingworld.com/Rolladen-Schneider_LS4",
+      "qualidade": "terciaria"
+    },
+    "cs22": {
+      "ref": "EASA CS-22 Amendment 3",
+      "url": "https://www.easa.europa.eu/en/downloads/131414/en",
+      "qualidade": "primaria"
+    },
+    "uiuc": {
+      "ref": "D. Lednicer, The Incomplete Guide to Airfoil Usage (UIUC)",
+      "url": "https://m-selig.ae.illinois.edu/ads/aircraft.html",
+      "qualidade": "secundaria"
+    },
+    "patching_wood": {
+      "ref": "Patching & Wood 1991, ensaio de fadiga de asa de planador em GFRP (OSTIV, Technical Soaring)",
+      "url": "https://journals.sfu.ca/ts/index.php/ts/article/view/708",
+      "qualidade": "secundaria"
+    },
+    "hoff_gratton": {
+      "ref": "Hoff, Gratton & Gee, 'Estimating Sailplane Mass Properties', Technical Soaring 34(4), 2010, pp. 118–122, Apêndice (massas pesadas)",
+      "url": "https://ts.ostiv.org/index.php/ts/article/download/42/38/155",
+      "qualidade": "secundaria"
+    }
   },
   "values": {
-    "span_m": {"value": 15.0, "source": "tcds"},
-    "wing_area_m2": {"value": 10.5, "source": "tcds", "alt": {"value": 10.53, "source": "spottingworld"}},
-    "aspect_ratio": {"value": 21.43, "source": "tcds", "nota": "b²/S; Jane's 21.4"},
-    "length_m": {"value": 6.66, "source": "tcds", "alt": {"value": 6.83, "source": "janes"}},
-    "cockpit_width_m": {"value": 0.64, "source": "spottingworld"},
-    "cockpit_height_m": {"value": 0.83, "source": "spottingworld"},
-    "airfoil_root": {"value": "FX 79-162 (modificado)", "source": "uiuc"},
-    "airfoil_tip": {"value": "FX 79-133 (modificado)", "source": "uiuc"},
-    "configuration": {"value": "asa de ombro, cauda em T, travões Schempp-Hirth no extradorso, lastro de água nas asas, trem monoroda retrátil", "source": "tcds"},
-    "certification_basis": {"value": "LFSM 1975 (+ requisitos GRP 1965); categoria Utility", "source": "tcds"},
-    "mtom_kg": {"value": 472.0, "source": "tcds"},
-    "max_non_lifting_parts_kg": {"value": 230.0, "source": "tcds", "nota": "250 kg com TN 4049"},
-    "max_cockpit_load_kg": {"value": 110.0, "source": "fm"},
-    "min_cockpit_load_kg": {"value": 70.0, "source": "fm"},
-    "water_ballast_max_kg": {"value": 140.0, "source": "fm"},
-    "empty_mass_kg": {"value": 238.0, "source": "janes", "alt": {"value": 246.0, "source": "spottingworld", "nota": "ca."}},
-    "wing_mass_kg": {"value": 128.0, "source": "fai_refmass", "nota": "duas semiasas, massa típica (dado do fabricante); normalizada 126 kg"},
-    "fuselage_mass_kg": {"value": null, "source": null, "nota": "desconhecido — sem fonte pública"},
-    "tail_mass_kg": {"value": null, "source": null, "nota": "desconhecido — sem fonte pública"},
-    "wing_loading_mtom_kg_m2": {"value": 44.95, "source": "tcds", "nota": "472/10,5; Jane's 44.9"},
-    "VA_km_h": {"value": 180.0, "source": "tcds"},
-    "VNE_km_h": {"value": 270.0, "source": "tcds"},
-    "VRA_km_h": {"value": 180.0, "source": "tcds"},
-    "VT_km_h": {"value": 180.0, "source": "tcds"},
-    "VW_km_h": {"value": 130.0, "source": "tcds"},
-    "VD_min_km_h": {"value": 300.0, "source": "cs22", "nota": "VNE ≤ 0,9 VDF ≤ 0,9 VD (CS 22.1505) → VD ≥ 270/0,9"},
-    "g_limits": {"value": {"VA": [5.3, -2.65], "VNE": [4.0, -1.5]}, "source": "janes", "nota": "iguais a CS 22.337 categoria U (n1..n4)"},
-    "cg_range_mm_aft_datum": {"value": [225.0, 375.0], "source": "tcds", "nota": "datum = bordo de ataque da asa na nervura de raiz"},
-    "stall_speed_km_h": {"value": 68.0, "source": "janes", "nota": "massa da medição desconhecida"},
-    "best_LD": {"value": 40.5, "V_km_h": 100.0, "source": "janes", "nota": "massa desconhecida"},
-    "min_sink_m_s": {"value": 0.61, "V_km_h": 75.0, "source": "janes", "nota": "massa desconhecida"},
-    "polar_ref_mass_kg": {"value": 320.0, "source": "cumulus", "nota": "230 kg seco + 90 kg"},
-    "polar_points_km_h_m_s": {"value": [[95.0, 0.660], [148.0, 1.426], [200.0, 2.995]], "source": "cumulus"},
-    "polar_best_LD_ref_mass": {"value": 40.0, "V_km_h": 95.0, "source": "cumulus"},
-    "flutter": {"value": "sem flutter até VD (demonstrado na certificação: LFSM/CS 22.629 + VNE 270 km/h no TCDS)", "source": "tcds", "nota": "qualitativo; nenhuma V_F publicada"}
+    "span_m": {
+      "value": 15.0,
+      "source": "tcds"
+    },
+    "wing_area_m2": {
+      "value": 10.5,
+      "source": "tcds",
+      "alt": {
+        "value": 10.53,
+        "source": "spottingworld"
+      }
+    },
+    "aspect_ratio": {
+      "value": 21.43,
+      "source": "tcds",
+      "nota": "b²/S; Jane's 21.4"
+    },
+    "length_m": {
+      "value": 6.66,
+      "source": "tcds",
+      "alt": {
+        "value": 6.83,
+        "source": "janes"
+      }
+    },
+    "cockpit_width_m": {
+      "value": 0.64,
+      "source": "spottingworld"
+    },
+    "cockpit_height_m": {
+      "value": 0.83,
+      "source": "spottingworld"
+    },
+    "airfoil_root": {
+      "value": "FX 79-162 (modificado)",
+      "source": "uiuc"
+    },
+    "airfoil_tip": {
+      "value": "FX 79-133 (modificado)",
+      "source": "uiuc"
+    },
+    "configuration": {
+      "value": "asa de ombro, cauda em T, travões Schempp-Hirth no extradorso, lastro de água nas asas, trem monoroda retrátil",
+      "source": "tcds"
+    },
+    "certification_basis": {
+      "value": "LFSM 1975 (+ requisitos GRP 1965); categoria Utility",
+      "source": "tcds"
+    },
+    "mtom_kg": {
+      "value": 472.0,
+      "source": "tcds"
+    },
+    "max_non_lifting_parts_kg": {
+      "value": 230.0,
+      "source": "tcds",
+      "nota": "250 kg com TN 4049"
+    },
+    "max_cockpit_load_kg": {
+      "value": 110.0,
+      "source": "fm"
+    },
+    "min_cockpit_load_kg": {
+      "value": 70.0,
+      "source": "fm"
+    },
+    "water_ballast_max_kg": {
+      "value": 140.0,
+      "source": "fm"
+    },
+    "empty_mass_kg": {
+      "value": 238.0,
+      "source": "janes",
+      "alt": {
+        "value": 246.0,
+        "source": "spottingworld",
+        "nota": "ca."
+      }
+    },
+    "wing_mass_kg": {
+      "value": 128.0,
+      "source": "fai_refmass",
+      "nota": "duas semiasas, massa típica (dado do fabricante); normalizada 126 kg"
+    },
+    "fuselage_mass_kg": {
+      "value": null,
+      "source": null,
+      "nota": "desconhecido — sem fonte pública"
+    },
+    "tail_mass_kg": {
+      "value": null,
+      "source": null,
+      "nota": "desconhecido — sem fonte pública"
+    },
+    "wing_loading_mtom_kg_m2": {
+      "value": 44.95,
+      "source": "tcds",
+      "nota": "472/10,5; Jane's 44.9"
+    },
+    "VA_km_h": {
+      "value": 180.0,
+      "source": "tcds"
+    },
+    "VNE_km_h": {
+      "value": 270.0,
+      "source": "tcds"
+    },
+    "VRA_km_h": {
+      "value": 180.0,
+      "source": "tcds"
+    },
+    "VT_km_h": {
+      "value": 180.0,
+      "source": "tcds"
+    },
+    "VW_km_h": {
+      "value": 130.0,
+      "source": "tcds"
+    },
+    "VD_min_km_h": {
+      "value": 300.0,
+      "source": "cs22",
+      "nota": "VNE ≤ 0,9 VDF ≤ 0,9 VD (CS 22.1505) → VD ≥ 270/0,9"
+    },
+    "g_limits": {
+      "value": {
+        "VA": [
+          5.3,
+          -2.65
+        ],
+        "VNE": [
+          4.0,
+          -1.5
+        ]
+      },
+      "source": "janes",
+      "nota": "iguais a CS 22.337 categoria U (n1..n4)"
+    },
+    "cg_range_mm_aft_datum": {
+      "value": [
+        225.0,
+        375.0
+      ],
+      "source": "tcds",
+      "nota": "datum = bordo de ataque da asa na nervura de raiz"
+    },
+    "stall_speed_km_h": {
+      "value": 68.0,
+      "source": "janes",
+      "nota": "massa da medição desconhecida"
+    },
+    "best_LD": {
+      "value": 40.5,
+      "V_km_h": 100.0,
+      "source": "janes",
+      "nota": "massa desconhecida"
+    },
+    "min_sink_m_s": {
+      "value": 0.61,
+      "V_km_h": 75.0,
+      "source": "janes",
+      "nota": "massa desconhecida"
+    },
+    "polar_ref_mass_kg": {
+      "value": 320.0,
+      "source": "cumulus",
+      "nota": "230 kg seco + 90 kg"
+    },
+    "polar_points_km_h_m_s": {
+      "value": [
+        [
+          95.0,
+          0.66
+        ],
+        [
+          148.0,
+          1.426
+        ],
+        [
+          200.0,
+          2.995
+        ]
+      ],
+      "source": "cumulus"
+    },
+    "polar_best_LD_ref_mass": {
+      "value": 40.0,
+      "V_km_h": 95.0,
+      "source": "cumulus"
+    },
+    "flutter": {
+      "value": "sem flutter até VD (demonstrado na certificação: LFSM/CS 22.629 + VNE 270 km/h no TCDS)",
+      "source": "tcds",
+      "nota": "qualitativo; nenhuma V_F publicada"
+    },
+    "analog_std_cirrus": {
+      "value": {
+        "empty_kg": 246.5,
+        "wing_kg": 116.5,
+        "fuselage_kg": 123.0,
+        "htail_kg": 7.0,
+        "span_m": 15.0
+      },
+      "source": "hoff_gratton",
+      "nota": "ANÁLOGO (Schempp-Hirth Standard Cirrus, Classe Standard 15 m em GRP, pesado) — não é o LS4; fuselagem inclui deriva, trem, comandos e instrumentos"
+    },
+    "wing_fraction_of_empty": {
+      "value": [
+        0.46,
+        0.55
+      ],
+      "source": "hoff_gratton",
+      "nota": "asa ≈ metade da massa vazia nos planadores do apêndice (exceto Nimbus 2A, 0,64)"
+    }
   }
 }
