@@ -67,7 +67,8 @@ def _surface_lines(sf: dict[str, Any]) -> dict[str, Any]:
         sv = (np.array([s * math.tan(sw), 0.0, s]) if sf.get("axis", "y") == "z"
               else np.array([s * math.tan(sw), s, 0.0]))
         inc = 0.0
-    eta_ribs = np.unique(np.append(np.arange(0.0, s, pitch), s)) / s
+    eta_ribs = (np.asarray(sf["rib_eta"], float) if sf.get("rib_eta") is not None      # compósito: estações declaradas
+                else np.unique(np.append(np.arange(0.0, s, pitch), s)) / s)
 
     def P(eta: float, xc: float, side: float) -> tuple[float, float, float]:
         v = sv * np.array([1.0, side, 1.0])

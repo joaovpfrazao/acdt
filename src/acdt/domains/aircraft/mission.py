@@ -47,7 +47,7 @@ DEFAULT_ASSUMPTIONS: dict = {
                    # pitch_m | auto, chord_075_over_D | static_rpm | auto, blades, airfoil}; None = constant etas
                    "propeller": None},
     "geometry": {"fuselage_length_m": None, "fuselage_diameter_m": None, "fuselage_fineness": 7.0,
-                 "fuselage_class": None, "tail_class": None, "c_ht": None, "c_vt": None,
+                 "fuselage_class": None, "fuselage_profile": None, "tail_class": None, "c_ht": None, "c_vt": None,
                  "tail_arm_fraction": 0.60, "ar_h": 4.0, "ar_v": 1.5,
                  # dihedral_deg: explicit wing dihedral [deg] for AVL Clβ / spiral (Etkin & Reid /
                  # Nelson). None → PRESSUPOSTO 3° on TrapezoidalWing (backward compatible); set null
@@ -65,6 +65,10 @@ DEFAULT_ASSUMPTIONS: dict = {
     # Phase 2 — structures.py: V-n (CS-23 / STANAG 4671), Schrenk loads, box-beam wing
     "structures": {"regulation": "auto", "load_factor_from_vn": True, "material": "auto",
                    "nonoptimum_factor": 1.25, "VH_eas_m_s": None,
+                   # VD declarado [m/s EAS] (p. ex. VNE/0,9 de um TCDS, CS 22.1505); CD,min para o VD mínimo de
+                   # CS 22.335(f); alívio extra na asa (lastro de água nos tanques da asa) e massa máxima das partes
+                   # não sustentadoras (TCDS de planadores) — caso de flexão adicional
+                   "VD_eas_m_s": None, "CD_min": None, "wing_relief_extra_kg": 0.0, "non_lifting_max_kg": None,
                    "elastic_axis": "section", "le_cell": True,
                    # L1 beam (structures_l1.py). Both default off: the size loop stays the rigid Raymer/Megson
                    # path. flex (or aero.elastic) feeds cruise twist back into K. mass_in_loop replaces the

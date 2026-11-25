@@ -109,6 +109,28 @@ def composite_equivalent(key: str, lamina_name: str, angles=QUASI_ISO, cut=STRAI
                      "stiffness D and anisotropic coupling are NOT represented (high-fidelity stage)"])
 
 
+UD = (0.0,)                                     # roving / tecido unidirecional puro
+PM45 = (45.0, -45.0)                            # tecido ±45 (revestimentos de corte de planadores)
+# Banzos de longarina em rovings de vidro de planador: tensão de cálculo ÚLTIMA 300 MPa do banzo do Schempp-Hirth
+# Janus (Patching & Wood, "Fatigue testing of a GFRP glider", Technical Soaring / XXII OSTIV Congress, Uvalde 1991:
+# "ultimate design stress of 300 MPa", 950 με/g nos rovings do banzo superior até 9 g último).
+GLIDER_GFRP_CAP_ULT_PA = 300e6
+
+
+def glider_gfrp_cap() -> Material:
+    """Banzo de rovings de vidro UD (E1 de Daniel & Ishai Tab. A.4) com a tensão de cálculo última do Janus
+    (:data:`GLIDER_GFRP_CAP_ULT_PA`, Patching & Wood 1991) como admissível de compressão e tração."""
+    lam = LAMINA["E-glass/epoxy"]
+    E = lam["E1"]
+    s = GLIDER_GFRP_CAP_ULT_PA
+    return Material("gfrp_ud_cap", "E-glass/epoxy UD rovings — glider spar cap", E, lam["G12"], lam["nu12"],
+                    lam["rho"], s, s, s, 0.8 * STRAIN_CUTOFF["gamma"] * lam["G12"],
+                    "E1 Daniel & Ishai (2006) Tab. A.4; σ de cálculo último 300 MPa — Patching & Wood (1991), "
+                    "banzo GFRP do Janus (OSTIV XXII); τ por corte de deformação (PRESSUPOSTO)",
+                    "composite_equivalent", 0.25e-3, {"lamina": "E-glass/epoxy", "angles_half_stack": [0.0]},
+                    ["admissível de banzo de planador (ensaio de fadiga/estático publicado), não do CMH-17"])
+
+
 def _metals() -> dict:
     return {
         "al2024_t3": Material("al2024_t3", "Al 2024-T3 sheet", 72.4e9, 27.6e9, 0.33, 2780.0, 434e6, 269e6, 269e6,
@@ -142,6 +164,9 @@ def library() -> dict[str, Material]:
     lib["cfrp_qi"] = composite_equivalent("cfrp_qi", "AS4/3501-6", QUASI_ISO, label="[0/±45/90]s quasi-isotropic")
     lib["cfrp_cap"] = composite_equivalent("cfrp_cap", "AS4/3501-6", SPAR_CAP, label="70/20/10 spar-cap laminate")
     lib["gfrp_qi"] = composite_equivalent("gfrp_qi", "E-glass/epoxy", QUASI_ISO, label="[0/±45/90]s quasi-isotropic")
+    lib["gfrp_pm45"] = composite_equivalent("gfrp_pm45", "E-glass/epoxy", PM45, label="±45 fabric (shear skins)")
+    lib["cfrp_pm45"] = composite_equivalent("cfrp_pm45", "AS4/3501-6", PM45, label="±45 fabric (shear skins)")
+    lib["gfrp_ud_cap"] = glider_gfrp_cap()
     lib.update(_others())
     return lib
 

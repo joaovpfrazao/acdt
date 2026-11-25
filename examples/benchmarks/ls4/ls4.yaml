@@ -1,0 +1,98 @@
+# Copyright (c) 2026 João Frazão. SPDX-License-Identifier: Apache-2.0
+# Caso de teste (benchmark): planador monolugar Classe Standard em compósito de vidro — Rolladen-Schneider LS4.
+# Só caso de teste: os valores reais estão em reference_data.json (com fontes) e NÃO são impostos ao modelo,
+# exceto as entradas de geometria/carga declaradas abaixo (envergadura, carga alar, comprimento, VD, cargas úteis).
+# O estudo examples/studies/planador_ls4/ compara o resultado do acdt com o avião real (applied: false).
+name: Rolladen-Schneider LS4 (benchmark de planador em compósito)
+description: >
+  Planador Classe Standard de 15 m, GRP, asa de ombro, cauda em T, travões Schempp-Hirth, lastro de água nas asas,
+  trem monoroda retrátil (EASA TCDS A.095, Secção L). Entradas reais: b = 15 m e S = 10,5 m² (via AR e carga alar
+  no MTOM), L = 6,66 m, VNE 270 km/h (VD = VNE/0,9 por CS 22.1505), MTOM 472 kg, partes não sustentadoras 230 kg,
+  carga máxima do cockpit 110 kg (manual de voo). Sem propulsão (propulsion_type: none).
+aircraft_class: sailplane_unpowered
+requirements:
+  propulsion_type: none
+  regulatory_category: cs_22
+  # piloto + paraquedas: carga máxima do cockpit 110 kg (LS4 Flight Manual, p. 1-5, TN 4049)
+  crew_mass: {target: 110, unit: kg, source: "LS4 Flight Manual p. 1-5 (DG, fev. 2019, TN 4049)"}
+  # lastro de água de projeto: MTOM 472 − vazio 238 (Jane's 1988-89) − cockpit 110 = 124 kg (≤ 140 kg do manual).
+  # Escolhido para que, se o acdt acertasse no vazio, W0 = MTOM — a diferença de W0 é a diferença de vazio.
+  payload_mass: {target: 124, unit: kg, source: "MTOM TCDS − vazio Jane's − cockpit máx. (derivado)"}
+assumptions:
+  weights:
+    method: components
+    initial_class: sailplane_unpowered      # Raymer Tab. 3.1 — só valor inicial
+    components:
+      material: composite
+      wing_method: box                      # asa = caixão dimensionado (Megson/Bruhn), não Raymer 15.46
+      # trem: monoroda + roda/patim de cauda → equações GA de Raymer (15.50/15.51, cauda ×0,5): EXTRAPOLAÇÃO
+      landing_gear: taildragger
+      main_gear_length_m: 0.30              # PRESSUPOSTO
+      nose_gear_length_m: 0.10              # PRESSUPOSTO (roda de cauda)
+      avionics_uninstalled_kg: 4            # PRESSUPOSTO: anemómetro, altímetro, variómetro, rádio
+      include: {furnishings: false, hydraulics: false, electrical: false, fuel_system: false}
+      items:
+        # bateria 12 V 7 Ah de chumbo (classe Yuasa NP7-12, ~2,65 kg na folha do fabricante) — PRESSUPOSTO de classe
+        - {name: bateria 12 V 7 Ah, mass_kg: 2.65, group: equipment, source: "PRESSUPOSTO (classe NP7-12)"}
+  aero:
+    fidelity: lowfi                         # XFOIL (perfil) + AVL (carga em envergadura)
+    AR: 21.4286                             # b²/S = 15²/10,5 (TCDS A.095)
+    taper: 0.45                             # PRESSUPOSTO (planta não publicada no TCDS)
+    tc_root: 0.162                          # FX 79-162 na raiz (Lednicer, Incomplete Guide to Airfoil Usage)
+    tc_tip: 0.133                           # FX 79-133 na ponta (idem)
+    # coordenadas FX 79-162/133 não públicas na base UIUC → perfil laminar Wortmann FX 67-K-150 como substituto
+    airfoil: fx67k150                       # PRESSUPOSTO (substituto)
+    # XFOIL perde a convergência a α ≈ 12° neste perfil laminar com cl ainda a subir (clmax 1,14 = limite
+    # inferior); NeuralFoil (Sharpe 2024) capta a perda (clmax ≈ 1,39 a Re 1,1e6) — PRESSUPOSTO
+    airfoil_solver: neuralfoil
+    flap: {kind: none}                      # LS4 sem flaps (travões de mergulho no extradorso)
+    laminar: {wing: 1.0, htail: 0.4, vtail: 0.4, fuselage: 0.2}   # asa: transição livre (XFOIL Ncrit 9); resto PRESSUPOSTO
+  geometry:
+    fuselage_length_m: 6.66                 # TCDS A.095
+    fuselage_diameter_m: 0.73               # √(0,64 × 0,83): largura e altura do cockpit (LS) — equivalente, PRESSUPOSTO
+    # casulo + cone de cauda fino (corpo de revolução equivalente; quebras PRESSUPOSTO, ordem de grandeza)
+    fuselage_profile: [[0.0, 0.20], [0.03, 0.50], [0.10, 0.85], [0.18, 1.0], [0.28, 0.95], [0.36, 0.72],
+                       [0.45, 0.42], [0.70, 0.28], [0.92, 0.22], [1.0, 0.12]]
+    wing_position: high                     # asa de ombro (TCDS)
+    dihedral_deg: 3.0                       # PRESSUPOSTO
+    tail_class: sailplane                   # Raymer Tab. 6.4: c_HT 0,50, c_VT 0,02
+    tail_arm_fraction: 0.56                 # PRESSUPOSTO
+    ar_h: 6.0                               # PRESSUPOSTO
+    ar_v: 1.5
+  constraints:
+    criterion: fixed_ws
+    ws_fixed: 440.85                        # 472 kg × 9,80665 / 10,5 m² — carga alar do LS4 no MTOM
+  structures:
+    regulation: cs_22                       # CS-22 Amdt 3 (o LS4 foi certificado pelos LFSM 1975)
+    VD_eas_m_s: 83.333                      # VNE 270 km/h (TCDS) / 0,9 → 300 km/h (CS 22.1505)
+    # caixão compósito de vidro: revestimentos ±45, banzos de rovings UD (σ último 300 MPa — Patching & Wood 1991),
+    # núcleo de espuma PVC
+    material: {skin: gfrp_pm45, cap: gfrp_ud_cap, core: pvc_foam_h80}
+    wing_relief_extra_kg: 124.0             # lastro de água nos tanques da asa (alívio de flexão ∝ corda — PRESSUPOSTO)
+    non_lifting_max_kg: 230.0               # massa máx. das partes não sustentadoras (TCDS A.095)
+    mass_in_loop: true                      # fuselagem/empenagens pela viga L1 no ciclo
+  stability:
+    stations:
+      crew: [L, 0.17]                       # PRESSUPOSTO: piloto semi-deitado
+      payload: [MAC, 0.30]                  # lastro de água na asa
+      nose_gear: [L, 0.97]                  # roda de cauda
+      main_gear: [MAC, 0.10]                # PRESSUPOSTO
+      avionics: [L, 0.15]
+  structure_layout:
+    enabled: true
+    coupling: iterar                        # massas/CG da estrutura paramétrica entram no ciclo de W0
+    construction: composito_monocasca       # casca sem reforçadores, poucas cavernas e nervuras
+    composite:
+      shell_material: gfrp_qi               # casca da fuselagem: vidro/epóxi quase-isotrópico (CLT)
+      core_material: pvc_foam_h80
+      rib_stations_eta:                     # PRESSUPOSTO (posições típicas; o LS4 não as publica)
+        asa: [0.0, 0.25, 0.45, 0.55, 0.78, 1.0]   # raiz, travão (início/fim), aileron (início/charneira), ponta
+        estabilizador: [0.0, 1.0]           # raiz e ponta
+        deriva: [0.0, 0.5, 1.0]             # raiz, charneira do leme, ponta
+    fuselage:
+      bulkheads:                            # PRESSUPOSTO (posições em fração de L)
+        - {id: painel_cockpit, x_frac: 0.10}
+        - {id: encosto_ligacao_asa, x_frac: 0.19}
+        - {id: cauda, x_frac: 0.90}
+    surfaces:
+      estabilizador: {on_fin_tip: true}     # cauda em T (TCDS A.095)

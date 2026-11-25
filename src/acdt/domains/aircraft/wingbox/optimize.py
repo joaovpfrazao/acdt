@@ -182,9 +182,7 @@ class WingBoxProblem:
         self.vn = sr.vn
         A = res.spec.assumptions
         sa, wo = A["structures"], _merge_opts(A["weights"].get("components"))
-        mat = sa["material"]
-        if mat == "auto":
-            mat = "cfrp" if wo["material"] == "composite" else "al2024_t3"
+        mat = S.resolve_material(sa["material"], wo["material"] == "composite")
         self.material = mat
         self.mat = S.MATERIALS[mat] if isinstance(mat, str) else mat   # dict: external material (acdt.ai)
         self.nonopt = sa["nonoptimum_factor"]

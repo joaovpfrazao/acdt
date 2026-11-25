@@ -142,7 +142,7 @@ def assembly_spec(config, *, x_wing_apex: float | None = None, wing_z: float = 0
     xs = np.arange(0.0, L + 1e-9, fus.frames.frame_pitch)
     if len(xs) == 0 or xs[-1] < L - 1e-6:
         xs = np.append(xs, L)
-    radii = _radius(xs, L, R)
+    radii = _radius(xs, L, R, getattr(fus, "profile", None))
     nose = -x_apex
     for i, (x, radius) in enumerate(zip(xs, radii)):
         parts.append({"name": f"fuselage_frame_{i:03d}", "kind": "ring", "x": float(nose + x),

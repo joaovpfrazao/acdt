@@ -118,8 +118,13 @@ def _material(material: str | dict) -> dict:
     return MATERIALS[material] if isinstance(material, str) else material
 
 
-def _radius(x, L: float, R: float) -> np.ndarray:
-    """Equivalent body of revolution, not a loft. Breaks (x/L, R/Rmax): nose 0.45, cabin 1, tail 0.35."""
+def _radius(x, L: float, R: float, profile=None) -> np.ndarray:
+    """Equivalent body of revolution, not a loft. Breaks (x/L, R/Rmax): nose 0.45, cabin 1, tail 0.35; or the
+    declared ``profile`` ((x/L, R/Rmax), ...) of ``Fuselage.profile`` (geometry.fuselage_profile)."""
+    if profile:
+        xq = np.array([float(a) for a, _ in profile]) * L
+        rq = np.array([float(b) for _, b in profile]) * R
+        return np.interp(np.asarray(x, float), xq, rq)
     xp = np.array([0.0, 0.12, 0.25, 0.62, 0.82, 1.0]) * L
     rp = np.array([0.45, 0.75, 1.0, 1.0, 0.62, 0.35]) * R
     return np.interp(np.asarray(x, float), xp, rp)
@@ -306,7 +311,7 @@ def fuselage_beam(config, W0_kg: float, n_limit: float, q_VA: float, q_VC: float
 
     t_min = max(m["t_min_skin"], fus.frames.skin_thickness)
     E, G = m["E"], m.get("G", m["E"] / (2 * (1 + m["nu"])))
-    R_x = _radius(x, L, R)
+    R_x = _radius(x, L, R, getattr(fus, "profile", None))
     t = np.empty_like(x)
     gamma = np.empty_like(x)
     for i in range(len(x)):
@@ -321,7 +326,7 @@ def fuselage_beam(config, W0_kg: float, n_limit: float, q_VA: float, q_VC: float
     x_fr = np.arange(0.0, L + 1e-9, fus.frames.frame_pitch)
     if len(x_fr) == 0 or x_fr[-1] < L - 1e-6:
         x_fr = np.append(x_fr, L)
-    R_fr = _radius(x_fr, L, R)
+    R_fr = _radius(x_fr, L, R, getattr(fus, "profile", None))
     frames = float(np.sum(rho * _FRAME_FLANGE_M * m["t_min_web"] * 2 * math.pi * R_fr))
     shell = skin + longerons + frames
     nonopt_mass = (nonopt - 1.0) * shell
@@ -647,9 +652,8 @@ def mass_kwargs_from_spec(spec, uas: bool) -> dict:
     A = spec.assumptions
     sa = A["structures"]
     wo = _merge_opts(A["weights"].get("components"))
-    mat = sa.get("material", "auto")
-    if mat == "auto":
-        mat = "cfrp" if wo.get("material") == "composite" else "al2024_t3"
+    from .structures import resolve_material
+    mat = resolve_material(sa.get("material", "auto"), wo.get("material") == "composite")
     reg = sa.get("regulation", "auto")
     if reg == "auto":
         reg = "stanag_4671" if uas else "cs_23"

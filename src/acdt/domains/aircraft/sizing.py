@@ -88,6 +88,7 @@ class DesignResult:
     noise: dict | None = None             # noise.analyse_noise (disciplina ruído, L0)
     thermal: dict | None = None           # thermal.analyse_thermal (disciplina térmica, L0/L1)
     thermal_coupling: dict | None = None  # thermal.size_with_thermal (acoplamento iterar)
+    glide: object | None = None  # glide.GlidePolar (planador, propulsion_type none)
     icing: dict | None = None             # icing.analyse_icing (disciplina gelo, L0/L1)
     icing_coupling: dict | None = None    # icing.size_with_icing (acoplamento iterar)
     structure_coupling: dict | None = None  # structure_layout.size_with_structure (acoplamento iterar)
@@ -316,16 +317,31 @@ def structures_inputs(spec: MissionSpec, W0: float, config, CLmax: float, CLa: f
     reg = sa["regulation"]
     if reg == "auto":
         reg = "stanag_4671" if uas else "cs_23"
-    mat = sa["material"]
-    if mat == "auto":
-        mat = "cfrp" if wo["material"] == "composite" else "al2024_t3"
+    from .structures import resolve_material
+    mat = resolve_material(sa["material"], wo["material"] == "composite")
+    n_pos = wo["limit_load_factor"] or (None if reg == "cs_22" else limit_load_factor(W0, cat))
     return dict(wing=config.wing, W0=W0, CLmax=CLmax, CLalpha=CLa,
                 V_cruise_eas=V_cruise * math.sqrt(isa(h_cruise).sigma), category=cat, regulation=reg,
-                altitude=h_cruise, n_pos=wo["limit_load_factor"] or limit_load_factor(W0, cat),
+                altitude=h_cruise, n_pos=n_pos, VD_eas=sa.get("VD_eas_m_s"), CD_min=sa.get("CD_min"),
+                wing_relief_extra_kg=sa.get("wing_relief_extra_kg") or 0.0,
+                non_lifting_max_kg=sa.get("non_lifting_max_kg"),
                 wing_mass_raymer=wing_mass_raymer, material=mat, cm0=cm0, avl_strips=avl_strips,
                 VH_eas=sa["VH_eas_m_s"], areal_density_floor=wo["min_areal_density_kg_m2"] or 0.0,
                 fuselage_width=config.fuselage.max_diameter, nonoptimum_factor=sa["nonoptimum_factor"],
                 elastic_axis=sa.get("elastic_axis", "section"), le_cell=sa.get("le_cell", True))
+
+
+def fuselage_profile(raw) -> tuple[tuple[float, float], ...]:
+    """``geometry.fuselage_profile``: quebras [[x/L, R/Rmax], ...] do corpo de revolução equivalente (x/L de 0 a 1
+    crescente, 0 < R/Rmax ≤ 1, pelo menos um ponto com R/Rmax = 1). Erro claro se mal formado. R/Rmax = 0 é
+    recusado: a viga L1 dimensiona um tubo em cada estação (a ponta do nariz é truncada, como no perfil por defeito)."""
+    pts = tuple((float(a), float(b)) for a, b in raw)
+    xs = [a for a, _ in pts]
+    if len(pts) < 2 or xs != sorted(xs) or xs[0] != 0.0 or xs[-1] != 1.0:
+        raise InfeasibleError("geometry.fuselage_profile: x/L tem de crescer de 0 a 1 (≥ 2 pontos)")
+    if any(not 0.0 < b <= 1.0 for _, b in pts) or max(b for _, b in pts) < 1.0 - 1e-9:
+        raise InfeasibleError("geometry.fuselage_profile: R/Rmax em ]0, 1] com máximo 1")
+    return pts
 
 
 def build_configuration(spec: MissionSpec, W0: float, ws: float, AR: float | None = None) -> Configuration:
@@ -341,6 +357,8 @@ def build_configuration(spec: MissionSpec, W0: float, ws: float, AR: float | Non
     if geo_a["fuselage_length_m"]:
         fus_ = Fuselage(geo_a["fuselage_length_m"], geo_a["fuselage_diameter_m"]
                         or geo_a["fuselage_length_m"] / geo_a["fuselage_fineness"])
+        if geo_a.get("fuselage_profile"):
+            fus_.profile = fuselage_profile(geo_a["fuselage_profile"])
     else:
         fc = geo_a["fuselage_class"] or spec.aircraft_class
         if fc not in RAYMER_FUSELAGE_LENGTH:
@@ -758,6 +776,11 @@ def _run_mda(spec: MissionSpec, strict: bool = False, systems=None) -> DesignRes
                                    lambda w, rho_c=rho_c, Vc=Vc, a=actx: _cruise_tw(w, rho_c, Vc, a),
                                    lambda w, Vc=Vc: w * 0 + Vc, h_cruise, pctx.eta_cruise,
                                    note="speed derived from mission-leg rules"))
+        if kind == "none":
+            # sem propulsão (planador): só os limites de carga alar (perda, aterragem) entram no ponto de projeto;
+            # as curvas de potência/tração não se aplicam (valor 0)
+            cons = [c for c in cons if c.kind == "ws_max"]
+
         def build_config(ws_, W0_=sz.W0):
             return build_configuration(spec, W0_, ws_, AR)
 

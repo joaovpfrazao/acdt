@@ -259,6 +259,15 @@ def _aft_cg_avl_frame(st, x_apex):
 def performance_stage(res) -> None:
     if res.config is None or not math.isfinite(res.S):
         return
+    if res.spec.propulsion_kind == "none":
+        # planador: sem missão a motor — polar de velocidades em voo planado (glide.py)
+        from .glide import glide_from_result
+        gp = glide_from_result(res)
+        res.glide = gp
+        res.checks.append(CheckResult("perf:planeio", True, f"planeio: (L/D)max {gp.LD_max:.1f} a "
+                                      f"{3.6 * gp.V_best_LD:.0f} km/h; afundamento mín. {gp.sink_min:.2f} m/s a "
+                                      f"{3.6 * gp.V_min_sink:.0f} km/h (W0, ISA SL, polar parabólica)"))
+        return
     from .performance import performance_analysis
     pf = performance_analysis(res, res.spec.assumptions["performance"])
     res.performance = pf
