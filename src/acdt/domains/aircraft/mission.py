@@ -70,6 +70,9 @@ DEFAULT_ASSUMPTIONS: dict = {
                    # não sustentadoras (TCDS de planadores) — caso de flexão adicional
                    "VD_eas_m_s": None, "CD_min": None, "wing_relief_extra_kg": 0.0, "non_lifting_max_kg": None,
                    "elastic_axis": "section", "le_cell": True,
+                   # bordos de ataque/fuga do caixão compósito: "monolitica" (laminado à espessura mínima) ou
+                   # "sanduiche" (faces mínimas + núcleo mínimo — casca sem reforçadores, p. ex. planadores)
+                   "secondary_skin": "monolitica",
                    # L1 beam (structures_l1.py). Both default off: the size loop stays the rigid Raymer/Megson
                    # path. flex (or aero.elastic) feeds cruise twist back into K. mass_in_loop replaces the
                    # fuselage and tail group weights with the beam masses inside the MDA.

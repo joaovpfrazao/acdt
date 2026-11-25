@@ -183,3 +183,13 @@ def test_l1_landing_beam_is_balanced_free_tail_end(ls4):
     res, _ = ls4
     f = res.structures_l1.fuselage
     assert abs(f["M_limit_Nm"][-1]) < 1e-6 * max(f["M_limit_Nm"])
+
+
+def test_secondary_skin_sandwich_option(ls4):
+    """structures.secondary_skin: sanduiche → bordos de ataque/fuga com faces mínimas + núcleo mínimo."""
+    res, _ = ls4
+    box = res.structures.box
+    assert any("sanduíche mínimo" in n for n in box.notes)
+    m = matlib.composite_box_material("gfrp_pm45", "gfrp_ud_cap", "pvc_foam_h80")
+    areal = 2 * m["t_min_skin"] * m["rho"] + m["core"]["t_min"] * m["core"]["rho"]
+    assert areal > m["t_min_skin"] * m["rho"] and box.masses["LE_TE_skins"] > 0

@@ -324,7 +324,7 @@ def structures_inputs(spec: MissionSpec, W0: float, config, CLmax: float, CLa: f
                 V_cruise_eas=V_cruise * math.sqrt(isa(h_cruise).sigma), category=cat, regulation=reg,
                 altitude=h_cruise, n_pos=n_pos, VD_eas=sa.get("VD_eas_m_s"), CD_min=sa.get("CD_min"),
                 wing_relief_extra_kg=sa.get("wing_relief_extra_kg") or 0.0,
-                non_lifting_max_kg=sa.get("non_lifting_max_kg"),
+                non_lifting_max_kg=sa.get("non_lifting_max_kg"), secondary_skin=sa.get("secondary_skin", "monolitica"),
                 wing_mass_raymer=wing_mass_raymer, material=mat, cm0=cm0, avl_strips=avl_strips,
                 VH_eas=sa["VH_eas_m_s"], areal_density_floor=wo["min_areal_density_kg_m2"] or 0.0,
                 fuselage_width=config.fuselage.max_diameter, nonoptimum_factor=sa["nonoptimum_factor"],

@@ -603,7 +603,7 @@ def sandwich_core(Nx, Nxy, b, t_f, Ef, nu, core, t_lim=0.05):
 def box_beam_sizing_buckling(wing, loads: BeamLoads, material: str | dict = "al2024_t3", n_ult_factor: float = 1.5,
                              nonoptimum_factor: float = 1.25, rib_pitch: float | None = None,
                              areal_density_floor: float = 0.0, n_neg_ratio: float = 0.4,
-                             fuselage_width: float = 0.0) -> WingBoxResult:
+                             fuselage_width: float = 0.0, secondary_sandwich: bool = False) -> WingBoxResult:
     """Phase 3 stability-driven two-spar box (same layout, loads and factors as :func:`box_beam_sizing`).
 
     **Metal (stiffened covers, Z-stringers):** the covers carry bending, N = M_u/(h w) [N/m].
@@ -718,7 +718,13 @@ def box_beam_sizing_buckling(wing, loads: BeamLoads, material: str | dict = "al2
                   f"Almas: núcleo sanduíche onde τ > τ_cr (máx. {web_core.max() * 1e3:.1f} mm)"]
     # secondary items as in the strength box
     perim_rest = np.maximum(2.04 * c - 2 * w, 0)
-    sec_skin = 2 * np.trapezoid(perim_rest * tmin * rho, y)
+    sec_areal = tmin * rho
+    if composite and secondary_sandwich and m.get("core"):
+        # bordo de ataque/fuga em sanduíche (faces à espessura mínima + núcleo mínimo) em vez de laminado simples:
+        # casca sem reforçadores entre poucas nervuras (planadores: "GRP mostly with synthetic foam cores")
+        sec_areal = 2 * tmin * rho + float(m["core"].get("t_min", 0.0)) * float(m["core"]["rho"])
+        notes.append(f"bordos de ataque/fuga em sanduíche mínimo: {sec_areal:.2f} kg/m² (structures.secondary_skin)")
+    sec_skin = 2 * np.trapezoid(perim_rest * sec_areal, y)
     if areal_density_floor:
         floor = 2 * np.trapezoid(2.04 * c * areal_density_floor, y)
         tot = covers + sec_skin
@@ -857,7 +863,8 @@ def wing_structure(res_like: dict) -> StructuresResult:
             return box_s, box_s
         return box_s, box_beam_sizing_buckling(
             w, beam, mat, 1.5, d.get("nonoptimum_factor", 1.25), areal_density_floor=d.get("areal_density_floor", 0.0),
-            n_neg_ratio=abs(vn.n_limit_neg / vn.n_limit_pos) if vn.n_limit_pos else 0.4)
+            n_neg_ratio=abs(vn.n_limit_neg / vn.n_limit_pos) if vn.n_limit_pos else 0.4,
+            secondary_sandwich=str(d.get("secondary_skin", "monolitica")) == "sanduiche")
 
     beam = shear_moment_diagram(load, w, qd, d.get("cm0", 0.0))
     box_s, box = size(beam)

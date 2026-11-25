@@ -68,6 +68,8 @@ assumptions:
     # caixão compósito de vidro: revestimentos ±45, banzos de rovings UD (σ último 300 MPa — Patching & Wood 1991),
     # núcleo de espuma PVC
     material: {skin: gfrp_pm45, cap: gfrp_ud_cap, core: pvc_foam_h80}
+    # casca da asa em sanduíche em toda a corda ("GRP mostly with synthetic foam cores" — Wikipedia, LS4 Structure)
+    secondary_skin: sanduiche
     wing_relief_extra_kg: 124.0             # lastro de água nos tanques da asa (alívio de flexão ∝ corda — PRESSUPOSTO)
     non_lifting_max_kg: 230.0               # massa máx. das partes não sustentadoras (TCDS A.095)
     mass_in_loop: true                      # fuselagem/empenagens pela viga L1 no ciclo
