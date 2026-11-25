@@ -176,3 +176,10 @@ def test_construction_option_rejects_unknown():
     with pytest.raises(ValueError):
         sl.is_composite({"construction": "madeira"})
     assert not sl.is_composite({}) and sl.is_composite({"construction": "composito_monocasca"})
+
+
+def test_l1_landing_beam_is_balanced_free_tail_end(ls4):
+    """Viga-fuselagem L1, caso de aterragem: forças em forma fechada → corte e momento nulos na ponta livre."""
+    res, _ = ls4
+    f = res.structures_l1.fuselage
+    assert abs(f["M_limit_Nm"][-1]) < 1e-6 * max(f["M_limit_Nm"])

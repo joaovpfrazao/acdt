@@ -292,7 +292,6 @@ def fuselage_beam(config, W0_kg: float, n_limit: float, q_VA: float, q_VC: float
         x_fwd, x_aft = _X_NOSE_GEAR_FRAC * L, _X_MAIN_GEAR_FRAC * L
     x_cg_l = min(max(_X_CG_LAND_FRAC * L, 0.05 * L), 0.95 * L)
     span_i = min(L, 2.0 * x_cg_l)
-    w_i = np.where(x <= span_i, -n_i * W_land / span_i, 0.0)
     L_w = kappa * W_land
     den = x_aft - x_fwd
     if abs(den) < 1e-6:
@@ -300,7 +299,17 @@ def fuselage_beam(config, W0_kg: float, n_limit: float, q_VA: float, q_VC: float
     else:
         R_aft = (n_i * W_land * x_cg_l - L_w * x_w - n_g * W_land * x_fwd) / den
         R_fwd = n_g * W_land - R_aft
-    V_l, M_l = _integrate_beam(x, w_i, [(x_fwd, R_fwd), (x_aft, R_aft), (x_w, L_w)])
+    # inércia uniforme em [0, span_i]: integrada em forma fechada (a regra do trapézio sobre o degrau em span_i
+    # deixava um resíduo de corte ≈ ½ célula × w e um momento ≠ 0 na ponta livre da cauda)
+    # forças concentradas também em forma fechada (na estação exata, não na estação seguinte)
+    V_l, M_l = np.zeros_like(x), np.zeros_like(x)
+    for xp, Fp in ((x_fwd, R_fwd), (x_aft, R_aft), (x_w, L_w)):
+        V_l = V_l + Fp * (x >= xp)
+        M_l = M_l + Fp * np.maximum(x - xp, 0.0)
+    F_i = n_i * W_land
+    xi = np.minimum(x, span_i)
+    V_l = V_l - F_i * xi / span_i
+    M_l = M_l - F_i * np.where(x <= span_i, x**2 / (2 * span_i), x - span_i / 2)
 
     M_lim = np.maximum(np.maximum(M_tail, M_eng), np.abs(M_l))
     V_lim = np.maximum(np.maximum(V_tail, V_eng), np.abs(V_l))
